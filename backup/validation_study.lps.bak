@@ -24,9 +24,8 @@
         <UnitName Value="background"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="1"/>
-        <ComponentState Value="1"/>
+        <TopLine Value="2"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -38,8 +37,8 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="1"/>
+        <TopLine Value="2"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -49,8 +48,8 @@
         <UnitName Value="draw_methods"/>
         <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="3"/>
-        <CursorPos X="1" Y="20"/>
+        <TopLine Value="2"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="79"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -63,9 +62,8 @@
         <UnitName Value="userconfigs"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="3"/>
-        <CursorPos X="1" Y="20"/>
-        <ComponentState Value="1"/>
+        <TopLine Value="2"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="79"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -76,8 +74,8 @@
         <UnitName Value="config"/>
         <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="3"/>
-        <CursorPos X="1" Y="20"/>
+        <TopLine Value="2"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="79"/>
         <Loaded Value="True"/>
       </Unit5>
