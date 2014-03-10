@@ -9,3 +9,7 @@ __history
 *.exe
 *.dll
 bin/*
+lib/*
+backup/*
+forms/backup/*
+units/backup/*
