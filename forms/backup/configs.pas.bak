@@ -1,0 +1,46 @@
+unit configs;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
+  StdCtrls;
+
+type
+
+  { TForm1 }
+
+  TForm1 = class(TForm)
+    lblGenetal: TLabel;
+    leParticipant: TLabeledEdit;
+    procedure FormPaint(Sender: TObject);
+  private
+    { private declarations }
+  public
+    { public declarations }
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.lfm}
+
+{ TForm1 }
+
+procedure TForm1.FormPaint(Sender: TObject);
+  var p1, p2 : TPoint;
+begin
+  p1 := Point(lblGeneral.Left, lblGeneral.Top);
+  p2 := Point(lblGeneral.Left + lblGeneral.Width, lblGeneral.Top);
+  Canvas.Line(p1, p2);
+  p1 := Point(lblGeneral.Left, lblGeneral.Top + lblGeneral.Height);
+  p2 := Point(lblGeneral.Left + lblGeneral.Width, lblGeneral.Top + lblGeneral.Height);
+  Canvas.Line(p1, p2);
+end;
+
+end.
+

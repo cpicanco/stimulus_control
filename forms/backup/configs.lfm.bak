@@ -1,0 +1,41 @@
+object Form1: TForm1
+  Left = 562
+  Height = 240
+  Top = 165
+  Width = 415
+  BiDiMode = bdRightToLeftNoAlign
+  Caption = 'Form1'
+  ClientHeight = 240
+  ClientWidth = 415
+  OnPaint = FormPaint
+  ParentBiDiMode = False
+  LCLVersion = '1.0.14.0'
+  object leParticipant: TLabeledEdit
+    Left = 8
+    Height = 27
+    Top = 48
+    Width = 399
+    Anchors = [akTop, akLeft, akRight]
+    EditLabel.AnchorSideLeft.Control = leParticipant
+    EditLabel.AnchorSideRight.Control = leParticipant
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = leParticipant
+    EditLabel.Left = 8
+    EditLabel.Height = 18
+    EditLabel.Top = 27
+    EditLabel.Width = 399
+    EditLabel.Caption = 'Participante'
+    EditLabel.ParentColor = False
+    TabOrder = 0
+  end
+  object lblGenetal: TLabel
+    Left = 0
+    Height = 18
+    Top = 0
+    Width = 415
+    Alignment = taCenter
+    Anchors = [akTop, akLeft, akRight]
+    Caption = 'Configurações Gerais'
+    ParentColor = False
+  end
+end
