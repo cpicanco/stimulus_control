@@ -30,7 +30,7 @@ uses
   //heaptrc,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, lazopenglcontext, background, userconfigs, client, lnetvisual,
+  Forms, background, userconfigs, client,
   draw_methods, config;
 
 {$R *.res}
