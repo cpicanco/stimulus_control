@@ -22,10 +22,12 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="background"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="2"/>
-        <CursorPos X="3" Y="19"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
+        <ComponentState Value="1"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -34,11 +36,10 @@
         <Filename Value="units/client.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="client"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="2"/>
-        <CursorPos X="3" Y="19"/>
+        <TopLine Value="1"/>
+        <CursorPos X="84" Y="18"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -48,9 +49,9 @@
         <UnitName Value="draw_methods"/>
         <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="2"/>
-        <CursorPos X="3" Y="19"/>
-        <UsageCount Value="79"/>
+        <TopLine Value="3"/>
+        <CursorPos X="1" Y="20"/>
+        <UsageCount Value="85"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -62,9 +63,10 @@
         <UnitName Value="userconfigs"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="2"/>
-        <CursorPos X="3" Y="19"/>
-        <UsageCount Value="79"/>
+        <TopLine Value="3"/>
+        <CursorPos X="1" Y="20"/>
+        <ComponentState Value="1"/>
+        <UsageCount Value="85"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit4>
@@ -74,9 +76,9 @@
         <UnitName Value="config"/>
         <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="2"/>
-        <CursorPos X="3" Y="19"/>
-        <UsageCount Value="79"/>
+        <TopLine Value="3"/>
+        <CursorPos X="1" Y="20"/>
+        <UsageCount Value="85"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -88,14 +90,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="68"/>
         <CursorPos X="18" Y="73"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="27"/>
       </Unit6>
       <Unit7>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/objpash.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="187"/>
         <CursorPos X="23" Y="192"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit7>
       <Unit8>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/classes/classesh.inc"/>
@@ -110,7 +112,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="250"/>
         <CursorPos X="3" Y="257"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit9>
       <Unit10>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-async/src/fpasync.pp"/>
@@ -118,7 +120,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="29"/>
         <CursorPos X="10" Y="38"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit10>
       <Unit11>
         <Filename Value="/usr/share/lazarus/1.0.14/components/indy-10.2.0.1/fpc/IdStackUnix.pas"/>
@@ -126,7 +128,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="603"/>
         <CursorPos X="19" Y="610"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit11>
       <Unit12>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-async/src/unix/libasync.pp"/>
@@ -134,7 +136,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="16"/>
         <CursorPos X="3" Y="25"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit12>
       <Unit13>
         <Filename Value="units/shared/zmqcpp.pas"/>
@@ -142,7 +144,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="15"/>
       </Unit13>
       <Unit14>
         <Filename Value="units/shared/zmqapi.pas"/>
@@ -150,7 +152,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="566"/>
         <CursorPos X="3" Y="574"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="15"/>
       </Unit14>
       <Unit15>
         <Filename Value="units/shared/zmq.pas"/>
@@ -158,7 +160,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="18"/>
+        <UsageCount Value="17"/>
       </Unit15>
       <Unit16>
         <Filename Value="shared/synapse40/source/lib/blcksock.pas"/>
@@ -166,7 +168,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="924"/>
         <CursorPos X="3" Y="941"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="15"/>
       </Unit16>
       <Unit17>
         <Filename Value="units/echo.pas"/>
@@ -174,7 +176,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="50"/>
         <CursorPos X="14" Y="51"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="15"/>
       </Unit17>
       <Unit18>
         <Filename Value="units/main.pas"/>
@@ -185,7 +187,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="7"/>
         <CursorPos X="3" Y="30"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit18>
       <Unit19>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/linux/system.pp"/>
@@ -201,14 +203,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="938"/>
         <CursorPos X="3" Y="924"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="0"/>
       </Unit20>
       <Unit21>
         <Filename Value="units/shared/zmq.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="3" Y="1"/>
-        <UsageCount Value="15"/>
+        <UsageCount Value="14"/>
       </Unit21>
       <Unit22>
         <Filename Value="units/shared/zmq_utils.pas"/>
@@ -216,14 +218,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="20"/>
         <CursorPos X="22" Y="26"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit22>
       <Unit23>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/classes/streams.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="823"/>
         <CursorPos X="3" Y="828"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit23>
       <Unit24>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/wince/windows.pp"/>
@@ -231,7 +233,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="17"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit24>
       <Unit25>
         <Filename Value="shared/delphizmq-2.2.0/zmqcpp.pas"/>
@@ -239,7 +241,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="16"/>
         <CursorPos X="3" Y="28"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit25>
       <Unit26>
         <Filename Value="shared/delphizmq-2.2.0/zmqapi.pas"/>
@@ -247,14 +249,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="628"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit26>
       <Unit27>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/objpas.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="262"/>
         <CursorPos X="9" Y="267"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit27>
       <Unit28>
         <Filename Value="forms/configs.pas"/>
@@ -264,7 +266,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="40" Y="6"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="20"/>
       </Unit28>
       <Unit29>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/objpas/math.pp"/>
@@ -272,7 +274,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="233"/>
         <CursorPos X="10" Y="241"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit29>
       <Unit30>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-image/src/fpcanvas.pp"/>
@@ -287,14 +289,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="380"/>
         <CursorPos X="3" Y="391"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit31>
       <Unit32>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/fcl-image/src/fpcdrawh.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="8"/>
         <CursorPos X="3" Y="19"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit32>
       <Unit33>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/graphics.pp"/>
@@ -302,21 +304,21 @@
         <WindowIndex Value="0"/>
         <TopLine Value="2666"/>
         <CursorPos X="17" Y="1068"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit33>
       <Unit34>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/include/canvas.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="559"/>
         <CursorPos X="3" Y="573"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit34>
       <Unit35>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/include/winapih.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="172"/>
         <CursorPos X="10" Y="190"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit35>
       <Unit36>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/lclintf.pas"/>
@@ -324,14 +326,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="205"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit36>
       <Unit37>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/include/winapi.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="657"/>
         <CursorPos X="3" Y="662"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit37>
       <Unit38>
         <Filename Value="shared/opengl/example/imgui.pas"/>
@@ -339,7 +341,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="4"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit38>
       <Unit39>
         <Filename Value="shared/opengl/example/imguimain.pas"/>
@@ -350,7 +352,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="71"/>
         <CursorPos X="3" Y="74"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="12"/>
       </Unit39>
       <Unit40>
         <Filename Value="/usr/share/fpcsrc/2.6.2/packages/opengl/src/gl.pp"/>
@@ -358,7 +360,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="76"/>
         <CursorPos X="3" Y="85"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit40>
       <Unit41>
         <Filename Value="/usr/share/lazarus/1.0.14/components/opengl/openglcontext.pas"/>
@@ -366,21 +368,21 @@
         <WindowIndex Value="0"/>
         <TopLine Value="386"/>
         <CursorPos X="3" Y="101"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit41>
       <Unit42>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/mathh.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="61"/>
         <CursorPos X="22" Y="69"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit42>
       <Unit43>
         <Filename Value="/usr/share/fpcsrc/2.6.2/rtl/inc/systemh.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="115"/>
         <CursorPos X="12" Y="124"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit43>
       <Unit44>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/extctrls.pp"/>
@@ -388,7 +390,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1127"/>
         <CursorPos X="35" Y="1024"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit44>
       <Unit45>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/controls.pp"/>
@@ -396,14 +398,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="166"/>
         <CursorPos X="3" Y="175"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit45>
       <Unit46>
         <Filename Value="forms/userconfigs.lfm"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit46>
     </Units>
