@@ -1,4 +1,5 @@
 *.dcu
+*.*~
 *.~*~
 *.local
 *.identcache
@@ -8,3 +9,9 @@ __history
 *.exe
 *.dll
 bin/*
+lib/*
+backup/*
+forms/backup/*
+forms/*.*~
+units/backup/*
+units/*.*~
