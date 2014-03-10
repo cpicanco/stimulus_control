@@ -1,3 +1,4 @@
+*.dbg
 *.dcu
 *.*~
 *.~*~
@@ -9,9 +10,13 @@ __history
 *.exe
 *.dll
 bin/*
-lib/*
 backup/*
-forms/backup/*
+lib/x86_64-linux/*.o
+lib/x86_64-linux/*.or
+lib/x86_64-linux/*.res
+lib/x86_64-linux/*.ppu
 forms/*.*~
-units/backup/*
+forms/backup/*
 units/*.*~
+units/backup/*
+
