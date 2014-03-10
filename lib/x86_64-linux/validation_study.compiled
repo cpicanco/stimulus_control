@@ -1,5 +1,0 @@
-<?xml version="1.0"?>
-<CONFIG>
-  <Compiler Value="/usr/bin/fpc" Date="1374722184"/>
-  <Params Value=" -MObjFPC -Scghi -O1 -Tlinux -g -gl -Xg -Xs -vewnhil -Fi/home/rafael/validation_study_0.1/lib/x86_64-linux -Fl/opt/gnome/lib -Fu/home/rafael/validation_study_0.1/forms -Fu/home/rafael/validation_study_0.1/units -Fu/home/rafael/validation_study_0.1/units/shared -Fu/usr/local/lib -Fu/home/rafael/validation_study/shared/lnet/lazaruspackage/lib/x86_64-linux -Fu/usr/share/lazarus/1.0.14/ideintf/units/x86_64-linux/gtk2 -Fu/home/rafael/.lazarus/lib/LazOpenGLContext/lib/x86_64-linux/gtk2 -Fu/usr/share/lazarus/1.0.14/lcl/units/x86_64-linux/gtk2 -Fu/usr/share/lazarus/1.0.14/lcl/units/x86_64-linux -Fu/usr/share/lazarus/1.0.14/components/lazutils/lib/x86_64-linux -Fu/usr/share/lazarus/1.0.14/packager/units/x86_64-linux -Fu/home/rafael/validation_study_0.1/ -FU/home/rafael/validation_study_0.1/lib/x86_64-linux/ -l -dLCL -dLCLgtk2 -dUseCThreads validation_study.lpr"/>
-</CONFIG>
