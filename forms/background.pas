@@ -28,7 +28,7 @@ uses
   {$IFDEF LCLGTK2}
   gtk2, gdk2, //glib2,
   {$ENDIF}
-  Classes, SysUtils, FileUtil, OpenGLContext, Forms
+  Classes, SysUtils, FileUtil, Forms
 , Controls, Graphics, Dialogs, StdCtrls, ExtCtrls
 , client
 , draw_methods
