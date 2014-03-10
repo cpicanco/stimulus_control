@@ -12,4 +12,6 @@ bin/*
 lib/*
 backup/*
 forms/backup/*
+forms/*.*~
 units/backup/*
+units/*.*~
