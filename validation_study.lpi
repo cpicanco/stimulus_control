@@ -76,7 +76,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="validation_study"/>
+      <Filename Value="validation_study.bin"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
