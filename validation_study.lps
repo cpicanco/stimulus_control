@@ -10,8 +10,8 @@
         <UnitName Value="validation_study"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="37"/>
-        <CursorPos X="36" Y="22"/>
+        <TopLine Value="1"/>
+        <CursorPos X="22" Y="1"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -22,28 +22,35 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="background"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="55"/>
-        <CursorPos X="7" Y="63"/>
+        <TopLine Value="1"/>
+        <CursorPos X="19" Y="7"/>
         <UsageCount Value="202"/>
+        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="units/client.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="client"/>
+        <EditorIndex Value="9"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="5"/>
-        <CursorPos X="30" Y="44"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="units/draw_methods.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="draw_methods"/>
+        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="226"/>
-        <CursorPos X="48" Y="233"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
         <UsageCount Value="232"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="forms/userconfigs.pas"/>
@@ -52,10 +59,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="371"/>
-        <CursorPos X="28" Y="361"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
         <UsageCount Value="232"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -73,19 +80,23 @@
         <Filename Value="units/simplegui.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="simplegui"/>
+        <EditorIndex Value="12"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="34"/>
-        <CursorPos X="22" Y="110"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="214"/>
+        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="units/regdata.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="regdata"/>
+        <EditorIndex Value="13"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="20"/>
-        <CursorPos X="32" Y="20"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="208"/>
+        <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="forms/userconfigs_trial_mirrored.pas"/>
@@ -96,8 +107,8 @@
         <UnitName Value="userconfigs_trial_mirrored"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="386"/>
-        <CursorPos X="32" Y="399"/>
+        <TopLine Value="1"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit8>
@@ -105,10 +116,10 @@
         <Filename Value="units/constants.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="constants"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="37"/>
-        <CursorPos X="19" Y="46"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit9>
@@ -116,19 +127,21 @@
         <Filename Value="units/custom_timer.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="custom_timer"/>
+        <EditorIndex Value="14"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="44"/>
-        <CursorPos X="45" Y="59"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
+        <Loaded Value="True"/>
       </Unit10>
       <Unit11>
         <Filename Value="units/session.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="session"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="11"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="195"/>
-        <CursorPos X="43" Y="206"/>
+        <TopLine Value="1"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -136,10 +149,10 @@
         <Filename Value="units/blocs.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="blocs"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="381"/>
-        <CursorPos X="100" Y="341"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit12>
@@ -147,56 +160,65 @@
         <Filename Value="units/countermanager.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="countermanager"/>
+        <EditorIndex Value="15"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="340"/>
-        <CursorPos X="3" Y="344"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
+        <Loaded Value="True"/>
       </Unit13>
       <Unit14>
         <Filename Value="units/counter.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="counter"/>
+        <EditorIndex Value="16"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="1"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
+        <Loaded Value="True"/>
       </Unit14>
       <Unit15>
         <Filename Value="units/schedules_abstract.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="schedules_abstract"/>
+        <EditorIndex Value="23"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="71"/>
-        <CursorPos X="98" Y="76"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
+        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="units/schedules.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="schedules"/>
+        <EditorIndex Value="25"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="332"/>
-        <CursorPos X="46" Y="180"/>
+        <TopLine Value="1"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
+        <Loaded Value="True"/>
       </Unit16>
       <Unit17>
         <Filename Value="units/response_key.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="response_key"/>
+        <EditorIndex Value="17"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="397"/>
-        <CursorPos X="14" Y="413"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
+        <Loaded Value="True"/>
       </Unit17>
       <Unit18>
         <Filename Value="units/trial_mirrored_stm.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_mirrored_stm"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="263"/>
-        <CursorPos X="52" Y="362"/>
+        <TopLine Value="1"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit18>
@@ -204,37 +226,45 @@
         <Filename Value="units/trial_mirrored_config.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_mirrored_config"/>
+        <EditorIndex Value="22"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="199"/>
-        <CursorPos X="29" Y="97"/>
+        <TopLine Value="1"/>
+        <CursorPos X="1" Y="1"/>
         <UsageCount Value="239"/>
+        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="units/trial_message.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_message"/>
+        <EditorIndex Value="18"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="28" Y="9"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="228"/>
+        <Loaded Value="True"/>
       </Unit20>
       <Unit21>
         <Filename Value="units/trial_matching.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_matching"/>
+        <EditorIndex Value="21"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="19" Y="10"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="228"/>
+        <Loaded Value="True"/>
       </Unit21>
       <Unit22>
         <Filename Value="units/trial_simple.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_simple"/>
+        <EditorIndex Value="20"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="11"/>
-        <CursorPos X="19" Y="11"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="228"/>
+        <Loaded Value="True"/>
       </Unit22>
       <Unit23>
         <Filename Value="forms/drawtest.pas"/>
@@ -250,34 +280,42 @@
       <Unit24>
         <Filename Value="units/session_config.pas"/>
         <UnitName Value="session_config"/>
+        <EditorIndex Value="8"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="217"/>
-        <CursorPos X="10" Y="18"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="120"/>
+        <Loaded Value="True"/>
       </Unit24>
       <Unit25>
         <Filename Value="units/trial.pas"/>
         <UnitName Value="trial"/>
+        <EditorIndex Value="24"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="58"/>
-        <CursorPos X="66" Y="63"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="119"/>
+        <Loaded Value="True"/>
       </Unit25>
       <Unit26>
         <Filename Value="units/interface_library.pas"/>
         <UnitName Value="interface_library"/>
+        <EditorIndex Value="19"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="8"/>
-        <CursorPos X="6" Y="17"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="114"/>
+        <Loaded Value="True"/>
       </Unit26>
       <Unit27>
         <Filename Value="units/escriba.pas"/>
         <UnitName Value="escriba"/>
+        <EditorIndex Value="10"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="326"/>
-        <CursorPos X="29" Y="335"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="19"/>
         <UsageCount Value="104"/>
+        <Loaded Value="True"/>
       </Unit27>
       <Unit28>
         <Filename Value="/usr/share/lazarus/1.0.14/lcl/controls.pp"/>
@@ -328,119 +366,127 @@
     <General>
       <ActiveWindowIndexAtStart Value="0"/>
     </General>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="forms/userconfigs.pas"/>
-        <Caret Line="101" Column="5" TopLine="93"/>
+        <Filename Value="units/trial_mirrored_stm.pas"/>
+        <Caret Line="52" Column="25" TopLine="39"/>
       </Position1>
       <Position2>
         <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="316" Column="3" TopLine="283"/>
+        <Caret Line="172" Column="14" TopLine="161"/>
       </Position2>
       <Position3>
         <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="167" Column="9" TopLine="133"/>
+        <Caret Line="330" Column="23" TopLine="300"/>
       </Position3>
       <Position4>
         <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="31" Column="5" TopLine="26"/>
+        <Caret Line="174" Column="51" TopLine="166"/>
       </Position4>
       <Position5>
         <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="52" Column="15" TopLine="48"/>
+        <Caret Line="174" Column="115" TopLine="166"/>
       </Position5>
       <Position6>
-        <Filename Value="forms/userconfigs.pas"/>
-        <Caret Line="410" Column="96" TopLine="410"/>
+        <Filename Value="units/trial_mirrored_stm.pas"/>
+        <Caret Line="362" Column="52" TopLine="160"/>
       </Position6>
       <Position7>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="118" Column="39" TopLine="62"/>
+        <Filename Value="forms/userconfigs_trial_mirrored.pas"/>
+        <Caret Line="399" Column="32" TopLine="308"/>
       </Position7>
       <Position8>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="42" Column="15" TopLine="42"/>
+        <Filename Value="forms/userconfigs.pas"/>
+        <Caret Line="361" Column="28" TopLine="361"/>
       </Position8>
       <Position9>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="397" Column="3" TopLine="384"/>
+        <Filename Value="units/constants.pas"/>
+        <Caret Line="46" Column="19" TopLine="37"/>
       </Position9>
       <Position10>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="306" Column="37" TopLine="297"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="341" Column="100" TopLine="341"/>
       </Position10>
       <Position11>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="183" Column="51" TopLine="174"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="206" Column="43" TopLine="195"/>
       </Position11>
       <Position12>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="184" Column="41" TopLine="174"/>
+        <Filename Value="units/draw_methods.pas"/>
+        <Caret Line="233" Column="48" TopLine="226"/>
       </Position12>
       <Position13>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="183" Column="58" TopLine="154"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="19" Column="3" TopLine="3"/>
       </Position13>
       <Position14>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="396" Column="3" TopLine="392"/>
+        <Filename Value="units/session_config.pas"/>
+        <Caret Line="18" Column="10" TopLine="18"/>
       </Position14>
       <Position15>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="39" Column="5" TopLine="33"/>
+        <Filename Value="units/client.pas"/>
+        <Caret Line="44" Column="30" TopLine="28"/>
       </Position15>
       <Position16>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="230" Column="42" TopLine="227"/>
+        <Filename Value="units/escriba.pas"/>
+        <Caret Line="335" Column="29" TopLine="326"/>
       </Position16>
       <Position17>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="408" Column="3" TopLine="401"/>
+        <Filename Value="units/simplegui.pas"/>
+        <Caret Line="110" Column="22" TopLine="94"/>
       </Position17>
       <Position18>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="327" Column="66" TopLine="320"/>
+        <Filename Value="units/regdata.pas"/>
+        <Caret Line="20" Column="32" TopLine="20"/>
       </Position18>
       <Position19>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="331" Column="33" TopLine="320"/>
+        <Filename Value="units/custom_timer.pas"/>
+        <Caret Line="59" Column="45" TopLine="44"/>
       </Position19>
       <Position20>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="330" Column="66" TopLine="323"/>
+        <Filename Value="units/countermanager.pas"/>
+        <Caret Line="344" Column="3" TopLine="340"/>
       </Position20>
       <Position21>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="331" Column="33" TopLine="304"/>
+        <Filename Value="units/response_key.pas"/>
+        <Caret Line="413" Column="14" TopLine="397"/>
       </Position21>
       <Position22>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="1" Column="1" TopLine="1"/>
+        <Filename Value="units/trial_message.pas"/>
+        <Caret Line="9" Column="28" TopLine="1"/>
       </Position22>
       <Position23>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="52" Column="25" TopLine="39"/>
+        <Filename Value="units/interface_library.pas"/>
+        <Caret Line="17" Column="6" TopLine="8"/>
       </Position23>
       <Position24>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="172" Column="14" TopLine="161"/>
+        <Filename Value="units/trial_simple.pas"/>
+        <Caret Line="11" Column="19" TopLine="11"/>
       </Position24>
       <Position25>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="330" Column="23" TopLine="300"/>
+        <Filename Value="units/trial_matching.pas"/>
+        <Caret Line="10" Column="19" TopLine="1"/>
       </Position25>
       <Position26>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="174" Column="51" TopLine="166"/>
+        <Filename Value="units/trial_mirrored_config.pas"/>
+        <Caret Line="97" Column="29" TopLine="97"/>
       </Position26>
       <Position27>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <Caret Line="174" Column="115" TopLine="166"/>
+        <Filename Value="units/schedules_abstract.pas"/>
+        <Caret Line="76" Column="98" TopLine="71"/>
       </Position27>
       <Position28>
-        <Filename Value="forms/userconfigs.pas"/>
-        <Caret Line="89" Column="46" TopLine="304"/>
+        <Filename Value="units/trial.pas"/>
+        <Caret Line="63" Column="66" TopLine="58"/>
       </Position28>
+      <Position29>
+        <Filename Value="units/schedules.pas"/>
+        <Caret Line="180" Column="46" TopLine="180"/>
+      </Position29>
+      <Position30>
+        <Filename Value="forms/background.pas"/>
+        <Caret Line="63" Column="7" TopLine="55"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
 </CONFIG>
