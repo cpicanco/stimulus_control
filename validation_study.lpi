@@ -34,7 +34,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="6">
+    <Units Count="23">
       <Unit0>
         <Filename Value="validation_study.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -71,6 +71,94 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="config"/>
       </Unit5>
+      <Unit6>
+        <Filename Value="units/simplegui.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="simplegui"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="units/regdata.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="regdata"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="forms/userconfigs_trial_mirrored.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="BresenhamLineForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="userconfigs_trial_mirrored"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="units/constants.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="constants"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="units/custom_timer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="custom_timer"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="units/session.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="session"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="units/blocs.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="blocs"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="units/countermanager.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="countermanager"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="units/counter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="counter"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="units/schedules_abstract.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="schedules_abstract"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="units/schedules.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="schedules"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="units/response_key.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="response_key"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="units/trial_mirrored_stm.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_mirrored_stm"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="units/trial_mirrored_config.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_mirrored_config"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="units/trial_message.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_message"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="units/trial_matching.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_matching"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="units/trial_simple.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_simple"/>
+      </Unit22>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -80,7 +168,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="forms;units;units/shared;/usr/local/lib/"/>
+      <OtherUnitFiles Value="forms;units;units/shared;/usr/local/lib/;dependency"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

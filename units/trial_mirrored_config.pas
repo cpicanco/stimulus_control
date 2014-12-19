@@ -17,7 +17,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.
 //
-unit config;
+unit trial_mirrored_config;
 
 {$mode objfpc}{$H+}
 
@@ -28,6 +28,8 @@ uses
   Classes, SysUtils, Forms, Math;
 
 type
+
+
   TCircle = record
     o : TPoint;  //Left/Top
     size : integer;
@@ -38,10 +40,15 @@ type
 
   TCurrentTrial = record
     C : array of TCircle; //circles
-    i : integer;          //trial index
+    i : integer; //trial index
+    NextTrial : string;
+    angle : float; // angle from "userconfigs_trial_mirrored" form,
+    response : string;
+
   end;
 
   TAxis = record
+    Rect : TRect;
     Trial : array of TPoint;
     axis : array of String;
   end;
@@ -61,18 +68,22 @@ type
         aGap_degree : integer = 360; aGap_length: integer = 1; aGap: Boolean = False);
       procedure SetCurrentTrialTo(index : integer);
       procedure TrialOrdering(D : TDistances);
+      procedure CenterRect(var Rect : TRect);
     public
-      constructor Create(AOwner: TComponent; Step, Circles_Size : integer); reintroduce;
+      constructor Create(AOwner: TComponent; Step, Circles_Size : integer; VisibleRect : TRect); reintroduce;
       function NextTrial: Boolean;
       property CT : TCurrentTrial read FCT;
       property X : TAxis read Fx;
-
-
   end;
 
 const
   horizontal = 0;
   vertical = 1;
+resourcestring
+  rLeft = 'Esquerda';
+  rRight = 'Direita';
+  rTop = 'Cima';
+  rBottom = 'Baixo';
 
 implementation
 
@@ -82,7 +93,6 @@ function TConfig.MirroredDistanceOf(Distance: integer; primary_axis: string
   ): integer;
 var HalfScreenWidth, HalfScreenHeight: integer;
 begin
-
   HalfScreenWidth := Round(Screen.Width/2);
   if primary_axis = 'h' then
     begin
@@ -116,39 +126,33 @@ function TConfig.SetAxis(step, Circles_Size: integer): TDistances;
 var
   i, VisibleHeight, VisibleWidth : integer;
 begin
-  VisibleHeight := Screen.Height - Circles_Size;
-  VisibleWidth := Screen.Width - Circles_Size;
+  //VisibleHeight := Screen.Height - Circles_Size;
+  //VisibleWidth := Screen.Width - Circles_Size;
+  VisibleHeight := X.Rect.Bottom - X.Rect.Top - Circles_Size;
+  VisibleWidth := X.Rect.Right - X.Rect.Left - Circles_Size;
+
   //set the number of axis on the first level of D array
   //0 - horizontal, 1 - vertical
   SetLength(Result, 2);
 
   //set the number of distances on each axis based on step number
   //lets divide for 2 since mirrored circles will be used
-
-  //if visible field = square and if height < width
-  //SetLength(Result[horizontal], Round((VisibleHeight / 2) / step));
-  //else
   SetLength(Result[horizontal], Round((VisibleWidth / 2) / step));
-
   SetLength(Result[vertical], Round((VisibleHeight / 2) / step));
 
-  //set the horizontal initial distance (square).
-  //Result[horizontal, 0] := Round((screen.Width - screen.Height) / 2);
-
   //set the horizontal initial distance
-  Result[horizontal, 0] := 0;
+  Result[horizontal, 0] := X.Rect.Left;
 
   //set the horizontal incremented/steped distances
-  for i := 1 to Length(Result[horizontal]) -1 do
+  for i := 1 to High(Result[horizontal]) do
     Result[horizontal, i] := Result[horizontal, i -1] + step;
 
   //set the vertical distances.
-  Result[vertical, 0] := 0;
-  for i := 1 to Length(Result[vertical]) -1 do
+  Result[vertical, 0] := X.Rect.Top;
+  for i := 1 to High(Result[vertical]) do
     Result[vertical, i] := Result[vertical, i -1] + step;
-
   //horizontal and vertical are primary distances
-  //diagonal 1 and 2 are derived from primary ones
+  //for now, diagonal 1 and 2 are derived from primary ones
 end;
 
 procedure TConfig.SetCircles(aSize : integer;
@@ -182,24 +186,29 @@ begin
          begin
            C[1].o.X := MirroredDistanceOf(C[0].o.X, Fx.axis[i]);
            C[1].o.Y := C[0].o.Y;
+           if Round(Random) = 0 then response := rLeft else response := rRight;
          end;
 
        if Fx.axis[i] = 'v' then
          begin
            C[1].o.X := C[0].o.X;
            C[1].o.Y := MirroredDistanceOf(C[0].o.Y, Fx.axis[i]);
+           if Round(Random) = 0 then response := rTop else response := rBottom;
          end;
 
        if (Fx.axis[i] = 'd1') or (Fx.axis[i] = 'd2') then
          begin
            C[1].o.X := MirroredDistanceOf(C[0].o.X, 'h');
            C[1].o.Y := MirroredDistanceOf(C[0].o.Y, 'v');
+           if Round(Random) = 0 then response := rLeft else response := rRight;
          end;
        //ShowMessage('Trial ' + IntToStr(i) + 'o1=' + IntToStr(C[0].o.X) + ',' + IntToStr(C[0].o.Y));
        //ShowMessage('Trial ' + IntToStr(i) + 'o2=' + IntToStr(C[1].o.X) + ',' + IntToStr(C[1].o.Y));
      end;
 
 end;
+
+{TODO -oRafael -cTrialOrdering: Trial Order need to be presented to and if necessary modified by the user before running}
 
 procedure TConfig.TrialOrdering(D: TDistances);
 var k, i, j, Temp, Trials, HorizTrials, VertTrials, DiagTrials: integer; diagonal_step, inc_step : float;
@@ -277,9 +286,26 @@ begin
   SetCurrentTrialTo(0);
 end;
 
-constructor TConfig.Create(AOwner: TComponent; Step, Circles_Size : integer);
+procedure TConfig.CenterRect(var Rect : TRect);
+var HalfScreenWidth, HalfScreenHeight: float;
+begin
+  HalfScreenWidth := Screen.Width/2;
+  HalfScreenHeight := Screen.Height/2;
+
+  Rect.Left := Round(HalfScreenWidth - (Rect.Right/2));
+  Rect.Right := Round(HalfScreenWidth + (Rect.Right/2));
+  Rect.Top := Round(HalfScreenHeight - (Rect.Bottom/2));
+  Rect.Bottom := Round(HalfScreenHeight + (Rect.Bottom/2));
+end;
+
+constructor TConfig.Create(AOwner: TComponent; Step, Circles_Size: integer;
+  VisibleRect: TRect);
 begin
   inherited Create(AOwner);
+
+  //Visible Rect need to be on the center of screen
+  FX.Rect := VisibleRect;
+  CenterRect(FX.Rect);
 
   //number of mirrored circles is constant, 0 - Left/Top, 1- Right/Bottom
   with FCT do SetLength(C, 2);
@@ -293,7 +319,7 @@ end;
 function TConfig.NextTrial: Boolean;
 begin
   with FCT do
-     if i < (Length(Fx.Trial) -1) then
+     if i < High(Fx.Trial) then
         begin
           Inc(i);
           SetCurrentTrialTo(i);

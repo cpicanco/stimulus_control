@@ -105,7 +105,9 @@ begin
   FMsg := '[Begin]';
   Synchronize( @Showstatus );
 
-  argv := '"' + GetCurrentDir + PathDelim + 'gettimestamp.py"' + #32 + '"' + GetCurrentDir + PathDelim + 'timestamps"'  + #32 + '"' + FTrialIndex + '"' + #32 + '"' + FCode + '"';
+  argv := '"' + GetCurrentDir + PathDelim + 'gettimestamp.py"' + #32 +
+          '"' + GetCurrentDir + PathDelim + 'timestamps"'  + #32 +
+          '"' + FTrialIndex + '"' + #32 + '"' + FCode + '"';
 
   Python := TProcess.Create(nil);
   Python.CommandLine := 'python' + #32 + argv;

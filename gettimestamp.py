@@ -1,7 +1,7 @@
 '''
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014,  Carlos Rafael Fernandes Picanco, cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -24,7 +24,7 @@
 import sys
 import zmq
 
-#file_path = '/home/validation_study/timestamps'
+#file_path = '/home/rafael/validation_study/timestamps'
 #index = 0
 
 file_path = sys.argv[1]
@@ -33,12 +33,17 @@ index = sys.argv[2]
 #print sys.argv[2]
 acode = sys.argv[3]
 
+#index = '0'
+#acode = 'Teste'
+
 #network setup
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
 socket.connect("tcp://127.0.0.1:5000")
 #filter messages starting with 'STRING'. '' receives all messages
 socket.setsockopt(zmq.SUBSCRIBE, '')
+
+#Time-out
 #socket.RCVTIMEO = 100
 
 for i in xrange(0, 1, 1):
