@@ -30,8 +30,32 @@ uses
   //heaptrc,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, background, userconfigs, client,
-  draw_methods, config;
+  Forms,
+
+  //Forms
+  userconfigs,
+  userconfigs_trial_mirrored,
+  background,
+
+  //units
+  client,
+  session_config, custom_timer,
+  trial_mirrored_config,
+  //simplegui,
+  regdata,
+  trial_mirrored_stm,
+  response_key,
+  schedules,
+  schedules_abstract,
+  counter,
+  countermanager,
+  blocs,
+  session,
+  constants,
+
+  //helpers
+  draw_methods, trial_simple, trial_matching, trial_message
+  ;
 
 {$R *.res}
 

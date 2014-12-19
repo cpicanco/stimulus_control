@@ -17,16 +17,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.
 //
-unit draw_methods;
+unit draw_methods; //helpers
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Graphics, SysUtils, Classes;
+  Graphics, SysUtils, Classes, Controls;
 
 type
+
+  TPoints = array of TPoint;
 
   TArc = record
     p1 : TPoint;
@@ -35,9 +37,13 @@ type
 
 function IsPointInPolygon(AX, AY: Integer; APolygon: array of TPoint): Boolean;
 
+function BresenhamLine(x0, x1, y0, y1 : integer): TPoints;
 procedure CenteredMarker(Canvas: TCanvas; Width, Height, size: integer);
+procedure DrawCenteredCircle (Canvas : TCanvas; Width, Height, Size : integer);
 procedure DrawCircle(Canvas : TCanvas; left, top, size: integer; gap : Boolean; gap_degree, gap_length: integer);
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
+procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
+procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
 
 implementation
 
@@ -93,6 +99,63 @@ begin
   Result := inside <> 0;
 end;
 
+procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
+begin
+  Canvas.Pixels[aPoint.X, aPoint.Y] := clColor;
+end;
+
+function BresenhamLine(x0, x1, y0, y1: integer): TPoints;
+var
+    dx, dy, sx, sy, err, err2 : integer;
+begin
+   dx := abs(x1-x0);
+   dy := abs(y1-y0);
+   if x0 < x1 then sx := 1 else sx := -1;
+   if y0 < y1 then sy := 1 else sy := -1;
+   err := dx-dy;
+
+   while True do
+   begin
+     //Plot(x0,y0);
+     SetLength(Result, Length(Result) + 1);
+     Result[High(Result)] := Point(x0, y0);
+     if (x0 = x1) and (y0 = y1) then Break;
+
+     err2 := 2*err;
+     if err2 > -dy then
+     begin
+       err := err - dy;
+       x0 := x0 + sx;
+     end;
+     if err2 < dx then
+     begin
+       err := err + dx;
+       y0 := y0 + sy;
+     end;
+   end;
+end;
+
+procedure TopBottomLine(Canvas: TCanvas; aControl: TControl);
+var p1, p2 : TPoint;
+begin
+  with Canvas do
+    begin
+      Pen.Width := 1;
+      with aControl do
+        begin
+          p1 := Point(Left, Top);
+          p2 := Point(Left + Width, Top);
+        end;
+      Line(p1, p2);
+      with aControl do
+        begin
+          p1 := Point(Left, Top + Height);
+          p2 := Point(Left + Width, Top + Height);
+        end;
+      Line(p1, p2);
+    end;
+end;
+
 procedure CenteredMarker(Canvas: TCanvas; Width, Height, size: integer);
   var center : TPoint;
 begin
@@ -122,8 +185,6 @@ begin
 
         end;
 end;
-
-
 
 procedure DrawCircle(Canvas: TCanvas; left, top, size: integer; gap: Boolean;
   gap_degree, gap_length: integer);
@@ -169,6 +230,27 @@ begin
       end;
 end;
 
+procedure DrawCenteredCircle (Canvas : TCanvas; Width, Height, Size : integer);
+  var center : TPoint;
+begin
+  center.X := Round(Width / 2);
+  center.Y := Round(Height / 2);
+
+  with Canvas do
+    begin
+      Brush.Color := clGreen;
+      Brush.Style:= bsClear;
+      Pen.Mode := pmCopy;
+      Pen.Style:= psSolid;
+      Pen.Color := clGreen;
+      Pen.Width := 2;
+      with center do
+        Ellipse(X - size, Y - size, X + size, Y + size);
+
+   end;
+end;
+
+
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 var plusX : integer;
 begin
@@ -191,14 +273,7 @@ begin
           plusX := Round((((X + (size * 9)) - (X + (size *5)))/2) + (X + (size *5)));
           Line(plusX, Y - (size * 2), plusX, Y + (size * 2));
           //Line(X, Y - size, X, Y + size);
-
-
         end;
-
-
-
-
-
     end;
 end;
 

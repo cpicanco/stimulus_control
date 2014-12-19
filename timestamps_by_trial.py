@@ -1,7 +1,7 @@
 '''
 //
 // Validation Project (PCRF) - Eye Tracking Set Up Validation
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014,  Carlos Rafael Fernandes Picanco, cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
