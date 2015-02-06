@@ -1,28 +1,34 @@
-Validation Project
+Validation Project (PCRF)
 ==================
-
-Stimulus Control Apps
 
 //
 
 This is a repository to my own stimulus control programs.
 
+<<<<<<< HEAD
+Validation Project (PCRF) is an ongoing project and includes a stimulus control program (Stimulus Control App) and some simple python scripts. The main program was writen in object pascal with the lazarus 1.2.6 IDE and was compiled on ubuntu 13.10, but was thought to be cross-plataform.
+=======
 Validation Project (PCRF) is an ongoing project and includes a stimulus control program (validation_study) and some simple (hacked) python scripts. The main program (validation_study) was writen in Object Free Pascal and Delphi with the lazarus 1.0.14 IDE and was compiled on ubuntu 13.10 (sancy), but was thought to be cross-plataform.
+>>>>>>> origin/master
 
-The Python Scripts were meant to be interfaces to the Pupil Eye Tracking, open source eye tracking hardware and software platform (https://github.com/pupil-labs/pupil).
+The python scripts were meant to be interfaces to the Pupil Capture software. Pupil is an open source hardware and software platform to track eye movements (https://github.com/pupil-labs/pupil).
 
 The python script 'gettimestamps.py' is part of a(n ugly) solution to produce a 'timestamp' (Pupil output) data structure sinchronized with some of the stimulus control program events. This structure will be useful for further analysis. 
 
-The script 'timestamps_by_trial.py' ilustrates how to read the file 'timestamps' (the validation_study output now) data in python.
+The script 'timestamps_by_trial.py' ilustrates how to read the data of the file 'timestamps' (an output from the Stimulus Control App).
 
 //
 
 Este é um repositório para os meus próprios programas de controle de estímulo.
 
+<<<<<<< HEAD
+Validation Project (PCRF) é um projeto em andamento e inclui um programa de controle de estímulo (Stimulus Control App) e alguns scripts simples em python. O programa principal (validation_study) foi escrito em object pascal com a IDE 'Lazarus 1.2.6' e foi compilado no Ubuntu 13.10, mas foi pensado para ser multi-plataforma.
+=======
 Projeto Validação (PCRF) é um projeto em andamento e inclui um programa de controle de estímulo (validation_study) e alguns scripts simples (hackeados) em python. O programa principal (validation_study) foi escrito em Object Free Pascal e Delphi com a IDE 'Lazarus 1.0.14' e foi compilado no Ubuntu 13.10 (sancy), mas foi pensado para ser multi-plataforma.
+>>>>>>> origin/master
 
-Os scripts em Python foram feitos para serem uma interface para o Pupil Eye Tracking, uma plataforma open source que inclui um hardware e um software de monitoramento de movimentos oculares (https://github.com/pupil-labs/pupil).
+Os scripts em python foram feitos para serem uma interface para o programa Pupil Capture. Pupil é uma plataforma open source que inclui um hardware e um software de monitoramento de movimentos oculares (https://github.com/pupil-labs/pupil).
 
 O script python 'gettimestamps.py' é parte de uma solução (meio feia) para a produção de uma estrutura de 'timestamps' (Pupil output) sincronizada com alguns eventos do programa de controle de estímulos. Essa estrutura setá útil para análises posteriores.
 
-O script 'timestamps_by_trial.py' ilustra como ler o arquivo 'timestamps' (o output do validation_study desta vez) em python.
+O script 'timestamps_by_trial.py' ilustra como ler os dados do arquivo 'timestamps' (o arquivo de saída do Stimulus Control App).
