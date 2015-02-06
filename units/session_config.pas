@@ -1,6 +1,7 @@
 //
-// Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Stimulus Control App.
+// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -28,6 +29,24 @@ uses
   constants;
 
 type
+
+  TCircle = record
+    o : TPoint;  //Left/Top
+    size : integer;
+    gap : Boolean;
+    gap_degree : integer;
+    gap_length : integer;
+  end;
+
+  TCurrentTrial = record
+    C : array of TCircle; //circles
+    //K : array of TKey; // not implemented yet
+    i : integer; //trial index
+    NextTrial : string;
+    angle : Extended; // angle from "userconfigs_trial_mirrored" form,
+    response : string;
+    Result : string;
+  end;
 
   TCfgTrial = record
     Id : integer;
@@ -237,29 +256,16 @@ begin
         if (FType = T_CIC) or (FType = T_CRT) then
         else FType := T_CIC;
 
-        {$IFDEF WINDOWS}
+        // set media and data paths
         s1 := ReadString(_Main, _RootMedia, '');
-        while Pos('/', s1) <> 0 do Delete(s1, 1, Pos('/', s1));
-        FRootMedia:= ExtractFilePath(FileName) + s1;
-        if not (FRootMedia[Length(FRootMedia)] = ) then FRootMedia:= FRootMedia + PathDelim;
-
-        s1 := ReadString(_Main, _RootData, '');
-        while Pos('/', s1) <> 0 do Delete(s1, 1, Pos('/', s1));
-        FRootData:= ExtractFilePath(FileName) + s1);
-        if not (FRootData[Length(FRootData)] = PathDelim) then FRootData:= FRootData + PathDelim;
-        {$ENDIF}
-
-        {$IFDEF LINUX}
-        s1 := ReadString(_Main, _RootMedia, '');
-        while Pos('\', s1) <> 0 do Delete(s1, 1, Pos('\', s1));
+        while Pos(PathDelim, s1) <> 0 do Delete(s1, 1, Pos(PathDelim, s1));
         FRootMedia:= ExtractFilePath(FileName) + s1;
         if not (FRootMedia[Length(FRootMedia)] = PathDelim) then FRootMedia:= FRootMedia + PathDelim;
 
         s1 := ReadString(_Main, _RootData, '');
-        while Pos('\', s1) <> 0 do Delete(s1, 1, Pos('\', s1));
+        while Pos(PathDelim, s1) <> 0 do Delete(s1, 1, Pos(PathDelim, s1));
         FRootData:= ExtractFilePath(FileName) + s1;
         if not (FRootData[Length(FRootData)] = PathDelim) then FRootData:= FRootData + PathDelim;
-        {$ENDIF}
 
         //Fddd := GetTickCount;
         SetLength(FBlcs, FNumBlc);

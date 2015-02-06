@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -178,7 +180,13 @@ begin
   Canvas.Pen.Color:= clBlack;
   Canvas.TextOut(x0.Value + 10, y0.Value + 10 , FAngle);
 
+  if cbPreview.Checked then
+    begin
+      DrawCircle(Canvas, FLine[FCurrentTrial].X, FLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
+      DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
+    end;
 
+  Canvas.Pen.Color:= clBlack;
   case cbChooseGrid.ItemIndex of
     0:{nothing};
     1..2:begin
@@ -188,19 +196,15 @@ begin
           mP := FGrid[i];
           mX := mP.X;
           mY := mP.Y;
+
           Canvas.Ellipse(mX -5, mY -5, mX +5, mY +5);
           Canvas.TextOut(mX, mY, FGridNames[i])
       end;
-
     end;
   end;
 
-  if cbPreview.Checked then
-    begin
-      DrawCircle(Canvas, FLine[FCurrentTrial].X, FLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
-      DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
 
-    end;
+  {// lazarus 1.0.4 to 1.2.6 changes...
   with Canvas do
     begin
       Brush.Style := bsClear;
@@ -209,6 +213,7 @@ begin
       Pen.Color := clBlack;
       Pen.Mode := pmCopy;
     end;
+  }
 end;
 
 procedure TBresenhamLineForm.PreviewTimerStartTimer(Sender: TObject);

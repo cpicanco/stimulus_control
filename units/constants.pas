@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -24,13 +26,13 @@ unit constants;
 interface
 
 const
-  //Posições
+  // Posições
   _Positions = 'Positions';
   _Cols = 'Cols';
   _Rows = 'Rows';
   _NumPos = 'NumPos';
 
-  //Main
+  // Main
   _Main = 'Main';
   _Name = 'Name';
   _Subject = 'Subject';
@@ -41,7 +43,7 @@ const
   _NumBlc = 'NumBlc';
   _Type = 'Type';
 
-  //Blc
+  // Blc
   _NumTrials = 'NumTrials';
   _CrtConsecutiveHit  = 'ConsecutiveHitCriterion';
   _CrtConsecutiveMiss = 'ConsecutiveMissCriterion';
@@ -51,16 +53,16 @@ const
   _MaxCorrection = 'MaxCorrection';
   _ITI = 'ITI';
 
-  //Blc Trial
+  // Blc Trial
   _BkGnd = 'BkGnd';
 
-  //Trial
+  // Trial
   _Cursor = 'Cursor';
   _AutoNxt = 'AutoNxt';
   _CustomNxtValue = 'CustomNxtValue';
   _Kind = 'Kind';
 
-  //MRD
+  // MRD
   _UseMedia = 'UseMedia';
   _ShowStarter = 'Starter';
   _Angle = 'Angle';
@@ -72,18 +74,18 @@ const
   _cGap_Length = 'GapLength';
   //some constants are shared with 'SIMPLE' when 'usemedia' is true
 
-  //MSG
+  // MSG
   _Msg = 'Msg';
   _MsgWidth = 'MsgWidth';
   _MsgFontSize = 'MsgFontSize';
   _MsgFontColor = 'MsgFontColor';
   _Prompt = 'Prompt';
 
-  //MTS
+  // MTS
   _Delayed = 'Delayed';
   _Delay = 'Delay';
 
-  //SIMPLE
+  // SIMPLE
   _NumComp = 'NumComp';   // number of stimuli on screen
   _cBnd = 'Bnd';          // top left width height
   _cStm = 'Stm';          // stimulus path
@@ -96,7 +98,7 @@ const
   _cIET = 'IET';          // Inter Trial Interval, in miliseconds
   _cTO  = 'TO';           // Time-Out Interval, in miliseconds
 
-  //Identificadores
+  // Identificadores
   _Kplus = 'K+';
   _Kminus = 'K-';
   _Pos = 'P';
@@ -107,6 +109,7 @@ const
 
 
 const
+  { escriba }
   KEnter = #13#10;
   KPositions = '[Positions]' + #13#10;
   KMain = '[Main]' + #13#10;
@@ -162,20 +165,21 @@ const
   KNxt = 'Nxt=' + #9;
   KTO = 'TO='  + #9;
 
-  {Session Parameters}
+  { Session Parameters }
   T_CIC = 'CIC';
   T_CRT = 'CRT';
 
-  {General Parameters}
+  { General Parameters }
   T_END = 'END';
 
-  {Trial Kinds}
+  { Trial Kinds }
+  T_FPE = 'FPE';
   T_MRD = 'MRD';
   T_MSG = 'MSG';
   T_MTS = 'MTS';
   T_Simple = 'SIMPLE';
 
-  {Sch}
+  { Schedules }
   T_RR  = 'RR';
   T_FR  = 'FR';
   T_VR = 'VR';
@@ -190,12 +194,12 @@ const
   T_DRL = 'DRL';
   T_DRH = 'DRH';
 
-  {Res}
+  { Res }
   T_HIT = 'HIT';
   T_MISS = 'MISS';
   T_NONE = 'NONE';
 
-  {Nxt}
+  { Nxt }
   T_REP = 'CRT';
 
 const

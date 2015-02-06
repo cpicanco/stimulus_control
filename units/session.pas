@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -23,14 +25,23 @@ unit session;
 
 interface
 
-uses Classes, Controls, SysUtils, LCLIntf,//dialogs,
-     session_config,
-     trial_mirrored_config, countermanager, regdata, blocs;
+uses Classes, Controls, SysUtils, LCLIntf
+     //,dialogs
+     , bass_player
+     , session_config
+     //, trial_mirrored_config
+     , countermanager
+     , regdata
+     , blocs
+     ;
 
 type
 
+  { TSession }
+
   TSession = class(TComponent)
   private
+    FAudioDevice: TBassAudioDevice;
     FTimeStart : cardinal;
     FManager : TCounterManager;
     FCrtReached : Boolean;
@@ -70,6 +81,7 @@ type
     procedure DoEndSess(Sender: TObject);
     procedure Play(CfgSes: TCfgSes; Manager : TCounterManager; FileData: String);
     procedure PlayBlc(Sender: TObject);
+    property AudioDevice : TBassAudioDevice read FAudioDevice write FAudioDevice;
     property BackGround: TWinControl read FBackGround write SetBackGround;
     property SessName: String  read FSessName write FSessName;
     property SubjName: String  read FSubjName write FSubjName;
@@ -83,6 +95,7 @@ type
     property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
+
   end;
 
 implementation
@@ -120,6 +133,7 @@ begin
   FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
   //FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
   FRegData.Free;
+  FAudioDevice.Free;
   //FRegDataTicks.Free;
   If Assigned(OnEndSess) then FOnEndSess(Sender);
 end;
@@ -191,7 +205,11 @@ begin
   FManager := Manager;
 
   if FileData = #0 then FileData:= 'Dados_000.txt';
-  if FTestMode then FSessName:= FSessName + #9 + '(Modo de Teste)';
+  if FTestMode then
+    begin
+      FSessName:= FSessName + #9 + '(Modo de Teste)';
+      FileData:= 'Teste_000.txt';
+    end;
 
   FRegData:= TRegData.Create(Self, FCfgSes.RootData + FileData);
   //FRegDataTicks:= TRegData.Create(Self, FCfgSes.RootData + 'Ticks_001.txt');

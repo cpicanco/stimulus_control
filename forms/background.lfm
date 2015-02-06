@@ -3,29 +3,10 @@ object bkgnd: Tbkgnd
   Height = 240
   Top = 254
   Width = 320
-  AutoSize = True
   Caption = 'bkgnd'
-  ClientHeight = 240
-  ClientWidth = 320
   Color = clWhite
   DragKind = dkDock
-  OnActivate = FormActivate
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
-  OnKeyPress = FormKeyPress
-  OnPaint = FormPaint
   Position = poScreenCenter
-  LCLVersion = '1.0.14.0'
-  Visible = True
-  object debugconsole: TMemo
-    Left = 104
-    Height = 208
-    Top = 0
-    Width = 216
-    Anchors = [akTop, akRight]
-    Enabled = False
-    ReadOnly = True
-    TabOrder = 0
-    Visible = False
-  end
+  LCLVersion = '1.2.6.0'
 end

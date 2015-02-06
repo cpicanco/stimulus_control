@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -25,7 +27,7 @@ interface
 
 uses Controls, Classes, ExtCtrls, SysUtils, StdCtrls,
      Graphics, Forms, LCLIntf, LCLType, LMessages, {IdGlobal,}
-     trial, countermanager;
+     trial_abstract, countermanager;
 
 type
 
@@ -235,7 +237,7 @@ var Lat_Cmp : string;
 begin
   Lat_Cmp := FormatFloat('#####,###',FLat - Ft) + #9 + 'ms';
   FData := FMemo.Lines.Text + #9 + Lat_Cmp;
-  if Assigned(OnConsequence) then FOnConsequence (Sender);
+  if Assigned(OnWriteTrialData) then FOnWriteTrialData(Sender);
 end;
 
 procedure TMSG.EndTrial(Sender: TObject);

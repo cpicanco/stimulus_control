@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -28,7 +30,7 @@ uses Dialogs,
      Graphics, ExtCtrls, StrUtils, {IdGlobal, IdGlobalProtocols,}
      LCLIntf, LCLType, Forms,
      custom_timer,
-     response_key, trial, countermanager,
+     response_key, trial_abstract, countermanager,
      session_config, counter, constants, interface_library;
 
 type
@@ -351,7 +353,7 @@ begin
           //FDataBkGndS;        //obsoleto
 
   FManager.OnConsequence(Self);
-  if Assigned(OnConsequence) then FOnConsequence (Self);
+  if Assigned(OnWriteTrialData) then FOnWriteTrialData(Self);
 end;
 
 procedure TSimpl.EndCorrection(Sender: TObject);

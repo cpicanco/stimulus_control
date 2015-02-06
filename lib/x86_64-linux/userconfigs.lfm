@@ -1,15 +1,15 @@
 object UserConfig: TUserConfig
-  Left = 703
-  Height = 400
-  Top = 209
-  Width = 400
-  HorzScrollBar.Page = 400
-  VertScrollBar.Page = 400
+  Left = 461
+  Height = 493
+  Top = 77
+  Width = 407
+  HorzScrollBar.Page = 401
+  VertScrollBar.Page = 269
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
-  Caption = 'Validation Study 1 (cpicanco@ufpa.br)'
-  ClientHeight = 400
-  ClientWidth = 400
+  Caption = '(cpicanco@ufpa.br)'
+  ClientHeight = 493
+  ClientWidth = 407
   Constraints.MinHeight = 400
   Constraints.MinWidth = 400
   Icon.Data = {
@@ -1621,11 +1621,11 @@ object UserConfig: TUserConfig
   OnDestroy = FormDestroy
   OnPaint = FormPaint
   ParentBiDiMode = False
-  LCLVersion = '1.0.14.0'
+  LCLVersion = '1.2.6.0'
   object btnRun: TButton
     Left = 8
     Height = 25
-    Top = 368
+    Top = 461
     Width = 64
     Anchors = [akLeft, akBottom]
     Caption = 'Rodar'
@@ -1635,7 +1635,7 @@ object UserConfig: TUserConfig
   object chkPlayOnSecondMonitor: TCheckBox
     Left = 72
     Height = 24
-    Top = 368
+    Top = 461
     Width = 112
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
@@ -1649,9 +1649,9 @@ object UserConfig: TUserConfig
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 362
+    Height = 455
     Top = 0
-    Width = 400
+    Width = 407
     ActivePage = tbTrials
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
@@ -1659,22 +1659,22 @@ object UserConfig: TUserConfig
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
-      ClientHeight = 331
-      ClientWidth = 396
+      ClientHeight = 424
+      ClientWidth = 403
       object leParticipant: TLabeledEdit
         Left = 6
         Height = 27
         Top = 77
-        Width = 384
+        Width = 391
         Anchors = [akTop, akLeft, akRight]
         EditLabel.AnchorSideLeft.Control = leParticipant
         EditLabel.AnchorSideRight.Control = leParticipant
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leParticipant
         EditLabel.Left = 6
-        EditLabel.Height = 18
-        EditLabel.Top = 56
-        EditLabel.Width = 384
+        EditLabel.Height = 17
+        EditLabel.Top = 57
+        EditLabel.Width = 391
         EditLabel.Caption = 'Participante'
         EditLabel.ParentColor = False
         TabOrder = 0
@@ -1684,10 +1684,10 @@ object UserConfig: TUserConfig
         AnchorSideLeft.Control = seITI
         AnchorSideLeft.Side = asrBottom
         AnchorSideRight.Side = asrBottom
-        Left = 129
-        Height = 18
+        Left = 128
+        Height = 17
         Top = 115
-        Width = 90
+        Width = 89
         BorderSpacing.Left = 6
         Caption = 'milisegundos'
         Layout = tlCenter
@@ -1696,7 +1696,7 @@ object UserConfig: TUserConfig
       object seITI: TSpinEdit
         AnchorSideLeft.Control = lblITI
         AnchorSideLeft.Side = asrBottom
-        Left = 33
+        Left = 32
         Height = 27
         Top = 108
         Width = 90
@@ -1711,9 +1711,9 @@ object UserConfig: TUserConfig
         AnchorSideLeft.Control = tbGeneral
         AnchorSideRight.Control = seITI
         Left = 6
-        Height = 18
+        Height = 17
         Top = 115
-        Width = 21
+        Width = 20
         BorderSpacing.Left = 6
         Caption = 'IET'
         ParentColor = False
@@ -1722,16 +1722,16 @@ object UserConfig: TUserConfig
         Left = 6
         Height = 27
         Top = 21
-        Width = 384
+        Width = 391
         Anchors = [akTop, akLeft, akRight]
         EditLabel.AnchorSideLeft.Control = leSessionName
         EditLabel.AnchorSideRight.Control = leSessionName
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leSessionName
         EditLabel.Left = 6
-        EditLabel.Height = 18
-        EditLabel.Top = 0
-        EditLabel.Width = 384
+        EditLabel.Height = 17
+        EditLabel.Top = 1
+        EditLabel.Width = 391
         EditLabel.Caption = 'Nome da Sessão'
         EditLabel.ParentColor = False
         TabOrder = 2
@@ -1740,8 +1740,8 @@ object UserConfig: TUserConfig
       object btnNextGeneral: TButton
         Left = 6
         Height = 25
-        Top = 299
-        Width = 385
+        Top = 392
+        Width = 392
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Avançar'
         OnClick = btnNextGeneralClick
@@ -1750,8 +1750,8 @@ object UserConfig: TUserConfig
     end
     object tbStimuli: TTabSheet
       Caption = 'Estímulos'
-      ClientHeight = 331
-      ClientWidth = 396
+      ClientHeight = 424
+      ClientWidth = 403
       object Image1: TImage
         AnchorSideLeft.Control = tbStimuli
         Left = 6
@@ -46370,8 +46370,8 @@ object UserConfig: TUserConfig
       object btnNextStimuli: TButton
         Left = 6
         Height = 24
-        Top = 300
-        Width = 384
+        Top = 393
+        Width = 391
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Avançar'
         OnClick = btnNextStimuliClick
@@ -46380,93 +46380,112 @@ object UserConfig: TUserConfig
     end
     object tbTrials: TTabSheet
       Caption = 'Tentativas'
-      ClientHeight = 331
-      ClientWidth = 396
+      ClientHeight = 424
+      ClientWidth = 403
       object StringGrid1: TStringGrid
         Left = 0
-        Height = 223
-        Top = 68
-        Width = 396
+        Height = 274
+        Top = 110
+        Width = 403
         Align = alClient
-        BorderSpacing.Top = 68
+        BorderSpacing.Top = 110
         BorderSpacing.Bottom = 40
         ColCount = 7
-        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowMoving, goEditing, goSmoothScroll]
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowMoving, goEditing, goDblClickAutoSize, goSmoothScroll]
         RowCount = 6
         TabOrder = 0
         OnClick = StringGrid1Click
+        OnColRowMoved = StringGrid1ColRowMoved
         OnDrawCell = StringGrid1DrawCell
+        ColWidths = (
+          86
+          56
+          56
+          56
+          56
+          56
+          57
+        )
       end
-      object Eixos: TButton
+      object btnFillType: TButton
         Left = 6
         Height = 25
+        Hint = 'Clique com o botão direito para escolher o tipo de preenchimento'
         Top = 8
         Width = 91
         Caption = 'Eixos'
-        OnClick = EixosClick
+        Color = clSkyBlue
+        OnClick = btnFillTypeClick
+        ParentShowHint = False
+        PopupMenu = pmFillType
+        ShowHint = True
         TabOrder = 1
       end
       object btnRandomize: TButton
         Left = 6
         Height = 25
-        Top = 35
+        Hint = 'Clique com o botão direito para escolher o tipo de randomização.'
+        Top = 34
         Width = 91
         Caption = 'Randomizar'
+        Color = clSkyBlue
         OnClick = btnRandomizeClick
+        ParentShowHint = False
         PopupMenu = pmRand
+        ShowHint = True
         TabOrder = 2
       end
       object btnNextTrials: TButton
         Left = 6
         Height = 25
-        Top = 299
-        Width = 384
+        Top = 392
+        Width = 391
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Avançar'
         OnClick = btnNextTrialsClick
         TabOrder = 3
       end
       object gbRepetitions: TGroupBox
-        Left = 102
+        Left = 104
         Height = 51
         Top = 8
-        Width = 96
-        Caption = 'Repetições'
+        Width = 144
+        Caption = 'Mostrar Repetições'
         ClientHeight = 32
-        ClientWidth = 92
+        ClientWidth = 140
         TabOrder = 4
         object seCount: TSpinEdit
-          Left = 35
+          Left = 80
           Height = 27
           Top = 2
           Width = 50
+          Anchors = [akTop, akRight]
           MaxValue = 900000
           MinValue = 2
           TabOrder = 0
           Value = 4
         end
-        object sbtnRepetitions: TSpeedButton
-          Left = 5
-          Height = 22
-          Top = 5
-          Width = 23
-          NumGlyphs = 0
-          OnClick = sbtnRepetitionsClick
+        object cbShowRepetitions: TCheckBox
+          Left = 8
+          Height = 24
+          Top = 3
+          Width = 24
+          TabOrder = 1
         end
       end
       object leSchedule: TLabeledEdit
-        Left = 205
+        Left = 253
         Height = 27
         Top = 29
-        Width = 80
+        Width = 144
         EditLabel.AnchorSideLeft.Control = leSchedule
         EditLabel.AnchorSideRight.Control = leSchedule
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leSchedule
-        EditLabel.Left = 205
-        EditLabel.Height = 18
-        EditLabel.Top = 8
-        EditLabel.Width = 80
+        EditLabel.Left = 253
+        EditLabel.Height = 17
+        EditLabel.Top = 9
+        EditLabel.Width = 144
         EditLabel.Caption = 'Esquema'
         EditLabel.ParentColor = False
         TabOrder = 5
@@ -46475,13 +46494,13 @@ object UserConfig: TUserConfig
     end
     object tbSave: TTabSheet
       Caption = 'Salvar'
-      ClientHeight = 331
-      ClientWidth = 396
+      ClientHeight = 424
+      ClientWidth = 403
       object btnSave: TButton
-        Left = 14
+        Left = 8
         Height = 25
-        Top = 299
-        Width = 371
+        Top = 392
+        Width = 384
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Salvar'
         OnClick = btnSaveClick
@@ -46489,9 +46508,9 @@ object UserConfig: TUserConfig
       end
       object Memo1: TMemo
         Left = 0
-        Height = 291
+        Height = 384
         Top = 0
-        Width = 396
+        Width = 403
         Align = alClient
         BorderSpacing.Bottom = 40
         TabOrder = 1
@@ -46509,12 +46528,15 @@ object UserConfig: TUserConfig
     object piTrials: TMenuItem
       Caption = 'Ordem das Tentativas'
       Checked = True
-      Default = True
+      GroupIndex = 2
+      RadioItem = True
       ShowAlwaysCheckable = True
       OnClick = piClick
     end
     object piExpectedResponse: TMenuItem
       Caption = 'Resposta'
+      GroupIndex = 2
+      RadioItem = True
       ShowAlwaysCheckable = True
       OnClick = piClick
     end
@@ -46529,5 +46551,24 @@ object UserConfig: TUserConfig
     Filter = 'TXT|*.txt'
     left = 312
     top = 40
+  end
+  object pmFillType: TPopupMenu
+    left = 203
+    top = 290
+    object piAxes: TMenuItem
+      Caption = 'Eixos'
+      Checked = True
+      GroupIndex = 1
+      RadioItem = True
+      ShowAlwaysCheckable = True
+      OnClick = piClick
+    end
+    object piMatrix: TMenuItem
+      Caption = 'Matriz'
+      GroupIndex = 1
+      RadioItem = True
+      ShowAlwaysCheckable = True
+      OnClick = piClick
+    end
   end
 end

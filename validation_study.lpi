@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
     <Version Value="9"/>
@@ -26,7 +26,6 @@
     <RunParams>
       <local>
         <FormatVersion Value="1"/>
-        <LaunchingApplication PathPlusParams="/usr/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
       </local>
     </RunParams>
     <RequiredPackages Count="1">
@@ -34,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="23">
+    <Units Count="26">
       <Unit0>
         <Filename Value="validation_study.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -67,98 +66,119 @@
         <UnitName Value="userconfigs"/>
       </Unit4>
       <Unit5>
-        <Filename Value="units/config.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="config"/>
-      </Unit5>
-      <Unit6>
         <Filename Value="units/simplegui.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="simplegui"/>
-      </Unit6>
-      <Unit7>
+      </Unit5>
+      <Unit6>
         <Filename Value="units/regdata.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="regdata"/>
-      </Unit7>
-      <Unit8>
+      </Unit6>
+      <Unit7>
         <Filename Value="forms/userconfigs_trial_mirrored.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BresenhamLineForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_trial_mirrored"/>
-      </Unit8>
-      <Unit9>
+      </Unit7>
+      <Unit8>
         <Filename Value="units/constants.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="constants"/>
-      </Unit9>
-      <Unit10>
+      </Unit8>
+      <Unit9>
         <Filename Value="units/custom_timer.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="custom_timer"/>
-      </Unit10>
-      <Unit11>
+      </Unit9>
+      <Unit10>
         <Filename Value="units/session.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="session"/>
-      </Unit11>
-      <Unit12>
+      </Unit10>
+      <Unit11>
         <Filename Value="units/blocs.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="blocs"/>
-      </Unit12>
-      <Unit13>
+      </Unit11>
+      <Unit12>
         <Filename Value="units/countermanager.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="countermanager"/>
-      </Unit13>
-      <Unit14>
+      </Unit12>
+      <Unit13>
         <Filename Value="units/counter.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="counter"/>
-      </Unit14>
-      <Unit15>
+      </Unit13>
+      <Unit14>
         <Filename Value="units/schedules_abstract.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="schedules_abstract"/>
-      </Unit15>
-      <Unit16>
+      </Unit14>
+      <Unit15>
         <Filename Value="units/schedules.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="schedules"/>
-      </Unit16>
-      <Unit17>
+      </Unit15>
+      <Unit16>
         <Filename Value="units/response_key.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="response_key"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_feature_positive"/>
       </Unit17>
       <Unit18>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_mirrored_stm"/>
-      </Unit18>
-      <Unit19>
-        <Filename Value="units/trial_mirrored_config.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_mirrored_config"/>
-      </Unit19>
-      <Unit20>
         <Filename Value="units/trial_message.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_message"/>
-      </Unit20>
-      <Unit21>
+      </Unit18>
+      <Unit19>
         <Filename Value="units/trial_matching.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_matching"/>
-      </Unit21>
-      <Unit22>
+      </Unit19>
+      <Unit20>
         <Filename Value="units/trial_simple.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_simple"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="forms/userconfigs_simple_discrimination_matrix.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="MatrixForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="userconfigs_simple_discrimination_matrix"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="forms/userconfigs_get_matrix.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="MatrixConfigForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="userconfigs_get_matrix"/>
       </Unit22>
+      <Unit23>
+        <Filename Value="units/criatore.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="criatore"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="units/trial_abstract.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_abstract"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="units/bass_player.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="bass_player"/>
+      </Unit25>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -173,9 +193,13 @@
     </SearchPaths>
     <CodeGeneration>
       <TargetOS Value="linux"/>
+      <Optimizations>
+        <OptimizationLevel Value="0"/>
+      </Optimizations>
     </CodeGeneration>
     <Linking>
       <Debugging>
+        <UseHeaptrc Value="True"/>
         <StripSymbols Value="True"/>
         <UseExternalDbgSyms Value="True"/>
       </Debugging>

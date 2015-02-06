@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -23,7 +25,9 @@ unit regdata;
 
 interface
 
-uses SysUtils, Classes, FileUtil;
+uses
+  //Dialogs,
+  SysUtils, Classes, FileUtil;
 
 type
 
@@ -31,6 +35,7 @@ type
 
   TRegData = class(TComponent)
   private
+    FFileName: string;
     FITIBEGIN: DWord;
     FITIEND: DWord;
     FLatencyLblBegin: Dword;
@@ -50,15 +55,15 @@ type
     property LatencyStmResponse : Dword read FLatencyStmResponse write FLatencyStmResponse;
     property ITIBEGIN : DWord read FITIBEGIN write FITIBEGIN;
     property ITIEND : DWord read FITIEND write FITIEND;
+    property FileName : string read FFileName;
   end;
 
 implementation
 
-constructor TRegData.Create(AOwner: TComponent; FileName: string);
+constructor TRegData.Create(AOwner: TComponent; FileName: String);
 var a1: Integer; s1, s2: string;
 begin
   inherited Create(AOwner);
-
   ForceDirectoriesUTF8(ExtractFilePath(FileName)); { *Converted from ForceDirectories*  }
 
   a1:= 1;
@@ -69,6 +74,7 @@ begin
     FileName:= s1 + '_' + StringOfChar(#48, 3 - Length(IntToStr(a1))) + IntToStr(a1) + s2;
   end;
   FSessionNumber := a1;
+  FFileName := FileName;
   AssignFile(FFile, FileName);
   Rewrite(FFile);
 end;

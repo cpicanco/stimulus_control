@@ -1,6 +1,10 @@
+core
+*.ico
+*.res
 *.bin
 *.dbg
 *.dcu
+*~
 *.*~
 *.~*~
 *.local
@@ -12,6 +16,8 @@ __history
 *.dll
 bin/*
 backup/*
+my_backups
+my_backups/*
 lib/x86_64-linux/*.o
 lib/x86_64-linux/*.or
 lib/x86_64-linux/*.res
@@ -20,5 +26,5 @@ forms/*.*~
 forms/backup/*
 units/*.*~
 units/backup/*
+units/my_backups/*
 Participante1/*
-
