@@ -1,6 +1,8 @@
 //
-// Validation Project (PCRF) - Eye Tracking Set Up Validation
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Validation Project (PCRF) - Stimulus Control App
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -35,26 +37,39 @@ uses
   //Forms
   userconfigs,
   userconfigs_trial_mirrored,
+  userconfigs_get_matrix,
+  userconfigs_simple_discrimination_matrix,
   background,
 
   //units
   client,
-  session_config, custom_timer,
-  trial_mirrored_config,
-  //simplegui,
+  criatore,
+  escriba,
+  custom_timer,
   regdata,
-  trial_mirrored_stm,
-  response_key,
-  schedules,
-  schedules_abstract,
+  constants,
   counter,
   countermanager,
+
+  // Responses, Schedules of Reinforcement, Stimuli
+  schedules,
+  schedules_abstract,
+  response_key,
+  bass_player,
+
+  // session, blocs, trials
+  trial_abstract,
+  trial_simple,
+  trial_matching,
+  trial_message,
+  trial_feature_positive,
   blocs,
   session,
-  constants,
+  session_config,
 
-  //helpers
-  draw_methods, trial_simple, trial_matching, trial_message
+  // helpers
+  draw_methods
+
   ;
 
 {$R *.res}

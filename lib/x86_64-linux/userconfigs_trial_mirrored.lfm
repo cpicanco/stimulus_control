@@ -1,9 +1,9 @@
 object BresenhamLineForm: TBresenhamLineForm
-  Left = 178
+  Left = 109
   Height = 240
-  Top = 156
+  Top = 139
   Width = 1186
-  Caption = 'BresenhamLineForm'
+  Caption = 'Eixos - BresenhamLineForm'
   ClientHeight = 240
   ClientWidth = 1186
   OnActivate = FormActivate
@@ -13,7 +13,7 @@ object BresenhamLineForm: TBresenhamLineForm
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   OnPaint = FormPaint
-  LCLVersion = '1.0.14.0'
+  LCLVersion = '1.2.6.0'
   object Panel1: TPanel
     Left = 0
     Height = 152
@@ -95,9 +95,9 @@ object BresenhamLineForm: TBresenhamLineForm
       AnchorSideLeft.Control = seNodes
       AnchorSideBottom.Control = seNodes
       Left = 152
-      Height = 18
-      Top = 60
-      Width = 58
+      Height = 17
+      Top = 61
+      Width = 57
       Anchors = [akLeft, akBottom]
       BorderSpacing.Bottom = 5
       Caption = 'Nódulos'
@@ -244,10 +244,10 @@ object BresenhamLineForm: TBresenhamLineForm
       AnchorSideLeft.Control = seSize
       AnchorSideBottom.Control = seSize
       Left = 232
-      Height = 18
+      Height = 17
       Hint = 'Tentativas por nódulo. Para editar cada nódulo separadamente clique em ''Editar''.'
-      Top = 60
-      Width = 63
+      Top = 61
+      Width = 62
       Anchors = [akLeft, akBottom]
       BorderSpacing.Bottom = 5
       Caption = 'Tamanho'

@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -27,6 +29,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls, types,
   StdCtrls, ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons
 
+, bass_player
 , draw_methods
 , regdata
 , session
@@ -47,8 +50,9 @@ type
     btnNextStimuli: TButton;
     btnNextGeneral: TButton;
     btnNextTrials: TButton;
+    cbShowRepetitions: TCheckBox;
     chkUseMedia: TCheckBox;
-    Eixos: TButton;
+    btnFillType: TButton;
     chkPlayOnSecondMonitor: TCheckBox;
     gbRepetitions: TGroupBox;
     Image1: TImage;
@@ -59,47 +63,54 @@ type
     leSchedule: TLabeledEdit;
     leSessionName: TLabeledEdit;
     Memo1: TMemo;
+    piMatrix: TMenuItem;
+    piAxes: TMenuItem;
     OpenDialog1: TOpenDialog;
     piTrials: TMenuItem;
     piExpectedResponse: TMenuItem;
     OpenPictureDialog1: TOpenPictureDialog;
     pgRodar: TPageControl;
     pmRand: TPopupMenu;
+    pmFillType: TPopupMenu;
     SaveDialog1: TSaveDialog;
     seCount: TSpinEdit;
     seITI: TSpinEdit;
-    sbtnRepetitions: TSpeedButton;
     StringGrid1: TStringGrid;
     tbSave: TTabSheet;
     tbGeneral: TTabSheet;
     tbStimuli: TTabSheet;
     tbTrials: TTabSheet;
     procedure btnCheckClick(Sender: TObject);
+    procedure btnFillTypeClick(Sender: TObject);
     procedure btnNextGeneralClick(Sender: TObject);
     procedure btnNextStimuliClick(Sender: TObject);
     procedure btnNextTrialsClick(Sender: TObject);
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
+
     procedure chkUseMediaChange(Sender: TObject);
-    procedure EixosClick(Sender: TObject);
+
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormPaint(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
     procedure piClick(Sender: TObject);
-    procedure sbtnRepetitionsClick(Sender: TObject);
     procedure StringGrid1Click(Sender: TObject);
+    procedure StringGrid1ColRowMoved(Sender: TObject; IsColumn: Boolean;
+      sIndex, tIndex: Integer);
     procedure StringGrid1DrawCell(Sender: TObject; aCol, aRow: Integer;
       Rect: TRect; aState: TGridDrawState);
   private
-    FCellToDraw : array of array of boolean;
+    FRepetitionMatrix : array of array of boolean;
+    FLastColCheckRepetition : integer;
     FNumTrials : integer;
     FSession : TSession;
     FManager : TCounterManager;
     FConfigs : TCfgSes;
     FEscriba : TEscriba;
     procedure RandTrialIndex;
+    procedure ResetRepetionMatrix;
     procedure CheckRepetitionCol(aCol : integer);
     procedure EndSession(Sender : TObject);
     //SimpleGui : TSimpleGui;
@@ -113,22 +124,32 @@ type
 var
   UserConfig: TUserConfig;
 resourcestring
+  rsPosition = 'Bnd';
+  rsComparison = 'C';
   rsTrials = 'Tentativas';
+  rsConsequence = 'Consequência';
   rsAngle = 'Ângulo';
   rsExpectedResponse = 'Resposta';
+  rsContingency = 'Contingência';
+  rsPositive = 'Positiva';
+  rsNegative = 'Negativa';
+  rsDefaultPositiveCsq = 'CSQ+';
+  rsDefaultNegativeCsq = 'CSQ-';
   rsSize = 'Tamanho';
   rsDefBlc = 'Bloco 1';
+  rsEndSession = 'Fim.';
   rsSchedule = 'Esquema';
+  rsFillTypeAxes = 'Eixos';
+  rsFillTypeMatriz = 'Matriz';
+  rsRandomizeTrials = 'Randomizar ordem das tentativas';
+  rsRandomizeResponses = 'Randomizar respostas';
 
-{TODO -oRafael -cFunctionality: choose axis and trials for each axis}
-{TODO -oRafael -cFunctionality: step from number of trials}
-{TODO -oRafael -cFunctionality: 'expected response' randomization}
 
 implementation
 
 {$R *.lfm}
 
-uses background, userconfigs_trial_mirrored;
+uses background, userconfigs_trial_mirrored, userconfigs_simple_discrimination_matrix;
 
 { TUserConfig }
 
@@ -149,28 +170,75 @@ end;
 
 procedure TUserConfig.piClick(Sender: TObject);
 begin
+  if (TMenuItem(Sender) = piAxes) and (btnFillType.Caption <> rsFillTypeAxes) then
+    begin
+      btnFillType.Caption := rsFillTypeAxes;
+      leSchedule.Text := 'FT 20';
+      StringGrid1.ColCount := 9;
+
+      with StringGrid1 do
+        begin
+          Cells[0, 0] := rsTrials;
+          Cells[1, 0] := rsAngle;
+          Cells[2, 0] := 'x0';
+          Cells[3, 0] := 'y0';
+          Cells[4, 0] := 'x1';
+          Cells[5, 0] := 'y1';
+          Cells[6, 0] := rsExpectedResponse;
+          Cells[7, 0] := rsSize;
+          Cells[8, 0] := rsSchedule;
+        end;
+
+      ResetRepetionMatrix;
+    end;
+
+  if (TMenuItem(Sender) = piMatrix) and (btnFillType.Caption <> rsFillTypeMatriz) then
+    begin
+      btnFillType.Caption := rsFillTypeMatriz;
+      leSchedule.Text := 'FRFT 3 40 0 0';
+      StringGrid1.ColCount := 4;
+      with StringGrid1 do
+        begin
+          Cells[0, 0] := rsTrials;
+          Cells[1, 0] := rsSchedule;
+          Cells[2, 0] := rsContingency;
+          Cells[3, 0] := rsConsequence;
+        end;
+
+      ResetRepetionMatrix;
+    end;
+
   if TMenuItem(Sender) = piTrials then
     begin
-      piTrials.Checked := True;
-      piExpectedResponse.Checked := False;
+      btnRandomize.Hint := rsRandomizeTrials;
     end;
+
   if TMenuItem(Sender) = piExpectedResponse then
     begin
-      piExpectedResponse.Checked := True;
-      piTrials.Checked := False;
+      btnRandomize.Hint := rsRandomizeResponses;
     end;
-end;
 
-procedure TUserConfig.sbtnRepetitionsClick(Sender: TObject);
-begin
-  sbtnRepetitions.Down := not sbtnRepetitions.Down;
+  TMenuItem(Sender).Checked := True;
 end;
 
 procedure TUserConfig.StringGrid1Click(Sender: TObject);
 begin
   //showmessage(inttostr(StringGrid1.Col) + ' ' + inttostr(StringGrid1.Row));
-  CheckRepetitionCol(StringGrid1.Col);
-  Invalidate;
+  if cbShowRepetitions.Checked and (StringGrid1.Col <> 0) then
+    begin
+      FLastColCheckRepetition := StringGrid1.Col;
+      CheckRepetitionCol(StringGrid1.Col);
+    end;
+end;
+
+procedure TUserConfig.StringGrid1ColRowMoved(Sender: TObject;
+  IsColumn: Boolean; sIndex, tIndex: Integer);
+begin
+  if not IsColumn then
+    begin
+      ResetRepetionMatrix;
+      if (FLastColCheckRepetition <> -1) and cbShowRepetitions.Checked then CheckRepetitionCol(FLastColCheckRepetition);
+    end;
 end;
 
 procedure TUserConfig.StringGrid1DrawCell(Sender: TObject; aCol, aRow: Integer;
@@ -193,11 +261,11 @@ var OldCanvas : TCanvas;
 begin
   OldCanvas := TCanvas.Create;
   try
-    if (aCol >= Low(FCellToDraw)) and
-       (aCol <= High(FCellToDraw)) then
-         if (aRow >= Low(FCellToDraw[aCol])) and
-            (aRoW <= High(FCellToDraw[aCol])) then
-    if FCellToDraw[aCol,aRow] then
+    if (aCol >= Low(FRepetitionMatrix)) and
+       (aCol <= High(FRepetitionMatrix)) then
+         if (aRow >= Low(FRepetitionMatrix[aCol])) and
+            (aRoW <= High(FRepetitionMatrix[aCol])) then
+    if FRepetitionMatrix[aCol,aRow] then
       begin
         SaveOldCanvas;
         StringGrid1.Canvas.Brush.Style := bsClear;
@@ -262,6 +330,20 @@ begin
     end;
 end;
 
+procedure TUserConfig.ResetRepetionMatrix;
+var
+  aRowCount, aColCount, i, j : integer;
+begin
+  aRowCount := StringGrid1.RowCount;
+  aColCount := StringGrid1.ColCount;
+  SetLength(FRepetitionMatrix, aColCount, aRowCount);
+  for j := 0 to aColCount -1 do
+    for i := 0 to aRowCount -1 do
+      FRepetitionMatrix[j, i] := False;
+  Invalidate;
+  StringGrid1.Invalidate;
+end;
+
 procedure TUserConfig.CheckRepetitionCol(aCol : integer);
 var aRowCount, aColCount, aRow, i, j,
     aBeginRow, aEndRow, Count : integer;
@@ -274,10 +356,6 @@ begin
 
   aRowCount := StringGrid1.RowCount;
   aColCount := StringGrid1.ColCount;
-  SetLength(FCellToDraw, aColCount, aRowCount);
-  for j := 0 to aColCount -1 do
-    for i := 0 to aRowCount -1 do
-      FCellToDraw[j, i] := False;
 
   for aRow := 1 to aRowCount -2 do
     begin
@@ -295,39 +373,44 @@ begin
           aEndRow := aRow + 1;
           if LastLine then
             if Count >= seCount.Value then
-              for i := aBeginRow to aEndRow do FCellToDraw[aCol, i] := True;
+              for i := aBeginRow to aEndRow do FRepetitionMatrix[aCol, i] := True;
         end
       else
         begin
           if Count >= seCount.Value then
-            for i := aBeginRow to aEndRow do FCellToDraw[aCol, i] := True;
+            for i := aBeginRow to aEndRow do FRepetitionMatrix[aCol, i] := True;
           Count := 1;
           Reset := True;
         end;
     end;
+  Invalidate;
+  StringGrid1.Invalidate;
 end;
 
 procedure TUserConfig.EndSession(Sender: TObject);
 begin
   bkgnd.Free;
-  ShowMessage('Fim.')
+  ShowMessage(rsEndSession)
 end;
 
 procedure TUserConfig.btnRandomizeClick(Sender: TObject);
 var aRow : integer;
+
 begin
   if piTrials.Checked then
     begin
-       RandTrialIndex;
+      RandTrialIndex;
     end;
+
   if piExpectedResponse.Checked then
     begin
       with StringGrid1 do
       for aRow := 1 to RowCount -1 do
         Cells[6, aRow] := IntToStr(Round(Random * 1))
     end;
-  Invalidate;
-  StringGrid1.Repaint;
+
+  ResetRepetionMatrix;
+  if FLastColCheckRepetition <> -1 then CheckRepetitionCol(FLastColCheckRepetition);
 end;
 
 procedure TUserConfig.btnCheckClick(Sender: TObject);
@@ -348,7 +431,10 @@ begin
 end;
 
 procedure TUserConfig.btnNextTrialsClick(Sender: TObject);
-var aTrial, aStm, aBlc, NumTrials : integer;
+var
+  aTrial, aStm, aBlc, aCol, NumTrials : integer;
+  aHStm : integer;
+  aValues : string;
 
   function GetBndString (StmNumber : integer) : string;
   begin
@@ -369,52 +455,138 @@ var aTrial, aStm, aBlc, NumTrials : integer;
     else Result := not Result;
   end;
 
+  function GetNumComp : integer;
+  var TopRightCell : string;
+  begin
+    with StringGrid1 do
+      begin
+        TopRightCell := Cells[ColCount - 1, 0];
+        Delete(TopRightCell, Pos(rsPosition, TopRightCell), Length(rsPosition));
+        Delete(TopRightCell, Pos(rsComparison, TopRightCell), Length(rsComparison));
+        Result := StrToInt(TopRightCell);
+      end;
+
+  end;
+
+  procedure NextValue(var S : string);
+  begin
+    Delete( S, 1, pos( #32, S ) );
+    if Length( S ) > 0 then
+      while S[1] = #32 do
+        Delete( S, 1, 1 );
+  end;
+
 begin
   NumTrials := StringGrid1.RowCount -1;
-  aBlc := 0;
 
-  FEscriba.Name := leSessionName.Text;
-  FEscriba.Subject := leParticipant.Text;
-  FEscriba.Blcs[aBlc].ITI := seITI.Value;
-  FEscriba.SesType  := 'CIC';
-  FEscriba.Data := '/Data/';
-  FEscriba.Media:= '/Media/';
- // FEscriba.SetVariables;
-  FEscriba.SetMain;
-
-  FEscriba.Blcs[aBlc].Name := rsDefBlc;
-  FEscriba.Blcs[aBlc].BkGnd := clWhite;
-  FEscriba.Blcs[aBlc].VirtualTrialValue:= 1;
-  FEscriba.Blcs[aBlc].NumTrials:= NumTrials;
-  FEscriba.SetBlc(aBlc, True);
-
-  FEscriba.SetLengthVetTrial(aBlc);
-  for aTrial := Low(FEscriba.Blcs[aBlc].Trials) to High(FEscriba.Blcs[aBlc].Trials) do
+  if piAxes.Checked then
     begin
-      FEscriba.Blcs[aBlc].Trials[aTrial].Id := aTrial + 1;
-      FEscriba.Blcs[aBlc].Trials[aTrial].Kind := T_MRD;
-      FEscriba.Blcs[aBlc].Trials[aTrial].NumComp := 2;
+      aBlc := 0;
 
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[8, aTrial + 1];
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_NextTrial] := '0';
+      FEscriba.Name := leSessionName.Text;
+      FEscriba.Subject := leParticipant.Text;
+      FEscriba.Blcs[aBlc].ITI := seITI.Value;
+      FEscriba.SesType  := 'CIC';
+      FEscriba.Data := 'Data';
+      FEscriba.Media:= 'Media';
+     // FEscriba.SetVariables;
+      FEscriba.SetMain;
 
-      FEscriba.Blcs[aBlc].Trials[aTrial].Name := FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Angle] + #32 + IntToStr(FEscriba.Blcs[aBlc].Trials[aTrial].Id);
-      for aStm := 1 to 2 do
+      FEscriba.Blcs[aBlc].Name := rsDefBlc;
+      FEscriba.Blcs[aBlc].BkGnd := clWhite;
+      FEscriba.Blcs[aBlc].VirtualTrialValue:= 1;
+      FEscriba.Blcs[aBlc].NumTrials:= NumTrials;
+      FEscriba.SetBlc(aBlc, True);
+
+      FEscriba.SetLengthVetTrial(aBlc);
+      for aTrial := Low(FEscriba.Blcs[aBlc].Trials) to High(FEscriba.Blcs[aBlc].Trials) do
         begin
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cBnd] := GetBndString(aStm);
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap] := BoolToStr(GetGapBool(aStm), '1','0');
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := '0';
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := '360'
+          FEscriba.Blcs[aBlc].Trials[aTrial].Id := aTrial + 1;
+          FEscriba.Blcs[aBlc].Trials[aTrial].Kind := T_MRD;
+          FEscriba.Blcs[aBlc].Trials[aTrial].NumComp := 2;
+
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[8, aTrial + 1];
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_NextTrial] := '0';
+
+          FEscriba.Blcs[aBlc].Trials[aTrial].Name := FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Angle] + #32 + IntToStr(FEscriba.Blcs[aBlc].Trials[aTrial].Id);
+
+          for aStm := 1 to 2 do
+            begin
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cBnd] := GetBndString(aStm);
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap] := BoolToStr(GetGapBool(aStm), '1','0');
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := '0';
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := '360'
+            end;
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.EndUpdate;
+          FEscriba.SetTrial(aTrial);
         end;
-      FEscriba.Blcs[aBlc].Trials[aTrial].SList.EndUpdate;
-      FEscriba.SetTrial(aTrial);
     end;
+
+  if piMatrix.Checked then
+    begin
+      aBlc := 0;
+
+      FEscriba.Name := leSessionName.Text;
+      FEscriba.Subject := leParticipant.Text;
+      FEscriba.Blcs[aBlc].ITI := seITI.Value;
+      FEscriba.SesType  := 'CIC';
+      FEscriba.Data := 'Data';
+      FEscriba.Media:= 'Media';
+     // FEscriba.SetVariables;
+      FEscriba.SetMain;
+
+      FEscriba.Blcs[aBlc].Name := rsDefBlc;
+      FEscriba.Blcs[aBlc].BkGnd := clWhite;
+      FEscriba.Blcs[aBlc].VirtualTrialValue:= 1;
+      FEscriba.Blcs[aBlc].NumTrials:= NumTrials;
+      FEscriba.SetBlc(aBlc, True);
+
+      FEscriba.SetLengthVetTrial(aBlc);
+      for aTrial := Low(FEscriba.Blcs[aBlc].Trials) to High(FEscriba.Blcs[aBlc].Trials) do
+        begin
+          FEscriba.Blcs[aBlc].Trials[aTrial].Id := aTrial + 1;
+          FEscriba.Blcs[aBlc].Trials[aTrial].Kind := T_FPE;
+          FEscriba.Blcs[aBlc].Trials[aTrial].NumComp := GetNumComp;
+
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ExpectedResponse] := StringGrid1.Cells[2, aTrial + 1];
+          // configurar o IET
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Trial + _cIET] := StringGrid1.Cells[3, aTrial + 1];
+
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_NextTrial] := '0';
+
+          FEscriba.Blcs[aBlc].Trials[aTrial].Name := StringGrid1.Cells[2, aTrial + 1] + #32 + IntToStr(FEscriba.Blcs[aBlc].Trials[aTrial].Id);
+
+
+          aHStm := GetNumComp;
+
+          for aStm := 0 to aHStm do
+            begin
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cBnd] := StringGrid1.Cells[aStm + 4 + (aHStm -1), aTrial + 1];
+              aValues :=  StringGrid1.Cells[aStm + 3, aTrial + 1] + #32;
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap] := Copy( aValues, 0, pos( #32, aValues ) - 1);
+              NextValue(aValues);
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := Copy( aValues, 0, pos( #32, aValues ) - 1);
+              NextValue(aValues);
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := Copy( aValues, 0, pos( #32, aValues ) - 1);
+
+            end;
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.EndUpdate;
+          FEscriba.SetTrial(aTrial);
+        end;
+    end;
+
   pgRodar.TabIndex := 3;
 end;
 
@@ -424,16 +596,25 @@ begin
   Image2.Visible := chkUseMedia.Checked
 end;
 
-procedure TUserConfig.EixosClick(Sender: TObject);
+
+procedure TUserConfig.btnFillTypeClick(Sender: TObject);
 var
-  aRow, aNode, aTrial, aAxis : integer;
+  aRow, aCol, aNode, aTrial, aAxis : integer;
   cAngle,              //Angle
   cSize,               //Size. width, heigth
   cX0, cY0,            //line
   cX1, cY1 : string;   //MirroredLine
 
-  procedure AddToGrid;
+  procedure AddAxesToGrid;
   begin
+    with BresenhamLineForm.Axis do
+      begin
+        cX0 := IntToStr(List[aAxis].Line[aNode].X);
+        cY0 := IntToStr(List[aAxis].Line[aNode].Y);
+        cX1 := IntToStr(List[aAxis].MirroredLine[aNode].X);
+        cY1 := IntToStr(List[aAxis].MirroredLine[aNode].Y);
+      end;
+
     with StringGrid1 do
       begin
         if (aRow +1) > RowCount then RowCount := aRow +1;
@@ -450,36 +631,105 @@ var
         end;
   end;
 
-begin
-  aRow := 1;
-  BresenhamLineForm := TBresenhamLineForm.Create(Application);
-  if BresenhamLineForm.ShowModal = mrOk then
-    begin
-      with BresenhamLineForm.Axis do
-        for aAxis := Low(List) to High(List) do
+  procedure AddMatrixTrialToGrid;
+  var
+    aComp, LowComp, HighComp : integer;
+    aContingency, aConsequence, aPosition : string;
+
+  begin
+    if MatrixForm.Trials[aTrial].Positive then
+      begin
+        aContingency := rsPositive;
+        aConsequence := rsDefaultPositiveCsq;
+      end
+    else
+      begin
+        aContingency := rsNegative;
+        aConsequence := rsDefaultNegativeCsq;
+      end;
+
+    with StringGrid1 do
+      begin
+        if (aRow + 1) > RowCount then RowCount := aRow + 1;
+        Cells[0, aRow] := IntToStr(aRow);    //Trial Number
+        Cells[1, aRow] := leSchedule.Text;
+        Cells[2, aRow] := aContingency;
+        Cells[3, aRow] := aConsequence;
+        aCol := 4;
+
+        LowComp := Low(MatrixForm.Trials[aTrial].Comps);
+        HighComp := High(MatrixForm.Trials[aTrial].Comps);
+        //ShowMessage(IntToStr(LowComp) + ' ' + IntToStr(HighComp));
+        for aComp := LowComp to HighComp do
           begin
-            cAngle := List[aAxis].Angle;
-            cSize := IntToStr(List[aAxis].Size);
-            for aNode := Low(List[aAxis].Line) to High(List[aAxis].Line) do
-              for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] -1 do
-                begin
-                  cX0 := IntToStr(List[aAxis].Line[aNode].X);
-                  cY0 := IntToStr(List[aAxis].Line[aNode].Y);
-                  cX1 := IntToStr(List[aAxis].MirroredLine[aNode].X);
-                  cY1 := IntToStr(List[aAxis].MirroredLine[aNode].Y);
-                  AddToGrid;
-                end;
+            if (aCol + 1) > ColCount then ColCount := aCol + 1;
+            Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1);
+            Cells[aCol, aRow] := MatrixForm.Trials[aTrial].Comps[aComp].Path;
+            Inc(aCol);
           end;
-      FNumTrials := aRow -1;
-      BresenhamLineForm.Free;
-    end
-  else;
+
+        LowComp := Low(MatrixForm.Trials[aTrial].Comps);
+        HighComp := High(MatrixForm.Trials[aTrial].Comps);
+        for aComp := LowComp to HighComp do
+          begin
+            if (aCol + 1) > ColCount then ColCount := aCol + 1;
+            Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1) + rsPosition;
+            aPosition := IntToStr(MatrixForm.Trials[aTrial].Comps[aComp].Top) + #32 +
+                         IntToStr(MatrixForm.Trials[aTrial].Comps[aComp].Left) + #32 +
+                         IntToStr(MatrixForm.Trials[aTrial].Comps[aComp].Width) + #32 +
+                         IntToStr(MatrixForm.Trials[aTrial].Comps[aComp].Height);
+
+            Cells[aCol, aRow] := aPosition;
+            Inc(aCol);
+          end;
+        Inc(aRow);
+      end;
+  end;
+
+begin
+  if piAxes.Checked then
+  begin
+    aRow := 1;
+    BresenhamLineForm := TBresenhamLineForm.Create(Application);
+    if BresenhamLineForm.ShowModal = mrOk then
+      begin
+        with BresenhamLineForm.Axis do
+          for aAxis := Low(List) to High(List) do
+            begin
+              cAngle := List[aAxis].Angle;
+              cSize := IntToStr(List[aAxis].Size);
+              for aNode := Low(List[aAxis].Line) to High(List[aAxis].Line) do
+                for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] -1 do AddAxesToGrid;
+            end;
+        FNumTrials := aRow -1;
+        BresenhamLineForm.Free;
+        ResetRepetionMatrix;
+        FLastColCheckRepetition := -1;
+      end;
+  end;
+
+  if piMatrix.Checked then
+    begin
+      aRow := 1;
+      aCol := 0;
+      MatrixForm := TMatrixForm.Create(Application);
+      if MatrixForm.ShowModal = mrOk then
+          begin
+            for aTrial := Low(MatrixForm.Trials) to High(MatrixForm.Trials) do AddMatrixTrialToGrid;
+
+            FNumTrials := aRow - 1;
+            MatrixForm.Free;
+            ResetRepetionMatrix;
+            FLastColCheckRepetition := -1;
+          end;
+    end;
 end;
 
 procedure TUserConfig.FormCreate(Sender: TObject);
 var aRowCount, aColCount, i,j : integer;
 begin
   Randomize;
+  FLastColCheckRepetition := -1;
   StringGrid1.ColCount := 9;
 
   with StringGrid1 do
@@ -493,14 +743,11 @@ begin
       Cells[6, 0] := rsExpectedResponse;
       Cells[7, 0] := rsSize;
       Cells[8, 0] := rsSchedule;
+      aRowCount := RowCount;
+      aColCount := ColCount;
     end;
 
-  aRowCount := StringGrid1.RowCount;
-  aColCount := StringGrid1.ColCount;
-  SetLength(FCellToDraw, aColCount, aRowCount);
-  for j := 0 to aColCount -1 do
-    for i := 0 to aRowCount -1 do
-      FCellToDraw[j, i] := False;
+  ResetRepetionMatrix;
 
   FEscriba := TEscriba.Create(Application);
   FEscriba.Memo := Memo1;
@@ -531,9 +778,9 @@ begin
       bkgnd := Tbkgnd.Create(Application);
       with bkgnd do
         begin
-          SetFullScreen(True);
           if chkPlayOnSecondMonitor.Checked then Left := Screen.Width + 1;
           Show;
+          SetFullScreen(True);
         end;
 
       FConfigs := TCfgSes.Create(bkgnd);
@@ -548,6 +795,7 @@ begin
       FSession.SubjName := FConfigs.Subject;
       FSession.TestMode := False;
       FSession.ShowCounter := False;
+      FSession.AudioDevice := TBassAudioDevice.Create(WindowHandle);
 
       FSession.Play(FConfigs, FManager, aDataName);
     end;

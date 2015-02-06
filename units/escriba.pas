@@ -1,6 +1,7 @@
 //
-// Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Stimulus Control App.
+// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -300,73 +301,132 @@ begin
 end;
 
 procedure TEscriba.WriteComp;
-var i : integer;
+var
+    i : integer;
+    aType : integer;
+    aComp : string;
+
+const
+  MirroredStimuli = 0;
+  FeaturePositive = 1;
+  SimpleDiscrimin = 2;
+  ConditDiscrimin = 3;
+
+  function GetTrialType (Kind : string) : integer;
+  begin
+    Result := -1;
+    if Kind = T_MRD then Result := 0;
+    if Kind = T_FPE then Result := 1;
+    if Kind = T_Simple then Result := 2;
+    if Kind = T_MTS then Result := 3;
+  end;
+
 begin
   i := FIndComp + 1;
-  if FBlcs[FIndBlc].Trials[FIndTrial].Kind = T_MRD then
-    begin
-      FText.Add(
-                GetComparison (i) + KBnd +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[GetComparison(i) + _cBnd] + KEnter +
-                GetComparison (i) + KStm +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[GetComparison(i) + _cStm] + KEnter +
-                GetComparison (i) + KcGap +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[GetComparison(i) + _cGap] + KEnter +
-                GetComparison (i) + KcGap_Degree +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[GetComparison(i) + _cGap_Degree] + KEnter +
-                GetComparison (i) + KcGap_Length +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[GetComparison(i) + _cGap_Length] + KEnter
-                );
-    end
-  else
-    FText.Add(
-          GetComparison (i) + KBnd + GetBnd (false) + KEnter +
-          GetComparison (i) + KStm +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cStm] + KEnter +
-          GetComparison (i) + KSch +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cSch] + KEnter +
-          GetComparison (i) + KIET +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cIET] + KEnter +
-          GetComparison (i) + KUsb +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cUsb] + KEnter +
-          GetComparison (i) + KCsq +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cCsq] + KEnter +
-          GetComparison (i) + KMsg +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cMsg] + KEnter +
-          GetComparison (i) + KRes +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cRes] + KEnter +
-          GetComparison (i) + KNxt +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cNxt] + KEnter +
-          GetComparison (i) + KTO +
-          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [GetComparison (i) + _cTO] + KEnter
-          );
+  aComp := GetComparison (i);
+
+  case GetTrialType(FBlcs[FIndBlc].Trials[FIndTrial].Kind) of
+    MirroredStimuli..FeaturePositive:
+                      FText.Add(
+                        aComp + KBnd +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cBnd] + KEnter +
+                        aComp + KStm +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cStm] + KEnter +
+                        aComp + KcGap +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cGap] + KEnter +
+                        aComp + KcGap_Degree +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cGap_Degree] + KEnter +
+                        aComp + KcGap_Length +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cGap_Length] + KEnter
+                        );
+
+    SimpleDiscrimin..ConditDiscrimin :
+                      FText.Add(
+                        aComp + KBnd + GetBnd (false) + KEnter +
+                        aComp + KStm +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cStm] + KEnter +
+                        aComp + KSch +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cSch] + KEnter +
+                        aComp + KIET +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cIET] + KEnter +
+                        aComp + KUsb +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cUsb] + KEnter +
+                        aComp + KCsq +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cCsq] + KEnter +
+                        aComp + KMsg +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cMsg] + KEnter +
+                        aComp + KRes +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cRes] + KEnter +
+                        aComp + KNxt +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cNxt] + KEnter +
+                        aComp + KTO +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [aComp + _cTO] + KEnter
+                        );
+
+  end;
 end;
 
 procedure TEscriba.WriteKind(kind: string);
 var i : Integer; NumComp: String;
 begin
+
+  if kind = T_FPE then
+    begin
+      NumComp := IntToStr(FBlcs[FIndBlc].Trials[FIndTrial].NumComp);
+      FText.Add(
+                KNumComp + NumComp + KEnter +
+                KUseMedia +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_UseMedia] + KEnter +
+                KShowStarter +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_ShowStarter] + KEnter +
+                KSchedule +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Schedule] + KEnter +
+                KExpectedResponse +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_ExpectedResponse] + KEnter +
+                _Trial + KIET +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Trial + _cIET] + KEnter +
+                KNextTrial +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_NextTrial] + KEnter
+                );
+      for i := 0 to StrToInt (NumComp) - 1 do SetComp (i);
+    end;
+
   if kind = T_MRD then
     begin
       NumComp := IntToStr(FBlcs[FIndBlc].Trials[FIndTrial].NumComp);
       FText.Add(
                 KNumComp + NumComp + KEnter +
-                KUseMedia + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_UseMedia] + KEnter +
-                KShowStarter + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_ShowStarter] + KEnter +
-                KAngle + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Angle] + KEnter +
-                KSchedule + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Schedule] + KEnter +
-                KNextTrial + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_NextTrial] + KEnter
+                KUseMedia +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_UseMedia] + KEnter +
+                KShowStarter +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_ShowStarter] + KEnter +
+                KAngle +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Angle] + KEnter +
+                KSchedule +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Schedule] + KEnter +
+                KNextTrial +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_NextTrial] + KEnter
                 );
       for i := 0 to StrToInt (NumComp) - 1 do SetComp (i);
     end;
+
   if kind = T_Msg then
     begin
-        FText.Add(KMsg + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_cMsg] + KEnter +
-                KWidth + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_MsgWidth] + KEnter +
-                KFontSize + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_MsgFontSize]  + KEnter +
-                KFontColor + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_MsgFontColor] + KEnter +
-                KBackGround + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_BkGnd] + KEnter +
-                KPrompt + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Prompt] + KEnter);
+        FText.Add(
+                KMsg +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_cMsg] + KEnter +
+                KWidth +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_MsgWidth] + KEnter +
+                KFontSize +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_MsgFontSize]  + KEnter +
+                KFontColor +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_MsgFontColor] + KEnter +
+                KBackGround +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_BkGnd] + KEnter +
+                KPrompt +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Prompt] + KEnter);
     end;
+
   if kind = T_Simple then
     begin
       NumComp := IntToStr(FBlcs[FIndBlc].Trials[FIndTrial].NumComp);
@@ -374,16 +434,22 @@ begin
       for i := 0 to StrToInt (NumComp) - 1 do SetComp (i);
       if FWriteK then WriteSupportKeyboard;
     end;
+
   if kind = T_MTS then
     begin
       NumComp := IntToStr(FBlcs[FIndBlc].Trials[FIndTrial].NumComp);
       FText.Add(
-                KComAtraso + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Delayed] + KEnter +
-                KAtraso + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Delay] + KEnter +
+                KComAtraso +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Delayed] + KEnter +
+                KAtraso +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Delay] + KEnter +
                 _Samp + KBnd + GetBnd(True) + KEnter +
-                _Samp + KStm + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Samp + _cStm] + KEnter +
-                _Samp + KSch + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Samp + _cSch] + KEnter +
-                _Samp + KMsg + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Samp + _cMsg] + KEnter + KEnter +
+                _Samp + KStm +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Samp + _cStm] + KEnter +
+                _Samp + KSch +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Samp + _cSch] + KEnter +
+                _Samp + KMsg +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Samp + _cMsg] + KEnter + KEnter +
                 KNumComp + NumComp + KEnter
                 );
       for i := 0 to StrToInt (NumComp) - 1 do SetComp (i);
@@ -426,16 +492,22 @@ begin
   FText.Add(
             KEnter +
             _Kplus + KMsg + rmKeyPlus + KEnter +
-            _Kplus + KCsq + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kplus + _cCsq] + KEnter +
-            _Kplus + KUsb + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kplus + _cUsb] + KEnter +
+            _Kplus + KCsq +
+              FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kplus + _cCsq] + KEnter +
+            _Kplus + KUsb +
+              FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kplus + _cUsb] + KEnter +
             _Kplus + KRes + T_NONE + KEnter +
-            _Kplus + KNxt + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kplus + _cNxt] + KEnter +
+            _Kplus + KNxt +
+              FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kplus + _cNxt] + KEnter +
             KEnter +
             _Kminus + KMsg + rmKeyMinus + KEnter +
-            _Kminus + KCsq + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kminus + _cCsq] + KEnter +
-            _Kminus + KUsb + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kminus + _cUsb] + KEnter +
+            _Kminus + KCsq +
+              FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kminus + _cCsq] + KEnter +
+            _Kminus + KUsb +
+              FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kminus + _cUsb] + KEnter +
             _Kminus + KRes + T_NONE + KEnter +
-            _Kminus + KNxt + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kminus + _cNxt]
+            _Kminus + KNxt +
+              FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Kminus + _cNxt]
             );
 end;
 
@@ -443,10 +515,14 @@ procedure TEscriba.WriteTrial;
 begin
   FText.Add(
             GetBlcTrial(FIndBlc + 1, FIndTrial + 1) + KEnter + KEnter +
-            KName + FBlcs[FIndBlc].Trials[FIndTrial].Name + KEnter +
-            KKind + FBlcs[FIndBlc].Trials[FIndTrial].Kind + Kenter +
-            KBackGround + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_BkGnd] + KEnter +
-            KCursor + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Cursor] + KEnter
+            KName +
+              FBlcs[FIndBlc].Trials[FIndTrial].Name + KEnter +
+            KKind +
+              FBlcs[FIndBlc].Trials[FIndTrial].Kind + Kenter +
+            KBackGround +
+              FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_BkGnd] + KEnter +
+            KCursor +
+              FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Cursor] + KEnter
             //KAutoNext + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_AutoNxt] + KEnter +
             //KCustomNext + FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_CustomNxtValue] + KEnter
             );

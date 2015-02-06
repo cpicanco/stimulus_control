@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -17,7 +19,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.
 //
-unit response_key;
+unit response_key;  // media_key may be a good name
 
 {$mode objfpc}{$H+}
 //{$MODE Delphi}
@@ -25,12 +27,12 @@ unit response_key;
 interface
 
 uses Dialogs,
-     LCLIntf, LCLType, LMessages, Messages,
-     SysUtils, Variants, Classes, Graphics, Controls, Forms,
-     {Registry,} StdCtrls, ExtCtrls,
-     FileUtil, {ShellAnimations, OleCtrls,}
-     schedules_abstract, counter
-     {, JvExControls, JvAnimatedImage, JvGIFCtrl, WMPLib_TLB};
+     LCLIntf, LCLType, LMessages, Messages, SysUtils, Variants, Classes,
+     Graphics, Controls, Forms, StdCtrls, ExtCtrls, FileUtil,
+     bass_player,
+     schedules_abstract,
+     counter
+     ;
 
 type
 
@@ -45,6 +47,7 @@ type
 
   TKey = class(TCustomControl)
   private
+    FAudioChannel : TBassChannel;
     FSchMan: TSchMan;
     FCounterResponse : TCounter;
     FOnConsequence: TNotifyEvent;
@@ -106,7 +109,7 @@ implementation
 
 constructor TKey.Create(AOwner: TComponent);
 begin
-  Inherited Create(AOwner);
+  inherited Create(AOwner);
   Height:= 45;
   Width:= 60;
   EditMode := False;
@@ -123,6 +126,7 @@ begin
       OnConsequence:= @Consequence;
       OnResponse:= @Response;
     end;
+
 end;
 
 destructor TKey.Destroy;
@@ -132,22 +136,29 @@ begin
       Stop;
       FreeAndNil(FMedia);
     end;}
-
+  if Assigned(FAudioChannel) then FAudioChannel.Free;
   if Assigned(FBitMap) then FBitMap.Free;
   //if Assigned(FGifImage) then FreeAndNil (FGifImage);
 
   if Assigned(FCounterResponse) then FCounterResponse.Free;
-  Inherited Destroy;
+  inherited Destroy;
 end;
 
 procedure TKey.FullScreen;
 begin
+  if FKind.stmImage  = stmPicture then
+    begin
+      Width := ClientWidth;
+      Height := ClientHeight;
+      FBitMap.SetSize(Width, Height);
+    end;
   {if (FKind.stmImage = stmVideo) then
     begin
       repeat Application.ProcessMessages until FMedia.playState = 3;
       if (FMedia.playState = 3) then
       FMedia.fullScreen := True;
     end;  }
+  Invalidate;
 end;
 
 procedure TKey.IncCounterResponse;
@@ -177,7 +188,6 @@ procedure TKey.Paint;
     begin
       with Canvas do
         begin
-          //Interpolation := TFPSharpInterpolation.Create;
           Draw(0,0, FBitMap);
           //StretchDraw(Rect(0, 0, Width, Height), FBitMap);
         end;
@@ -196,23 +206,15 @@ end;
 
 procedure TKey.Play;
 begin
-  {if Assigned(FMedia) then
-    begin
-      if (FKind.stmAudio) or (FKind.stmImage = stmVideo) then
-        try
-          //FMPlayer.Notify:= True;
-          if not (FMedia.playState = wmppsPlaying) then
-            FMedia.controls.play
-          else
-            FMedia.controls.stop;
-        except
-          on E:Exception do
-            begin
-              //MPlayerNotify(nil);
-            end;
+  if FKind.stmAudio then
+    try
+      FAudioChannel.Play;
+    except
+      on E:Exception do
+        begin
+
         end;
-    end
-  else;// MPlayerNotify(nil); }
+    end;
 end;
 
 procedure TKey.Stop;
@@ -226,202 +228,253 @@ begin
 end;
 
 procedure TKey.SetFileName(Path: String);                 //REVISAR
-var s1, s2 : String; //jpg : TJpegImage;
-    procedure Create_IMG;
-    begin
-      FBitMap := TBitMap.Create;
-      FBitMap.Width:= Width;
-      FBitMap.Height:= Height;
-    end;
+var
+    s1, s2 : String;
 
-    procedure Create_GIF;
-    begin
-      {FGifImage := TJvGIFAnimator.Create (Self);
-      FGifImage.Parent := Self;
-      FGifImage.Threaded := False;
-      FGifImage.Visible := False;
-      FGifImage.OnMouseDown := MouseDown;  //2
-      FGifImage.Stretch := True;
-      FGifImage.Align := alClient;
-      FGifImage.Top := 0;
-      FGifImage.Left := 0;
-      FGifImage.Width := Width;
-      FGifImage.Height := Height;
-      FGifImage.Cursor := Self.Cursor;
-      FGifImage.Animate := True; }
-    end;
+  procedure RpSave;
+  begin
+    FFileName := Path;
+  end;
 
-    procedure Create_MediaPlayer (OnlyAudio : Boolean);
-    begin
-      {FMedia := TWindowsMediaPlayer.Create(self);
-      if OnlyAudio then FMedia.ParentWindow := Application.Handle
-      else FMedia.Parent := Self;
-      FMedia.Align:= alClient;
-      FMedia.stretchToFit := True;
-      //FMedia.enableContextMenu := False;
-      //FMedia.windowlessVideo := True;
-      //FMedia.ControlInterface.stretchToFit := True;
-      //FMedia.DefaultInterface.stretchToFit := True;
-      //FMedia.Top := 0;
-      //FMedia.Left := 0;
-      //FMedia.Width  := Width;
-      //FMedia.Height := Height;
-      FMedia.settings.autoStart := False;
-      FMedia.settings.setMode('loop', false);
-      FMedia.settings.setMode('autoRewind', false);
-      FMedia.settings.invokeURLs := False;
-      FMedia.ControlInterface.enableContextMenu := False;
-      FMedia.ControlInterface.windowlessVideo := True;
-      FMedia.Cursor := Self.Cursor;
-      FMedia.OnMouseDown := MouseDown; //3
-      FMedia.uiMode := 'none'; }
+  procedure SetKind (Audio : boolean; Image : TImage);
+  begin
+    FKind.stmAudio := Audio;
+    FKind.stmImage := Image;
+  end;
 
-      if not EditMode then
-        begin
+  procedure Create_IMG;
+  begin
+    FBitMap := TBitMap.Create;
+    FBitMap.Width:= Width;
+    FBitMap.Height:= Height;
+  end;
 
-        end
-      else
-        begin
+  procedure Create_GIF;
+  begin
+    {FGifImage := TJvGIFAnimator.Create (Self);
+    FGifImage.Parent := Self;
+    FGifImage.Threaded := False;
+    FGifImage.Visible := False;
+    FGifImage.OnMouseDown := MouseDown;  //2
+    FGifImage.Stretch := True;
+    FGifImage.Align := alClient;
+    FGifImage.Top := 0;
+    FGifImage.Left := 0;
+    FGifImage.Width := Width;
+    FGifImage.Height := Height;
+    FGifImage.Cursor := Self.Cursor;
+    FGifImage.Animate := True; }
+  end;
+  {
+  procedure Create_AUD;
+  begin
+    //it is not necessary for audio
 
-        end;
+  end;
+  }
 
-    end;
+  procedure Create_VID;
+  begin
+    {
+    FMedia := TWindowsMediaPlayer.Create(self);
+    if OnlyAudio then FMedia.ParentWindow := Application.Handle
+    else FMedia.Parent := Self;
+    FMedia.Align:= alClient;
+    FMedia.stretchToFit := True;
+    //FMedia.enableContextMenu := False;
+    //FMedia.windowlessVideo := True;
+    //FMedia.ControlInterface.stretchToFit := True;
+    //FMedia.DefaultInterface.stretchToFit := True;
+    //FMedia.Top := 0;
+    //FMedia.Left := 0;
+    //FMedia.Width  := Width;
+    //FMedia.Height := Height;
+    FMedia.settings.autoStart := False;
+    FMedia.settings.setMode('loop', false);
+    FMedia.settings.setMode('autoRewind', false);
+    FMedia.settings.invokeURLs := False;
+    FMedia.ControlInterface.enableContextMenu := False;
+    FMedia.ControlInterface.windowlessVideo := True;
+    FMedia.Cursor := Self.Cursor;
+    FMedia.OnMouseDown := MouseDown; //3
+    FMedia.uiMode := 'none';
+    }
 
-    procedure RpSave;
-    begin
-      //Repaint;
-      FFileName := Path;
-      // Exit;
-    end;
-
-    procedure SetKind (Audio : boolean; Image : TImage);
-    begin
-      FKind.stmAudio := Audio;
-      FKind.stmImage := Image;
-    end;
-
-    function Load_BMP (Sound: boolean) : boolean;
-    begin
-      try
-        FBitMap.LoadFromFile(s2);
-        SetKind (Sound, stmPicture);
-      except
-        on Exception do
-          begin
-            Result := False;
-            Exit;
-          end;
-      end;
-      Result := True;
-    end;
-
-    function Load_JPG (Sound: boolean) : boolean;
-    var jpg : TJPEGImage;
-    begin
-      try
-        jpg:= TJPEGImage.Create;
-        jpg.LoadFromFile(s2);
-        FBitMap.Assign(jpg);
-        jpg.Free;
-        SetKind (Sound, stmPicture);
-      except
-        on Exception do
-          begin
-            Result := False;
-            Exit;
-          end;
-      end;
-      Result := True;
-    end;
-
-    function Load_GIF(Sound: boolean) : boolean;
-    begin
-      {
-      try
-        FGifImage.Image.LoadFromFile (s2);
-        SetKind (Sound, stmAnimation);
-        Result := True;
-      except
-        on Exception do
-          begin
-            Result := False;
-            Exit;
-          end;
-      end;}
-
-    end;
-
-    function Load_Media (Audio : boolean; Image : TImage) : boolean;
-    begin
-      {try
-        if EditMode then FMedia.settings.playCount := 1
-        else if FLoopNumber = 0 then FMedia.settings.playCount := MaxInt
-        else if FLoopNumber > 0 then FMedia.settings.playCount := FLoopNumber
-        else if FLoopNumber < 0 then FMedia.settings.playCount := Abs(FLoopNumber);
-        FMedia.URL := s2;
-      except
-        on Exception do
-          begin
-            Result := False;
-            Exit;
-          end;
-      end;
-      //FMPlayer.OnNotify:= MPlayerLoopNotify; }
-      SetKind (Audio, Image);
-      Result := True;
-    end;
-begin
-  {if Assigned(FMedia) then begin
-    FMedia.Close;
-    FreeAndNil(FMedia);
-  end; }
-
-  if FileExistsUTF8(Path) { *Converted from FileExists*  } then begin
-    s1:= UpperCase(ExtractFileExt(Path));
-    if (s1 = '.BMP') or (s1 = '.JPG') then Create_IMG;               //image
-
-    if (s1 = '.GIF') then Create_GIF;                                //animation
-
-    if (s1 = '.WAV') or (s1 = '.MID') then  Create_MediaPlayer(True);//audio
-
-    if (s1 = '.MPG') or (s1 = '.AVI') or                             //v\EDdeo
-       (s1 = '.MOV') or (s1 = '.FLV') or
-       (s1 = '.WMV') or (s1 = '.MP4') then Create_MediaPlayer(False);
-
-    s2:= Path;
-    if ( (s1 = '.MPG') or (s1 = '.AVI') or
-         (s1 = '.MOV') or (s1 = '.FLV') or
-         (s1 = '.WMV') or (s1 = '.MP4') ) and Load_Media (False,stmVideo) then RpSave;
-
-    if (s1 = '.BMP') and Load_BMP(False) then RpSave;
-    if (s1 = '.JPG') and Load_JPG(False) then RpSave;
-    if (s1 = '.GIF') and Load_GIF (False) then RpSave;
-    if ((s1 = '.WAV') or (s1 = '.MID')) and Load_Media(True,stmNone) then
+    if not EditMode then
       begin
-        s1:= Path;
-        Delete(s1, pos(Copy(Path,Length(Path)- 3,4),s1), 4);
-        if FileExistsUTF8(s1 + '.BMP') { *Converted from FileExists*  } then
-          begin
-            Create_IMG;
-            s2:= s1 + '.BMP';
-            if Load_BMP(True) then RpSave;
-          end;
-        if FileExistsUTF8(s1 + '.JPG') { *Converted from FileExists*  } then
-          begin
-            Create_IMG;
-            s2:= s1 + '.JPG';
-            if Load_JPG(True) then RpSave;
-          end;
-        if FileExistsUTF8(s1 + '.GIF') { *Converted from FileExists*  } then
-          begin
-            Create_GIF;
-            s2:= s1 + '.GIF';
-            if Load_GIF(True) then RpSave;
-          end;
+
+      end
+    else
+      begin
+
       end;
-  end
+
+  end;
+
+  function Load_BMP (Audio: boolean) : boolean;
+  begin
+    Result := False;
+    try
+      FBitMap.LoadFromFile(s2);
+      SetKind (Audio, stmPicture);
+    except
+      on Exception do Exit;
+    end;
+    Result := True;
+  end;
+
+  function Load_JPG (Audio: boolean) : boolean;
+  var jpg : TJPEGImage;
+  begin
+    Result := False;
+    try
+      jpg:= TJPEGImage.Create;
+      jpg.LoadFromFile(s2);
+      FBitMap.Assign(jpg);
+      jpg.Free;
+      SetKind (Audio, stmPicture);
+    except
+      on Exception do Exit;
+    end;
+    Result := True;
+  end;
+
+  function Load_GIF(Audio: boolean) : boolean;
+  begin
+    {
+    Result := False;
+    try
+      FGifImage.Image.LoadFromFile (s2);
+    except
+      on Exception do Exit;
+    end;
+
+    SetKind (Audio, stmAnimation);
+    Result := True;
+    }
+
+  end;
+
+  function Load_AUD: boolean;
+  begin
+    Result := False;
+    s2 := path;
+    try
+      FAudioChannel := TBassChannel.LoadFromFile(s2, FLoopNumber);
+    except
+      on E : Exception do
+        begin
+          ShowMessage('erro: ' + E.Message);
+          Application.Terminate;
+        end;
+    end;
+    SetKind (True, TImage.stmNone);
+    Result := True;
+  end;
+
+  function Load_VID (Audio : boolean) : boolean;
+  begin
+    {
+    Result := False;
+    try
+      if EditMode then FMedia.settings.playCount := 1
+      else if FLoopNumber = 0 then FMedia.settings.playCount := MaxInt
+      else if FLoopNumber > 0 then FMedia.settings.playCount := FLoopNumber
+      else if FLoopNumber < 0 then FMedia.settings.playCount := Abs(FLoopNumber);
+      FMedia.URL := s2;
+    except
+      on Exception do Exit;
+
+    end;
+    FMPlayer.OnNotify:= MPlayerLoopNotify;
+    SetKind (Audio, Image);
+    Result := True;
+    }
+  end;
+begin
+  if FileExistsUTF8(Path) { *Converted from FileExists*  } then
+    begin
+      s1:= UpperCase(ExtractFileExt(Path));
+
+      // create section
+
+      // image
+      if   (s1 = '.BMP')
+        or (s1 = '.JPG') then Create_IMG;
+
+      // animation
+      if   (s1 = '.GIF') then Create_GIF;
+
+      // audio
+      {
+      if   (s1 = '.WAV')
+        or (s1 = '.AIFF')
+        or (s1 = '.MP3')
+        or (s1 = '.MP2')
+        or (s1 = '.MP1')
+        or (s1 = '.OGG') then Create_AUD;
+      }
+
+      // video
+      if   (s1 = '.MPG')
+        or (s1 = '.AVI')
+        or (s1 = '.MOV')
+        or (s1 = '.FLV')
+        or (s1 = '.WMV')
+        or (s1 = '.MP4') then Create_VID;
+
+      //load section
+      s2 := Path;
+      if ( (s1 = '.MPG')
+        or (s1 = '.AVI')
+        or (s1 = '.MOV')
+        or (s1 = '.FLV')
+        or (s1 = '.WMV')
+        or (s1 = '.MP4') ) and Load_VID (False) then RpSave;
+
+      if (s1 = '.BMP') and Load_BMP(False) then RpSave;
+      if (s1 = '.JPG') and Load_JPG(False) then RpSave;
+      if (s1 = '.GIF') and Load_GIF (False) then RpSave;
+
+      if (  (s1 = '.WAV')
+         or (s1 = '.AIFF')
+         or (s1 = '.MP3')
+         or (s1 = '.MP2')
+         or (s1 = '.MP1')
+         or (s1 = '.OGG')  )
+         and Load_AUD then
+        begin
+          // note that at this point we already loaded the audio file
+          // the user can associate an image with each audio file sound
+          // the user can place an image file with the same name as the audio file inside rootmedia
+          // we will load the image here
+          s1:= Path;
+          Delete(s1, pos(Copy(Path,Length(Path)- 3,4),s1), 4);
+          if FileExistsUTF8(s1 + '.BMP') { *Converted from FileExists*  } then
+            begin
+              Create_IMG;
+              s2:= s1 + '.BMP';
+              Load_BMP(True)
+            end;
+
+          if FileExistsUTF8(s1 + '.JPG') { *Converted from FileExists*  } then
+            begin
+              Create_IMG;
+              s2:= s1 + '.JPG';
+              Load_JPG(True)
+            end;
+
+          if FileExistsUTF8(s1 + '.GIF') { *Converted from FileExists*  } then
+            begin
+              Create_GIF;
+              s2:= s1 + '.GIF';
+              Load_GIF(True)
+            end;
+          RpSave;
+        end;
+    end
   else FFileName := '';
-  Repaint;
+  Invalidate;
 end;
 
 procedure TKey.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -472,7 +525,7 @@ end;
 //******
 //**  **
 //******
-// Necessariamente Self, pois o objeto TKey deve enviar suas informa\E7\F5es de localiza\E7\E3o aos descendentes de TTrial
+// Necessariamente Self, pois o objeto TKey deve enviar suas informações de localização aos descendentes de TTrial
 // Sender is irrelevant at this point, TKey needs to send its info to TTrial decendents.
 //******
 //**  **

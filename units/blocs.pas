@@ -1,6 +1,8 @@
 //
 // Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
@@ -30,11 +32,13 @@ uses Classes, {IdGlobal,} Controls, LCLIntf, LCLType,
      session_config, regdata,
      constants, response_key,
      countermanager,
-     trial,
+     client,
+     trial_abstract,
        trial_message,
 
        trial_simple,
          trial_mirrored_stm,
+           trial_feature_positive,
 
        trial_matching
      ;
@@ -55,6 +59,7 @@ type
     FData : String;
     FDataTicks : String;
     FBlcHeader: String;
+    FTimestampsPath : string;
     FRegData: TRegData;
     //FRegDataTicks: TRegData;
     FNextBlc: String;
@@ -78,6 +83,9 @@ type
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnCriteria: TNotifyEvent;
+    FClientThread : TClientThread;
+    procedure CreateClientThread(Code : string);
+    procedure DebugStatus(msg : string);
     procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
     procedure ShowCounterPlease (Kind : String);
     procedure IETResponse(Sender: TObject);
@@ -158,9 +166,27 @@ end;
 procedure TBlc.TrialTerminate(Sender: TObject);
 var s0, s1, s2, s3, s4 : string;
     csqDuration : Integer;
+
   procedure SetValuesToStrings (var as1, as2, as3, as4 : string);
+  var
+      Values : string;
   begin
-    s0 := FTrial.IETConsequence + #32;
+    if FTrial.IETConsequence = 'CSQ+' then
+      begin
+        // FileName, HowManyLoops, Color, MediaDuration
+        Values := 'CSQ1.wav 1 255 1000';
+
+      end
+    else
+      if FTrial.IETConsequence = 'CSQ-' then
+        begin
+          // FileName, HowManyLoops, Color, MediaDuration
+          Values := 'CSQ2.wav 1 0 1000';
+
+        end
+      else Values := FTrial.IETConsequence;
+
+    s0 := Values + #32;
     as1:= FTrial.RootMedia + Copy(s0, 0, pos(#32, s0)-1);
     Delete(s0, 1, pos(#32, s0)); If Length(s0)>0 then While s0[1]=#32 do Delete(s0, 1, 1);
     as2:= Copy(s0, 0, pos(#32, s0)-1);
@@ -180,7 +206,7 @@ begin
   else //continue
     if (FTrial.NextTrial = 'CRT') or             // FTrial.NextTrial base 1, FManager.CurrentTrial.Counter base 0)
        (FTrial.NextTrial = (IntToStr(FManager.CurrentTrial.Counter + 1))) then
-      begin //correction trials were possible
+      begin //correction trials were on
         if ((FBlc.MaxCorrection) = FManager.BlcCscCorrections.Counter) and
            (FBlc.MaxCorrection <> 0) then
           begin //correction
@@ -195,7 +221,7 @@ begin
             FIsCorrection := True;
           end;
       end
-    else  //correction trials were not possible
+    else  //correction trials were off
       if StrToIntDef(FTrial.NextTrial, 0) > 0 then
         begin //go to the especified trial
           if FTrial.Result = 'MISS' then
@@ -225,8 +251,10 @@ begin
         if Assigned(OnCriteria) then FOnCriteria(Sender);
         FManager.CurrentTrial.Counter := FBlc.NumTrials
       end;
+  // FileName, HowManyLoops, Color, MediaDuration
 
   SetValuesToStrings(s1, s2, s3, s4);
+
   if (StrToIntDef(s4, 0) > 0) then
   begin
     if StrToIntDef(s2, 1) > 1 then csqDuration := StrToIntDef(s4, 0) * StrToIntDef(s2, 1)
@@ -251,9 +279,12 @@ begin
   if FTrial.TimeOut > 0 then
     if FBackGround is TForm then TForm(FBackGround).Color:= 0;
 
-  FTrial.Free;
+  if Assigned(FTrial) then
+    begin
+      FreeAndNil(FTrial);
+    end;
   //SetFocus;
-  if Assigned(OnEndTrial) then FOnEndTrial(Sender);  //Erro quando o Nxt = 0{Resolvido}
+  if Assigned(OnEndTrial) then FOnEndTrial(Sender);
 
 
   //showmessage(s0 + #13#10 +s1 + #13#10 +s2 + #13#10 +s3 + #13#10);
@@ -270,30 +301,34 @@ begin
         begin
           if ShowCounter then ShowCounterPlease ('IET');
           FTimerITI.Enabled:= True;
-        end else
-      begin
-        if (FTimerITI.Interval > 0)
-           and (FTimerTO.Interval = 0)
-           and (FTimerCsq.Interval = 0) then
-          begin
-            if ShowCounter then ShowCounterPlease ('IET');
-            FTimerITI.Enabled:= True;
-          end;
-        if ((FTimerITI.Interval > 0) or (FTimerCsq.Interval > 0))
-           and (FTimerTO.Interval = 0) then
-          begin
-            CreateIETMedia(s1, s2, s3);
-            //BlockInput(True);
-            FTimerCsq.Enabled:= True;
-          end;
+        end
+      else
+        begin
+          if (FTimerITI.Interval > 0)
+             and (FTimerTO.Interval = 0)
+             and (FTimerCsq.Interval = 0) then
+            begin
+              if ShowCounter then ShowCounterPlease ('IET');
+              FTimerITI.Enabled:= True;
+            end;
+          if ((FTimerITI.Interval > 0) or (FTimerCsq.Interval > 0))
+             and (FTimerTO.Interval = 0) then
+            begin
+              // FileName, HowManyLoops, Color
 
-        if ((FTimerITI.Interval > 0) or (FTimerTO.Interval > 0))
-           and (FTimerCsq.Interval = 0) then
-          begin
-            FTimerTO.Enabled:= True;
-          end;
-      end
+              CreateIETMedia(s1, s2, s3);
+              //BlockInput(True);
+              FTimerCsq.Enabled:= True;
+            end;
+
+          if ((FTimerITI.Interval > 0) or (FTimerTO.Interval > 0))
+             and (FTimerCsq.Interval = 0) then
+            begin
+              FTimerTO.Enabled:= True;
+            end;
+        end
     end;
+
 end;
 
 procedure TBlc.TimerCsqTimer(Sender: TObject);
@@ -377,7 +412,6 @@ begin
 
   if (FTrial is TMsg) then else
     if Assigned(OnConsequence) then FOnConsequence (Sender);
-  //saber o que a paula quer que apareça no Relatório quando o CrtKCsqHit ocorrer
 end;
 
 procedure TBlc.BkGndResponse(Sender: TObject);
@@ -406,20 +440,34 @@ begin
     Enabled:= False;
     OnTimer:= @TimerCsqTimer;
   end;
+
+end;
+
+procedure TBlc.CreateClientThread(Code: string);
+begin
+  FClientThread := TClientThread.Create( True, FManager.CurrentTrial.Counter, Code, FTimestampsPath);
+  FClientThread.OnShowStatus := @DebugStatus;
+  FClientThread.Start;
+end;
+
+procedure TBlc.DebugStatus(msg: string);
+begin
+  //do nothing
 end;
 
 procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color : string);
+var
+    MediaPath : string;
 begin
-  if FileExistsUTF8(Filename) { *Converted from FileExists*  } then
+  if FileExistsUTF8(FileName) { *Converted from FileExists*  } then
     begin
       //BlockInput(true);
-      //showmessage(filename);
       FIETMedia := TKey.Create(FBackGround);
       FIETMedia.Cursor:= FBackGround.Cursor;
       FIETMedia.Parent:= FBackGround;
       FIETMedia.OnConsequence:= @IETConsequence;
       FIETMedia.OnResponse:= @IETResponse;
-      FIETMedia.HowManyLoops := StrToIntDef(HowManyLoops, 0);
+      FIETMedia.HowManyLoops := StrToIntDef(HowManyLoops, 1) - 1;
       FIETMedia.Color := StrToIntDef(Color, 0);
       FIETMedia.Width := Screen.Width;
       FIETMedia.Height := Screen.Height;
@@ -444,7 +492,8 @@ begin
 end;
 
 procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
-//var a1: Integer;
+var
+  aFileName : string;
 begin
   FBlc:= CfgBlc;
   FManager := Manager;
@@ -458,6 +507,9 @@ begin
 
   FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
   FRegData.SaveData(FBlc.Name);
+
+  aFileName := ExtractFileNameWithoutExt(FRegData.FileName);
+  FTimestampsPath := aFileName + '.timestamps';
   //FRegDataTicks.SaveData(FBlc.Name);
   PlayTrial;
 end;
@@ -466,36 +518,49 @@ procedure TBlc.PlayTrial;
 var IndTrial : integer;
 begin
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
+
   IndTrial := FManager.CurrentTrial.Counter;
-  if IndTrial < FBlc.NumTrials then begin
-    FTrial:= nil;
 
-    if FBlc.Trials[IndTrial].Kind = T_MRD then FTrial:= TMRD.Create(Self);
-    if FBlc.Trials[IndTrial].Kind = T_MSG then FTrial:= TMSG.Create(Self);
-    if FBlc.Trials[IndTrial].Kind = T_MTS then FTrial:= TMTS.Create(Self);
-    if FBlc.Trials[IndTrial].Kind = T_Simple then FTrial:= TSimpl.Create(Self);
+  if IndTrial < FBlc.NumTrials then
+    begin
 
-    if Assigned(FTrial) then begin
-      FTrial.TimeStart := FTimeStart;
-      FTrial.Parent:= FBackGround;
-      FTrial.Align:= AlClient;
-      FTrial.OnEndTrial:= @TrialTerminate;
-      FTrial.OnConsequence:= @WriteTrialData;
-      FTrial.OnStmResponse:= @StmResponse;
-      FTrial.OnBkGndResponse:= @BkGndResponse;
-      FTrial.OnHit:= @Hit;
-      FTrial.OnMiss:= @Miss;
-      FTrial.CfgTrial:= FBlc.Trials[IndTrial];
-      FTrial.Visible := False;
-      FTrial.Play(FManager, FTestMode, FIsCorrection);
-      FTrial.Visible := True;
-      FTrial.SetFocus;
-      //BlockInput(False);
-    end else EndBlc(Self);
-    FIsCorrection := False;
-  end else EndBlc(Self);
+      if FBlc.Trials[IndTrial].Kind = T_FPE then FTrial := TFPE.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MRD then FTrial:= TMRD.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MSG then FTrial:= TMSG.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MTS then FTrial:= TMTS.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_Simple then FTrial:= TSimpl.Create(Self);
 
-end;
+
+      if Assigned(FTrial) then
+        begin
+          FTrial.TimeStart := FTimeStart;
+          FTrial.FileName := FTimestampsPath;
+          FTrial.Parent := FBackGround;
+          FTrial.Align := AlClient;
+          FTrial.OnEndTrial := @TrialTerminate;
+          FTrial.OnWriteTrialData := @WriteTrialData;
+          FTrial.OnStmResponse := @StmResponse;
+          FTrial.OnBkGndResponse := @BkGndResponse;
+          FTrial.OnHit := @Hit;
+          FTrial.OnMiss := @Miss;
+          FTrial.CfgTrial := FBlc.Trials[IndTrial];
+          FTrial.Visible := False;
+          FTrial.Play(FManager, FTestMode, FIsCorrection);
+          FTrial.Visible := True;
+          FTrial.SetFocus;
+        //BlockInput(False);
+        end else EndBlc(Self);
+
+      FIsCorrection := False;
+    end
+      else
+        begin
+          if Assigned(FTrial) then Ftrial.Free;
+          CreateClientThread('EndBloc');
+          EndBlc(Self);
+        end;
+  end;
+
 
 procedure TBlc.ShowCounterPlease(Kind: String);
 begin

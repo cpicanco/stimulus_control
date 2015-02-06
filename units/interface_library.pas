@@ -1,6 +1,7 @@
 //
-// Validation Project (PCRF) - Stimulus Control App
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, cpicanco@ufpa.br
+// Stimulus Control App.
+// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+// cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
 //
