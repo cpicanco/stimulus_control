@@ -1,7 +1,7 @@
 Validation Project (PCRF)
 ==================
 
-//
+// english
 
 This is a repository to my own stimulus control programs.
 
@@ -13,7 +13,7 @@ The python script 'gettimestamps.py' is part of a(n ugly) solution to produce a 
 
 The script 'timestamps_by_trial.py' ilustrates how to read the data of the file 'timestamps' (an output from the Stimulus Control App).
 
-//
+// português
 
 Este é um repositório para os meus próprios programas de controle de estímulo.
 
