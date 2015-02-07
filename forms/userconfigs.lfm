@@ -7,7 +7,7 @@ object UserConfig: TUserConfig
   VertScrollBar.Page = 269
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
-  Caption = '(cpicanco@ufpa.br)'
+  Caption = 'Configurar'
   ClientHeight = 493
   ClientWidth = 407
   Constraints.MinHeight = 400

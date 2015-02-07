@@ -5,7 +5,7 @@
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
-      <Title Value="validation_study"/>
+      <Title Value="stimulus_control"/>
       <ResourceType Value="res"/>
       <Icon Value="0"/>
     </General>
@@ -13,7 +13,10 @@
       <EnableI18N LFM="False"/>
     </i18n>
     <VersionInfo>
-      <StringTable ProductVersion=""/>
+      <UseVersionInfo Value="True"/>
+      <AutoIncrementBuild Value="True"/>
+      <RevisionNr Value="1"/>
+      <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará" FileDescription="Stimulus Control Application" InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control App" ProductVersion=""/>
     </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
@@ -35,9 +38,9 @@
     </RequiredPackages>
     <Units Count="26">
       <Unit0>
-        <Filename Value="validation_study.lpr"/>
+        <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="validation_study"/>
+        <UnitName Value="stimulus_control"/>
       </Unit0>
       <Unit1>
         <Filename Value="forms/background.pas"/>
@@ -184,7 +187,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="validation_study.bin"/>
+      <Filename Value="stimulus_control.bin"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>

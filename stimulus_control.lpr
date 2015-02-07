@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.
 //
-program validation_study;
+program stimulus_control;
 
 {$mode objfpc}{$H+}
 
@@ -74,7 +74,11 @@ uses
 
 {$R *.res}
 
+resourcestring
+  ApplicationTitle = 'Controle de Estímulos';
+
 begin
+  Application.Title := ApplicationTitle;
   Application.Initialize;
   Application.CreateForm(TUserConfig, UserConfig);
   Application.Run;
