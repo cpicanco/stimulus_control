@@ -731,6 +731,7 @@ begin
   Randomize;
   FLastColCheckRepetition := -1;
   StringGrid1.ColCount := 9;
+  Caption := Application.Title + ' - ' + 'cpicanco@ufpa.br';
 
   with StringGrid1 do
     begin

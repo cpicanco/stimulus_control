@@ -5,13 +5,16 @@
     <BuildModes Active="Default"/>
     <Units Count="46">
       <Unit0>
-        <Filename Value="validation_study.lpr"/>
+        <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="validation_study"/>
+        <UnitName Value="stimulus_control"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="36"/>
-        <CursorPos X="1" Y="53"/>
+        <TopLine Value="52"/>
+        <CursorPos X="92" Y="74"/>
         <UsageCount Value="202"/>
+        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="forms/background.pas"/>
@@ -20,13 +23,14 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="background"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="3" Y="21"/>
+        <ComponentState Value="1"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="units/client.pas"/>
@@ -53,7 +57,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
         <TopLine Value="504"/>
         <CursorPos X="1" Y="516"/>
@@ -85,7 +89,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_trial_mirrored"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="3" Y="21"/>
@@ -216,7 +220,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_simple_discrimination_matrix"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
         <TopLine Value="156"/>
         <CursorPos X="1" Y="166"/>
@@ -230,7 +234,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_get_matrix"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
         <TopLine Value="138"/>
         <CursorPos X="1" Y="157"/>
@@ -426,7 +430,16 @@
     <General>
       <ActiveWindowIndexAtStart Value="0"/>
     </General>
-    <JumpHistory Count="0" HistoryIndex="-1"/>
+    <JumpHistory Count="2" HistoryIndex="0">
+      <Position1>
+        <Filename Value="stimulus_control.lpr"/>
+        <Caret Line="81" Column="44" TopLine="52"/>
+      </Position1>
+      <Position2>
+        <Filename Value="stimulus_control.lpr"/>
+        <Caret Line="65" Column="46" TopLine="52"/>
+      </Position2>
+    </JumpHistory>
   </ProjectSession>
   <EditorMacros Count="0"/>
 </CONFIG>
