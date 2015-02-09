@@ -20,8 +20,8 @@
 //
 unit interface_library;
 
-//{$MODE Delphi}
-{$mode objfpc}{$H+}
+{$MODE Delphi}
+//{$mode objfpc}{$H+}
 
 interface
 
@@ -105,7 +105,7 @@ begin
     begin
       Enabled := False;
       Interval := 50;
-      OnTimer := @OutPortOff;
+      OnTimer := OutPortOff;
     end;
 
 {$IFDEF WINDOWS}
@@ -150,9 +150,9 @@ end;
 procedure TPLP.OnTimerMethod(AutoOff: Boolean);
 begin
   if AutoOff then
-    FCsqTimer.OnTimer := @OutPortOff
+    FCsqTimer.OnTimer := OutPortOff
   else
-    FCsqTimer.OnTimer := @OutPortNone;
+    FCsqTimer.OnTimer := OutPortNone;
 end;
 
 procedure TPLP.OutPortNone (Sender: TObject);
@@ -317,4 +317,4 @@ begin
 end;
  }
 
-end.
+end.

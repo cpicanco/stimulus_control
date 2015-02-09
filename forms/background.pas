@@ -83,7 +83,7 @@ begin
     with FScreenBounds do
       SetBounds(Left, Top, Right - Left, Bottom - Top);
       {$IFDEF WINDOWS}
-        Application.ShowInTaskBar := False;
+        Application.TaskBarBehavior := tbDefault;
       {$ENDIF}
 
       {$IFDEF LCLGTK2}

@@ -27,3 +27,8 @@ units/*.*~
 units/backup/*
 units/my_backups/*
 Participante1/*
+*.ppu
+*.o
+*.a
+*.or
+*.rst

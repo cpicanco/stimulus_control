@@ -3,16 +3,15 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Default"/>
-    <Units Count="46">
+    <Units Count="47">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="stimulus_control"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="52"/>
-        <CursorPos X="92" Y="74"/>
+        <TopLine Value="50"/>
+        <CursorPos X="56" Y="78"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -25,9 +24,8 @@
         <UnitName Value="background"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="3" Y="21"/>
-        <ComponentState Value="1"/>
+        <TopLine Value="72"/>
+        <CursorPos X="49" Y="86"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -57,12 +55,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs"/>
-        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
         <TopLine Value="504"/>
         <CursorPos X="1" Y="516"/>
         <UsageCount Value="232"/>
-        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="units/simplegui.pas"/>
@@ -89,10 +85,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_trial_mirrored"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="3" Y="21"/>
+        <TopLine Value="654"/>
+        <CursorPos X="42" Y="661"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit7>
@@ -220,10 +216,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_simple_discrimination_matrix"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="156"/>
-        <CursorPos X="1" Y="166"/>
+        <TopLine Value="377"/>
+        <CursorPos X="38" Y="383"/>
         <UsageCount Value="272"/>
         <Loaded Value="True"/>
       </Unit21>
@@ -234,12 +230,14 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_get_matrix"/>
-        <EditorIndex Value="3"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="138"/>
-        <CursorPos X="1" Y="157"/>
+        <TopLine Value="152"/>
+        <CursorPos X="1" Y="162"/>
         <UsageCount Value="263"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit22>
       <Unit23>
         <Filename Value="units/criatore.pas"/>
@@ -264,9 +262,9 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="bass_player"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="11" Y="3"/>
-        <UsageCount Value="91"/>
+        <TopLine Value="62"/>
+        <CursorPos X="1" Y="71"/>
+        <UsageCount Value="93"/>
       </Unit25>
       <Unit26>
         <Filename Value="units/config.pas"/>
@@ -307,8 +305,8 @@
         <Filename Value="units/interface_library.pas"/>
         <UnitName Value="interface_library"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="3" Y="20"/>
+        <TopLine Value="143"/>
+        <CursorPos X="26" Y="155"/>
         <UsageCount Value="79"/>
       </Unit30>
       <Unit31>
@@ -346,8 +344,8 @@
         <Filename Value="dependency/bass.pas"/>
         <UnitName Value="BASS"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="499"/>
-        <CursorPos X="1" Y="507"/>
+        <TopLine Value="769"/>
+        <CursorPos X="10" Y="779"/>
         <UsageCount Value="10"/>
       </Unit35>
       <Unit36>
@@ -426,19 +424,39 @@
         <CursorPos X="123" Y="448"/>
         <UsageCount Value="10"/>
       </Unit45>
+      <Unit46>
+        <Filename Value="C:/lazarus/packager/registration/fcllaz.pas"/>
+        <UnitName Value="fcllaz"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="1"/>
+        <CursorPos X="14" Y="7"/>
+        <UsageCount Value="10"/>
+      </Unit46>
     </Units>
     <General>
       <ActiveWindowIndexAtStart Value="0"/>
     </General>
-    <JumpHistory Count="2" HistoryIndex="0">
+    <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
         <Filename Value="stimulus_control.lpr"/>
         <Caret Line="81" Column="44" TopLine="52"/>
       </Position1>
       <Position2>
-        <Filename Value="stimulus_control.lpr"/>
-        <Caret Line="65" Column="46" TopLine="52"/>
+        <Filename Value="forms/background.pas"/>
+        <Caret Line="21" Column="3" TopLine="1"/>
       </Position2>
+      <Position3>
+        <Filename Value="forms/userconfigs_trial_mirrored.pas"/>
+        <Caret Line="21" Column="3" TopLine="1"/>
+      </Position3>
+      <Position4>
+        <Filename Value="forms/userconfigs_simple_discrimination_matrix.pas"/>
+        <Caret Line="166" Column="1" TopLine="156"/>
+      </Position4>
+      <Position5>
+        <Filename Value="forms/userconfigs_get_matrix.pas"/>
+        <Caret Line="181" Column="12" TopLine="210"/>
+      </Position5>
     </JumpHistory>
   </ProjectSession>
   <EditorMacros Count="0"/>
