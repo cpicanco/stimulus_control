@@ -191,11 +191,10 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="forms;units;units/shared;/usr/local/lib/;dependency"/>
+      <OtherUnitFiles Value="forms;units;units/shared;/usr/local/lib;dependency"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>
-      <TargetOS Value="linux"/>
       <Optimizations>
         <OptimizationLevel Value="0"/>
       </Optimizations>

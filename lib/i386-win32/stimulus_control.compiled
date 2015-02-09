@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\lazarus\fpc\2.6.4\bin\i386-win32\fpc.exe" Date="1162572796"/>
+  <Params Value=" -MObjFPC -Scghi -g -gl -gh -Xg -Xs -WG -vewnhil -FiD:\GitHub\cpicanco\validation_project\lib\i386-win32 -FuD:\GitHub\cpicanco\validation_project\forms -FuD:\GitHub\cpicanco\validation_project\units -FuD:\GitHub\cpicanco\validation_project\units\shared -FuD:\GitHub\cpicanco\validation_project\usr\local\lib -FuD:\GitHub\cpicanco\validation_project\dependency -FuC:\lazarus\lcl\units\i386-win32\win32 -FuC:\lazarus\lcl\units\i386-win32 -FuC:\lazarus\components\lazutils\lib\i386-win32 -FuC:\lazarus\packager\units\i386-win32 -FuD:\GitHub\cpicanco\validation_project\ -FUD:\GitHub\cpicanco\validation_project\lib\i386-win32\ -l -ostimulus_control.bin.exe -dLCL -dLCLwin32 -dUseCThreads stimulus_control.lpr"/>
+</CONFIG>

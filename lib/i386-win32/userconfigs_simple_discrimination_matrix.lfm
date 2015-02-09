@@ -1,0 +1,174 @@
+object MatrixForm: TMatrixForm
+  Left = 132
+  Height = 243
+  Top = 50
+  Width = 1189
+  Caption = 'MatrixForm'
+  ClientHeight = 243
+  ClientWidth = 1189
+  OnActivate = FormActivate
+  OnKeyPress = FormKeyPress
+  OnPaint = FormPaint
+  LCLVersion = '1.2.6.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 160
+    Top = 0
+    Width = 1189
+    Align = alTop
+    ClientHeight = 160
+    ClientWidth = 1189
+    TabOrder = 0
+    object btnMinimizeTopTab: TButton
+      Left = 944
+      Height = 56
+      Top = 8
+      Width = 118
+      Caption = 'Minimizar Aba'
+      OnClick = btnMinimizeTopTabClick
+      TabOrder = 0
+    end
+    object btnClose: TButton
+      Left = 1064
+      Height = 56
+      Top = 8
+      Width = 118
+      Anchors = [akTop, akRight]
+      Caption = 'Fechar'
+      ModalResult = 11
+      TabOrder = 1
+    end
+    object cbPreview: TCheckBox
+      Left = 8
+      Height = 24
+      Top = 128
+      Width = 79
+      Caption = 'Preview'
+      OnChange = cbPreviewChange
+      TabOrder = 2
+    end
+    object gbTrials: TGroupBox
+      Left = 8
+      Height = 49
+      Top = 8
+      Width = 141
+      Caption = 'N° Tentativas'
+      ClientHeight = 30
+      ClientWidth = 137
+      TabOrder = 3
+      object btnEditNodes: TButton
+        Left = 76
+        Height = 25
+        Top = 2
+        Width = 54
+        Caption = 'Editar'
+        TabOrder = 0
+      end
+      object seTrials: TSpinEdit
+        Left = 2
+        Height = 27
+        Top = 1
+        Width = 71
+        MaxValue = 2000
+        MinValue = 2
+        TabOrder = 1
+        Value = 4
+      end
+    end
+    object btnOk: TButton
+      Left = 944
+      Height = 73
+      Top = 79
+      Width = 238
+      Caption = 'Adicionar à Lista'
+      ModalResult = 1
+      TabOrder = 4
+    end
+    object gbStimuli: TGroupBox
+      Left = 304
+      Height = 73
+      Top = 8
+      Width = 159
+      Caption = 'Estímulos'
+      ClientHeight = 54
+      ClientWidth = 155
+      TabOrder = 5
+      object cbUseStimuliSet: TCheckBox
+        AnchorSideLeft.Control = cbChooseGrid
+        AnchorSideBottom.Control = cbChooseGrid
+        Left = 0
+        Height = 24
+        Top = -1
+        Width = 87
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Bottom = 1
+        Caption = 'Conjunto'
+        TabOrder = 0
+      end
+      object btnEditNodes1: TButton
+        AnchorSideLeft.Control = cbUseStimuliSet
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = cbUseStimuliSet
+        Left = 100
+        Height = 25
+        Top = -1
+        Width = 54
+        BorderSpacing.Left = 13
+        Caption = 'Editar'
+        TabOrder = 1
+      end
+      object cbChooseGrid: TComboBox
+        AnchorSideRight.Control = btnEditNodes1
+        Left = 0
+        Height = 29
+        Top = 24
+        Width = 154
+        Enabled = False
+        ItemHeight = 0
+        ItemIndex = 0
+        Items.Strings = (
+          'NA'
+          'Ângulos'
+          'Ângulos (C)'
+        )
+        TabOrder = 2
+        Text = 'NA'
+      end
+    end
+    object btnGetMatrix: TButton
+      Left = 464
+      Height = 73
+      Top = 8
+      Width = 99
+      Caption = 'Gerar Matriz'
+      OnClick = btnGetMatrixClick
+      TabOrder = 6
+    end
+    object gbGapLength: TGroupBox
+      Left = 160
+      Height = 49
+      Top = 8
+      Width = 141
+      Caption = 'GapLength'
+      ClientHeight = 30
+      ClientWidth = 137
+      TabOrder = 7
+      object seGapLength: TSpinEdit
+        Left = 2
+        Height = 27
+        Top = 1
+        Width = 71
+        MaxValue = 359
+        MinValue = 1
+        TabOrder = 0
+        Value = 1
+      end
+    end
+  end
+  object PreviewTimer: TTimer
+    Enabled = False
+    OnTimer = PreviewTimerTimer
+    left = 48
+    top = 176
+  end
+end

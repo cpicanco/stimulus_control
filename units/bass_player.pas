@@ -46,18 +46,29 @@ implementation
 
   // on session start
 constructor TBassAudioDevice.Create(WindowHandle: HWND);
-var awindow : Pointer;
-begin
+{$IFDEF MSWINDOWS}
 
+{$ELSE}
+var awindow : Pointer;
+{$ENDIF}
+begin
+  {$IFDEF MSWINDOWS}
+  BASS_Init(-1, 44100, 0, WindowHandle, nil);
+  {$ELSE}
   awindow := @WindowHandle;
   BASS_Init(-1, 44100, 0, awindow, nil);
+  {$ENDIF}
 end;
 
   // on session start
 constructor TBassAudioDevice.Create;
 begin
+  {$IFDEF MSWINDOWS}
+  {$ELSE}
   BASS_Init(-1, 44100, 0, nil, nil);
+  {$ENDIF}
 end;
+
 
   // on before program closes
 destructor TBassAudioDevice.Destroy;
