@@ -147,8 +147,33 @@ implementation
 { TBresenhamLineForm }
 
 procedure TBresenhamLineForm.FormPaint(Sender: TObject);
-var i, mX, mY:  integer; mP : TPoint;
+var
+  i, mX, mY:  integer;
+  mP : TPoint;
+  OldCanvas : TCanvas;
+
+  procedure SaveOldCanvas;
+  begin
+    OldCanvas.Brush.Color := Canvas.Brush.Color;
+    OldCanvas.Brush.Style := Canvas.Brush.Style;
+
+    OldCanvas.Pen.Color := Canvas.Pen.Color;
+    OldCanvas.Pen.Style := Canvas.Pen.Style;
+    OldCanvas.Pen.Mode := Canvas.Pen.Mode;
+  end;
+
+  procedure LoadOldCanvas;
+  begin
+    Canvas.Brush.Color := OldCanvas.Brush.Color;
+    Canvas.Brush.Style := OldCanvas.Brush.Style;
+
+    Canvas.Pen.Color := OldCanvas.Pen.Color;
+    Canvas.Pen.Style := OldCanvas.Pen.Style;
+    Canvas.Pen.Mode := OldCanvas.Pen.Mode;
+  end;
 begin
+  OldCanvas := TCanvas.Create;
+  SaveOldCanvas;
 
   mP := ScreenToClient(Point(Mouse.CursorPos.X, Mouse.CursorPos.Y));
   mX := mP.X;
@@ -186,9 +211,9 @@ begin
       DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
     end;
 
-  Canvas.Pen.Color:= clBlack;
+  LoadOldCanvas;
   case cbChooseGrid.ItemIndex of
-    0:{nothing};
+    0:{ do nothing };
     1..2:begin
 
       for i := Low(FGrid) to High(FGrid)do
@@ -197,8 +222,8 @@ begin
           mX := mP.X;
           mY := mP.Y;
 
-          Canvas.Ellipse(mX -5, mY -5, mX +5, mY +5);
-          Canvas.TextOut(mX, mY, FGridNames[i])
+          Canvas.Ellipse(mX-10, mY-10, mX +10, mY +10);
+          Canvas.TextOut(mX-10, mY-10, FGridNames[i])
       end;
     end;
   end;
@@ -214,6 +239,8 @@ begin
       Pen.Mode := pmCopy;
     end;
   }
+  //LoadOldCanvas;
+  OldCanvas.Free;
 end;
 
 procedure TBresenhamLineForm.PreviewTimerStartTimer(Sender: TObject);
