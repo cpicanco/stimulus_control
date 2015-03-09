@@ -38,12 +38,27 @@ uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils,
 type
 
   { TMRD }
+
   TDataSupport = record
     StarterLatency : cardinal;
     Latency : cardinal;
     Responses : integer;
     StmBegin : cardinal;
     StmEnd : cardinal;
+
+    {
+      CSQ occurs at the trial ending, after the trial is destroyed, see units/blocs.pas IETconsequence,
+      so it is not always contingent to the subject's response
+    }
+    CSQHIT : string;
+    CSQMISS : string;
+
+    {
+      CSQ2 occurs as soon as the subject's response meets the response schedule, i.e., always contingent.
+      CSQ2 is only available for TSchRRRT instances, see units/schedules_abstract.
+    }
+    CSQ2 : string;
+
   end;
 
   TFPE = Class(TTrial)
@@ -140,38 +155,16 @@ begin
       FCanResponse:= False;
       //FDataSupport.StmDuration := GetTickCount;
 
-      if FCurrTrial.response = 'Positiva' then
+      if FFlagCsq2Fired then
         begin
-          if FFlagCsq2Fired then
-            begin
-              FResult := T_HIT;
-              //FIETConsequence := V2.avi 1 255 18000
-              FIETConsequence := 'CSQ+';
-              FIETConsequence := FIETCode;
-            end
-          else
-            begin
-              FResult := T_MISS;
-              // within trial user defined differential consequences is not implemented yet
-              FIETConsequence := 'CSQ-';
-            end;
-
+          FResult := T_HIT;
+          FIETConsequence := FDataSupport.CSQHIT;
         end
-      else if FCurrTrial.response = 'Negativa' then
+      else
         begin
-          if FFlagCsq2Fired then
-            begin
-              FResult := T_MISS;
-              // within trial user defined differential consequences is not implemented yet
-              FIETConsequence := 'CSQ-';
-            end
-          else
-            begin
-              FResult := T_HIT;
-              //FIETConsequence := V2.avi 1 255 18000
-              FIETConsequence := 'CSQ+';
-              FIETConsequence := FIETCode;
-            end;
+          FResult := T_MISS;
+          // within trial user defined differential consequences is not implemented yet
+          FIETConsequence := FDataSupport.CSQMISS;
         end;
 
       FCurrTrial.Result := FResult;
@@ -191,9 +184,23 @@ begin
 end;
 
 procedure TFPE.Consequence2(Sender: TObject);
+var
+  aConsequence : TKey;
+  aFullPath : string;
+
 begin
     if FFlagCsq2Fired = False then FFlagCsq2Fired := True;
-
+    aConsequence := TKey.Create(Self);
+    aConsequence.Cursor:= Self.Cursor;
+    aConsequence.Parent:= Self;
+    //aConsequence.OnConsequence2:=@Consequence2;
+    //aConsequence.OnConsequence:= @Consequence;
+    //aConsequence.OnResponse:= @Response;
+    aConsequence.HowManyLoops := 0;
+    aConsequence.Color := 255;
+    aConsequence.FullPath := RootMedia + FDataSupport.CSQ2;
+    aConsequence.Play;
+    //aConsequence.FullScreen;
 end;
 
 procedure TFPE.TimerClockTimer(Sender: TObject);
@@ -274,6 +281,13 @@ var
   R : TRect;
   a1 : Integer;
 
+
+  procedure NextCommaDelimitedParameter;
+  begin
+    Delete(s1, 1, pos(#44, s1));
+    if Length(s1) > 0 then while s1[1] = #44 do Delete(s1, 1, 1);
+  end;
+
   procedure NextSpaceDelimitedParameter;
   begin
     Delete(s1, 1, pos(#32, s1));
@@ -302,7 +316,7 @@ begin
   FUseMedia := StrToBoolDef(FCfgTrial.SList.Values[_UseMedia], False);
 
   FShowStarter := StrToBoolDef(FCfgTrial.SList.Values[_ShowStarter], False);
-  //FStarterSchedule :=  not implemented yet
+  //FStarterSchedule :=  not implemented
   FNumComp := StrToIntDef(FCfgTrial.SList.Values[_NumComp], 1);
   FRootMedia := FCfgTrial.SList.Values[_RootMedia];
 
@@ -330,9 +344,42 @@ begin
       OnResponse:= @Response;
     end;
 
-  FCurrTrial.response := FCfgTrial.SList.Values[_ExpectedResponse];
   FSchedule.Kind:= FCfgTrial.SList.Values[_Schedule];
-  FIETCode := FCfgTrial.SList.Values[_Trial + _cIET];
+
+  // allow user defined differential consequences
+  // we expect somthing like:
+
+  // PositiveHIT, PositiveMISS, PositiveCSQ2
+  // NegativeHIT, NegativeMISS, NegativeCSQ2
+
+  // Positive
+  // NONE,MISS,HIT
+
+  // Negative
+  // NONE,HIT,MISS
+
+  // Custom
+  // S1.wav 0 -1 1000,S2.wav 0 -1 1000, S3.wav 0 -1 1000,
+
+  s1 := FCfgTrial.SList.Values[_Trial + _cIET] + #44;
+
+  FDataSupport.CSQHIT := Copy(s1, 0, pos(#44, s1) - 1);
+  NextCommaDelimitedParameter;
+
+  FDataSupport.CSQMISS := Copy(s1, 0, pos(#44, s1) - 1);
+  NextCommaDelimitedParameter;
+
+  FDataSupport.CSQ2 := Copy(s1, 0, pos(#44, s1) - 1);
+
+  // Alias to a default media name.ext
+  FCurrTrial.response := FCfgTrial.SList.Values[_ExpectedResponse];
+  if FCurrTrial.response = 'Positiva' then
+    if FDataSupport.CSQ2 = T_HIT then FDataSupport.CSQ2 := 'CSQ1.wav';
+
+  if FCurrTrial.response = 'Negativa' then
+    if FDataSupport.CSQ2 = T_MISS then FDataSupport.CSQ2 := 'CSQ2.wav';
+
+
   FCurrTrial.Result := T_NONE;
   FCurrTrial.NextTrial := FCfgTrial.SList.Values[_NextTrial];
 

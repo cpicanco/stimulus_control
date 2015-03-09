@@ -13,27 +13,24 @@
 import sys
 import zmq
 
-#file_path = '/home/rafael/validation_study/timestamps'
-#index = 0
-
 file_path = sys.argv[1]
-#print sys.argv[1]
+# print sys.argv[1]
 index = sys.argv[2]
-#print sys.argv[2]
+# print sys.argv[2]
 acode = sys.argv[3]
 
-#index = '0'
-#acode = 'Teste'
+# index = '0'
+# acode = 'Teste'
 
 #network setup
 context = zmq.Context()
 socket = context.socket(zmq.SUB)
-socket.connect("tcp://127.0.0.1:5000")
+socket.connect("tcp://10.42.0.43:5500")
 #filter messages starting with 'STRING'. '' receives all messages
 socket.setsockopt(zmq.SUBSCRIBE, '')
 
 #Time-out
-#socket.RCVTIMEO = 100
+socket.RCVTIMEO = 100
 
 for i in xrange(0, 1, 1):
     msg = socket.recv()
