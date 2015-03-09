@@ -149,7 +149,7 @@ end;
 
 procedure TBlc.IETConsequence(Sender: TObject);
 begin
-  BkGndResponse(Sender);
+  //BkGndResponse(Sender);
 end;
 
 procedure TBlc.IETResponse(Sender: TObject);
@@ -166,6 +166,12 @@ end;
 procedure TBlc.TrialTerminate(Sender: TObject);
 var s0, s1, s2, s3, s4 : string;
     csqDuration : Integer;
+
+  procedure NextSpaceDelimitedParameter;
+  begin
+    Delete(s0, 1, pos(#32, s0));
+    if Length(s0) > 0 then while s0[1] = #32 do Delete(s0, 1, 1);
+  end;
 
   procedure SetValuesToStrings (var as1, as2, as3, as4 : string);
   var
@@ -188,11 +194,11 @@ var s0, s1, s2, s3, s4 : string;
 
     s0 := Values + #32;
     as1:= FTrial.RootMedia + Copy(s0, 0, pos(#32, s0)-1);
-    Delete(s0, 1, pos(#32, s0)); If Length(s0)>0 then While s0[1]=#32 do Delete(s0, 1, 1);
+    NextSpaceDelimitedParameter;
     as2:= Copy(s0, 0, pos(#32, s0)-1);
-    Delete(s0, 1, pos(#32, s0)); If Length(s0)>0 then While s0[1]=#32 do Delete(s0, 1, 1);
+    NextSpaceDelimitedParameter
     as3:= Copy(s0, 0, pos(#32, s0)-1);
-    Delete(s0, 1, pos(#32, s0)); If Length(s0)>0 then While s0[1]=#32 do Delete(s0, 1, 1);
+    NextSpaceDelimitedParameter
     as4:= Copy(s0, 0, pos(#32, s0)-1);
   end;
 begin
