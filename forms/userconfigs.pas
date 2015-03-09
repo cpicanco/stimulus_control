@@ -30,8 +30,8 @@ uses
   StdCtrls, ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons
 
 , bass_player
-, draw_methods
-, regdata
+//, draw_methods
+//, regdata
 , session
 , session_config
 , countermanager
@@ -44,6 +44,7 @@ type
   { TUserConfig }
 
   TUserConfig = class(TForm)
+    btnFillCondition: TButton;
     btnRun: TButton;
     btnRandomize: TButton;
     btnSave: TButton;
@@ -51,18 +52,18 @@ type
     btnNextGeneral: TButton;
     btnNextTrials: TButton;
     cbShowRepetitions: TCheckBox;
-    chkUseMedia: TCheckBox;
-    btnFillType: TButton;
+    btnGridType: TButton;
     chkPlayOnSecondMonitor: TCheckBox;
     gbRepetitions: TGroupBox;
-    Image1: TImage;
-    Image2: TImage;
     lblITI: TLabel;
     lblmilisec: TLabel;
     leParticipant: TLabeledEdit;
-    leSchedule: TLabeledEdit;
+    leFillValue: TLabeledEdit;
     leSessionName: TLabeledEdit;
     Memo1: TMemo;
+    piFillEven: TMenuItem;
+    piFillOdd: TMenuItem;
+    piFillAll: TMenuItem;
     piMatrix: TMenuItem;
     piAxes: TMenuItem;
     OpenDialog1: TOpenDialog;
@@ -70,8 +71,9 @@ type
     piExpectedResponse: TMenuItem;
     OpenPictureDialog1: TOpenPictureDialog;
     pgRodar: TPageControl;
-    pmRand: TPopupMenu;
-    pmFillType: TPopupMenu;
+    pmRandomize: TPopupMenu;
+    pmGridType: TPopupMenu;
+    pmFillCondition: TPopupMenu;
     SaveDialog1: TSaveDialog;
     seCount: TSpinEdit;
     seITI: TSpinEdit;
@@ -81,7 +83,8 @@ type
     tbStimuli: TTabSheet;
     tbTrials: TTabSheet;
     procedure btnCheckClick(Sender: TObject);
-    procedure btnFillTypeClick(Sender: TObject);
+    procedure btnFillConditionClick(Sender: TObject);
+    procedure btnGridTypeClick(Sender: TObject);
     procedure btnNextGeneralClick(Sender: TObject);
     procedure btnNextStimuliClick(Sender: TObject);
     procedure btnNextTrialsClick(Sender: TObject);
@@ -96,6 +99,7 @@ type
     procedure FormPaint(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
     procedure piClick(Sender: TObject);
+    procedure piFillEvenClick(Sender: TObject);
     procedure StringGrid1Click(Sender: TObject);
     procedure StringGrid1ColRowMoved(Sender: TObject; IsColumn: Boolean;
       sIndex, tIndex: Integer);
@@ -103,16 +107,17 @@ type
       Rect: TRect; aState: TGridDrawState);
   private
     FRepetitionMatrix : array of array of boolean;
-    FLastColCheckRepetition : integer;
+    FLastFocusedCol : integer;
     FNumTrials : integer;
     FSession : TSession;
     FManager : TCounterManager;
     FConfigs : TCfgSes;
     FEscriba : TEscriba;
-    procedure RandTrialIndex;
-    procedure ResetRepetionMatrix;
+    function MeetCondition(aCol, aRow : integer): boolean;
     procedure CheckRepetitionCol(aCol : integer);
     procedure EndSession(Sender : TObject);
+    procedure RandTrialIndex;
+    procedure ResetRepetionMatrix;
     //SimpleGui : TSimpleGui;
     //FData : TRegData;
     //FConfig : TConfig;
@@ -133,8 +138,8 @@ resourcestring
   rsContingency = 'Contingência';
   rsPositive = 'Positiva';
   rsNegative = 'Negativa';
-  rsDefaultPositiveCsq = 'CSQ+';
-  rsDefaultNegativeCsq = 'CSQ-';
+  rsDefaultPositiveCsq = 'NONE,MISS,HIT,';
+  rsDefaultNegativeCsq = 'NONE,HIT,MISS,';
   rsSize = 'Tamanho';
   rsDefBlc = 'Bloco 1';
   rsEndSession = 'Fim.';
@@ -170,12 +175,11 @@ end;
 
 procedure TUserConfig.piClick(Sender: TObject);
 begin
-  if (TMenuItem(Sender) = piAxes) and (btnFillType.Caption <> rsFillTypeAxes) then
+  if (TMenuItem(Sender) = piAxes) and (btnGridType.Caption <> rsFillTypeAxes) then
     begin
-      btnFillType.Caption := rsFillTypeAxes;
-      leSchedule.Text := 'FT 20';
-      StringGrid1.ColCount := 9;
+      btnGridType.Caption := rsFillTypeAxes;
 
+      StringGrid1.ColCount := 9;
       with StringGrid1 do
         begin
           Cells[0, 0] := rsTrials;
@@ -192,10 +196,10 @@ begin
       ResetRepetionMatrix;
     end;
 
-  if (TMenuItem(Sender) = piMatrix) and (btnFillType.Caption <> rsFillTypeMatriz) then
+  if (TMenuItem(Sender) = piMatrix) and (btnGridType.Caption <> rsFillTypeMatriz) then
     begin
-      btnFillType.Caption := rsFillTypeMatriz;
-      leSchedule.Text := 'FRFT 3 40 0 0';
+      btnGridType.Caption := rsFillTypeMatriz;
+
       StringGrid1.ColCount := 4;
       with StringGrid1 do
         begin
@@ -221,13 +225,20 @@ begin
   TMenuItem(Sender).Checked := True;
 end;
 
+procedure TUserConfig.piFillEvenClick(Sender: TObject);
+begin
+
+end;
+
+
 procedure TUserConfig.StringGrid1Click(Sender: TObject);
 begin
   //showmessage(inttostr(StringGrid1.Col) + ' ' + inttostr(StringGrid1.Row));
-  if cbShowRepetitions.Checked and (StringGrid1.Col <> 0) then
+  if StringGrid1.Col <> 0 then
     begin
-      FLastColCheckRepetition := StringGrid1.Col;
-      CheckRepetitionCol(StringGrid1.Col);
+      FLastFocusedCol := StringGrid1.Col;
+      leFillValue.EditLabel.Caption := StringGrid1.Cells[StringGrid1.Col,0];
+      if cbShowRepetitions.Checked then CheckRepetitionCol(StringGrid1.Col);
     end;
 end;
 
@@ -237,7 +248,7 @@ begin
   if not IsColumn then
     begin
       ResetRepetionMatrix;
-      if (FLastColCheckRepetition <> -1) and cbShowRepetitions.Checked then CheckRepetitionCol(FLastColCheckRepetition);
+      if (FLastFocusedCol <> -1) and cbShowRepetitions.Checked then CheckRepetitionCol(FLastFocusedCol);
     end;
 end;
 
@@ -278,6 +289,25 @@ begin
   finally
     OldCanvas.Free;
   end;
+end;
+
+function TUserConfig.MeetCondition(aCol, aRow : integer): boolean;
+var
+  aRowString : string;
+begin
+
+  Result := False;
+
+  if piFillAll.Checked then
+    Result := piFillAll.Checked;
+
+  if piFillOdd.Checked then
+    if (StrToIntDef(StringGrid1.Cells[0, aRow], 2) mod 2) <> 0 then
+      Result := piFillOdd.Checked;
+
+  if piFillEven.Checked then
+    if (StrToIntDef(StringGrid1.Cells[0, aRow], 1) mod 2) = 0 then
+      Result := piFillEven.Checked;
 end;
 
 procedure TUserConfig.RandTrialIndex;
@@ -345,7 +375,7 @@ begin
 end;
 
 procedure TUserConfig.CheckRepetitionCol(aCol : integer);
-var aRowCount, aColCount, aRow, i, j,
+var aRowCount, aRow, i,
     aBeginRow, aEndRow, Count : integer;
     LastLine, Reset : Boolean;
 
@@ -355,7 +385,6 @@ begin
   LastLine := False;
 
   aRowCount := StringGrid1.RowCount;
-  aColCount := StringGrid1.ColCount;
 
   for aRow := 1 to aRowCount -2 do
     begin
@@ -410,12 +439,26 @@ begin
     end;
 
   ResetRepetionMatrix;
-  if FLastColCheckRepetition <> -1 then CheckRepetitionCol(FLastColCheckRepetition);
+  if FLastFocusedCol <> -1 then CheckRepetitionCol(FLastFocusedCol);
 end;
 
 procedure TUserConfig.btnCheckClick(Sender: TObject);
 begin
 //
+end;
+
+procedure TUserConfig.btnFillConditionClick(Sender: TObject);
+var
+    aRow,
+    aRowCount : integer;
+
+begin
+  if (FLastFocusedCol <> -1) and (FLastFocusedCol <> 0) then
+    begin
+      aRowCount := StringGrid1.RowCount;
+      for aRow := 1 to aRowCount -1 do
+        if MeetCondition(FLastFocusedCol, aRow) then StringGrid1.Cells[FLastFocusedCol, aRow] := leFillValue.Text;
+    end;
 end;
 
 procedure TUserConfig.btnNextGeneralClick(Sender: TObject);
@@ -432,7 +475,7 @@ end;
 
 procedure TUserConfig.btnNextTrialsClick(Sender: TObject);
 var
-  aTrial, aStm, aBlc, aCol, NumTrials : integer;
+  aTrial, aStm, aBlc, NumTrials : integer;
   aHStm : integer;
   aValues : string;
 
@@ -508,7 +551,8 @@ begin
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          //FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(False, '1','0');
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[8, aTrial + 1];
@@ -557,7 +601,8 @@ begin
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          //FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(False, '1','0');
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ExpectedResponse] := StringGrid1.Cells[2, aTrial + 1];
@@ -592,12 +637,13 @@ end;
 
 procedure TUserConfig.chkUseMediaChange(Sender: TObject);
 begin
-  Image1.Visible := chkUseMedia.Checked;
-  Image2.Visible := chkUseMedia.Checked
+  //GUI to select custom images from media files was not implemented yet
+  //Image1.Visible := chkUseMedia.Checked;
+  //Image2.Visible := chkUseMedia.Checked
 end;
 
 
-procedure TUserConfig.btnFillTypeClick(Sender: TObject);
+procedure TUserConfig.btnGridTypeClick(Sender: TObject);
 var
   aRow, aCol, aNode, aTrial, aAxis : integer;
   cAngle,              //Angle
@@ -617,7 +663,7 @@ var
 
     with StringGrid1 do
       begin
-        if (aRow +1) > RowCount then RowCount := aRow +1;
+        if (aRow +1) > RowCount then RowCount := aRow + 1;
         Cells[0, aRow] := IntToStr(aRow);    //Trial Number
         Cells[1, aRow] := cAngle;
         Cells[2, aRow] := cX0;
@@ -626,7 +672,7 @@ var
         Cells[5, aRow] := cY1;
         Cells[6, aRow] := IntToStr(Round(Random * 1));
         Cells[7, aRow] := cSize;
-        Cells[8, aRow] := leSchedule.Text;
+        Cells[8, aRow] := 'FT 20';
         Inc(aRow);
         end;
   end;
@@ -652,7 +698,7 @@ var
       begin
         if (aRow + 1) > RowCount then RowCount := aRow + 1;
         Cells[0, aRow] := IntToStr(aRow);    //Trial Number
-        Cells[1, aRow] := leSchedule.Text;
+        Cells[1, aRow] := 'FRFT 3 40 0 0';
         Cells[2, aRow] := aContingency;
         Cells[3, aRow] := aConsequence;
         aCol := 4;
@@ -699,12 +745,12 @@ begin
               cAngle := List[aAxis].Angle;
               cSize := IntToStr(List[aAxis].Size);
               for aNode := Low(List[aAxis].Line) to High(List[aAxis].Line) do
-                for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] -1 do AddAxesToGrid;
+                for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] - 1 do AddAxesToGrid;
             end;
-        FNumTrials := aRow -1;
+        FNumTrials := aRow - 1;
         BresenhamLineForm.Free;
         ResetRepetionMatrix;
-        FLastColCheckRepetition := -1;
+        FLastFocusedCol := -1;
       end;
   end;
 
@@ -720,16 +766,15 @@ begin
             FNumTrials := aRow - 1;
             MatrixForm.Free;
             ResetRepetionMatrix;
-            FLastColCheckRepetition := -1;
+            FLastFocusedCol := -1;
           end;
     end;
 end;
 
 procedure TUserConfig.FormCreate(Sender: TObject);
-var aRowCount, aColCount, i,j : integer;
 begin
   Randomize;
-  FLastColCheckRepetition := -1;
+  FLastFocusedCol := -1;
   StringGrid1.ColCount := 9;
   Caption := Application.Title + ' - ' + 'cpicanco@ufpa.br';
 
@@ -744,8 +789,8 @@ begin
       Cells[6, 0] := rsExpectedResponse;
       Cells[7, 0] := rsSize;
       Cells[8, 0] := rsSchedule;
-      aRowCount := RowCount;
-      aColCount := ColCount;
+      //aRowCount := RowCount;
+      //aColCount := ColCount;
     end;
 
   ResetRepetionMatrix;

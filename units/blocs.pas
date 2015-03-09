@@ -177,28 +177,33 @@ var s0, s1, s2, s3, s4 : string;
   var
       Values : string;
   begin
-    if FTrial.IETConsequence = 'CSQ+' then
+    if FTrial.IETConsequence = T_HIT then
       begin
         // FileName, HowManyLoops, Color, MediaDuration
         Values := 'CSQ1.wav 1 255 1000';
 
       end
     else
-      if FTrial.IETConsequence = 'CSQ-' then
+      if FTrial.IETConsequence = T_MISS then
         begin
           // FileName, HowManyLoops, Color, MediaDuration
           Values := 'CSQ2.wav 1 0 1000';
 
         end
+      else
+        if FTrial.IETConsequence = T_NONE then
+          begin
+            Values := 'NONE 0 -1 0';
+          end
       else Values := FTrial.IETConsequence;
 
     s0 := Values + #32;
     as1:= FTrial.RootMedia + Copy(s0, 0, pos(#32, s0)-1);
     NextSpaceDelimitedParameter;
     as2:= Copy(s0, 0, pos(#32, s0)-1);
-    NextSpaceDelimitedParameter
+    NextSpaceDelimitedParameter;
     as3:= Copy(s0, 0, pos(#32, s0)-1);
-    NextSpaceDelimitedParameter
+    NextSpaceDelimitedParameter;
     as4:= Copy(s0, 0, pos(#32, s0)-1);
   end;
 begin

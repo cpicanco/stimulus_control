@@ -96,6 +96,7 @@ begin
 
   Python := TProcess.Create(nil);
   Python.CommandLine := 'python' + #32 + argv;
+
   try
     Python.Execute;
   finally
