@@ -45,9 +45,12 @@ type
     stmImage : TImage;
   end;
 
+  { TKey }
+
   TKey = class(TCustomControl)
   private
     FAudioChannel : TBassChannel;
+    FKeyPress: TNotifyEvent;
     FSchMan: TSchMan;
     FCounterResponse : TCounter;
     FOnConsequence: TNotifyEvent;
@@ -97,6 +100,7 @@ type
     property OnMouseDown;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnKeyPress: TNotifyEvent read FKeyPress write FKeyPress;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnConsequence2: TNotifyEvent read FOnConsequence2 write FOnConsequence2;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
@@ -111,7 +115,7 @@ constructor TKey.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Height:= 45;
-  Width:= 60;
+  Width:= 45;
   EditMode := False;
   FLRespPnt[0] := 0;
   FLRespPnt[1] := 0;
@@ -200,7 +204,7 @@ begin
     end
   else
     begin
-      PaintKey(Color);
+      if Color <> -1 then PaintKey(Color);
     end;
 end;
 
@@ -227,7 +231,7 @@ begin
     end;}
 end;
 
-procedure TKey.SetFileName(Path: String);                 //REVISAR
+procedure TKey.SetFileName(Path: string);                 //REVISAR
 var
     s1, s2 : String;
 
