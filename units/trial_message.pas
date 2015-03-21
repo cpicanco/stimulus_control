@@ -53,7 +53,7 @@ type
     procedure StartTrial(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(TestMode: Boolean; Correction : Boolean); override;
     procedure DispenserPlusCall; override;
   end;
 
@@ -65,7 +65,7 @@ procedure TMSG.Click;
 begin
   inherited Click;
   FLat := GetTickCount;
-  FDataTicks:= FDataTicks +
+  DataTicks := DataTicks +
                FormatFloat('####,####',FLat - Ft) + #9 +
                'BkgndClk' + #9 +
                '-' + #9 +
@@ -94,9 +94,9 @@ constructor TMSG.Create(AOwner: TComponent);
 begin
   Inherited Create(AOwner);
 
-  FHeader := 'Mensagem' + #9 + 'Lat.Cmp.';
+  Header := 'Mensagem' + #9 + 'Lat.Cmp.';
 
-  FHeaderTicks:= 'Tempo_ms' + #9 +
+  HeaderTicks:= 'Tempo_ms' + #9 +
                  'Cmp.Tipo' + #9 +
                  'FileName' + #9 +
                  'Left....' + #9 +
@@ -153,7 +153,7 @@ end;
 procedure TMSG.MemoClick(Sender: TObject);
 begin
   FLat := GetTickCount;
-  FDataTicks:= FDataTicks +
+  DataTicks:= DataTicks +
                FormatFloat('####,####',FLat - Ft) + #9 +
                'MemoClk' + #9 +
                '-' + #9 +
@@ -168,27 +168,26 @@ begin
   //SetFocus;
 end;
 
-procedure TMSG.Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean);
+procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);
 var H: Integer;
 begin
-  FManager := Manager;
-  FNextTrial:= '-1';
-  Color:= StrToIntDef(FCfgTrial.SList.Values['BkGnd'], 0);
-  FCanPassTrial := StrToBoolDef(FCfgTrial.SList.Values['AutoNxt'], True);
+  NextTrial:= '-1';
+  Color:= StrToIntDef(CfgTrial.SList.Values['BkGnd'], 0);
+  FCanPassTrial := StrToBoolDef(CfgTrial.SList.Values['AutoNxt'], True);
   if FCanPassTrial = False then
     begin
-      FTrialInterval := StrToIntDef(FCfgTrial.SList.Values['CustomNxtValue'], 10000);
+      FTrialInterval := StrToIntDef(CfgTrial.SList.Values['CustomNxtValue'], 10000);
       SetTimerCsq;
     end;
 
   If TestMode then Cursor := 0
-  else Cursor := StrToIntDef(FCfgTrial.SList.Values['Cursor'], 0);
+  else Cursor := StrToIntDef(CfgTrial.SList.Values['Cursor'], 0);
 
-  FMemo.Text := FCfgTrial.SList.Values['Msg'];
-  FMemo.Width := StrToIntDef(FCfgTrial.SList.Values['MsgWidth'], 640);
-  FMemo.Font.Size := StrToIntDef(FCfgTrial.SList.Values['MsgFontSize'], 28);
-  FMemo.Font.Color := StrToIntDef(FCfgTrial.SList.Values['MsgFontColor'], clWhite);
-  FMemo.Color := StrToIntDef(FCfgTrial.SList.Values['BkGnd'], clBlack);
+  FMemo.Text := CfgTrial.SList.Values['Msg'];
+  FMemo.Width := StrToIntDef(CfgTrial.SList.Values['MsgWidth'], 640);
+  FMemo.Font.Size := StrToIntDef(CfgTrial.SList.Values['MsgFontSize'], 28);
+  FMemo.Font.Color := StrToIntDef(CfgTrial.SList.Values['MsgFontColor'], clWhite);
+  FMemo.Color := StrToIntDef(CfgTrial.SList.Values['BkGnd'], clBlack);
 
   H:= (FMemo.Lines.Count + 2) * FMemo.Font.Height * -1;
   FMemo.SetBounds((Width-FMemo.Width)div 2, (Height-H)div 2, FMemo.Width, H);
@@ -197,7 +196,7 @@ begin
   If Cursor = 0 then FMemo.Cursor:= crArrow
   else FMemo.Cursor:= Cursor;
 
-  FMemoPrompt.Visible:= StrToBoolDef(FCfgTrial.SList.Values['Prompt'], False);
+  FMemoPrompt.Visible:= StrToBoolDef(CfgTrial.SList.Values['Prompt'], False);
   If FMemoPrompt.Visible then begin
     FMemoPrompt.SetBounds((Width-FMemoPrompt.Width)div 2, (Height-FMemoPrompt.Height)-20, FMemoPrompt.Width, FMemoPrompt.Height);
     FMemoPrompt.Font.Color:= FMemo.Font.Color;
@@ -222,7 +221,7 @@ procedure TMSG.TimerCsqTimer(Sender: TObject);
 begin
   FTimerCsq.Enabled:= False;
   FLat := GetTickCount;
-  FDataTicks:= FDataTicks +
+  DataTicks:= DataTicks +
                FormatFloat('####,####',FLat - Ft) + #9 +
                'TimeCsq' + #9 +
                '-' + #9 +
@@ -236,15 +235,15 @@ procedure TMSG.WriteData(Sender: TObject);
 var Lat_Cmp : string;
 begin
   Lat_Cmp := FormatFloat('#####,###',FLat - Ft) + #9 + 'ms';
-  FData := FMemo.Lines.Text + #9 + Lat_Cmp;
-  if Assigned(OnWriteTrialData) then FOnWriteTrialData(Sender);
+  Data := FMemo.Lines.Text + #9 + Lat_Cmp;
+  if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
 end;
 
 procedure TMSG.EndTrial(Sender: TObject);
 begin
   WriteData(Sender);
   if FCanPassTrial then
-    if Assigned(OnEndTrial) then FOnEndTrial(Sender);
+    if Assigned(OnEndTrial) then OnEndTrial(Sender);
 end;
 
 end.

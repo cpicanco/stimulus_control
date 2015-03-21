@@ -49,78 +49,82 @@ type
 
   TBlc = class(TComponent)
   private
-    FCounterLabel : TLabel;
-    FTimeStart: cardinal;
-    FITIBegin : cardinal;
-    FITIEnd : cardinal;
-    FTrial: TTrial;
-    FIETMedia : TKey;
-    FManager : TCounterManager;
-    FData : String;
-    FDataTicks : String;
-    FBlcHeader: String;
-    FTimestampsPath : string;
-    FRegData: TRegData;
+    //FOnBeginTrial: TNotifyEvent;
     //FRegDataTicks: TRegData;
-    FNextBlc: String;
-    FOnEndBlc: TNotifyEvent;
     FBackGround: TWinControl;
     FBlc: TCfgBlc;
-    FLastHeader: String;
-    FTimerITI: TTimer;
-    FTimerTO : TTimer;
-    FTimerCsq : TTimer;
-    FShowCounter : Boolean;
-    FTestMode: Boolean;
+    FBlcHeader: String;
+    FClientThread : TClientThread;
+    FCounterLabel : TLabel;
+    FData : String;
+    FDataTicks : String;
+    FIETMedia : TKey;
     FIsCorrection : Boolean;
+    FITIBegin : cardinal;
+    FITIEnd : cardinal;
+    FLastHeader: String;
+    FCounterManager : TCounterManager;
+    FNextBlc: String;
     FOnBeginCorrection : TNotifyEvent;
-    FOnEndCorrection : TNotifyEvent;
-    FOnStmResponse: TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
-    //FOnBeginTrial: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
+    FOnCriteria: TNotifyEvent;
+    FOnEndBlc: TNotifyEvent;
+    FOnEndCorrection : TNotifyEvent;
+    FOnEndTrial: TNotifyEvent;
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
-    FOnCriteria: TNotifyEvent;
-    FClientThread : TClientThread;
+    FOnStmResponse: TNotifyEvent;
+    FRegData: TRegData;
+    FServerAddress: string;
+    FShowCounter : Boolean;
+    FTestMode: Boolean;
+    FTimerCsq : TTimer;
+    FTimerITI: TTimer;
+    FTimerTO : TTimer;
+    FTimestampsPath : string;
+    FTimeStart: cardinal;
+    FTrial: TTrial;
     procedure CreateClientThread(Code : string);
-    procedure DebugStatus(msg : string);
     procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
-    procedure ShowCounterPlease (Kind : String);
-    procedure IETResponse(Sender: TObject);
-    procedure IETConsequence(Sender: TObject);
-    procedure EndBlc(Sender: TObject);
+    procedure DebugStatus(msg : string);
     procedure PlayTrial;
-    procedure WriteTrialData(Sender: TObject);
-    procedure TrialTerminate(Sender: TObject);
+    procedure ShowCounterPlease (Kind : String);
+    // events
+    procedure BkGndResponse(Sender: TObject);
+    procedure EndBlc(Sender: TObject);
+    procedure Hit(Sender: TObject);
+    procedure IETConsequence(Sender: TObject);
+    procedure IETResponse(Sender: TObject);
+    procedure Miss(Sender: TObject);
+    procedure StmResponse(Sender: TObject);
+    procedure TimerCsqTimer(Sender: TObject);
     procedure TimerITITimer(Sender: TObject);
     procedure TimerTOTimer(Sender: TObject);
-    procedure TimerCsqTimer(Sender: TObject);
-    procedure StmResponse(Sender: TObject);
-    procedure BkGndResponse(Sender: TObject);
-    procedure Hit(Sender: TObject);
-    procedure Miss(Sender: TObject);
+    procedure TrialTerminate(Sender: TObject);
+    procedure WriteTrialData(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
-    property ShowCounter : Boolean read FShowCounter write FShowCounter;
-    property RegData: TRegData read FRegData write FRegData;
     //property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
-    property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
-    property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
+    property RegData: TRegData read FRegData write FRegData;
+    property ServerAddress : string read FServerAddress write FServerAddress;
+    property ShowCounter : Boolean read FShowCounter write FShowCounter;
+    property TimeStart : cardinal read FTimeStart write FTimeStart;
+  public
+    property OnBeginCorrection: TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
+    property OnCriteria: TNotifyEvent read FOnCriteria write FOnCriteria;
+    property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
+    property OnEndCorrection: TNotifyEvent read FOnEndCorrection write FOnEndCorrection;
     property OnEndTrial : TNotifyEvent read FOnEndTrial write FOnEndTrial;
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
-    property OnBeginCorrection: TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
-    property OnEndCorrection: TNotifyEvent read FOnEndCorrection write FOnEndCorrection;
-    property OnCriteria: TNotifyEvent read FOnCriteria write FOnCriteria;
-    property TimeStart : cardinal read FTimeStart write FTimeStart;
+    property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
   end;
 
 implementation
@@ -137,11 +141,11 @@ end;
 
 procedure TBlc.Hit(Sender: TObject);
 begin
-  FManager.OnHit(Sender);
+  FCounterManager.OnHit(Sender);
   if FBlc.CrtKCsqHit > 0 then
-    if FBlc.CrtKCsqHit = FManager.BlcCsqHits.Counter then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
+    if FBlc.CrtKCsqHit = FCounterManager.BlcCsqHits.Counter then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
       begin
-        FManager.OnCsqCriterion(Sender);
+        FCounterManager.OnCsqCriterion(Sender);
         FTrial.DispenserPlusCall;
       end;
   if Assigned(OnHit) then FOnHit(Sender);
@@ -159,7 +163,7 @@ end;
 
 procedure TBlc.Miss(Sender: TObject);
 begin
-  FManager.OnMiss(Sender);
+  FCounterManager.OnMiss(Sender);
   if Assigned(OnMiss) then FOnMiss(Sender);
 end;
 
@@ -213,22 +217,22 @@ begin
   FDataTicks := '';
 
   if  (FTrial.NextTrial = 'END') then //end session
-    FManager.CurrentTrial.Counter := FBlc.NumTrials
+    FCounterManager.CurrentTrial.Counter := FBlc.NumTrials
   else //continue
-    if (FTrial.NextTrial = 'CRT') or             // FTrial.NextTrial base 1, FManager.CurrentTrial.Counter base 0)
-       (FTrial.NextTrial = (IntToStr(FManager.CurrentTrial.Counter + 1))) then
+    if (FTrial.NextTrial = 'CRT') or             // FTrial.NextTrial base 1, FCounterManager.CurrentTrial.Counter base 0)
+       (FTrial.NextTrial = (IntToStr(FCounterManager.CurrentTrial.Counter + 1))) then
       begin //correction trials were on
-        if ((FBlc.MaxCorrection) = FManager.BlcCscCorrections.Counter) and
+        if ((FBlc.MaxCorrection) = FCounterManager.BlcCscCorrections.Counter) and
            (FBlc.MaxCorrection <> 0) then
           begin //correction
-            FManager._VirtualTrialFix;
-            FManager.OnNotCorrection(Sender);
-            FManager.OnEndTrial (Sender);
+            FCounterManager._VirtualTrialFix;
+            FCounterManager.OnNotCorrection(Sender);
+            FCounterManager.OnEndTrial (Sender);
             FIsCorrection := False;
           end
         else
           begin // not correction
-            FManager.OnCorrection(Sender);
+            FCounterManager.OnCorrection(Sender);
             FIsCorrection := True;
           end;
       end
@@ -236,31 +240,31 @@ begin
       if StrToIntDef(FTrial.NextTrial, 0) > 0 then
         begin //go to the especified trial
           if FTrial.Result = 'MISS' then
-            FManager.VirtualTrialLoop.Counter := FManager.VirtualTrialValue;
+            FCounterManager.VirtualTrialLoop.Counter := FCounterManager.VirtualTrialValue;
 
-          FManager.OnNotCorrection(Sender);
-          FManager.CurrentTrial.Counter := StrToIntDef(FTrial.NextTrial, 0) - 1;
-          FManager.OnNxtTrial (Sender);
+          FCounterManager.OnNotCorrection(Sender);
+          FCounterManager.CurrentTrial.Counter := StrToIntDef(FTrial.NextTrial, 0) - 1;
+          FCounterManager.OnNxtTrial (Sender);
           FIsCorrection := False;
         end
       else // go to the next trial,
         begin
           if FTrial.Result = 'MISS' then
-            FManager.VirtualTrialLoop.Counter := FManager.VirtualTrialValue;
+            FCounterManager.VirtualTrialLoop.Counter := FCounterManager.VirtualTrialValue;
 
-          FManager.OnNotCorrection(Sender);
-          FManager.OnEndTrial (Sender);
+          FCounterManager.OnNotCorrection(Sender);
+          FCounterManager.OnEndTrial (Sender);
           FIsCorrection := False;
         end;
 
   //Critérios de ACERTO atingido
-  if  ((FBlc.CrtConsecutiveHit > 0) and (FBlc.CrtConsecutiveHit = FManager.BlcCscHits.Counter))
-   //or ((FCfgBlc.CrtConsecutiveMiss > 0) and (FCfgBlc.CrtConsecutiveMiss = FManager.BlcCscMisses.Counter))
+  if  ((FBlc.CrtConsecutiveHit > 0) and (FBlc.CrtConsecutiveHit = FCounterManager.BlcCscHits.Counter))
+   //or ((FCfgBlc.CrtConsecutiveMiss > 0) and (FCfgBlc.CrtConsecutiveMiss = FCounterManager.BlcCscMisses.Counter))
    or ((FTrial.NextTrial = IntToStr(FBlc.CrtMaxTrials)) and (FBlc.CrtMaxTrials > 0))
   then
       begin
         if Assigned(OnCriteria) then FOnCriteria(Sender);
-        FManager.CurrentTrial.Counter := FBlc.NumTrials
+        FCounterManager.CurrentTrial.Counter := FBlc.NumTrials
       end;
   // FileName, HowManyLoops, Color, MediaDuration
 
@@ -393,12 +397,12 @@ begin
   FLastHeader:= FTrial.Header;
   FBlcHeader:= #32#32#32#32#32#32#32#32#9#32#32#32#32#32#32#32#32#9;
 
-  CountTr := IntToStr(FManager.Trials.Counter + 1);
-  NumTr:= IntToStr(FManager.CurrentTrial.Counter + 1);
-  if FBlc.Trials[FManager.CurrentTrial.Counter].Name = '' then NameTr:= '--------'
-  else NameTr:= FBlc.Trials[FManager.CurrentTrial.Counter].Name;
+  CountTr := IntToStr(FCounterManager.Trials.Counter + 1);
+  NumTr:= IntToStr(FCounterManager.CurrentTrial.Counter + 1);
+  if FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name = '' then NameTr:= '--------'
+  else NameTr:= FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name;
 
-  if (FManager.CurrentTrial.Counter + 1) = 1 then
+  if (FCounterManager.CurrentTrial.Counter + 1) = 1 then
     begin
       FData:= FData + CountTr + #9 +
           NumTr + #9 +
@@ -456,7 +460,7 @@ end;
 
 procedure TBlc.CreateClientThread(Code: string);
 begin
-  FClientThread := TClientThread.Create( True, FManager.CurrentTrial.Counter, Code, FTimestampsPath);
+  FClientThread := TClientThread.Create( FCounterManager.CurrentTrial.Counter, Code, FTimestampsPath );
   FClientThread.OnShowStatus := @DebugStatus;
   FClientThread.Start;
 end;
@@ -466,7 +470,7 @@ begin
   //do nothing
 end;
 
-procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color : string);
+procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
 var
     MediaPath : string;
 begin
@@ -505,15 +509,16 @@ end;
 procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
 var
   aFileName : string;
+
 begin
   FBlc:= CfgBlc;
-  FManager := Manager;
+  FCounterManager := Manager;
 
   FTestMode:= TestMode;
 
   FLastHeader:= '';
 
-  FManager.CurrentTrial.Counter := IndTent;
+  FCounterManager.CurrentTrial.Counter := IndTent;
   FIsCorrection := False;
 
   FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
@@ -521,6 +526,7 @@ begin
 
   aFileName := ExtractFileNameWithoutExt(FRegData.FileName);
   FTimestampsPath := aFileName + '.timestamps';
+  //ForceDirectoriesUTF8(ExtractFilePath(FTimestampsPath));
   //FRegDataTicks.SaveData(FBlc.Name);
   PlayTrial;
 end;
@@ -530,7 +536,7 @@ var IndTrial : integer;
 begin
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
 
-  IndTrial := FManager.CurrentTrial.Counter;
+  IndTrial := FCounterManager.CurrentTrial.Counter;
 
   if IndTrial < FBlc.NumTrials then
     begin
@@ -544,6 +550,8 @@ begin
 
       if Assigned(FTrial) then
         begin
+          FTrial.CounterManager := FCounterManager;
+          FTrial.ServerAddress := FServerAddress;
           FTrial.TimeStart := FTimeStart;
           FTrial.FileName := FTimestampsPath;
           FTrial.Parent := FBackGround;
@@ -556,7 +564,7 @@ begin
           FTrial.OnMiss := @Miss;
           FTrial.CfgTrial := FBlc.Trials[IndTrial];
           FTrial.Visible := False;
-          FTrial.Play(FManager, FTestMode, FIsCorrection);
+          FTrial.Play(FTestMode, FIsCorrection);
           FTrial.Visible := True;
           FTrial.SetFocus;
         //BlockInput(False);
@@ -585,7 +593,7 @@ begin
       AutoSize := True;
       WordWrap := True;
 
-      Caption := IntToStr(FManager.OnHitResult);
+      Caption := IntToStr(FCounterManager.OnHitResult);
       //Color := clBtnFace;
       Font.Size := 100;
       Font.Color := clWhite;

@@ -27,13 +27,20 @@ unit trial_mirrored_stm;
 
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils,
-     counter,
-     dialogs,
-     session_config,
-     countermanager,
-     trial_abstract, custom_timer, constants, client,
-     draw_methods, schedules_abstract, response_key;
+uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils
+
+  , counter
+  , dialogs
+  , session_config
+  , countermanager
+  , trial_abstract
+  , custom_timer
+  , constants
+  , client
+  , draw_methods
+  , schedules_abstract
+  , response_key
+  ;
 
 type
 
@@ -59,8 +66,6 @@ type
     FClockThread : TClockThread;
     FClientThread : TClientThread;
     FList : TStringList;
-    procedure CreateClientThread(Code : string);
-    procedure DebugStatus(msg : string);
   protected
     procedure BeginCorrection (Sender : TObject);
     procedure EndCorrection (Sender : TObject);
@@ -85,7 +90,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy;override;
 
-    procedure Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(TestMode: Boolean; Correction : Boolean); override;
 
   end;
 
@@ -95,7 +100,7 @@ implementation
 constructor TMRD.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FHeader := '___Angle' + #9 +
+  Header := '___Angle' + #9 +
              '______X1' + #9 +
              '______Y1' + #9 +
              '______X2' + #9 +
@@ -124,12 +129,12 @@ end;
 
 procedure TMRD.BeginCorrection(Sender: TObject);
 begin
-  if Assigned (OnBeginCorrection) then FOnBeginCorrection (Sender);
+  if Assigned (OnBeginCorrection) then OnBeginCorrection (Sender);
 end;
 
 procedure TMRD.EndCorrection(Sender: TObject);
 begin
-  if Assigned (OnEndCorrection) then FOnEndCorrection (Sender);
+  if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
 end;
 
 procedure TMRD.Consequence(Sender: TObject);
@@ -140,17 +145,17 @@ begin
       FCanResponse:= False;
       //FDataSupport.StmDuration := GetTickCount;
 
-      //FResult := 'HIT';
-      //FResult := 'MISS';
-      FResult := 'NONE';
+      //Result := 'HIT';
+      //Result := 'MISS';
+      Result := 'NONE';
 
-      if FCircles.NextTrial = T_CRT then FNextTrial := T_CRT
-      else FNextTrial := FCircles.NextTrial;
+      if FCircles.NextTrial = T_CRT then NextTrial := T_CRT
+      else NextTrial := FCircles.NextTrial;
 
       //Dispenser(FDataCsq, FDataUsb);
       //if FResult = 'HIT' then  Hit(Sender);
       //if FResult = 'MISS' then  Miss(Sender);
-      if FResult = 'NONE' then  None(Sender);
+      if Result = 'NONE' then  None(Sender);
 
     EndTrial(Sender);
     end;
@@ -226,7 +231,7 @@ begin
     end;
 end;
 
-procedure TMRD.Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean);
+procedure TMRD.Play(TestMode: Boolean; Correction : Boolean);
 var
   s1, sName, sLoop, sColor, sGap, sGapDegree, sGapLength : string;
   R : TRect;
@@ -246,25 +251,24 @@ var
         Color := StrToIntDef(sColor, $0000FF {clRed} );
         HowManyLoops:= StrToIntDef(sLoop, 0);
         FullPath:= sName;
-        SchMan.Kind:= FCfgTrial.SList.Values[_Schedule];
+        SchMan.Kind:= CfgTrial.SList.Values[_Schedule];
         //Visible := False;
       end;
   end;
 
 begin
   FCanResponse:= False;
-  FNextTrial:= '-1';
-  FManager := Manager;
+  NextTrial := '-1';
   Randomize;
 
 
-  FUseMedia := StrToBoolDef(FCfgTrial.SList.Values[_UseMedia], False);
+  FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
 
-  FShowStarter := StrToBoolDef(FCfgTrial.SList.Values[_ShowStarter], False);
+  FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
   //FStarterSchedule :=  necessary?
 
   if FUseMedia then
-    FRootMedia := FCfgTrial.SList.Values[_RootMedia]
+    RootMedia := CfgTrial.SList.Values[_RootMedia]
   else
     begin
       SetLength(FCircles.C, 2);
@@ -274,9 +278,9 @@ begin
   else FIsCorrection := False;
 
   //self descends TCustomControl
-  Color:= StrToIntDef(FCfgTrial.SList.Values[_BkGnd], 0);
+  Color:= StrToIntDef(CfgTrial.SList.Values[_BkGnd], 0);
   if TestMode then Cursor:= 0
-  else Cursor:= StrToIntDef(FCfgTrial.SList.Values[_Cursor], 0);
+  else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
 
   FSchedule := TSchMan.Create(self);
   with FSchedule do
@@ -286,14 +290,14 @@ begin
       OnResponse:= @Response;
     end;
 
-  FCircles.angle := StrToFloatDef(FCfgTrial.SList.Values[_Angle], 0.0);
-  FCircles.response := FCfgTrial.SList.Values[_Comp + '1' + _cGap];
-  FCircles.NextTrial := FCfgTrial.SList.Values[_NextTrial];
-  FSchedule.Kind:= FCfgTrial.SList.Values[_Schedule];
+  FCircles.angle := StrToFloatDef(CfgTrial.SList.Values[_Angle], 0.0);
+  FCircles.response := CfgTrial.SList.Values[_Comp + '1' + _cGap];
+  FCircles.NextTrial := CfgTrial.SList.Values[_NextTrial];
+  FSchedule.Kind:= CfgTrial.SList.Values[_Schedule];
 
   for a1 := 0 to 1 do
     begin
-        s1:= FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
+        s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
 
         R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
         NextSpaceDelimitedParameter;
@@ -306,7 +310,7 @@ begin
 
        if FUseMedia then
          begin
-           s1:= FCfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
+           s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
 
            sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
            NextSpaceDelimitedParameter;
@@ -324,11 +328,11 @@ begin
             begin
               o := Point(R.Left, R.Top);
               size := R.Right;
-              gap := StrToBoolDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
+              gap := StrToBoolDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
               if gap then
                   begin
-                    gap_degree := StrToIntDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
-                    gap_length := StrToIntDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
+                    gap_degree := StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
+                    gap_length := StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
                   end;
             end;
       end;
@@ -374,7 +378,7 @@ end;
 procedure TMRD.WriteData(Sender: TObject);  //
 begin
 
-  FData := //Format('%-*.*d', [4,8,FCfgTrial.Id + 1]) + #9 +
+  Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
            #32#32#32#32#32 + FormatFloat('000;;00', FCircles.angle) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[0].o.X]) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[0].o.Y]) + #9 +
@@ -401,37 +405,25 @@ procedure TMRD.EndTrial(Sender: TObject);
 begin
   FDataSupport.StmEnd := GetTickCount;
   WriteData(Sender);
-  FManager.OnConsequence(Self);
-  if Assigned(OnWriteTrialData) then FOnWriteTrialData (Self);
-  if Assigned(OnEndTrial) then FOnEndTrial(sender);
+  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);;
+  if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
+  if Assigned(OnEndTrial) then OnEndTrial(Sender);
 end;
 
 procedure TMRD.Hit(Sender: TObject);
 begin
-  if Assigned(OnHit) then FOnHit(Sender);
+  if Assigned(OnHit) then OnHit(Sender);
 end;
 
 procedure TMRD.Miss(Sender: TObject);
 begin
-  if Assigned(OnMiss) then FOnMiss (Sender);
+  if Assigned(OnMiss) then OnMiss (Sender);
 end;
 
 
 procedure TMRD.None(Sender: TObject);
 begin
-  if Assigned(OnNone) then FOnNone (Sender);
-end;
-
-procedure TMRD.CreateClientThread(Code: string);
-begin
-  FClientThread := TClientThread.Create( True, FCfgTrial.Id, Code, FileName );
-  FClientThread.OnShowStatus := @DebugStatus;
-  FClientThread.Start;
-end;
-
-procedure TMRD.DebugStatus(msg: string);
-begin
-
+  if Assigned(OnNone) then OnNone (Sender);
 end;
 
 procedure TMRD.Response(Sender: TObject);
@@ -449,8 +441,8 @@ begin
       else;
 
   Invalidate;
-  if Assigned(FManager.OnStmResponse) then FManager.OnStmResponse (Sender);
-  if Assigned(OnStmResponse) then FOnStmResponse (Self);
+  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);
+  if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
 
 end.

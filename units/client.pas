@@ -29,6 +29,8 @@ uses
    Classes
  , SysUtils
  , Process
+ , FileUtil
+ , zmqapi
  ;
 
 type
@@ -39,35 +41,49 @@ type
 
   TClientThread = class(TThread)
   private
+    FAddress: string;
+    FContext : TZMQContext;
+	  FSubscriber : TZMQSocket;
     FMsg : string;
     FTrialIndex : string;
     FCode : string;
     FTimestampsPath : string;
     FOnShowStatus: TShowStatusEvent;
+    FTimestampsFile : TextFile;
+    function GetTimestampFromMessage(aMessage : Utf8String) : Utf8String;
+    procedure SetAddress(AValue: string);
     procedure ShowStatus;
   protected
     procedure Execute; override;
   public
-    constructor Create(CreateSuspended : boolean; TrialIndex : integer; Code : string; OutputPath : string);
+    constructor Create(TrialIndex : integer; Code, OutputPath : string; CreateSuspended : boolean = True);
     destructor Destroy; override;
     property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
+    property ServerAddress : string read FAddress write SetAddress;
   end;
 
 implementation
 
-constructor TClientThread.Create(CreateSuspended : boolean; TrialIndex : integer; Code : string; OutputPath : string);
+constructor TClientThread.Create(TrialIndex : integer; Code, OutputPath : string; CreateSuspended : boolean = True);
 begin
   FreeOnTerminate := True;
+
   FTrialIndex := IntToStr(TrialIndex);
   FCode := Code;
   FTimestampsPath := OutputPath;
+  FAddress := '127.0.0.1:5000';
+
+  ForceDirectoriesUTF8(ExtractFilePath(FTimestampsPath));
+	AssignFile(FTimestampsFile, FTimestampsPath);
+	if FileExistsUTF8(FTimestampsPath) then
+	  Append(FTimestampsFile)
+	else Rewrite(FTimestampsFile);
 
   inherited Create(CreateSuspended);
 end;
 
 destructor TClientThread.Destroy;
 begin
-  //
   inherited Destroy;
 end;
 
@@ -80,31 +96,62 @@ begin
   end;
 end;
 
+function TClientThread.GetTimestampFromMessage(aMessage: Utf8String
+  ): Utf8String;
+
+  var aKey, aHeader : Utf8String;
+begin
+	aHeader := 'Pupil';
+	aKey := 'timestamp:';
+	Delete(  aMessage, Pos(aHeader, aMessage), Length(aHeader)  );
+	Delete(  aMessage, Pos(aKey, aMessage), Length(aKey)  );
+
+	while Pos(#10, aMessage) <> 0 do
+		Delete(  aMessage, Pos(#10, aMessage), Length(#10)  );
+
+	Result := aMessage;
+
+end;
+
+procedure TClientThread.SetAddress(AValue: string);
+begin
+  if FAddress = AValue then Exit;
+
+  if Length(AValue) > 0 then FAddress := AValue;
+end;
+
+
 procedure TClientThread.Execute;
 var
-  Python : TProcess;
-  argv : string;
+  data : string;
+  message : UTF8String;
 begin
-  FMsg := '[Begin]';
-  Synchronize( @Showstatus );
-
-  argv := '"' + GetCurrentDir + PathDelim + 'gettimestamp.py' + '"' + #32 +
-          '"' + FTimestampsPath + '"'  + #32 +
-          '"' + FTrialIndex + '"' + #32 + '"' + FCode + '"';
-  FMsg := argv;
-  Synchronize( @Showstatus );
-
-  Python := TProcess.Create(nil);
-  Python.CommandLine := 'python' + #32 + argv;
-
   try
-    Python.Execute;
-  finally
-    Python.Free;
-  end;
+    FContext := TZMQContext.Create;
+	  FSubscriber := FContext.Socket( stSub );
+    FSubscriber.connect( 'tcp://' + FAddress );
+    FSubscriber.subscribe( '' );
 
-  FMsg := '[End]';
-  Synchronize( @Showstatus );
+    FSubscriber.recv( message );
+
+    data := '(' + FTrialIndex + ',' + GetTimestampFromMessage(message) + ',' + FCode + ')';
+
+	  Writeln(FTimestampsFile, data);
+
+
+    FMsg := data + #10#10 +
+            '"' + FTimestampsPath + '"'  + #10 +
+            '"' + FAddress + '"';
+
+    Synchronize( @Showstatus );
+
+  finally
+
+    CloseFile(FTimestampsFile);
+    FSubscriber.Free;
+	  FContext.Free;
+    Terminate;
+  end;
 end;
 
 end.

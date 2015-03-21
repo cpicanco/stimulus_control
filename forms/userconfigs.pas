@@ -32,6 +32,7 @@ uses
 , bass_player
 //, draw_methods
 //, regdata
+, client
 , session
 , session_config
 , countermanager
@@ -51,12 +52,13 @@ type
     btnNextStimuli: TButton;
     btnNextGeneral: TButton;
     btnNextTrials: TButton;
+    btnClientTest: TButton;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
     chkPlayOnSecondMonitor: TCheckBox;
     gbRepetitions: TGroupBox;
+    leServerAddress: TLabeledEdit;
     lblITI: TLabel;
-    lblmilisec: TLabel;
     leParticipant: TLabeledEdit;
     leFillValue: TLabeledEdit;
     leSessionName: TLabeledEdit;
@@ -83,6 +85,7 @@ type
     tbStimuli: TTabSheet;
     tbTrials: TTabSheet;
     procedure btnCheckClick(Sender: TObject);
+    procedure btnClientTestClick(Sender: TObject);
     procedure btnFillConditionClick(Sender: TObject);
     procedure btnGridTypeClick(Sender: TObject);
     procedure btnNextGeneralClick(Sender: TObject);
@@ -118,6 +121,7 @@ type
     procedure EndSession(Sender : TObject);
     procedure RandTrialIndex;
     procedure ResetRepetionMatrix;
+    procedure DebugStatus(Message: String);
     //SimpleGui : TSimpleGui;
     //FData : TRegData;
     //FConfig : TConfig;
@@ -374,6 +378,11 @@ begin
   StringGrid1.Invalidate;
 end;
 
+procedure TUserConfig.DebugStatus(Message: String);
+begin
+  ShowMessage(Message);
+end;
+
 procedure TUserConfig.CheckRepetitionCol(aCol : integer);
 var aRowCount, aRow, i,
     aBeginRow, aEndRow, Count : integer;
@@ -444,7 +453,19 @@ end;
 
 procedure TUserConfig.btnCheckClick(Sender: TObject);
 begin
-//
+  //
+end;
+
+procedure TUserConfig.btnClientTestClick(Sender: TObject);
+var
+  Client : TClientThread;
+  Filename : string;
+begin
+  Filename := GetCurrentDirUTF8 + '/timestamps';
+  Client := TClientThread.Create( -1, 'The Client is Working', FileName );
+  Client.OnShowStatus := @DebugStatus;
+  Client.ServerAddress := leServerAddress.Text;
+  Client.Start;
 end;
 
 procedure TUserConfig.btnFillConditionClick(Sender: TObject);
@@ -841,6 +862,7 @@ begin
       FSession.SubjName := FConfigs.Subject;
       FSession.TestMode := False;
       FSession.ShowCounter := False;
+      FSession.ServerAddress := leServerAddress.Text;
       FSession.AudioDevice := TBassAudioDevice.Create(WindowHandle);
 
       FSession.Play(FConfigs, FManager, aDataName);

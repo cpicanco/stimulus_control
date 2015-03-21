@@ -27,13 +27,20 @@ unit trial_feature_positive;
 
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils,
-     counter,
-     dialogs,
-     session_config,
-     countermanager,
-     trial_abstract, custom_timer, constants, client,
-     draw_methods, schedules_abstract, response_key;
+uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils
+
+  , counter
+  , dialogs
+  , session_config
+  , countermanager
+  , trial_abstract
+  , custom_timer
+  , constants
+  , client
+  , draw_methods
+  , schedules_abstract
+  , response_key
+  ;
 
 type
 
@@ -61,6 +68,8 @@ type
 
   end;
 
+  { TFPE }
+
   TFPE = Class(TTrial)
   private
     FIETCode : string;
@@ -76,8 +85,6 @@ type
     FClockThread : TClockThread;
     FClientThread : TClientThread;
     FList : TStringList;
-    procedure CreateClientThread(Code : string);
-    procedure DebugStatus(msg : string);
   protected
     procedure BeginCorrection (Sender : TObject);
     procedure EndCorrection (Sender : TObject);
@@ -102,8 +109,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy;override;
-
-    procedure Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(TestMode: Boolean; Correction : Boolean); override;
 
   end;
 
@@ -113,7 +119,7 @@ implementation
 constructor TFPE.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FHeader := 'ExpcResp' + #9 +
+  Header := 'ExpcResp' + #9 +
              '__Result' + #9 +
              'RespFreq' + #9 +
              'StartLat' + #9 +
@@ -125,8 +131,8 @@ begin
              //'ITIBEGIN' + #9 +
              //'_ITI_END' + #9 +
              //'' + #9 +
-
              ;
+
   FDataSupport.Responses:= 0;
 end;
 
@@ -139,12 +145,12 @@ end;
 
 procedure TFPE.BeginCorrection(Sender: TObject);
 begin
-  if Assigned (OnBeginCorrection) then FOnBeginCorrection (Sender);
+  if Assigned (OnBeginCorrection) then OnBeginCorrection (Sender);
 end;
 
 procedure TFPE.EndCorrection(Sender: TObject);
 begin
-  if Assigned (OnEndCorrection) then FOnEndCorrection (Sender);
+  if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
 end;
 
 procedure TFPE.Consequence(Sender: TObject);
@@ -157,27 +163,27 @@ begin
 
       if FFlagCsq2Fired then
         begin
-          FResult := T_HIT;
-          FIETConsequence := FDataSupport.CSQHIT;
+          Result := T_HIT;
+          IETConsequence := FDataSupport.CSQHIT;
         end
       else
         begin
-          FResult := T_MISS;
+          Result := T_MISS;
           // within trial user defined differential consequences is not implemented yet
-          FIETConsequence := FDataSupport.CSQMISS;
+          IETConsequence := FDataSupport.CSQMISS;
         end;
 
-      FCurrTrial.Result := FResult;
+      FCurrTrial.Result := Result;
 
-      if FCurrTrial.NextTrial = T_CRT then FNextTrial := T_CRT
-      else FNextTrial := FCurrTrial.NextTrial;
+      if FCurrTrial.NextTrial = T_CRT then NextTrial := T_CRT
+      else NextTrial := FCurrTrial.NextTrial;
 
       //Dispenser(FDataCsq, FDataUsb);
-      if FResult = T_HIT then  Hit(Sender)
+      if Result = T_HIT then  Hit(Sender)
       else
-      if FResult = T_MISS then  Miss(Sender)
+      if Result = T_MISS then  Miss(Sender)
       else
-      if FResult = T_NONE then  None(Sender);
+      if Result = T_NONE then  None(Sender);
 
     EndTrial(Sender);
     end;
@@ -275,7 +281,7 @@ begin
     end;
 end;
 
-procedure TFPE.Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean);
+procedure TFPE.Play(TestMode: Boolean; Correction : Boolean);
 var
   s1, sName, sLoop, sColor, sGap, sGapDegree, sGapLength : string;
   R : TRect;
@@ -302,23 +308,22 @@ var
         Color := StrToIntDef(sColor, $0000FF {clRed} );
         HowManyLoops:= StrToIntDef(sLoop, 0);
         FullPath:= sName;
-        SchMan.Kind:= FCfgTrial.SList.Values[_Schedule];
+        SchMan.Kind:= CfgTrial.SList.Values[_Schedule];
         //Visible := False;
       end;
   end;
 
 begin
   FCanResponse:= False;
-  FNextTrial:= '-1';
-  FManager := Manager;
+  NextTrial:= '-1';
   Randomize;
 
-  FUseMedia := StrToBoolDef(FCfgTrial.SList.Values[_UseMedia], False);
+  FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
 
-  FShowStarter := StrToBoolDef(FCfgTrial.SList.Values[_ShowStarter], False);
+  FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
   //FStarterSchedule :=  not implemented
-  FNumComp := StrToIntDef(FCfgTrial.SList.Values[_NumComp], 1);
-  FRootMedia := FCfgTrial.SList.Values[_RootMedia];
+  FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
+  RootMedia := CfgTrial.SList.Values[_RootMedia];
 
   if FUseMedia then
     // not implemented yet
@@ -331,9 +336,9 @@ begin
   else FIsCorrection := False;
 
 
-  Color:= StrToIntDef(FCfgTrial.SList.Values[_BkGnd], 0);
+  Color:= StrToIntDef(CfgTrial.SList.Values[_BkGnd], 0);
   if TestMode then Cursor:= 0
-  else Cursor:= StrToIntDef(FCfgTrial.SList.Values[_Cursor], 0);
+  else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
 
   //self descends from TCustomControl
   FSchedule := TSchMan.Create(self);
@@ -344,7 +349,7 @@ begin
       OnResponse:= @Response;
     end;
 
-  FSchedule.Kind:= FCfgTrial.SList.Values[_Schedule];
+  FSchedule.Kind:= CfgTrial.SList.Values[_Schedule];
 
   // allow user defined differential consequences
   // we expect somthing like:
@@ -361,7 +366,7 @@ begin
   // Custom
   // S1.wav 0 -1 1000,S2.wav 0 -1 1000, S3.wav 0 -1 1000,
 
-  s1 := FCfgTrial.SList.Values[_Trial + _cIET] + #44;
+  s1 := CfgTrial.SList.Values[_Trial + _cIET] + #44;
 
   FDataSupport.CSQHIT := Copy(s1, 0, pos(#44, s1) - 1);
   NextCommaDelimitedParameter;
@@ -372,7 +377,7 @@ begin
   FDataSupport.CSQ2 := Copy(s1, 0, pos(#44, s1) - 1);
 
   // Alias to a default media name.ext
-  FCurrTrial.response := FCfgTrial.SList.Values[_ExpectedResponse];
+  FCurrTrial.response := CfgTrial.SList.Values[_ExpectedResponse];
   if FCurrTrial.response = 'Positiva' then
     if FDataSupport.CSQ2 = T_HIT then FDataSupport.CSQ2 := 'CSQ1.wav';
 
@@ -381,11 +386,11 @@ begin
 
 
   FCurrTrial.Result := T_NONE;
-  FCurrTrial.NextTrial := FCfgTrial.SList.Values[_NextTrial];
+  FCurrTrial.NextTrial := CfgTrial.SList.Values[_NextTrial];
 
   for a1 := 0 to FNumComp -1 do
     begin
-        s1:= FCfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd];
+        s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd];
 
         R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
         NextSpaceDelimitedParameter;
@@ -399,7 +404,7 @@ begin
        if FUseMedia then
          begin
            //not implemented yet
-           {s1:= FCfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
+           {s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
 
            sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
            NextSpaceDelimitedParameter;
@@ -417,11 +422,11 @@ begin
             begin
               o := Point( R.Top, R.Left );
               size := R.Right;
-              gap := StrToBoolDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
+              gap := StrToBoolDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
               if gap then
                   begin
-                    gap_degree := StrToIntDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Degree], Random(360));
-                    gap_length := StrToIntDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Length], 5 );
+                    gap_degree := StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Degree], Random(360));
+                    gap_length := StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Length], 5 );
                   end;
             end;
       end;
@@ -472,7 +477,7 @@ begin
     Latency := FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart)
   else Latency := #32#32#32#32#32#32#32 + 'NA';
 
-  FData := //Format('%-*.*d', [4,8,FCfgTrial.Id + 1]) + #9 +
+  Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
            #32#32#32#32#32#32#32 + FCurrTrial.response + #9 +
            #32#32#32#32#32#32#32 + FCurrTrial.Result + #9 +
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
@@ -496,38 +501,26 @@ procedure TFPE.EndTrial(Sender: TObject);
 begin
   FDataSupport.StmEnd := GetTickCount;
   WriteData(Sender);
-  FManager.OnConsequence(Self);
 
-  if Assigned(OnWriteTrialData) then FOnWriteTrialData(Self);
-  if Assigned(OnEndTrial) then FOnEndTrial(sender);
+  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+  if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
+  if Assigned(OnEndTrial) then OnEndTrial(sender);
 end;
 
 procedure TFPE.Hit(Sender: TObject);
 begin
-  if Assigned(OnHit) then FOnHit(Sender);
+  if Assigned(OnHit) then OnHit(Sender);
 end;
 
 procedure TFPE.Miss(Sender: TObject);
 begin
-  if Assigned(OnMiss) then FOnMiss (Sender);
+  if Assigned(OnMiss) then OnMiss (Sender);
 end;
 
 
 procedure TFPE.None(Sender: TObject);
 begin
-  if Assigned(OnNone) then FOnNone (Sender);
-end;
-
-procedure TFPE.CreateClientThread(Code: string);
-begin
-  FClientThread := TClientThread.Create( True, FCfgTrial.Id, Code, FileName );
-  FClientThread.OnShowStatus := @DebugStatus;
-  FClientThread.Start;
-end;
-
-procedure TFPE.DebugStatus(msg: string);
-begin
-  // do nothing
+  if Assigned(OnNone) then OnNone (Sender);
 end;
 
 procedure TFPE.Response(Sender: TObject);
@@ -546,8 +539,8 @@ begin
   //    else;
 
   Invalidate;
-  if Assigned(FManager.OnStmResponse) then FManager.OnStmResponse (Sender);
-  if Assigned(OnStmResponse) then FOnStmResponse (Self);
+  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
+  if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
 
 end.

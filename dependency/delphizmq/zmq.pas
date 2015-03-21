@@ -18,22 +18,28 @@
 }
 unit zmq;
 
-{$mode DELPHI}
+{$ifdef UNIX}
+  {$linklib pthread}
+{$endif}
 
 {$I zmq.inc}
 
 interface
 
-const
-{$ifdef zmq3}
-  libzmq = 'libzmq.so.3.0.0';
-{$else}
-  libzmq = 'libzmq.so';
+{$ifdef FPC}
+uses
+  ctypes;
 {$endif}
 
-{  Run-time API version detection                                              }
-procedure zmq_version(var major, minor, patch: Integer); cdecl; external libzmq;
+const
+  {$ifdef UNIX}
+  libzmq = 'libzmq.so';
+  {$else}
+  libzmq = 'libzmq.dll';
+  {$endif}
 
+{  Run-time API version detection                                              }
+procedure zmq_version( var major, minor, patch: Integer ); cdecl; external libzmq;
 
 {******************************************************************************}
 {*  0MQ errors.                                                               *}
@@ -147,22 +153,21 @@ type
     vsm_size: Byte;
     vsm_data: Array[0..ZMQ_MAX_VSM_SIZE-1] of Byte;
   end;
-  
+
 {$endif}
 
   free_fn = procedure(data, hint: Pointer);
 
+{$ifdef FPC}  
+  size_t = clong;
+{$else}
   size_t = Cardinal;
+{$endif}
 
 function zmq_msg_init( var msg: zmq_msg_t ): Integer; cdecl; external libzmq;
 function zmq_msg_init_size( var msg: zmq_msg_t; size: size_t ): Integer; cdecl; external libzmq;
 function zmq_msg_init_data( var msg: zmq_msg_t; data: Pointer; size: size_t;
   ffn: free_fn; hint: Pointer ): Integer; cdecl; external libzmq;
-
-{$ifdef zmq3}
-function zmq_msg_send (var msg: zmq_msg_t; s: Pointer; flags: Integer): Integer; cdecl; external libzmq;
-function zmq_msg_recv (var msg: zmq_msg_t; s: Pointer; flags: Integer): Integer; cdecl; external libzmq;
-{$endif}
 
 function zmq_msg_close(var msg: zmq_msg_t): Integer; cdecl; external libzmq;
 function zmq_msg_move(dest, src: zmq_msg_t): Integer; cdecl; external libzmq;
@@ -174,7 +179,8 @@ function zmq_msg_size(var msg: zmq_msg_t): size_t; cdecl; external libzmq;
 function zmq_msg_more (var msg: zmq_msg_t): Integer; cdecl; external libzmq;
 function zmq_msg_get (var msg: zmq_msg_t; option: Integer): Integer; cdecl; external libzmq;
 function zmq_msg_set (var msg: zmq_msg_t; option: Integer; optval: Integer): Integer; cdecl; external libzmq;
-
+function zmq_msg_send (var msg: zmq_msg_t; s: Pointer; flags: Integer): Integer; cdecl; external libzmq;
+function zmq_msg_recv (var msg: zmq_msg_t; s: Pointer; flags: Integer): Integer; cdecl; external libzmq;
 {$endif}
 {******************************************************************************}
 {*  0MQ socket definition.                                                    *}
@@ -239,12 +245,14 @@ const
 {$ifdef zmq3}
   ZMQ_IPV4ONLY = 31;
   ZMQ_LAST_ENDPOINT = 32;
-  ZMQ_ROUTER_BEHAVIOR = 33;
+  ZMQ_ROUTER_MANDATORY = 33;
   ZMQ_TCP_KEEPALIVE = 34;
   ZMQ_TCP_KEEPALIVE_CNT = 35;
   ZMQ_TCP_KEEPALIVE_IDLE = 36;
   ZMQ_TCP_KEEPALIVE_INTVL = 37;
   ZMQ_TCP_ACCEPT_FILTER = 38;
+  ZMQ_DELAY_ATTACH_ON_CONNECT = 39;
+  ZMQ_XPUB_VERBOSE = 40;
 
 {*  Message options                                                           *}
   ZMQ_MORE = 1;
@@ -278,12 +286,23 @@ const
   ZMQ_EVENT_CLOSE_FAILED = 256;
   ZMQ_EVENT_DISCONNECTED =512;
 
+  ZMQ_EVENT_ALL =
+    ZMQ_EVENT_CONNECTED or
+    ZMQ_EVENT_CONNECT_DELAYED or
+    ZMQ_EVENT_CONNECT_RETRIED or
+    ZMQ_EVENT_LISTENING or
+    ZMQ_EVENT_BIND_FAILED or
+    ZMQ_EVENT_ACCEPTED or
+    ZMQ_EVENT_ACCEPT_FAILED or
+    ZMQ_EVENT_CLOSED or
+    ZMQ_EVENT_CLOSE_FAILED or
+    ZMQ_EVENT_DISCONNECTED;
 
 {*  Socket event data (union member per event)                                *}
 type
-  zmq_event_data_t = record
+  zmq_event_t = record
+    event: Integer;
     addr: PAnsiChar;
-
     case Integer of
       0, // connected
       3, // listening
@@ -305,29 +324,32 @@ type
         );
   end;
 
-{*  Callback template for socket state changes                                *}
-type
-  zmq_monitor_fn = procedure( s: Pointer; event: Integer; data: zmq_event_data_t );
-
-function zmq_ctx_set_monitor( context: Pointer; monitor: zmq_monitor_fn ): Integer; cdecl; external libzmq;
 {$endif}
 
 function zmq_socket(context: Pointer; stype: Integer): Pointer; cdecl; external libzmq;
 function zmq_close(s: Pointer): Integer; cdecl; external libzmq;
 function zmq_setsockopt(s: Pointer; option: Integer; optval: Pointer; optvallen: size_t ): Integer; cdecl; external libzmq;
-function zmq_getsockopt(s: Pointer; option: Integer; optval: Pointer; var optvallen: Cardinal): Integer; cdecl; external libzmq;
+function zmq_getsockopt(s: Pointer; option: Integer; optval: Pointer; var optvallen: size_t): Integer; cdecl; external libzmq;
 function zmq_bind(s: Pointer; addr: PAnsiChar): Integer; cdecl; external libzmq;
 function zmq_connect(s: Pointer; addr: PAnsiChar): Integer; cdecl; external libzmq;
 {$ifdef zmq3}
 function zmq_unbind(s: Pointer; addr: PAnsiChar): Integer; cdecl; external libzmq;
 function zmq_disconnect(s: Pointer; addr: PAnsiChar): Integer; cdecl; external libzmq;
 {$endif}
+
+{$ifdef zmq3}
+function zmq_send (s: Pointer; const buffer; len: size_t; flags: Integer): Integer; cdecl; external libzmq;
+function zmq_recv (s: Pointer; var buffer; len: size_t; flags: Integer): Integer; cdecl; external libzmq;
+{$else}
 function zmq_send (s: Pointer; var msg: zmq_msg_t; flags: Integer): Integer; cdecl; external libzmq;
 function zmq_recv (s: Pointer; var msg: zmq_msg_t; flags: Integer): Integer; cdecl; external libzmq;
+{$endif}
 
 {$ifdef zmq3}
 function zmq_sendmsg(s: Pointer; var msg: zmq_msg_t; flags: Integer): Integer; cdecl; external libzmq;
 function zmq_recvmsg(s: Pointer; var msg: zmq_msg_t; flags: Integer): Integer; cdecl; external libzmq;
+
+function zmq_socket_monitor( s: Pointer; addr: PAnsiChar; events: Integer ): Integer; cdecl; external libzmq;
 
 {
 /*  Experimental                                                              */
@@ -359,12 +381,33 @@ function zmq_poll( var items: pollitem_t; nitems: Integer; timeout: Longint ): I
 {******************************************************************************}
 {*  Built-in devices                                                          *}
 {******************************************************************************}
+
+{$ifdef zmq3}
+{*  Built-in message proxy (3-way) *}
+function zmq_proxy( frontend, backend, capture: Pointer ): Integer; cdecl; external libzmq;
+
+{$endif}
+{*  Deprecated aliases *}
 const
   ZMQ_STREAMER = 1;
   ZMQ_FORWARDER = 2;
   ZMQ_QUEUE = 3;
-
+  
+{*  Deprecated method *}
 function zmq_device(device: Integer; insocket,outsocket: Pointer): Integer; cdecl; external libzmq;
+
+{*  Helper functions are used by perf tests so that they don't have to care   *}
+{*  about minutiae of time-related functions on different OS platforms.       *}
+
+{*  Starts the stopwatch. Returns the handle to the watch.                    *}
+function zmq_stopwatch_start: Pointer; stdcall; external libzmq;
+
+{*  Stops the stopwatch. Returns the number of microseconds elapsed since     *}
+{*  the stopwatch was started.                                                *}
+function zmq_stopwatch_stop( watch: Pointer ): LongWord; stdcall; external libzmq;
+
+{*  Sleeps for specified number of seconds.                                   *}
+procedure zmq_sleep( seconds: Integer ); stdcall; external libzmq;
 
 implementation
 
