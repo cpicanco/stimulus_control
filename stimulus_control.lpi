@@ -191,7 +191,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="forms;units;units/shared;/usr/local/lib/;dependency"/>
+      <OtherUnitFiles Value="forms;units;/usr/local/lib/;dependency/delphizmq"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

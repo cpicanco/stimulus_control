@@ -3,8 +3,8 @@ object UserConfig: TUserConfig
   Height = 493
   Top = 77
   Width = 407
-  HorzScrollBar.Page = 254
-  VertScrollBar.Page = 271
+  HorzScrollBar.Page = 161
+  VertScrollBar.Page = 114
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
   Caption = 'Configurar'
@@ -1652,10 +1652,10 @@ object UserConfig: TUserConfig
     Height = 455
     Top = 0
     Width = 407
-    ActivePage = tbTrials
+    ActivePage = tbGeneral
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
@@ -1680,26 +1680,13 @@ object UserConfig: TUserConfig
         TabOrder = 0
         Text = 'Participante1'
       end
-      object lblmilisec: TLabel
-        AnchorSideLeft.Control = seITI
-        AnchorSideLeft.Side = asrBottom
-        AnchorSideRight.Side = asrBottom
-        Left = 129
-        Height = 15
-        Top = 115
-        Width = 76
-        BorderSpacing.Left = 6
-        Caption = 'milisegundos'
-        Layout = tlCenter
-        ParentColor = False
-      end
       object seITI: TSpinEdit
-        AnchorSideLeft.Control = lblITI
         AnchorSideLeft.Side = asrBottom
-        Left = 33
+        Left = 6
         Height = 25
-        Top = 108
-        Width = 90
+        Top = 180
+        Width = 389
+        Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Left = 6
         Increment = 50
         MaxValue = 30000
@@ -1708,14 +1695,16 @@ object UserConfig: TUserConfig
         Value = 1000
       end
       object lblITI: TLabel
-        AnchorSideLeft.Control = tbGeneral
+        AnchorSideLeft.Control = seITI
         AnchorSideRight.Control = seITI
+        AnchorSideBottom.Control = seITI
         Left = 6
         Height = 15
-        Top = 115
-        Width = 21
-        BorderSpacing.Left = 6
-        Caption = 'IET'
+        Top = 163
+        Width = 109
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Bottom = 2
+        Caption = 'IET (milisegundos)'
         ParentColor = False
       end
       object leSessionName: TLabeledEdit
@@ -1746,6 +1735,37 @@ object UserConfig: TUserConfig
         Caption = 'Avançar'
         OnClick = btnNextGeneralClick
         TabOrder = 3
+      end
+      object leServerAddress: TLabeledEdit
+        Left = 6
+        Height = 25
+        Top = 128
+        Width = 312
+        Anchors = [akTop, akLeft, akRight]
+        EditLabel.AnchorSideLeft.Control = leServerAddress
+        EditLabel.AnchorSideRight.Control = leServerAddress
+        EditLabel.AnchorSideRight.Side = asrBottom
+        EditLabel.AnchorSideBottom.Control = leServerAddress
+        EditLabel.Left = 6
+        EditLabel.Height = 15
+        EditLabel.Top = 110
+        EditLabel.Width = 312
+        EditLabel.Caption = 'Servidor (Pupil timestamps)'
+        EditLabel.ParentColor = False
+        TabOrder = 4
+        Text = '127.0.0.1:5020'
+      end
+      object btnClientTest: TButton
+        AnchorSideLeft.Control = leServerAddress
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = leServerAddress
+        Left = 318
+        Height = 25
+        Top = 128
+        Width = 75
+        Caption = 'Testar'
+        OnClick = btnClientTestClick
+        TabOrder = 5
       end
     end
     object tbStimuli: TTabSheet
@@ -1924,12 +1944,12 @@ object UserConfig: TUserConfig
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Options = [ofPathMustExist, ofEnableSizing, ofViewDetail]
-    left = 312
-    top = 232
+    left = 328
+    top = 312
   end
   object pmRandomize: TPopupMenu
-    left = 312
-    top = 296
+    left = 48
+    top = 264
     object piTrials: TMenuItem
       Caption = 'Ordem das Tentativas'
       Checked = True
@@ -1948,18 +1968,18 @@ object UserConfig: TUserConfig
   end
   object OpenDialog1: TOpenDialog
     Filter = 'TXT|*.txt'
-    left = 312
-    top = 96
+    left = 328
+    top = 368
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = '.txt'
     Filter = 'TXT|*.txt'
-    left = 312
-    top = 40
+    left = 328
+    top = 264
   end
   object pmGridType: TPopupMenu
-    left = 203
-    top = 290
+    left = 48
+    top = 368
     object piAxes: TMenuItem
       Caption = 'Eixos'
       Checked = True
@@ -1977,8 +1997,8 @@ object UserConfig: TUserConfig
     end
   end
   object pmFillCondition: TPopupMenu
-    left = 64
-    top = 294
+    left = 48
+    top = 312
     object piFillAll: TMenuItem
       Caption = 'Todas as linhas da coluna'
       Checked = True

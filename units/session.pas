@@ -29,7 +29,6 @@ uses Classes, Controls, SysUtils, LCLIntf
      //,dialogs
      , bass_player
      , session_config
-     //, trial_mirrored_config
      , countermanager
      , regdata
      , blocs
@@ -41,40 +40,41 @@ type
 
   TSession = class(TComponent)
   private
-    FAudioDevice: TBassAudioDevice;
-    FTimeStart : cardinal;
-    FManager : TCounterManager;
-    FCrtReached : Boolean;
-    FBlc: TBlc;
-    FRegData: TRegData;
-    //FRegDataTicks: TRegData;
-    FCfgSes: TCfgSes;
-    FOnEndSess: TNotifyEvent;
-    FSubjName: String;
-    FSessName: String;
-    FBackGround: TWinControl;
-    FTestMode: Boolean;
-    FShowCounter : Boolean;
-    FOnStmResponse: TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
-    FOnBkGndResponse: TNotifyEvent;
-    //FOnBeginTrial: TNotifyEvent;
-    FOnEndBlc: TNotifyEvent;
-    FOnConsequence: TNotifyEvent;
     //FOnBeginSess: TNotifyEvent;
+    //FOnBeginTrial: TNotifyEvent;
+    //FOnCriteria: TNotifyEvent;
+    //FRegDataTicks: TRegData;
+    FAudioDevice: TBassAudioDevice;
+    FBackGround: TWinControl;
+    FBlc: TBlc;
+    FCfgSes: TCfgSes;
+    FCrtReached : Boolean;
+    FManager : TCounterManager;
+    FOnBkGndResponse: TNotifyEvent;
+    FOnConsequence: TNotifyEvent;
+    FOnEndBlc: TNotifyEvent;
+    FOnEndSess: TNotifyEvent;
+    FOnEndTrial: TNotifyEvent;
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
-    //FOnCriteria: TNotifyEvent;
-    procedure EndSess(Sender: TObject);
-    procedure SetBackGround(BackGround: TWinControl);
+    FOnStmResponse: TNotifyEvent;
+    FRegData: TRegData;
+    FServerAddress: string;
+    FSessName: String;
+    FShowCounter : Boolean;
+    FSubjName: String;
+    FTestMode: Boolean;
+    FTimeStart : cardinal;
+    procedure BkGndResponse(Sender: TObject);
     procedure BlcEndBlc(Sender: TObject);
-    procedure StmResponse(Sender:TObject);
     procedure Consequence(Sender: TObject);
+    procedure Criteria(Sender: TObject);
+    procedure EndSess(Sender: TObject);
+    procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
-    procedure BkGndResponse(Sender: TObject);
-    procedure EndTrial(Sender: TObject);
-    procedure Criteria(Sender: TObject);
+    procedure SetBackGround(BackGround: TWinControl);
+    procedure StmResponse(Sender:TObject);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -83,18 +83,20 @@ type
     procedure PlayBlc(Sender: TObject);
     property AudioDevice : TBassAudioDevice read FAudioDevice write FAudioDevice;
     property BackGround: TWinControl read FBackGround write SetBackGround;
+    property ServerAddress : string read FServerAddress write FServerAddress;
     property SessName: String  read FSessName write FSessName;
+    property ShowCounter : Boolean read FShowCounter write FShowCounter;
     property SubjName: String  read FSubjName write FSubjName;
     property TestMode: Boolean  read FTestMode write FTestMode;
-    property ShowCounter : Boolean read FShowCounter write FShowCounter;
-    property OnEndSess: TNotifyEvent read FOnEndSess write FOnEndSess;
-    property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
+  public
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
-    property OnEndTrial : TNotifyEvent read FOnEndTrial write FOnEndTrial;
     property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
+    property OnEndSess: TNotifyEvent read FOnEndSess write FOnEndSess;
+    property OnEndTrial : TNotifyEvent read FOnEndTrial write FOnEndTrial;
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
+    property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
 
   end;
 
@@ -172,6 +174,7 @@ constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FBlc:= TBlc.Create(Self);
+  FBlc.ServerAddress:= FServerAddress;
   FBlc.OnStmResponse:= @StmResponse;
   FBlc.OnConsequence:= @Consequence;
   FBlc.OnBkGndResponse:= @BkGndResponse;
