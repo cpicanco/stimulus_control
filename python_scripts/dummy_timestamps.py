@@ -2,7 +2,7 @@
 
 	Broadcast dummy Pupil timestamps
 
-"""
+"""	
  
 import zmq
 #from ctypes import create_string_buffer
@@ -23,7 +23,7 @@ def main():
 	except zmq.ZMQError:
 		print "Could not set Socket."
  
-	for i in range(60000):
+	for i in range(6000):
 		socket.send( test_msg() )
 		sleep(0.01)
  
