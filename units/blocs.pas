@@ -85,7 +85,6 @@ type
     FTimestampsPath : string;
     FTimeStart: cardinal;
     FTrial: TTrial;
-    procedure CreateClientThread(Code : string);
     procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
     procedure DebugStatus(msg : string);
     procedure PlayTrial;
@@ -216,9 +215,9 @@ begin
   FData := '';
   FDataTicks := '';
 
-  if  (FTrial.NextTrial = 'END') then //end session
+  if  (FTrial.NextTrial = 'END') then //end bloc
     FCounterManager.CurrentTrial.Counter := FBlc.NumTrials
-  else //continue
+  else // continue
     if (FTrial.NextTrial = 'CRT') or             // FTrial.NextTrial base 1, FCounterManager.CurrentTrial.Counter base 0)
        (FTrial.NextTrial = (IntToStr(FCounterManager.CurrentTrial.Counter + 1))) then
       begin //correction trials were on
@@ -296,11 +295,20 @@ begin
 
   if Assigned(FTrial) then
     begin
+      if FCounterManager.CurrentTrial.Counter >= FBlc.NumTrials then
+        FTrial.CreateClientThread('EndBloc');
       FreeAndNil(FTrial);
     end;
-  //SetFocus;
-  if Assigned(OnEndTrial) then FOnEndTrial(Sender);
 
+  //SetFocus;
+
+  {
+
+    Note that from now on screen color should be equal to the Bloc background.
+
+  }
+
+  if Assigned(OnEndTrial) then FOnEndTrial(Sender);
 
   //showmessage(s0 + #13#10 +s1 + #13#10 +s2 + #13#10 +s3 + #13#10);
     if (FTimerITI.Interval = 0)
@@ -458,13 +466,6 @@ begin
 
 end;
 
-procedure TBlc.CreateClientThread(Code: string);
-begin
-  FClientThread := TClientThread.Create( FCounterManager.CurrentTrial.Counter, Code, FTimestampsPath );
-  FClientThread.OnShowStatus := @DebugStatus;
-  FClientThread.Start;
-end;
-
 procedure TBlc.DebugStatus(msg: string);
 begin
   //do nothing
@@ -575,7 +576,6 @@ begin
       else
         begin
           if Assigned(FTrial) then Ftrial.Free;
-          CreateClientThread('EndBloc');
           EndBlc(Self);
         end;
   end;

@@ -10,8 +10,8 @@
         <UnitName Value="stimulus_control"/>
         <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="53" Y="64"/>
+        <TopLine Value="16"/>
+        <CursorPos X="21" Y="26"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -31,11 +31,10 @@
         <Filename Value="units/client.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="client"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="116"/>
-        <CursorPos X="15" Y="153"/>
+        <TopLine Value="117"/>
+        <CursorPos X="35" Y="138"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -57,8 +56,8 @@
         <UnitName Value="userconfigs"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="445"/>
-        <CursorPos X="23" Y="467"/>
+        <TopLine Value="845"/>
+        <CursorPos X="45" Y="862"/>
         <UsageCount Value="232"/>
         <Loaded Value="True"/>
       </Unit4>
@@ -114,19 +113,21 @@
         <Filename Value="units/session.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="session"/>
+        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="53"/>
-        <CursorPos X="1" Y="67"/>
+        <TopLine Value="212"/>
+        <CursorPos X="3" Y="243"/>
         <UsageCount Value="241"/>
+        <Loaded Value="True"/>
       </Unit10>
       <Unit11>
         <Filename Value="units/blocs.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="blocs"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="289"/>
-        <CursorPos X="52" Y="551"/>
+        <TopLine Value="539"/>
+        <CursorPos X="3" Y="515"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -181,8 +182,8 @@
         <UnitName Value="trial_feature_positive"/>
         <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="109"/>
-        <CursorPos X="3" Y="135"/>
+        <TopLine Value="222"/>
+        <CursorPos X="49" Y="238"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit17>
@@ -250,10 +251,11 @@
         <Filename Value="units/trial_abstract.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_abstract"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="77"/>
-        <CursorPos X="49" Y="109"/>
+        <TopLine Value="99"/>
+        <CursorPos X="1" Y="133"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit24>
@@ -264,7 +266,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="11" Y="3"/>
-        <UsageCount Value="156"/>
+        <UsageCount Value="173"/>
       </Unit25>
       <Unit26>
         <Filename Value="units/config.pas"/>
@@ -272,7 +274,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="40"/>
         <CursorPos X="10" Y="58"/>
-        <UsageCount Value="205"/>
+        <UsageCount Value="203"/>
       </Unit26>
       <Unit27>
         <Filename Value="units/trial_mirrored_config.pas"/>
@@ -280,7 +282,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="112"/>
         <CursorPos X="3" Y="21"/>
-        <UsageCount Value="221"/>
+        <UsageCount Value="219"/>
       </Unit27>
       <Unit28>
         <Filename Value="forms/drawtest.pas"/>
@@ -291,17 +293,15 @@
         <WindowIndex Value="0"/>
         <TopLine Value="124"/>
         <CursorPos X="27" Y="132"/>
-        <UsageCount Value="69"/>
+        <UsageCount Value="67"/>
       </Unit28>
       <Unit29>
         <Filename Value="units/session_config.pas"/>
         <UnitName Value="session_config"/>
-        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="113"/>
+        <TopLine Value="166"/>
         <CursorPos X="54" Y="141"/>
-        <UsageCount Value="100"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="99"/>
       </Unit29>
       <Unit30>
         <Filename Value="units/interface_library.pas"/>
@@ -309,7 +309,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="3" Y="20"/>
-        <UsageCount Value="73"/>
+        <UsageCount Value="71"/>
       </Unit30>
       <Unit31>
         <Filename Value="units/escriba.pas"/>
@@ -317,7 +317,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="314"/>
         <CursorPos X="1" Y="323"/>
-        <UsageCount Value="72"/>
+        <UsageCount Value="70"/>
       </Unit31>
       <Unit32>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/fileutil.pas"/>
@@ -325,14 +325,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit32>
       <Unit33>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/fileutil.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="397"/>
         <CursorPos X="3" Y="405"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="0"/>
       </Unit33>
       <Unit34>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/lazfileutils.pas"/>
@@ -340,7 +340,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="232"/>
         <CursorPos X="3" Y="243"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="0"/>
       </Unit34>
       <Unit35>
         <Filename Value="dependency/bass.pas"/>
@@ -348,7 +348,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="499"/>
         <CursorPos X="1" Y="507"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="2"/>
       </Unit35>
       <Unit36>
         <Filename Value="../bin/ovoplayer-1.0/src/audioengine_bass.pas"/>
@@ -356,7 +356,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="22"/>
         <CursorPos X="26" Y="39"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit36>
       <Unit37>
         <Filename Value="../bass_test/form_main.pas"/>
@@ -364,7 +364,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="39"/>
         <CursorPos X="6" Y="63"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit37>
       <Unit38>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/forms.pp"/>
@@ -372,14 +372,14 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1376"/>
         <CursorPos X="15" Y="1391"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit38>
       <Unit39>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/application.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="356"/>
         <CursorPos X="3" Y="373"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit39>
       <Unit40>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/grids.pas"/>
@@ -387,7 +387,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="8909"/>
         <CursorPos X="1" Y="8927"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="0"/>
       </Unit40>
       <Unit41>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/lazutf8sysutils.pas"/>
@@ -395,31 +395,31 @@
         <WindowIndex Value="0"/>
         <TopLine Value="84"/>
         <CursorPos X="1" Y="104"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit41>
       <Unit42>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/wincontrol.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="7077"/>
         <CursorPos X="30" Y="7089"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit42>
       <Unit43>
         <Filename Value="units/trial_mirrored_stm.pas"/>
         <UnitName Value="trial_mirrored_stm"/>
         <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="23"/>
-        <CursorPos X="3" Y="43"/>
-        <UsageCount Value="16"/>
+        <TopLine Value="174"/>
+        <CursorPos X="78" Y="201"/>
+        <UsageCount Value="25"/>
         <Loaded Value="True"/>
       </Unit43>
       <Unit44>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/customform.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="436"/>
-        <CursorPos X="34" Y="445"/>
-        <UsageCount Value="7"/>
+        <CursorPos X="1" Y="454"/>
+        <UsageCount Value="9"/>
       </Unit44>
       <Unit45>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/controls.pp"/>
@@ -427,21 +427,21 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1373"/>
         <CursorPos X="25" Y="1406"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="7"/>
       </Unit45>
       <Unit46>
         <Filename Value="/usr/share/fpcsrc/2.6.4/rtl/inc/systemh.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="936"/>
         <CursorPos X="11" Y="957"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit46>
       <Unit47>
         <Filename Value="/usr/share/fpcsrc/2.6.4/rtl/inc/text.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="147"/>
         <CursorPos X="3" Y="158"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit47>
       <Unit48>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/lclintf.pas"/>
@@ -449,7 +449,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="8"/>
       </Unit48>
       <Unit49>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/lclproc.pas"/>
@@ -457,7 +457,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="20" Y="22"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="8"/>
       </Unit49>
       <Unit50>
         <Filename Value="dependency/delphizmq/zmqapi.pas"/>
@@ -465,7 +465,7 @@
         <WindowIndex Value="0"/>
         <TopLine Value="1759"/>
         <CursorPos X="73" Y="1784"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="8"/>
       </Unit50>
       <Unit51>
         <Filename Value="dependency/delphizmq/zmq.pas"/>
@@ -473,65 +473,133 @@
         <WindowIndex Value="0"/>
         <TopLine Value="373"/>
         <CursorPos X="10" Y="409"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="8"/>
       </Unit51>
     </Units>
     <General>
       <ActiveWindowIndexAtStart Value="0"/>
     </General>
-    <JumpHistory Count="13" HistoryIndex="12">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="units/blocs.pas"/>
-        <Caret Line="403" Column="44" TopLine="369"/>
+        <Filename Value="units/trial_mirrored_stm.pas"/>
+        <Caret Line="216" Column="3" TopLine="200"/>
       </Position1>
       <Position2>
-        <Filename Value="units/blocs.pas"/>
-        <Caret Line="405" Column="22" TopLine="371"/>
+        <Filename Value="units/trial_abstract.pas"/>
+        <Caret Line="68" Column="31" TopLine="52"/>
       </Position2>
       <Position3>
-        <Filename Value="units/blocs.pas"/>
-        <Caret Line="463" Column="57" TopLine="444"/>
+        <Filename Value="units/trial_abstract.pas"/>
+        <Caret Line="126" Column="40" TopLine="88"/>
       </Position3>
       <Position4>
-        <Filename Value="forms/userconfigs.pas"/>
-        <Caret Line="866" Column="29" TopLine="844"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="264" Column="18" TopLine="255"/>
       </Position4>
       <Position5>
-        <Filename Value="units/trial_abstract.pas"/>
-        <Caret Line="68" Column="41" TopLine="58"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="5" Column="13" TopLine="1"/>
       </Position5>
       <Position6>
         <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="528" Column="1" TopLine="496"/>
+        <Caret Line="202" Column="37" TopLine="186"/>
       </Position6>
       <Position7>
         <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="30" Column="6" TopLine="259"/>
+        <Caret Line="203" Column="37" TopLine="186"/>
       </Position7>
       <Position8>
         <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="72" Column="3" TopLine="7"/>
+        <Caret Line="204" Column="34" TopLine="186"/>
       </Position8>
       <Position9>
-        <Filename Value="units/trial_abstract.pas"/>
-        <Caret Line="28" Column="72" TopLine="1"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="348" Column="26" TopLine="330"/>
       </Position9>
       <Position10>
-        <Filename Value="units/client.pas"/>
-        <Caret Line="162" Column="5" TopLine="19"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="349" Column="24" TopLine="330"/>
       </Position10>
       <Position11>
-        <Filename Value="units/trial_abstract.pas"/>
-        <Caret Line="109" Column="49" TopLine="77"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="350" Column="21" TopLine="330"/>
       </Position11>
       <Position12>
-        <Filename Value="units/client.pas"/>
-        <Caret Line="62" Column="60" TopLine="41"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="464" Column="28" TopLine="446"/>
       </Position12>
       <Position13>
-        <Filename Value="units/client.pas"/>
-        <Caret Line="54" Column="23" TopLine="37"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="5" Column="13" TopLine="73"/>
       </Position13>
+      <Position14>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="160" Column="25" TopLine="153"/>
+      </Position14>
+      <Position15>
+        <Filename Value="units/trial_abstract.pas"/>
+        <Caret Line="114" Column="32" TopLine="89"/>
+      </Position15>
+      <Position16>
+        <Filename Value="units/trial_abstract.pas"/>
+        <Caret Line="119" Column="3" TopLine="91"/>
+      </Position16>
+      <Position17>
+        <Filename Value="units/trial_abstract.pas"/>
+        <Caret Line="114" Column="60" TopLine="91"/>
+      </Position17>
+      <Position18>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="555" Column="35" TopLine="541"/>
+      </Position18>
+      <Position19>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="79" Column="19" TopLine="60"/>
+      </Position19>
+      <Position20>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="113" Column="56" TopLine="80"/>
+      </Position20>
+      <Position21>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="177" Column="38" TopLine="162"/>
+      </Position21>
+      <Position22>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="62" Column="19" TopLine="41"/>
+      </Position22>
+      <Position23>
+        <Filename Value="forms/userconfigs.pas"/>
+        <Caret Line="862" Column="45" TopLine="845"/>
+      </Position23>
+      <Position24>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="221" Column="39" TopLine="203"/>
+      </Position24>
+      <Position25>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="243" Column="3" TopLine="212"/>
+      </Position25>
+      <Position26>
+        <Filename Value="units/client.pas"/>
+        <Caret Line="62" Column="56" TopLine="36"/>
+      </Position26>
+      <Position27>
+        <Filename Value="units/client.pas"/>
+        <Caret Line="117" Column="34" TopLine="104"/>
+      </Position27>
+      <Position28>
+        <Filename Value="units/client.pas"/>
+        <Caret Line="121" Column="44" TopLine="98"/>
+      </Position28>
+      <Position29>
+        <Filename Value="units/client.pas"/>
+        <Caret Line="134" Column="51" TopLine="113"/>
+      </Position29>
+      <Position30>
+        <Filename Value="units/trial_abstract.pas"/>
+        <Caret Line="136" Column="43" TopLine="100"/>
+      </Position30>
     </JumpHistory>
   </ProjectSession>
   <EditorMacros Count="0"/>

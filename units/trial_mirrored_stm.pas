@@ -183,35 +183,37 @@ begin
   inherited KeyUp(Key, Shift);
   if Key = 27 {ESC} then FCanResponse:= True;
   Invalidate;
-end;
 
-procedure TMRD.KeyPress(var Key: Char);
-begin
-  inherited KeyPress(Key);
   if FCanResponse then
     begin
       if FShowStarter then
         begin
-          if (key in [#32]) then
+          if key = 32 then
             begin
               //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
               FDataSupport.Latency := GetTickCount;
-              CreateClientThread('*R:' + IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Date) + #32 +
-                                  IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Time));
+              CreateClientThread('*R:' + IntToStr(DateTimeToTimeStamp(Now).Time));
               FShowStarter := False;
               Invalidate;
               StartTrial;
             end;
         end
-      else CreateClientThread('R:' + IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Date) + #32 +
-                                  IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Time));
+      else CreateClientThread('R:' + IntToStr(DateTimeToTimeStamp(Now).Time));
     end;
+end;
+
+procedure TMRD.KeyPress(var Key: Char);
+begin
+  inherited KeyPress(Key);
+  // do nothing
 
 end;
 
 procedure TMRD.Paint;
 var i : integer;
 begin
+  inherited Paint;
+
   if FCanResponse then
     begin
       if FShowStarter then

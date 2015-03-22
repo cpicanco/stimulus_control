@@ -23,6 +23,8 @@ program stimulus_control;
 
 {$mode objfpc}{$H+}
 
+{$I stimulus_control.inc}
+
 uses
   {$IFDEF UNIX}
     {$IFDEF UseCThreads}
