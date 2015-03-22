@@ -43,7 +43,7 @@ begin
 	subscriber.connect( 'tcp://' + address );
 	subscriber.subscribe( '' );
 
-	FTimestampsPath := '/home/rafael/git/validation_project/Participante1/Data/Data_001.timestamp';
+	FTimestampsPath := '/home/rafael/git/validation_project/Participante1/Data/timestamps_teste';
 
 	ForceDirectoriesUTF8(ExtractFilePath(FTimestampsPath));
 	AssignFile(FTimestampsFile, FTimestampsPath);

@@ -174,7 +174,6 @@ constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FBlc:= TBlc.Create(Self);
-  FBlc.ServerAddress:= FServerAddress;
   FBlc.OnStmResponse:= @StmResponse;
   FBlc.OnConsequence:= @Consequence;
   FBlc.OnBkGndResponse:= @BkGndResponse;
@@ -219,6 +218,7 @@ begin
 
   FBlc.ShowCounter := ShowCounter;
   FBlc.RegData:= FRegData;
+  FBlc.ServerAddress:= FServerAddress;
   //FBlc.RegDataTicks := FRegDataTicks;
   FBlc.BackGround:= FBackGround;
 
@@ -233,6 +233,7 @@ begin
   //                  'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
   //                  'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
   FManager.OnBeginSess(Self);
+
   PlayBlc(Self);
 end;
 

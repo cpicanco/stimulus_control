@@ -226,41 +226,42 @@ begin
   inherited KeyUp(Key, Shift);
   if Key = 27 {ESC} then FCanResponse:= True;
   Invalidate;
+
+  if FCanResponse then
+  begin
+    if FShowStarter then
+      begin
+        if Key = 32 then
+          begin
+            //if FUseMedia then ... not implemented yet
+            FDataSupport.StarterLatency := GetTickCount;
+            CreateClientThread('*R:' + IntToStr(DateTimeToTimeStamp(Now).Time));
+            FShowStarter := False;
+            Invalidate;
+            StartTrial;
+          end;
+      end
+    else
+      begin
+        //if FUseMedia then ... not implemented yet
+        CreateClientThread('R:' + IntToStr(DateTimeToTimeStamp(Now).Time));
+        FSchedule.DoResponse;
+      end;
+  end;
+
 end;
 
 procedure TFPE.KeyPress(var Key: Char);
 begin
   inherited KeyPress(Key);
-  if FCanResponse then
-    begin
-      if FShowStarter then
-        begin
-          if (key in [#32]) then
-            begin
-              //if FUseMedia then ... not implemented yet
-
-              FDataSupport.StarterLatency := GetTickCount;
-              CreateClientThread('*R:' + IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Date) + #32 +
-                                  IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Time));
-              FShowStarter := False;
-              Invalidate;
-              StartTrial;
-            end;
-        end
-      else
-        begin
-          //if FUseMedia then ... not implemented yet
-          CreateClientThread('R:' + IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Date) + #32 +
-                                  IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Time));
-          FSchedule.DoResponse;
-        end;
-    end;
+  //do nothing
 
 end;
 
 procedure TFPE.Paint;
 var i : integer;
 begin
+  inherited Paint;
   if FCanResponse then
     begin
       if FShowStarter then

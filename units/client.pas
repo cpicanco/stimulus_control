@@ -41,7 +41,7 @@ type
 
   TClientThread = class(TThread)
   private
-    FAddress: string;
+    FServerAddress: string;
     FContext : TZMQContext;
 	  FSubscriber : TZMQSocket;
     FMsg : string;
@@ -51,7 +51,7 @@ type
     FOnShowStatus: TShowStatusEvent;
     FTimestampsFile : TextFile;
     function GetTimestampFromMessage(aMessage : Utf8String) : Utf8String;
-    procedure SetAddress(AValue: string);
+    procedure SetServerAddress(AValue: string);
     procedure ShowStatus;
   protected
     procedure Execute; override;
@@ -59,7 +59,7 @@ type
     constructor Create(TrialIndex : integer; Code, OutputPath : string; CreateSuspended : boolean = True);
     destructor Destroy; override;
     property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
-    property ServerAddress : string read FAddress write SetAddress;
+    property ServerAddress : string read FServerAddress write SetServerAddress;
   end;
 
 implementation
@@ -71,7 +71,7 @@ begin
   FTrialIndex := IntToStr(TrialIndex);
   FCode := Code;
   FTimestampsPath := OutputPath;
-  FAddress := '127.0.0.1:5000';
+  FServerAddress := '127.0.0.1:5000';
 
   ForceDirectoriesUTF8(ExtractFilePath(FTimestampsPath));
 	AssignFile(FTimestampsFile, FTimestampsPath);
@@ -84,6 +84,7 @@ end;
 
 destructor TClientThread.Destroy;
 begin
+  //
   inherited Destroy;
 end;
 
@@ -113,11 +114,11 @@ begin
 
 end;
 
-procedure TClientThread.SetAddress(AValue: string);
+procedure TClientThread.SetServerAddress(AValue: string);
 begin
-  if FAddress = AValue then Exit;
+  if FServerAddress = AValue then Exit;
 
-  if Length(AValue) > 0 then FAddress := AValue;
+  if Length(AValue) > 0 then FServerAddress := AValue;
 end;
 
 
@@ -127,26 +128,26 @@ var
   message : UTF8String;
 begin
   try
+
     FContext := TZMQContext.Create;
 	  FSubscriber := FContext.Socket( stSub );
-    FSubscriber.connect( 'tcp://' + FAddress );
+    FSubscriber.connect( 'tcp://' + FServerAddress);
     FSubscriber.subscribe( '' );
 
     FSubscriber.recv( message );
-
-    data := '(' + FTrialIndex + ',' + GetTimestampFromMessage(message) + ',' + FCode + ')';
+    // ('value', 'value', 'value')
+    data := #40#39 + FTrialIndex + #39#44#32#39 + GetTimestampFromMessage(message) + #39#44#32#39 + FCode + #39#41;
 
 	  Writeln(FTimestampsFile, data);
 
 
     FMsg := data + #10#10 +
             '"' + FTimestampsPath + '"'  + #10 +
-            '"' + FAddress + '"';
+            '"' + FServerAddress + '"';
 
     Synchronize( @Showstatus );
 
   finally
-
     CloseFile(FTimestampsFile);
     FSubscriber.Free;
 	  FContext.Free;
