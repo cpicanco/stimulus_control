@@ -23,24 +23,26 @@ unit blocs;
 
 {$mode objfpc}{$H+}
 
+{$I stimulus_control.inc}
+
 interface
 
 uses Classes, {IdGlobal,} Controls, LCLIntf, LCLType,
      ExtCtrls, SysUtils, Graphics, Forms,
-     Dialogs,StdCtrls, FileUtil,
+     Dialogs,StdCtrls,
 
-     session_config, regdata,
-     constants, response_key,
-     countermanager,
-     client,
-     trial_abstract,
-       trial_message,
-
-       trial_simple,
-         trial_mirrored_stm,
-           trial_feature_positive,
-
-       trial_matching
+       session_config
+     , regdata
+     , constants
+     , response_key
+     , countermanager
+     , client
+     , trial_abstract
+        , trial_message
+     , trial_simple
+        , trial_mirrored_stm
+        , trial_feature_positive
+     , trial_matching
      ;
 
 type
@@ -82,7 +84,7 @@ type
     FTimerCsq : TTimer;
     FTimerITI: TTimer;
     FTimerTO : TTimer;
-    FTimestampsPath : string;
+    FTimestampsData : TRegData;
     FTimeStart: cardinal;
     FTrial: TTrial;
     procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
@@ -105,7 +107,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
+    procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; TimestampsData : TRegData; IndTent: Integer; TestMode: Boolean);
     //property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
@@ -169,6 +171,7 @@ end;
 procedure TBlc.TrialTerminate(Sender: TObject);
 var s0, s1, s2, s3, s4 : string;
     csqDuration : Integer;
+    TimestampsData : TRegData;
 
   procedure NextSpaceDelimitedParameter;
   begin
@@ -296,8 +299,9 @@ begin
   if Assigned(FTrial) then
     begin
       if FCounterManager.CurrentTrial.Counter >= FBlc.NumTrials then
-        FTrial.CreateClientThread('EndBloc');
-      FreeAndNil(FTrial);
+        FTrial.CreateClientThread('B:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+      //FreeAndNil(FTrial);
+      FTrial.Free;
     end;
 
   //SetFocus;
@@ -322,7 +326,7 @@ begin
        and (FTimerTO.Interval > 0)
        and (FTimerCsq.Interval > 0) then
         begin
-          if ShowCounter then ShowCounterPlease ('IET');
+          if ShowCounter then ShowCounterPlease('IET');
           FTimerITI.Enabled:= True;
         end
       else
@@ -331,7 +335,7 @@ begin
              and (FTimerTO.Interval = 0)
              and (FTimerCsq.Interval = 0) then
             begin
-              if ShowCounter then ShowCounterPlease ('IET');
+              if ShowCounter then ShowCounterPlease('IET');
               FTimerITI.Enabled:= True;
             end;
           if ((FTimerITI.Interval > 0) or (FTimerCsq.Interval > 0))
@@ -364,7 +368,7 @@ begin
     end;
   if (FTimerITI.Interval > 0) then
     begin
-      if ShowCounter then ShowCounterPlease ('IET');
+      if ShowCounter then ShowCounterPlease('IET');
       FTimerITI.Enabled:= True;
     end
   else PlayTrial;
@@ -374,7 +378,7 @@ procedure TBlc.TimerITITimer(Sender: TObject);
 begin
   if Assigned(FCounterLabel) then
     begin
-      FreeAndNil(FCounterLabel);
+      FCounterLabel.Free;
     end;
   FTimerITI.Enabled:= False;
   FITIEnd := GetTickCount;
@@ -388,7 +392,7 @@ begin
 
   if (FTimerITI.Interval > 0) then
     begin
-      if ShowCounter then ShowCounterPlease ('IET');
+      if ShowCounter then ShowCounterPlease('IET');
       FTimerITI.Enabled:= True;
     end
   else PlayTrial;
@@ -426,8 +430,8 @@ begin
           NumTr + #9 +
           NameTr + #9 +
           FTrial.Data + #9 +
-          FormatFloat('00000000;;00000000',FITIBegin - FTimeStart) + #9 +
-          FormatFloat('00000000;;00000000',FITIEND - FTimeStart) +
+          FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
+          FormatFloat('00000000;;00000000', FITIEND - FTimeStart) +
           #13#10;
 
     end;
@@ -473,41 +477,39 @@ end;
 
 procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
 var
-    MediaPath : string;
+  MediaPath : string;
 begin
-  if FileExistsUTF8(FileName) { *Converted from FileExists*  } then
-    begin
-      //BlockInput(true);
-      FIETMedia := TKey.Create(FBackGround);
-      FIETMedia.Cursor:= FBackGround.Cursor;
-      FIETMedia.Parent:= FBackGround;
-      FIETMedia.OnConsequence:= @IETConsequence;
-      FIETMedia.OnResponse:= @IETResponse;
-      FIETMedia.HowManyLoops := StrToIntDef(HowManyLoops, 1) - 1;
-      FIETMedia.Color := StrToIntDef(Color, 0);
-      FIETMedia.Width := Screen.Width;
-      FIETMedia.Height := Screen.Height;
-      {
-      FIETMedia.Width := (Screen.Width div 5) * 4;
-      FIETMedia.Height := (Screen.Height div 5) * 4;
-      FIETMedia.Top := (Screen.Height div 2) - (FIETMedia.Height div 2);
-      FIETMedia.Left := (Screen.Width div 2) - (FIETMedia.Width div 2);
-      }
-      FIETMedia.FullPath := FileName;
-      FIETMedia.Play;
-      FIETMedia.FullScreen;
-      //FTrial.IETConsequence := '';
-      //FIETMedia.Show;
 
-    end;
+  //BlockInput(true);
+  FIETMedia := TKey.Create(FBackGround);
+  FIETMedia.Cursor:= FBackGround.Cursor;
+  FIETMedia.Parent:= FBackGround;
+  FIETMedia.OnConsequence:= @IETConsequence;
+  FIETMedia.OnResponse:= @IETResponse;
+  FIETMedia.HowManyLoops := StrToIntDef(HowManyLoops, 1) - 1;
+  FIETMedia.Color := StrToIntDef(Color, 0);
+  FIETMedia.Width := Screen.Width;
+  FIETMedia.Height := Screen.Height;
+  {
+  FIETMedia.Width := (Screen.Width div 5) * 4;
+  FIETMedia.Height := (Screen.Height div 5) * 4;
+  FIETMedia.Top := (Screen.Height div 2) - (FIETMedia.Height div 2);
+  FIETMedia.Left := (Screen.Width div 2) - (FIETMedia.Width div 2);
+  }
+  FIETMedia.FullPath := FileName;
+  FIETMedia.Play;
+  FIETMedia.FullScreen;
+  //FTrial.IETConsequence := '';
+  //FIETMedia.Show;
 end;
 
 destructor TBlc.Destroy;
 begin
-  Inherited Destroy;
+
+  inherited Destroy;
 end;
 
-procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
+procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; TimeStampsData: TRegData; IndTent: Integer; TestMode: Boolean);
 var
   aFileName : string;
 
@@ -525,11 +527,8 @@ begin
   FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
   FRegData.SaveData(FBlc.Name);
 
-  aFileName := ExtractFileNameWithoutExt(FRegData.FileName);
-  FTimestampsPath := aFileName + '.timestamps';
-  //ForceDirectoriesUTF8(ExtractFilePath(FTimestampsPath));
-  //FRegDataTicks.SaveData(FBlc.Name);
-  PlayTrial;
+  FTimestampsData := TimestampsData;
+  PlayTrial
 end;
 
 procedure TBlc.PlayTrial;
@@ -548,13 +547,12 @@ begin
       if FBlc.Trials[IndTrial].Kind = T_MTS then FTrial:= TMTS.Create(Self);
       if FBlc.Trials[IndTrial].Kind = T_Simple then FTrial:= TSimpl.Create(Self);
 
-
       if Assigned(FTrial) then
         begin
           FTrial.CounterManager := FCounterManager;
           FTrial.ServerAddress := FServerAddress;
           FTrial.TimeStart := FTimeStart;
-          FTrial.FileName := FTimestampsPath;
+          FTrial.TimestampsData := FTimestampsData;
           FTrial.Parent := FBackGround;
           FTrial.Align := AlClient;
           FTrial.OnEndTrial := @TrialTerminate;
@@ -568,7 +566,6 @@ begin
           FTrial.Play(FTestMode, FIsCorrection);
           FTrial.Visible := True;
           FTrial.SetFocus;
-        //BlockInput(False);
         end else EndBlc(Self);
 
       FIsCorrection := False;
@@ -578,12 +575,13 @@ begin
           if Assigned(FTrial) then Ftrial.Free;
           EndBlc(Self);
         end;
-  end;
+
+end;
 
 
 procedure TBlc.ShowCounterPlease(Kind: String);
 begin
-  if Kind = 'IET' then
+  {if Kind = 'IET' then
   begin
     FCounterLabel := TLabel.Create(FBackGround);
     with FCounterLabel do
@@ -600,7 +598,7 @@ begin
       Top := (Screen.Height div 2) - (Height div 2);
       Left := (Screen.Width div 2) - (Width div 2);
     end
-  end;
+  end; }
 end;
 
 procedure TBlc.StmResponse(Sender: TObject);
