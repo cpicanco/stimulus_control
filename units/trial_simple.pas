@@ -21,17 +21,24 @@
 //
 unit trial_simple;
 
-{$MODE Delphi}
+{$mode objfpc}{$H+}
 
 interface
 
-uses Dialogs,
-     Classes, Types, SysUtils, Controls,
-     Graphics, ExtCtrls, StrUtils, {IdGlobal, IdGlobalProtocols,}
-     LCLIntf, LCLType, Forms,
-     custom_timer,
-     response_key, trial_abstract, countermanager,
-     session_config, counter, constants, interface_library;
+uses
+  LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils
+
+  // TTimer
+  , ExtCtrls
+
+  , response_key
+  , trial_abstract
+  , countermanager
+  , session_config
+  , counter
+  , constants
+  , interface_library
+  ;
 
 type
 
@@ -48,9 +55,7 @@ type
 
   TSimpl = Class(TTrial)
   protected
-    //FComparisonFocus : integer;
     FFirstResp : Boolean;
-    //FClockSwitchON : Boolean;
     FFlagCsq2Fired : Boolean;
     FTrialInterval: Integer;
     FCanPassTrial: Boolean;
@@ -63,8 +68,6 @@ type
     FDataBkGndS: String;
     FDataCsq: Byte;
     FTimerCsq: TTimer;
-    //FTimerClock: TTimer;
-    FClockThread: TClockThread;
     FFlagResp: Boolean;
     FKPlus: TSupportKey;
     FKMinus: TSupportKey;
@@ -84,7 +87,7 @@ type
     procedure TimerCsqTimer(Sender: TObject);
     procedure TimerClockTimer(Sender: TObject);
     procedure Dispenser(Csq: Byte; Usb: string);
-    procedure StartTrial;
+    procedure StartTrial(Sender: TObject); override;
     procedure EndTrial(Sender: TObject);
 
     procedure SetTimerCsq;
@@ -95,7 +98,7 @@ type
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy;override;
+    destructor Destroy; override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
     procedure DispenserPlusCall; override;
   end;
@@ -106,7 +109,7 @@ constructor TSimpl.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  Header:=  #9 +
+  Header :=  #9 +
              'Pos.Cmp.' + #9 +        //header do Relatório
              'Res.Cmp.' + #9 +
              'Lat.Cmp.' + #9 + #9 +
@@ -116,7 +119,7 @@ begin
              'UDsp.   ' + #9 +
              'Res.Frq.';
 
-  HeaderTicks:= 'Tempo_ms' + #9 +
+  HeaderTicks := 'Tempo_ms' + #9 +
                  'Cmp.Tipo' + #9 +
                  'FileName' + #9 +
                  'Left....' + #9 +
@@ -129,7 +132,7 @@ begin
     begin
       Enabled:= False;
       Interval:= 1;
-      OnTimer:= TimerCsqTimer;
+      OnTimer:= @TimerCsqTimer;
     end;
 
   //This Timer controls Sch integer increment.
@@ -143,8 +146,6 @@ begin
       OnTimer:= TimerClockTimer;
     end;}
    FFlagCsq2Fired := False;
-  //FComparisonFocus := -1;
-  //FClockSwitchON := True;
 end;
 
 destructor TSimpl.Destroy;
@@ -197,9 +198,9 @@ begin
           Key.Tag:= a1;
           Key.Cursor:= Self.Cursor;
           Key.Parent:= Self;
-          Key.OnConsequence:= Consequence;
-          Key.OnConsequence2:= Consequence2;
-          Key.OnResponse:= Response;
+          Key.OnConsequence:= @Consequence;
+          Key.OnConsequence2:= @Consequence2;
+          Key.OnResponse:= @Response;
 
           s1:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cBnd];
           R.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
@@ -217,7 +218,7 @@ begin
           sLoop := Copy(s1, 0, pos(#32, s1)-1);
           Delete(s1, 1, pos(#32, s1)); If Length(s1)>0 then While s1[1]=#32 do Delete(s1, 1, 1);
           sColor := Copy(s1, 0, pos(#32, s1)-1);
-          Key.Color := StrToIntDef(sColor, clRed);
+          Key.Color := StrToIntDef(sColor, $0000FF{clRed});
           Key.HowManyLoops:= StrToIntDef(sLoop, 0);
           Key.FullPath:= sName;
           Key.SchMan.Kind:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cSch];
@@ -253,7 +254,7 @@ begin
     TO_:= StrToIntDef(CfgTrial.SList.Values[_Kminus + _cTO],0);
   end;
 
-  StartTrial;
+  StartTrial(Self);
 end;
 
 procedure TSimpl.SetTimerCsq;
@@ -261,9 +262,11 @@ begin
   FTimerCsq.Interval := FTrialInterval;
 end;
 
-procedure TSimpl.StartTrial;
+procedure TSimpl.StartTrial(Sender: TObject);
 var a1 : integer;
 begin
+  inherited StartTrial(Sender);
+
   if FCanPassTrial then FTimerCsq.Enabled:= False else FTimerCsq.Enabled:= True;
   if FIsCorrection then
     begin
@@ -279,13 +282,10 @@ begin
   Ft := GetTickCount;
   FLatCmp:= 0;
   FDurCmp := 0;
-  FClockThread := TClockThread.Create(False);
-  FClockThread.OnTimer := TimerClockTimer;
 end;
 
 procedure TSimpl.TimerCsqTimer(Sender: TObject);
 begin
-  FClockThread.FinishThreadExecution;
   FTimerCsq.Enabled:= False;
   FCanPassTrial := True;
   EndTrial(Sender);
@@ -297,7 +297,7 @@ begin
   for a1:= 0 to FNumKeyC-1 do FVetSupportC[a1].Key.SchMan.Clock;
 end;
 
-procedure TSimpl.WriteData;  //Dados do Relatório
+procedure TSimpl.WriteData(Sender: TObject);  //Dados do Relatório
 var Lat_Cmp,Dur_CmpResponse,Dur_Cmp, Res_Cmp, Disp, uDisp: String;
     PosComps, Res_Frq: String;
     a1: Integer;
@@ -348,8 +348,7 @@ begin
           Disp      + #9 +
           uDisp     + #9 +
           Res_Frq;
-          //   + #9 +
-          //FDataBkGndS;        //obsoleto
+
 
   CounterManager.OnConsequence(Self);
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
@@ -438,7 +437,7 @@ begin
                '-' + #9 +
                IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9;
       FDataBkGndI.Plus(1);
-    //  FDataBkGndS := FDataBkGndS + IntToStr(X)+ ',' + IntToStr(Y) + #9;          //obsoleto
+
       CounterManager.OnBkgndResponse(FDataBkGndI);
       if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;

@@ -30,7 +30,6 @@ uses
   Classes, Types, SysUtils, Controls, Graphics,
   Forms, ExtCtrls, StrUtils
 
- , custom_timer
  , response_key
  , trial_abstract
  , countermanager
@@ -51,8 +50,10 @@ type
     TO_    : Integer;
   end;
 
+  { TMTS }
+
   TMTS = Class(TTrial)
-  protected
+  private
     FTrialInterval: Integer;
     //FComparisonFocus : integer;
     FDataBkGndI: TCounter;
@@ -76,7 +77,6 @@ type
     FDataUsb: ShortInt;
     FTimerDelay: TTimer;
     //FTimerClock: TTimer;
-    FClockThread: TClockThread;
     FTimerCsq: TTimer;
     FFirstResp : Boolean;
     FFlagResp: Boolean;
@@ -86,27 +86,28 @@ type
     FNumKeyC: Integer;
     FVetSupportC: Array of TSupportKey;
     procedure BeginCorrection (Sender : TObject);
-    procedure EndCorrection (Sender : TObject);
-    procedure SConsequence(Sender: TObject);     //consequência do modelo
     procedure Consequence(Sender: TObject);      //para a passagem de tentativa e ativação de interfaces
     procedure Consequence2(Sender: TObject);     //para a ativação de interfaces e interrupção de clocks
-    procedure Response(Sender: TObject);
+    procedure Dispenser(Csq: Byte; Usb: string);
+    procedure EndCorrection (Sender : TObject);
+    procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
-    procedure TimerDelayTimer(Sender: TObject);
-    procedure TimerCsqTimer(Sender: TObject);
-    procedure TimerClockTimer(Sender: TObject);
-    procedure Dispenser(Csq: Byte; Usb: string);
-    procedure StartTrial(Sender: TObject);
-    procedure EndTrial(Sender: TObject);
-    procedure ShowKeyC;
+    procedure Response(Sender: TObject);
+    procedure SConsequence(Sender: TObject);     //consequência do modelo
     procedure SetTimerCsq;
+    procedure ShowKeyC;
+    procedure StartTrial(Sender: TObject); override;
+    procedure ThreadClock(Sender: TObject); override;
+    procedure TimerCsqTimer(Sender: TObject);
+    procedure TimerDelayTimer(Sender: TObject);
+    procedure WriteData(Sender: TObject); override;
+    // TCustomControl
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure KeyPress(var Key: Char); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
-    procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -153,21 +154,13 @@ begin
     OnTimer:= @TimerDelayTimer;
   end;
 
-  //Native TTimer was substituted for
-  //a threaded custom timer (uTrial -> TClockThread) for better performance
-  {FTimerClock:= TTimer.Create(Self);
-  With FTimerClock do begin
-    Enabled:= False;
-    Interval:= 100;
-    OnTimer:= TimerClockTimer;
-  end;}
-
   FTimerCsq:= TTimer.Create(Self);
   With FTimerCsq do begin
     Enabled:= False;
     Interval:= 1;
     OnTimer:= @TimerCsqTimer;
   end;
+
   FFlagCsq2Fired := False;
  // FComparisonFocus := -1;
   //FClockSwitchON := True;
@@ -367,16 +360,6 @@ begin
   ShowKeyC;
 end;
 
-procedure TMTS.TimerClockTimer(Sender: TObject);
-var a1: Integer;
-begin
-  if FSupportS.Key.Visible then FSupportS.Key.SchMan.Clock;
-  if not FFlagModCmps then
-    for a1:= 0 to FNumKeyC-1 do
-      if FVetSupportC[a1].Key.Visible then
-        FVetSupportC[a1].Key.SchMan.Clock;
-end;
-
 procedure TMTS.TimerCsqTimer(Sender: TObject);
 begin
   //FTimerClock.Enabled:= False;
@@ -485,7 +468,6 @@ procedure TMTS.EndTrial(Sender: TObject);
 begin
  // if FLatMod = 0 then FLatMod:= GetTickCount;
  // if Ft2 = 0 then FLatCmp:= 0 else FLatCmp := GetTickCount;
-  FClockThread.FinishThreadExecution;
   WriteData(Sender);
   if FCanPassTrial then
     if Assigned(OnEndTrial) then OnEndTrial(Sender);
@@ -608,6 +590,7 @@ end;
 
 procedure TMTS.StartTrial(Sender: TObject);
 begin
+  inherited StartTrial(Sender);
   if FCanPassTrial then FTimerCsq.Enabled:= False else FTimerCsq.Enabled:= True;
   if FIsCorrection then
     begin
@@ -621,8 +604,6 @@ begin
   Ft2 := 0;
   FLatCmp:= 0;
   FDurCmp := 0;
-  FClockThread := TClockThread.Create(False);
-  FClockThread.OnTimer := @TimerClockTimer;
   Ft := GetTickCount;
   //FTimerClock.Enabled:= True;
 end;
@@ -641,6 +622,16 @@ begin
 
   if FTimerDelay.Interval > 0 then FTimerDelay.Enabled:= True
   else ShowKeyC;
+end;
+
+procedure TMTS.ThreadClock(Sender: TObject);
+var a1: Integer;
+begin
+  if FSupportS.Key.Visible then FSupportS.Key.SchMan.Clock;
+  if not FFlagModCmps then
+    for a1:= 0 to FNumKeyC-1 do
+      if FVetSupportC[a1].Key.Visible then
+          FVetSupportC[a1].Key.SchMan.Clock;
 end;
 
 procedure TMTS.BeginCorrection(Sender: TObject);
@@ -713,7 +704,6 @@ begin
       end;
   end;
 end;
-
 
 procedure TMTS.Consequence2(Sender: TObject);
 begin
