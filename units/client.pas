@@ -23,17 +23,26 @@ unit client;
 
 {$mode objfpc}{$H+}
 
+{$I stimulus_control.inc}
+
 interface
 
 uses
    Classes
  , SysUtils
  , Process
- , FileUtil
+ , Regdata
  , zmqapi
+ {$ifdef DEBUG}
+ , debug_logger
+ {$endif}
  ;
 
 type
+
+  {
+    http://wiki.freepascal.org/Multithreaded_Application_Tutorial
+  }
 
   TShowStatusEvent = procedure(Status: String) of object;
 
@@ -47,38 +56,43 @@ type
     FMsg : string;
     FTrialIndex : string;
     FCode : string;
-    FTimestampsPath : string;
     FOnShowStatus: TShowStatusEvent;
-    FTimestampsFile : TextFile;
+    FTimestampsData : TRegData;
     function GetTimestampFromMessage(aMessage : Utf8String) : Utf8String;
     procedure SetServerAddress(AValue: string);
     procedure ShowStatus;
   protected
     procedure Execute; override;
   public
-    constructor Create(TrialIndex : integer; Code, OutputPath : string; CreateSuspended : boolean = True);
+    constructor Create(TrialIndex : integer; Code : string; CreateSuspended : boolean = True); overload;
+    constructor Create(TrialIndex : integer; Code : string; TimestampsData : TRegData; CreateSuspended : boolean = True); overload;
     destructor Destroy; override;
     property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
     property ServerAddress : string read FServerAddress write SetServerAddress;
+    property TimestampsData : TRegData read FTimestampsData write FTimestampsData;
   end;
 
 implementation
 
-constructor TClientThread.Create(TrialIndex : integer; Code, OutputPath : string; CreateSuspended : boolean = True);
+constructor TClientThread.Create(TrialIndex : integer; Code : string; CreateSuspended : boolean = True);
 begin
   FreeOnTerminate := True;
 
   FTrialIndex := IntToStr(TrialIndex);
   FCode := Code;
-  FTimestampsPath := OutputPath;
   FServerAddress := '127.0.0.1:5000';
+  inherited Create(CreateSuspended);
+end;
 
-  ForceDirectoriesUTF8(ExtractFilePath(FTimestampsPath));
-	AssignFile(FTimestampsFile, FTimestampsPath);
-	if FileExistsUTF8(FTimestampsPath) then
-	  Append(FTimestampsFile)
-	else Rewrite(FTimestampsFile);
+constructor TClientThread.Create(TrialIndex: integer; Code: string;
+  TimestampsData: TRegData; CreateSuspended: boolean);
+begin
+  FreeOnTerminate := True;
 
+  FTimestampsData := TimestampsData;
+  FTrialIndex := IntToStr(TrialIndex);
+  FCode := Code;
+  FServerAddress := '127.0.0.1:5000';
   inherited Create(CreateSuspended);
 end;
 
@@ -128,7 +142,6 @@ var
   message : UTF8String;
 begin
   try
-
     FContext := TZMQContext.Create;
 	  FSubscriber := FContext.Socket( stSub );
     FSubscriber.connect( 'tcp://' + FServerAddress);
@@ -138,19 +151,23 @@ begin
     // ('value', 'value', 'value')
     data := #40#39 + FTrialIndex + #39#44#32#39 + GetTimestampFromMessage(message) + #39#44#32#39 + FCode + #39#41;
 
-	  Writeln(FTimestampsFile, data);
+    {$ifdef DEBUG}
+    if not Assigned(FTimestampsData) then
+      begin
+        FMsg := mt_Warning + 'TClientThread has an overloaded constructor. FTimestampsData was not assigned.';
+        Synchronize( @Showstatus );
+      end;
 
+    if Assigned(FTimestampsData) then
+    {$endif}
+      FTimestampsData.SaveData(data);
 
-    FMsg := data + #10#10 +
-            '"' + FTimestampsPath + '"'  + #10 +
-            '"' + FServerAddress + '"';
-
+    FMsg := data + #10#10 + '"' + FServerAddress + '"';
     Synchronize( @Showstatus );
 
   finally
-    CloseFile(FTimestampsFile);
     FSubscriber.Free;
-	  FContext.Free;
+    FContext.Free;
     Terminate;
   end;
 end;
