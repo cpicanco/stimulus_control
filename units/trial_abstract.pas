@@ -23,14 +23,19 @@ unit trial_abstract;
 
 {$mode objfpc}{$H+}
 
+{$I stimulus_control.inc}
+
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils, LCLProc,
-     session_config
-   , client
-   , countermanager
-   , FileUtil
-   ;
+uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils, LCLProc
+
+  , session_config
+  , client
+  , regdata
+  , countermanager
+  , custom_timer
+  ;
+
 type
 
   { TTrial }
@@ -51,6 +56,7 @@ type
     FRootMedia: string;
     FServerAddress: string;
     FTimeOut: Integer;
+    FTimestampsData: TRegData;
     FTimeStart: cardinal;
     // events
     FOnBeginCorrection: TNotifyEvent;
@@ -63,11 +69,15 @@ type
     FOnNone: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
     FOnWriteTrialData: TNotifyEvent;
-  protected
+    FClockThread : TClockThread;
+  strict protected
     FIscorrection : Boolean;
     procedure DebugStatus(msg : string);
+    procedure StartTrial(Sender: TObject); virtual;
+    procedure ThreadClock(Sender: TObject); virtual; abstract;
     procedure WriteData(Sender: TObject); virtual; abstract;
   public
+    destructor Destroy; override;
     procedure DispenserPlusCall; virtual; abstract;
     procedure Play(TestMode: Boolean; Correction : Boolean); virtual; abstract;
     procedure CreateClientThread(Code : string);
@@ -83,7 +93,8 @@ type
     property Result: string read FResult write FResult;
     property RootMedia : string read FRootMedia write FRootMedia;
     property ServerAddress : string read FServerAddress write FServerAddress;
-    property TimeOut : Integer read FTimeOut write FTimeOut ;
+    property TimeOut : Integer read FTimeOut write FTimeOut;
+    property TimestampsData : TRegdata read FTimestampsData write FTimestampsData;
     property TimeStart : cardinal read FTimeStart write FTimeStart;
     property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse: TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
@@ -95,8 +106,6 @@ type
     property OnNone: TNotifyEvent read FOnNone write FOnNone;
     property OnStmResponse: TNotifyEvent read FOnStmResponse write FOnStmResponse;
     property OnWriteTrialData: TNotifyEvent read FOnWriteTrialData write FOnWriteTrialData;
-
-
   end;
 
 implementation
@@ -104,37 +113,32 @@ implementation
 { TTrial }
 
 procedure TTrial.CreateClientThread(Code: string);
-{$ifdef DEBUG}
-var
-    FTimestampsPath : string;
-    FTimestampsFile : TextFile;
-{$endif}
 begin
-  {$ifdef DEBUG}
-  FTimestampsPath := GetCurrentDirUTF8 + '/timedebug';
-  ForceDirectoriesUTF8(ExtractFilePath(FTimestampsPath));
-	AssignFile(FTimestampsFile, FTimestampsPath);
-	if FileExistsUTF8(FTimestampsPath) then
-	  Append(FTimestampsFile)
-	else Rewrite(FTimestampsFile);
-  Writeln(FTimestampsFile, code + #32 + IntToStr(FCfgTrial.Id) + #32 + FFileName + #32 + FServerAddress);
-  {$endif}
-
-  FClientThread := TClientThread.Create( FCfgTrial.Id, Code, FFileName );
+  FClientThread := TClientThread.Create( FCfgTrial.Id, Code);
   FClientThread.OnShowStatus := @DebugStatus;
+  FClientThread.TimestampsData := FTimestampsData;
   FClientThread.ServerAddress := FServerAddress;
   FClientThread.Start;
-
-  {$ifdef DEBUG}
-  Writeln(FTimestampsFile, 'Started');
-  CloseFile(FTimestampsFile);
-  {$endif}
 end;
-
 
 procedure TTrial.DebugStatus(msg: string);
 begin
 //
 end;
+
+procedure TTrial.StartTrial(Sender: TObject);
+begin
+  FClockThread := TClockThread.Create(False);
+  FClockThread.OnTimer := @ThreadClock; // descendents can implement the ThreadClock method
+end;
+
+destructor TTrial.Destroy;
+begin
+  if Assigned(FClockThread) then
+    FClockThread.Running := False;
+  inherited Destroy;
+end;
+
+
 
 end.

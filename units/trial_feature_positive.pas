@@ -23,6 +23,8 @@ unit trial_feature_positive;
 
 {$mode objfpc}{$H+}
 
+{$I stimulus_control.inc}
+
 //{$MODE Delphi}
 
 interface
@@ -82,7 +84,6 @@ type
     FUseMedia : Boolean;
     FShowStarter : Boolean;
     FCanResponse : Boolean;
-    FClockThread : TClockThread;
     FClientThread : TClientThread;
     FList : TStringList;
   protected
@@ -94,13 +95,12 @@ type
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
-    procedure TimerClockTimer(Sender: TObject);
-    procedure StartTrial;
+    procedure ThreadClock(Sender: TObject); override;
+    procedure StartTrial(Sender: TObject); override;
     procedure BeginStarter;
     procedure EndTrial(Sender: TObject);
     procedure WriteData(Sender: TObject); override;
     procedure SetTimerCsq;
-
     //TCustomControl
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
@@ -108,7 +108,6 @@ type
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy;override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
 
   end;
@@ -136,13 +135,6 @@ begin
   FDataSupport.Responses:= 0;
 end;
 
-destructor TFPE.Destroy;
-begin
-  //do something
-  FClockThread.FinishThreadExecution;
-  inherited Destroy;
-end;
-
 procedure TFPE.BeginCorrection(Sender: TObject);
 begin
   if Assigned (OnBeginCorrection) then OnBeginCorrection (Sender);
@@ -157,18 +149,18 @@ procedure TFPE.Consequence(Sender: TObject);
 begin
   if FCanResponse then
     begin
-      CreateClientThread('Consequence');
+      CreateClientThread('C:'+ FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
       FCanResponse:= False;
       //FDataSupport.StmDuration := GetTickCount;
 
       if FFlagCsq2Fired then
         begin
-          Result := T_HIT;
+          if FCurrTrial.response = 'Positiva' then  Result := T_HIT else Result := T_MISS;
           IETConsequence := FDataSupport.CSQHIT;
         end
       else
         begin
-          Result := T_MISS;
+          if FCurrTrial.response = 'Negativa' then  Result := T_HIT else Result := T_MISS;
           // within trial user defined differential consequences is not implemented yet
           IETConsequence := FDataSupport.CSQMISS;
         end;
@@ -209,16 +201,42 @@ begin
     //aConsequence.FullScreen;
 end;
 
-procedure TFPE.TimerClockTimer(Sender: TObject);
+procedure TFPE.ThreadClock(Sender: TObject);
 begin
   FSchedule.Clock;
 end;
 
 procedure TFPE.KeyDown(var Key: Word; Shift: TShiftState);
 begin
+
   inherited KeyDown (Key, Shift);
   if Key = 27 {ESC} then FCanResponse:= False;
   Invalidate;
+
+  // This should be the last one.
+  if ssCtrl in Shift then
+    if Key = 81 {q} then
+      begin
+        Data := Data + '<>################## Sessão cancelada ##################<>' + #13#10;
+
+        Result := 'NONE';
+        IETConsequence := 'NONE';
+        NextTrial := 'END';
+        None(Self);
+        EndTrial(Self);
+      end;
+
+  if ssAlt in Shift then
+    if Key = 244 {f4} then
+      begin
+        Data := Data + '<>################## Sessão cancelada ##################<>' + #13#10;
+
+        Result := 'NONE';
+        IETConsequence := 'NONE';
+        NextTrial := 'END';
+        None(Self);
+        EndTrial(Self);
+      end;
 end;
 
 procedure TFPE.KeyUp(var Key: Word; Shift: TShiftState);
@@ -235,16 +253,16 @@ begin
           begin
             //if FUseMedia then ... not implemented yet
             FDataSupport.StarterLatency := GetTickCount;
-            CreateClientThread('*R:' + IntToStr(DateTimeToTimeStamp(Now).Time));
+            CreateClientThread('*R:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
             FShowStarter := False;
             Invalidate;
-            StartTrial;
+            StartTrial(Self);
           end;
       end
     else
       begin
         //if FUseMedia then ... not implemented yet
-        CreateClientThread('R:' + IntToStr(DateTimeToTimeStamp(Now).Time));
+        CreateClientThread('R:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
         FSchedule.DoResponse;
       end;
   end;
@@ -432,11 +450,11 @@ begin
             end;
       end;
 
-  if FShowStarter then BeginStarter else StartTrial;
+  if FShowStarter then BeginStarter else StartTrial(Self);
   //showmessage(BoolToStr(FShowStarter));
 end;
 
-procedure TFPE.StartTrial;
+procedure TFPE.StartTrial(Sender: TObject);
 var a1 : integer;
 
   procedure KeyStart(var aKey : TKey);
@@ -446,6 +464,8 @@ var a1 : integer;
   end;
 
 begin
+  inherited StartTrial(Sender);
+
   if FIsCorrection then
     begin
       BeginCorrection(Self);
@@ -460,13 +480,11 @@ begin
   FFirstResp := True;
   FCanResponse:= True;
   FDataSupport.StmBegin := GetTickCount;
-  FClockThread := TClockThread.Create(False);
-  FClockThread.OnTimer := @TimerClockTimer;
 end;
 
 procedure TFPE.BeginStarter;
 begin
-  CreateClientThread('BeginStarter');
+  CreateClientThread('S:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
   FCanResponse:= True;
   Invalidate;
 end;
