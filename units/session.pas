@@ -23,6 +23,8 @@ unit session;
 
 {$mode objfpc}{$H+}
 
+{$I stimulus_control.inc}
+
 interface
 
 uses Classes, Controls, SysUtils, LCLIntf
@@ -30,6 +32,7 @@ uses Classes, Controls, SysUtils, LCLIntf
      , bass_player
      , session_config
      , countermanager
+     , FileUtil
      , regdata
      , blocs
      ;
@@ -59,6 +62,7 @@ type
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
     FRegData: TRegData;
+    FTimestampsData : TRegData;
     FServerAddress: string;
     FSessName: String;
     FShowCounter : Boolean;
@@ -213,7 +217,8 @@ begin
       FileData:= 'Teste_000.txt';
     end;
 
-  FRegData:= TRegData.Create(Self, FCfgSes.RootData + FileData);
+  FRegData := TRegData.Create(Self, FCfgSes.RootData + FileData);
+  FTimestampsData := TRegData.Create(Self, ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps');
   //FRegDataTicks:= TRegData.Create(Self, FCfgSes.RootData + 'Ticks_001.txt');
 
   FBlc.ShowCounter := ShowCounter;
@@ -244,7 +249,7 @@ begin
   IndTrial := FManager.CurrentTrial.Counter;
   FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);
 
-  if IndBlc < FCfgSes.NumBlc then FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, IndTrial, FTestMode)
+  if IndBlc < FCfgSes.NumBlc then FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, FTimeStampsData, IndTrial, FTestMode)
   else EndSess(Sender);
 end;
 
