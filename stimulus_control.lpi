@@ -18,8 +18,16 @@
       <RevisionNr Value="1"/>
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará" FileDescription="Stimulus Control Application" InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control App" ProductVersion=""/>
     </VersionInfo>
+    <MacroValues Count="2">
+      <Macro1 Name="fpGUIPlatform" Value="x11"/>
+      <Macro2 Name="LCLWidgetType" Value="gtk2"/>
+    </MacroValues>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
+      <SharedMatrixOptions Count="2">
+        <Item1 ID="256034483827" Modes="Default" Type="IDEMacro" MacroName="fpGUIPlatform" Value="x11"/>
+        <Item2 ID="391980771510" Modes="Default" Type="IDEMacro" MacroName="LCLWidgetType" Value="gtk2"/>
+      </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
@@ -36,7 +44,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="26">
+    <Units Count="27">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -182,6 +190,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="bass_player"/>
       </Unit25>
+      <Unit26>
+        <Filename Value="units/debug_logger.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="debug_logger"/>
+      </Unit26>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -202,9 +215,7 @@
     </CodeGeneration>
     <Linking>
       <Debugging>
-        <UseHeaptrc Value="True"/>
         <StripSymbols Value="True"/>
-        <UseExternalDbgSyms Value="True"/>
       </Debugging>
       <Options>
         <Win32>

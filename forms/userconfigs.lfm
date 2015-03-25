@@ -1619,7 +1619,6 @@ object UserConfig: TUserConfig
   }
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnPaint = FormPaint
   ParentBiDiMode = False
   LCLVersion = '1.2.6.0'
   object btnRun: TButton
@@ -1753,7 +1752,7 @@ object UserConfig: TUserConfig
         EditLabel.Caption = 'Servidor (Pupil timestamps)'
         EditLabel.ParentColor = False
         TabOrder = 4
-        Text = '127.0.0.1:5020'
+        Text = '10.42.0.1:5020'
       end
       object btnClientTest: TButton
         AnchorSideLeft.Control = leServerAddress

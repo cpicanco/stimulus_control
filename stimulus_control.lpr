@@ -26,52 +26,57 @@ program stimulus_control;
 {$I stimulus_control.inc}
 
 uses
+
   {$IFDEF UNIX}
     {$IFDEF UseCThreads}
-      cthreads,
-      cmem,
+      cthreads
+    , cmem
     {$ENDIF}
-  //heaptrc,
+  //, heaptrc
   {$ENDIF}
-  Interfaces, // this includes the LCL widgetset
-  Forms,
+  , Interfaces // this includes the LCL widgetset
+  , Forms
 
   //Forms
-  userconfigs,
-  userconfigs_trial_mirrored,
-  userconfigs_get_matrix,
-  userconfigs_simple_discrimination_matrix,
-  background,
+  , userconfigs
+  , userconfigs_trial_mirrored
+  , userconfigs_get_matrix
+  , userconfigs_simple_discrimination_matrix
+  , background
 
   //units
-  client,
-  criatore,
-  escriba,
-  custom_timer,
-  regdata,
-  constants,
-  counter,
-  countermanager,
+  , client
+  , criatore
+  , escriba
+  , custom_timer
+  , regdata
+  , constants
+  , counter
+  , countermanager
 
   // Responses, Schedules of Reinforcement, Stimuli
-  schedules,
-  schedules_abstract,
-  response_key,
-  bass_player,
+  , schedules
+  , schedules_abstract
+  , response_key
+  , bass_player
 
   // session, blocs, trials
-  trial_abstract,
-  trial_simple,
-  trial_matching,
-  trial_message,
-  trial_feature_positive,
-  blocs,
-  session,
-  session_config,
+  , trial_abstract
+  , trial_simple
+  , trial_matching
+  , trial_message
+  , trial_feature_positive
+  , blocs
+  , session
+  , session_config
 
   // helpers
-  draw_methods
+  , draw_methods
 
+  {$ifdef DEBUG}
+  , debug_logger
+  , FileUtil
+  {$endif}
   ;
 
 {$R *.res}
@@ -80,8 +85,16 @@ resourcestring
   ApplicationTitle = 'Controle de Estímulos';
 
 begin
+
+  {$ifdef DEBUG}
+  DebugLn(mt_Information + 'Logger initialized');
+  {$endif}
+
   Application.Title := ApplicationTitle;
   Application.Initialize;
+  {$ifdef DEBUG}
+  DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
+  {$endif}
   Application.CreateForm(TUserConfig, UserConfig);
   Application.Run;
 end.
