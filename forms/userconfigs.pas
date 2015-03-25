@@ -23,20 +23,25 @@ unit userconfigs;
 
 {$mode objfpc}{$H+}
 
+{$I stimulus_control.inc}
+
 interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls, types,
   StdCtrls, ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons
 
+{$ifdef DEBUG}
+, debug_logger
+{$endif}
+
 , bass_player
-//, draw_methods
-//, regdata
 , client
 , session
 , session_config
 , countermanager
 , escriba
+, regdata
 , constants
 ;
 
@@ -99,7 +104,6 @@ type
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormPaint(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
     procedure piClick(Sender: TObject);
     procedure piFillEvenClick(Sender: TObject);
@@ -116,6 +120,7 @@ type
     FManager : TCounterManager;
     FConfigs : TCfgSes;
     FEscriba : TEscriba;
+    FData : TRegData;
     function MeetCondition(aCol, aRow : integer): boolean;
     procedure CheckRepetitionCol(aCol : integer);
     procedure EndSession(Sender : TObject);
@@ -161,14 +166,6 @@ implementation
 uses background, userconfigs_trial_mirrored, userconfigs_simple_discrimination_matrix;
 
 { TUserConfig }
-
-procedure TUserConfig.FormPaint(Sender: TObject);
-  //var p1, p2 : TPoint;
-begin
-  //TopBottomLine(Canvas, lblGeneral);
-  //TopBottomLine(Canvas, lblArea);
-  //TopBottomLine(Canvas, lblStimulus);
-end;
 
 
 procedure TUserConfig.ImageDblClick(Sender: TObject);
@@ -217,14 +214,10 @@ begin
     end;
 
   if TMenuItem(Sender) = piTrials then
-    begin
       btnRandomize.Hint := rsRandomizeTrials;
-    end;
 
   if TMenuItem(Sender) = piExpectedResponse then
-    begin
       btnRandomize.Hint := rsRandomizeResponses;
-    end;
 
   TMenuItem(Sender).Checked := True;
 end;
@@ -315,9 +308,11 @@ begin
 end;
 
 procedure TUserConfig.RandTrialIndex;
-var i, NumTrials, RandLine: integer;
-    InCell : string;
-    StrArray : array of string;
+var
+  i, NumTrials, RandLine: integer;
+  InCell : string;
+  StrArray : array of string;
+
   procedure SaveLine (Line : integer);
   var j : integer;
   begin
@@ -327,6 +322,7 @@ var i, NumTrials, RandLine: integer;
         StrArray[j] := InCell;
       end;
   end;
+
   procedure SendToLine (Line : integer);
   var j : integer;
   begin
@@ -336,6 +332,7 @@ var i, NumTrials, RandLine: integer;
         StringGrid1.Cells[(j), (Line)] := InCell;
       end;
   end;
+
   procedure ChangeLines (New, Old : integer);
   var j : integer;
   begin
@@ -345,6 +342,7 @@ var i, NumTrials, RandLine: integer;
         StringGrid1.Cells[(j), (New)] := InCell;
       end;
   end;
+
 begin
   Randomize;
   SetLength(StrArray, StringGrid1.ColCount);
@@ -381,12 +379,16 @@ end;
 procedure TUserConfig.DebugStatus(Message: String);
 begin
   ShowMessage(Message);
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'zmq Client said:' + Message);
+  {$endif}
 end;
 
 procedure TUserConfig.CheckRepetitionCol(aCol : integer);
-var aRowCount, aRow, i,
-    aBeginRow, aEndRow, Count : integer;
-    LastLine, Reset : Boolean;
+var
+  aRowCount, aRow, i,
+  aBeginRow, aEndRow, Count : integer;
+  LastLine, Reset : Boolean;
 
 begin
   Count := 1;
@@ -427,7 +429,8 @@ end;
 
 procedure TUserConfig.EndSession(Sender: TObject);
 begin
-  bkgnd.Free;
+  bkgnd.SetFullScreen(False);
+  bkgnd.Hide;
   ShowMessage(rsEndSession)
 end;
 
@@ -458,14 +461,34 @@ end;
 
 procedure TUserConfig.btnClientTestClick(Sender: TObject);
 var
+  Filename : UTF8String;
   Client : TClientThread;
-  Filename : string;
 begin
-  Filename := GetCurrentDirUTF8 + '/timestamps';
-  Client := TClientThread.Create( -1, 'The Client is Working', FileName );
+
+  if not Assigned(FData) then
+    begin
+      Filename := GetCurrentDirUTF8 + '/Test_000.timestamps';
+      FData := TRegData.Create(Self, Filename);
+      Sleep(2000);
+    end;
+
+  Client := TClientThread.Create( -1, 'The Client is Working', FData );
   Client.OnShowStatus := @DebugStatus;
   Client.ServerAddress := leServerAddress.Text;
-  Client.Start;
+
+  {$ifdef DEBUG}
+  try
+  {$endif}
+    Client.Start;
+  {$ifdef DEBUG}
+  except
+    on E:exception do
+      begin
+        DebugLn(mt_Exception + E.Message );
+      end;
+  end;
+  {$endif}
+  Sleep (1000);
 end;
 
 procedure TUserConfig.btnFillConditionClick(Sender: TObject);
@@ -484,8 +507,6 @@ end;
 
 procedure TUserConfig.btnNextGeneralClick(Sender: TObject);
 begin
-  //FEscriba.Name := leSessionName.Text;
-
   pgRodar.TabIndex := 1;
 end;
 
@@ -842,7 +863,8 @@ begin
 
   if OpenDialog1.Execute then
     begin
-      bkgnd := Tbkgnd.Create(Application);
+      if not Assigned(bkgnd) then
+        bkgnd := Tbkgnd.Create(Application);
       with bkgnd do
         begin
           if chkPlayOnSecondMonitor.Checked then Left := Screen.Width + 1;
