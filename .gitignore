@@ -1,4 +1,5 @@
 core
+*.bak
 *.res
 *.bin
 *.dbg
