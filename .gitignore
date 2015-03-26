@@ -1,4 +1,5 @@
 core
+*.lps
 *.a
 *.bak
 *.res
