@@ -23,11 +23,9 @@ unit blocs;
 
 {$mode objfpc}{$H+}
 
-{$I stimulus_control.inc}
-
 interface
 
-uses Classes, {IdGlobal,} Controls, LCLIntf, LCLType,
+uses Classes, Controls, LCLIntf, LCLType,
      ExtCtrls, SysUtils, Graphics, Forms,
      Dialogs,StdCtrls,
 
@@ -36,7 +34,7 @@ uses Classes, {IdGlobal,} Controls, LCLIntf, LCLType,
      , constants
      , response_key
      , countermanager
-     , client
+     //, client
      , trial_abstract
         , trial_message
      , trial_simple
@@ -53,10 +51,10 @@ type
   private
     //FOnBeginTrial: TNotifyEvent;
     //FRegDataTicks: TRegData;
+    //FClientThread : TClientThread;
     FBackGround: TWinControl;
     FBlc: TCfgBlc;
     FBlcHeader: String;
-    FClientThread : TClientThread;
     FCounterLabel : TLabel;
     FData : String;
     FDataTicks : String;
@@ -90,7 +88,7 @@ type
     procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
     procedure DebugStatus(msg : string);
     procedure PlayTrial;
-    procedure ShowCounterPlease (Kind : String);
+    //procedure ShowCounterPlease (Kind : String);
     // events
     procedure BkGndResponse(Sender: TObject);
     procedure EndBlc(Sender: TObject);
@@ -171,7 +169,7 @@ end;
 procedure TBlc.TrialTerminate(Sender: TObject);
 var s0, s1, s2, s3, s4 : string;
     csqDuration : Integer;
-    TimestampsData : TRegData;
+    //TimestampsData : TRegData;
 
   procedure NextSpaceDelimitedParameter;
   begin
@@ -217,6 +215,10 @@ begin
   //FRegDataTicks.SaveData(FDataTicks);
   FData := '';
   FDataTicks := '';
+  s1 := '';
+  s2 := '';
+  s3 := '';
+  s4 := '';
 
   if  (FTrial.NextTrial = 'END') then //end bloc
     FCounterManager.CurrentTrial.Counter := FBlc.NumTrials
@@ -326,7 +328,7 @@ begin
        and (FTimerTO.Interval > 0)
        and (FTimerCsq.Interval > 0) then
         begin
-          if ShowCounter then ShowCounterPlease('IET');
+          //if ShowCounter then ShowCounterPlease('IET');
           FTimerITI.Enabled:= True;
         end
       else
@@ -335,7 +337,7 @@ begin
              and (FTimerTO.Interval = 0)
              and (FTimerCsq.Interval = 0) then
             begin
-              if ShowCounter then ShowCounterPlease('IET');
+              //if ShowCounter then ShowCounterPlease('IET');
               FTimerITI.Enabled:= True;
             end;
           if ((FTimerITI.Interval > 0) or (FTimerCsq.Interval > 0))
@@ -368,7 +370,7 @@ begin
     end;
   if (FTimerITI.Interval > 0) then
     begin
-      if ShowCounter then ShowCounterPlease('IET');
+      //if ShowCounter then ShowCounterPlease('IET');
       FTimerITI.Enabled:= True;
     end
   else PlayTrial;
@@ -392,7 +394,7 @@ begin
 
   if (FTimerITI.Interval > 0) then
     begin
-      if ShowCounter then ShowCounterPlease('IET');
+      //if ShowCounter then ShowCounterPlease('IET');
       FTimerITI.Enabled:= True;
     end
   else PlayTrial;
@@ -476,8 +478,8 @@ begin
 end;
 
 procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
-var
-  MediaPath : string;
+//var
+//  MediaPath : string;
 begin
 
   //BlockInput(true);
@@ -510,8 +512,8 @@ begin
 end;
 
 procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; TimeStampsData: TRegData; IndTent: Integer; TestMode: Boolean);
-var
-  aFileName : string;
+//var
+//  aFileName : string;
 
 begin
   FBlc:= CfgBlc;
@@ -578,10 +580,10 @@ begin
 
 end;
 
-
+  {
 procedure TBlc.ShowCounterPlease(Kind: String);
 begin
-  {if Kind = 'IET' then
+  if Kind = 'IET' then
   begin
     FCounterLabel := TLabel.Create(FBackGround);
     with FCounterLabel do
@@ -598,8 +600,8 @@ begin
       Top := (Screen.Height div 2) - (Height div 2);
       Left := (Screen.Width div 2) - (Width div 2);
     end
-  end; }
-end;
+  end;
+end;   }
 
 procedure TBlc.StmResponse(Sender: TObject);
 begin

@@ -23,8 +23,6 @@ unit regdata;
 
 {$mode objfpc}{$H+}
 
-{$I stimulus_control.inc}
-
 interface
 
 uses
@@ -142,7 +140,7 @@ begin
 end;
 
 procedure TRegData.SaveData(Data: string);
-var bol : Boolean;
+//var bol : Boolean;
 begin
   if FFileName <> '' then
     begin

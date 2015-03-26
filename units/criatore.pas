@@ -26,8 +26,8 @@ unit criatore;
 interface
 
 uses
-  LCLIntf, LCLType, LMessages, SysUtils, Classes, Graphics, Controls,
-  StdCtrls, ExtCtrls, Math, Forms, Dialogs,
+  LCLIntf, LCLType, {LMessages,} SysUtils, Classes, Graphics, Controls,
+  {StdCtrls,} ExtCtrls, {Math,} Forms, Dialogs,
 
   session_config;
 

@@ -303,7 +303,7 @@ end;
 procedure TEscriba.WriteComp;
 var
     i : integer;
-    aType : integer;
+    //aType : integer;
     aComp : string;
 
 const

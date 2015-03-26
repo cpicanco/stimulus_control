@@ -130,7 +130,7 @@ procedure TMatrixForm.FormPaint(Sender: TObject);
 var
     i : integer;
     OldCanvas : TCanvas;
-    aTop, aLeft, aWidth, aHeight : integer;
+    aTop, aLeft, aWidth{, aHeight} : integer;
     aGapValues : string;
     aGap : Boolean;
     aGapDegree : integer;
@@ -178,7 +178,7 @@ begin
                 aTop := Trials[FCurrentTrial].Comps[i].Top;
                 aLeft := Trials[FCurrentTrial].Comps[i].Left;
                 aWidth := Trials[FCurrentTrial].Comps[i].Width;
-                aHeight := Trials[FCurrentTrial].Comps[i].Height;
+                //aHeight := Trials[FCurrentTrial].Comps[i].Height;
                 aGapValues := Trials[FCurrentTrial].Comps[i].Path;
                 //WriteLn(aGapValues);
                 aGap := StrToBoolDef( Copy( aGapValues, 0, pos( #32, aGapValues ) - 1), False);
@@ -217,7 +217,7 @@ procedure TMatrixForm.SetMatrix(MatrixCoordenates : TStrings);
 var
     i, j, t : integer;
     aTop, aLeft, aWidth, aHeight : integer;
-    aGap, aGapDegree, aGapLength : integer;
+    {aGap,} aGapDegree, aGapLength : integer;
     aPositiveTrial, inct : Boolean;
     Coordenates : string;
 
@@ -338,7 +338,7 @@ end;
 
 procedure TMatrixForm.Button1Click(Sender: TObject);
 var i : Integer;
-    a : string;
+    //a : string;
 begin
   for i := 0 To Length(Trials[FCurrentTrial].Comps) -1 do
     begin

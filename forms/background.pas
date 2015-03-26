@@ -26,15 +26,15 @@ unit background;
 interface
 
 uses
-  LCLType, LCLIntf, Math,
+  LCLType, LCLIntf, {Math,}
   {$IFDEF LCLGTK2}
   gtk2, gdk2, //glib2,
   {$ENDIF}
   Classes, SysUtils, FileUtil, Forms
-, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls
-, regdata
-, client
-, draw_methods
+, Controls, Graphics, Dialogs, {StdCtrls,} ExtCtrls
+//, regdata
+//, client
+//, draw_methods
 ;
 
 type

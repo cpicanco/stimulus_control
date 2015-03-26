@@ -30,7 +30,7 @@ uses
   {$IFDEF LCLGTK2}
   gtk2, gdk2, //glib2,
   {$ENDIF}
-  Spin, ValEdit, Grids, ExtCtrls, draw_methods, math
+  Spin, {ValEdit,} Grids, ExtCtrls, draw_methods, math
   ;
 
 type
@@ -106,7 +106,7 @@ type
     procedure seNodesChange(Sender: TObject);
     procedure SpinChange(Sender: TObject);
     procedure SpinClick(Sender: TObject);
-    procedure EditingDone(Sender: TObject);
+    procedure EditingCDone(Sender: TObject);
   private
     FCurrentTrial : integer;
     FGrid : TPoints;
@@ -282,7 +282,7 @@ begin
   Invalidate;
 end;
 
-procedure TBresenhamLineForm.EditingDone(Sender: TObject);
+procedure TBresenhamLineForm.EditingCDone(Sender: TObject);
   var i : integer;
 begin
   if (Sender = x0) or (Sender = x1) or (Sender = y0) or (Sender = y1) or (Sender = seNodes) then

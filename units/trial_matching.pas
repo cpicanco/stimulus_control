@@ -20,20 +20,25 @@
 // along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.
 //
 unit trial_matching;
+
 {$mode objfpc}{$H+}
-//{$MODE Delphi}
 
 interface
 
 uses
-  LCLIntf, LCLType, LMessages,
-  Classes, Types, SysUtils, Controls, Graphics,
-  Forms, ExtCtrls, StrUtils
+
+  LCLIntf, LCLType, {LMessages,} Controls, Classes, SysUtils
+
+  // TTimer
+  , ExtCtrls
+
+  //IntToBin
+  , strutils
 
  , response_key
  , trial_abstract
- , countermanager
- , session_config
+ //, countermanager
+ //, session_config
  , counter
  , constants
  ;
@@ -57,7 +62,7 @@ type
     FTrialInterval: Integer;
     //FComparisonFocus : integer;
     FDataBkGndI: TCounter;
-    FDataBkGndS: String;
+    //FDataBkGndS: String;
     FFlagModCmps: Boolean;
     FFlagCsq2Fired: Boolean;
     //FClockSwitchON : Boolean;
@@ -98,16 +103,17 @@ type
     procedure SConsequence(Sender: TObject);     //consequência do modelo
     procedure SetTimerCsq;
     procedure ShowKeyC;
-    procedure StartTrial(Sender: TObject); override;
-    procedure ThreadClock(Sender: TObject); override;
     procedure TimerCsqTimer(Sender: TObject);
     procedure TimerDelayTimer(Sender: TObject);
-    procedure WriteData(Sender: TObject); override;
     // TCustomControl
+  protected
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure KeyPress(var Key: Char); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure StartTrial(Sender: TObject); override;
+    procedure ThreadClock(Sender: TObject); override;
+    procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -232,7 +238,7 @@ begin
     sLoop := Copy(s1, 0, pos(#32, s1)-1);
     Delete(s1, 1, pos(#32, s1)); If Length(s1)>0 then While s1[1]=#32 do Delete(s1, 1, 1);
     sColor := Copy(s1, 0, pos(#32, s1)-1);
-    Key.Color := StrToIntDef(sColor, clRed);
+    Key.Color := StrToIntDef(sColor, $0000FF);
     Key.HowManyLoops:= StrToIntDef(sLoop, 0);
     Key.FullPath:= sName;
     //Key.FileName:= CfgTrial.SList.Values['RootMedia'] + CfgTrial.SList.Values['SStm'];
@@ -245,7 +251,7 @@ begin
   FNumKeyC:= StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
 
   SetLength(FVetSupportC, FNumKeyC);
-  For a1:= 0 to FNumKeyC-1 do begin
+  for a1:= 0 to FNumKeyC-1 do begin
     With FVetSupportC[a1] do begin
       Key:= TKey.Create(Self);
       Key.Tag:= a1;
@@ -272,7 +278,7 @@ begin
       sLoop := Copy(s1, 0, pos(#32, s1)-1);
       Delete(s1, 1, pos(#32, s1)); If Length(s1)>0 then While s1[1]=#32 do Delete(s1, 1, 1);
       sColor := Copy(s1, 0, pos(#32, s1)-1);
-      Key.Color := StrToIntDef(sColor, clRed);
+      Key.Color := StrToIntDef(sColor, $0000FF);
       Key.HowManyLoops:= StrToIntDef(sLoop, 0);
       Key.FullPath:= sName;
 
@@ -286,7 +292,6 @@ begin
       Msg:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cMsg];
       Res:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cRes];
       Nxt:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cNxt];
-      Application.ProcessMessages;
     end;
   end;
 
@@ -369,13 +374,27 @@ begin
 end;
 
 procedure TMTS.WriteData(Sender: TObject);
-var Pos_Mod, Resp_Mod,
-    Lat_Mod, Dur_ModResponse, Dur_Mod, Atraso,
-    Res_Mask, Lat_Mask, Dur_CmpResponse, Dur_Cmp,
-    Disp, uDisp,
-    PosComps, Res_Frq: String;
+var
+    Pos_Mod,
+    Resp_Mod,
+    Lat_Mod,
+    Dur_ModResponse,
+    Dur_Mod,
+    Atraso,
+    Res_Mask,
+    Lat_Mask,
+    Dur_CmpResponse,
+    Dur_Cmp,
+    Disp,
+    uDisp,
+    PosComps,
+    Res_Frq: String;
+
     a1: Integer;
 begin
+  Res_Frq := '';
+  PosComps := '';
+
   If FSupportS.Msg = '' then FSupportS.Msg:= '--------';
   Pos_Mod:= LeftStr(FSupportS.Msg+#32#32#32#32#32#32#32#32, 8);
 

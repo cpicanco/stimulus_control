@@ -23,8 +23,6 @@ unit client;
 
 {$mode objfpc}{$H+}
 
-{$I stimulus_control.inc}
-
 interface
 
 uses
@@ -147,6 +145,7 @@ begin
     FSubscriber.connect( 'tcp://' + FServerAddress);
     FSubscriber.subscribe( '' );
 
+    message := '';
     FSubscriber.recv( message );
     // ('value', 'value', 'value')
     data := #40#39 + FTrialIndex + #39#44#32#39 + GetTimestampFromMessage(message) + #39#44#32#39 + FCode + #39#41;

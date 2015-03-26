@@ -17,7 +17,7 @@ type
     public
       constructor Create (WindowHandle : HWND); overload;
       constructor Create; overload;
-      destructor Destroy;
+      destructor Destroy; override;
       //procedure SetVolume; virtual; abstract;
       //procedure SetDevice; virtual; abstract;
   end;
@@ -63,6 +63,7 @@ end;
 destructor TBassAudioDevice.Destroy;
 begin
   BASS_Free;
+  inherited Destroy;
 end;
 
   { TBassChannel }

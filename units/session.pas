@@ -23,8 +23,6 @@ unit session;
 
 {$mode objfpc}{$H+}
 
-{$I stimulus_control.inc}
-
 interface
 
 uses Classes, Controls, SysUtils, LCLIntf

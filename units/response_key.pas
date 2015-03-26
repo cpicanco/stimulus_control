@@ -27,8 +27,8 @@ unit response_key;  // media_key may be a good name
 interface
 
 uses Dialogs,
-     LCLIntf, LCLType, LMessages, Messages, SysUtils, Variants, Classes,
-     Graphics, Controls, Forms, StdCtrls, ExtCtrls, FileUtil,
+     LCLIntf, LCLType, {LMessages,} SysUtils, Variants, Classes,
+     Graphics, Controls, Forms, ExtCtrls, FileUtil,
      bass_player,
      schedules_abstract,
      counter
@@ -73,6 +73,7 @@ type
     procedure Response (Sender: TObject);
     //procedure CMMouseEnter(var msg: TMessage); message CM_MOUSEENTER;
     //procedure CMMouseLeave(var msg: TMessage); message CM_MOUSELEAVE;
+  protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); overload; override;
     procedure MouseDown(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);reintroduce; overload;
     procedure MouseDown(Sender : TObject; Button: Smallint; ShiftState: Smallint; X: Integer; Y: Integer); reintroduce; overload;

@@ -22,11 +22,230 @@
       <Macro1 Name="fpGUIPlatform" Value="x11"/>
       <Macro2 Name="LCLWidgetType" Value="gtk2"/>
     </MacroValues>
-    <BuildModes Count="1">
-      <Item1 Name="Default" Default="True"/>
-      <SharedMatrixOptions Count="2">
-        <Item1 ID="256034483827" Modes="Default" Type="IDEMacro" MacroName="fpGUIPlatform" Value="x11"/>
-        <Item2 ID="391980771510" Modes="Default" Type="IDEMacro" MacroName="LCLWidgetType" Value="gtk2"/>
+    <BuildModes Count="6">
+      <Item1 Name="Debug" Default="True"/>
+      <Item2 Name="Release">
+        <MacroValues Count="2">
+          <Macro1 Name="fpGUIPlatform" Value="x11"/>
+          <Macro2 Name="LCLWidgetType" Value="gtk2"/>
+        </MacroValues>
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control.bin"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="forms;units;/usr/local/lib/;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <CompilerMessages>
+              <MsgFileName Value=""/>
+            </CompilerMessages>
+            <CustomOptions Value="-dUseCThreads"/>
+            <CompilerPath Value="$(CompPath)"/>
+          </Other>
+        </CompilerOptions>
+      </Item2>
+      <Item3 Name="WinDebug">
+        <MacroValues Count="2">
+          <Macro3 Name="fpGUIPlatform" Value="gdi"/>
+          <Macro4 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control.bin"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="forms;units;/usr/local/lib/;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <CompilerMessages>
+              <MsgFileName Value=""/>
+            </CompilerMessages>
+            <CustomOptions Value="-dUseCThreads"/>
+            <CompilerPath Value="$(CompPath)"/>
+          </Other>
+        </CompilerOptions>
+      </Item3>
+      <Item4 Name="WinRelease">
+        <MacroValues Count="2">
+          <Macro3 Name="fpGUIPlatform" Value="gdi"/>
+          <Macro4 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control.bin"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="forms;units;/usr/local/lib/;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <CompilerMessages>
+              <MsgFileName Value=""/>
+            </CompilerMessages>
+            <CustomOptions Value="-dUseCThreads"/>
+            <CompilerPath Value="$(CompPath)"/>
+          </Other>
+        </CompilerOptions>
+      </Item4>
+      <Item5 Name="MacDebug">
+        <MacroValues Count="2">
+          <Macro1 Name="fpGUIPlatform" Value="x11"/>
+          <Macro5 Name="LCLWidgetType" Value="carbon"/>
+        </MacroValues>
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control.bin"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="forms;units;/usr/local/lib/;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <CompilerMessages>
+              <MsgFileName Value=""/>
+            </CompilerMessages>
+            <CustomOptions Value="-dUseCThreads"/>
+            <CompilerPath Value="$(CompPath)"/>
+          </Other>
+        </CompilerOptions>
+      </Item5>
+      <Item6 Name="MacRelease">
+        <MacroValues Count="2">
+          <Macro1 Name="fpGUIPlatform" Value="x11"/>
+          <Macro5 Name="LCLWidgetType" Value="carbon"/>
+        </MacroValues>
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control.bin"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="forms;units;/usr/local/lib/;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <CompilerMessages>
+              <MsgFileName Value=""/>
+            </CompilerMessages>
+            <CustomOptions Value="-dUseCThreads"/>
+            <CompilerPath Value="$(CompPath)"/>
+          </Other>
+        </CompilerOptions>
+      </Item6>
+      <SharedMatrixOptions Count="6">
+        <Item1 Modes="Debug,MacDebug,MacRelease,Release" Type="IDEMacro" MacroName="fpGUIPlatform" Value="x11"/>
+        <Item2 Modes="Debug,Release" Type="IDEMacro" MacroName="LCLWidgetType" Value="gtk2"/>
+        <Item3 ID="062521388972" Modes="WinDebug,WinRelease" Type="IDEMacro" MacroName="fpGUIPlatform" Value="gdi"/>
+        <Item4 ID="251590465574" Modes="WinDebug,WinRelease" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item5 ID="228596256702" Modes="MacDebug,MacRelease" Type="IDEMacro" MacroName="LCLWidgetType" Value="carbon"/>
+        <Item6 ID="313147574189" Modes="WinDebug,MacDebug,Debug" Value="-dDEBUG"/>
       </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
