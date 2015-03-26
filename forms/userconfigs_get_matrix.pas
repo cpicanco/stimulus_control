@@ -103,7 +103,7 @@ resourcestring
 
 implementation
 
-uses background, userconfigs_simple_discrimination_matrix;
+uses {background,} userconfigs_simple_discrimination_matrix;
 
 {$R *.lfm}
 

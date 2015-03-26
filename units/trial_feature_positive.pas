@@ -23,22 +23,18 @@ unit trial_feature_positive;
 
 {$mode objfpc}{$H+}
 
-{$I stimulus_control.inc}
-
-//{$MODE Delphi}
-
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils
+uses LCLIntf, LCLType, {LMessages,} Controls, Classes, SysUtils
 
-  , counter
+  //, counter
   , dialogs
   , session_config
-  , countermanager
+  //, countermanager
   , trial_abstract
-  , custom_timer
+  //, custom_timer
   , constants
-  , client
+  //, client
   , draw_methods
   , schedules_abstract
   , response_key
@@ -74,7 +70,7 @@ type
 
   TFPE = Class(TTrial)
   private
-    FIETCode : string;
+    //FIETCode : string;
     FNumComp : integer;
     FDataSupport : TDataSupport;
     FCurrTrial: TCurrentTrial;
@@ -84,8 +80,8 @@ type
     FUseMedia : Boolean;
     FShowStarter : Boolean;
     FCanResponse : Boolean;
-    FClientThread : TClientThread;
-    FList : TStringList;
+    //FClientThread : TClientThread;
+    //FList : TStringList;
   protected
     procedure BeginCorrection (Sender : TObject);
     procedure EndCorrection (Sender : TObject);
@@ -184,7 +180,7 @@ end;
 procedure TFPE.Consequence2(Sender: TObject);
 var
   aConsequence : TKey;
-  aFullPath : string;
+  //aFullPath : string;
 
 begin
     if FFlagCsq2Fired = False then FFlagCsq2Fired := True;
@@ -302,7 +298,7 @@ end;
 
 procedure TFPE.Play(TestMode: Boolean; Correction : Boolean);
 var
-  s1, sName, sLoop, sColor, sGap, sGapDegree, sGapLength : string;
+  s1{, sName, sLoop, sColor, sGap, sGapDegree, sGapLength} : string;
   R : TRect;
   a1 : Integer;
 
@@ -324,9 +320,9 @@ var
     with aKey do
       begin
         BoundsRect := R;
-        Color := StrToIntDef(sColor, $0000FF {clRed} );
-        HowManyLoops:= StrToIntDef(sLoop, 0);
-        FullPath:= sName;
+        //Color := StrToIntDef(sColor, $0000FF {clRed} );
+        //HowManyLoops:= StrToIntDef(sLoop, 0);
+        //FullPath:= sName;
         SchMan.Kind:= CfgTrial.SList.Values[_Schedule];
         //Visible := False;
       end;
@@ -455,7 +451,7 @@ begin
 end;
 
 procedure TFPE.StartTrial(Sender: TObject);
-var a1 : integer;
+//var a1 : integer;
 
   procedure KeyStart(var aKey : TKey);
   begin

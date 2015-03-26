@@ -26,15 +26,16 @@ unit trial_simple;
 interface
 
 uses
-  LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils
+
+  LCLIntf, LCLType, Controls, Classes, SysUtils
 
   // TTimer
   , ExtCtrls
 
   , response_key
   , trial_abstract
-  , countermanager
-  , session_config
+  //, countermanager
+  //, session_config
   , counter
   , constants
   , interface_library
@@ -298,10 +299,22 @@ begin
 end;
 
 procedure TSimpl.WriteData(Sender: TObject);  //Dados do Relatório
-var Lat_Cmp,Dur_CmpResponse,Dur_Cmp, Res_Cmp, Disp, uDisp: String;
-    PosComps, Res_Frq: String;
+var
+    Lat_Cmp,
+    Dur_CmpResponse,
+    Dur_Cmp,
+    Res_Cmp,
+    Disp,
+    uDisp,
+    PosComps,
+    Res_Frq: String;
+
     a1: Integer;
 begin
+  Res_Frq := '';
+  PosComps := '';
+  Disp := '';
+  uDisp := '';
   for a1 := 0 to ComponentCount - 1 do
     begin
       if Components[a1] is TKey then

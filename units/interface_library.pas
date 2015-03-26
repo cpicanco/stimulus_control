@@ -20,12 +20,14 @@
 //
 unit interface_library;
 
-//{$MODE Delphi}
 {$mode objfpc}{$H+}
 
 interface
 
-uses Classes,
+// this unit was not implemented yet
+
+uses
+     Classes,
 
      {$IFDEF WINDOWS}
      Windows, Registry,
@@ -36,7 +38,7 @@ uses Classes,
      {$ENDIF}
      Synaser, {----> Serial port library, windows and linux}
      Dialogs, Forms, ExtCtrls,
-     SysUtils, LCLIntf, LCLType, LMessages;
+     SysUtils, LCLIntf, LCLType;
 
 type
 
@@ -100,7 +102,7 @@ implementation
 
 constructor TPLP.Create (AOwner : TComponent);
 begin
-  FCsqTimer := TTimer.Create (Self);
+  FCsqTimer := TTimer.Create (AOwner);
   with FCsqTimer do
     begin
       Enabled := False;
@@ -196,11 +198,11 @@ end;
 {TRS232}
 
 function TRS232.GetCommPortNumber: ShortInt;
+{$IFDEF WINDOWS}
 var
-  {$IFDEF WINDOWS}
   Reg: TRegistry;
-  {$ENDIF}
   s1: string;
+{$ENDIF}
 begin
   {$IFDEF WINDOWS}
   Reg := TRegistry.Create;

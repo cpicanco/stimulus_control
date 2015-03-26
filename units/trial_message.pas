@@ -26,8 +26,11 @@ unit trial_message;
 interface
 
 uses Controls, Classes, ExtCtrls, SysUtils, StdCtrls,
-     Graphics, Forms, LCLIntf, LCLType, LMessages, {IdGlobal,}
-     trial_abstract, countermanager;
+     Graphics, Forms, LCLIntf, LCLType
+
+     , trial_abstract
+     //, countermanager
+     ;
 
 type
 
@@ -50,7 +53,7 @@ type
     procedure MemoClick(Sender: TObject);
     procedure Click; override;
     procedure WriteData(Sender: TObject); override;
-    procedure StartTrial(Sender: TObject);
+    procedure StartTrial(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
@@ -140,7 +143,7 @@ end;
 
 procedure TMSG.DispenserPlusCall;
 begin
-  inherited;
+  //
 
 end;
 
@@ -171,6 +174,8 @@ end;
 procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);
 var H: Integer;
 begin
+  //FIscorrection := Correction; //Messages with corrections were not implemented yet
+
   NextTrial:= '-1';
   Color:= StrToIntDef(CfgTrial.SList.Values['BkGnd'], 0);
   FCanPassTrial := StrToBoolDef(CfgTrial.SList.Values['AutoNxt'], True);
@@ -210,8 +215,9 @@ begin
   FTimerCsq.Interval := FTrialInterval;
 end;
 
-procedure TMSG.StartTrial;
+procedure TMSG.StartTrial(Sender: TObject);
 begin
+  inherited StartTrial(Sender);
   if FCanPassTrial then FTimerCsq.Enabled:= False else FTimerCsq.Enabled:= True;
   FFlagResp:= True;
   Ft := GetTickCount;

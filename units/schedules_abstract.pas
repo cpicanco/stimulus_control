@@ -21,7 +21,7 @@
 //
 unit schedules_abstract;
 
-{$MODE Delphi}
+{$mode objfpc}{$H+}
 
 interface
 
@@ -160,9 +160,9 @@ begin
   FAbsSchLoaded:= Assigned(FAbsSch); // Assigned (FAbsSch) Testa se FAbsSch é nulo ou não. Retorna False se nulo.
 
   if FAbsSchLoaded then begin
-    FAbsSch.OnConsequence2:= AbsSchConsequence2;
-    FAbsSch.OnConsequence:= AbsSchConsequence;
-    FAbsSch.OnResponse:= AbsSchResponce;
+    FAbsSch.OnConsequence2:= @AbsSchConsequence2;
+    FAbsSch.OnConsequence:= @AbsSchConsequence;
+    FAbsSch.OnResponse:= @AbsSchResponce;
     FAbsSch.Reset;
     FAbsSch.Reset2;
   end;

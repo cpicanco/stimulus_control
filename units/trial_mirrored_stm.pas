@@ -23,21 +23,23 @@ unit trial_mirrored_stm;
 
 {$mode objfpc}{$H+}
 
-{$I stimulus_control.inc}
-
-//{$MODE Delphi}
-
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils
+uses
 
-  , counter
+  LCLIntf, LCLType, Controls, Classes, SysUtils
+
+  //, counter
+  //, countermanager
+  //, client
+
+  {$ifdef DEBUG}
+  , debug_logger
   , dialogs
+  {$endif}
   , session_config
-  , countermanager
   , trial_abstract
   , constants
-  , client
   , draw_methods
   , schedules_abstract
   , response_key
@@ -64,7 +66,7 @@ type
     FUseMedia : Boolean;
     FShowStarter : Boolean;
     FCanResponse : Boolean;
-    FList : TStringList;
+    //FList : TStringList;
   protected
     procedure BeginCorrection (Sender : TObject);
     procedure EndCorrection (Sender : TObject);
@@ -74,7 +76,7 @@ type
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
     procedure ThreadClock(Sender: TObject); override;
-    procedure StartTrial(Sender: TObject);
+    procedure StartTrial(Sender: TObject); override;
     procedure BeginStarter;
     procedure EndTrial(Sender: TObject);
     procedure WriteData(Sender: TObject); override;
@@ -210,7 +212,7 @@ begin
 end;
 
 procedure TMRD.Paint;
-var i : integer;
+//var i : integer;
 begin
   inherited Paint;
 
@@ -235,7 +237,7 @@ end;
 
 procedure TMRD.Play(TestMode: Boolean; Correction : Boolean);
 var
-  s1, sName, sLoop, sColor, sGap, sGapDegree, sGapLength : string;
+  s1, sName, sLoop, sColor{, sGap, sGapDegree, sGapLength} : string;
   R : TRect;
   a1 : Integer;
 
@@ -338,11 +340,13 @@ begin
             end;
       end;
   if FShowStarter then BeginStarter else StartTrial(Self);
-  //showmessage(BoolToStr(FShowStarter));
+
+  {$ifdef DEBUG}
+  DebugLn(mt_Information + 'Starter:' + BoolToStr(FShowStarter);
+  {$endif}
 end;
 
 procedure TMRD.StartTrial(Sender: TObject);
-var a1 : integer;
 
   procedure KeyStart(var aKey : TKey);
   begin

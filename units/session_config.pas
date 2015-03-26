@@ -96,8 +96,6 @@ type
   { TCfgSes }
 
   TCfgSes = class(TComponent)
-  private
-    FServerAddress: string;
   protected
     //Fddd: Cardinal;
     FBlcs: TVetCfgBlc;

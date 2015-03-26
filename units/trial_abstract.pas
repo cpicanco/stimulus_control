@@ -23,11 +23,9 @@ unit trial_abstract;
 
 {$mode objfpc}{$H+}
 
-{$I stimulus_control.inc}
-
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils, LCLProc
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, LCLProc
 
   , session_config
   , client

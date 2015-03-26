@@ -23,8 +23,6 @@ unit userconfigs;
 
 {$mode objfpc}{$H+}
 
-{$I stimulus_control.inc}
-
 interface
 
 uses
@@ -289,10 +287,10 @@ begin
 end;
 
 function TUserConfig.MeetCondition(aCol, aRow : integer): boolean;
-var
-  aRowString : string;
+//var
+//  aRowString : string;
 begin
-
+  //conditions needs aCol;
   Result := False;
 
   if piFillAll.Checked then

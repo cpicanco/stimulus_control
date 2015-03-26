@@ -27,7 +27,7 @@ unit custom_timer;
 
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils;
+uses LCLIntf, LCLType, Controls, Classes, SysUtils;
 type
 
   { TClockThread }
