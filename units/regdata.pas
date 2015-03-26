@@ -32,6 +32,9 @@ uses
   , FileUtil
   ;
 
+const
+  NO_THREADID : TThreadID = 95025460;
+
 type
 
   { TRegData }
@@ -39,6 +42,7 @@ type
   TRegData = class(TComponent)
   private
     FFileName: string;
+    FHostThreadID: TThreadID;
     FITIBEGIN: DWord;             // intertrial interval begin
     FITIEND: DWord;               // intertrial interval end
     FLatencyStmBegin: Dword;      // stimulus onset
@@ -52,7 +56,7 @@ type
     procedure AppendF;
     procedure AssignFFile;
     procedure CloseFFile;
-
+    property HostThreadID : TThreadID read FHostThreadID write FHostThreadID default 95025460;
     property SessionNumber : integer read FSessionNumber write FSessionNumber;
     property LatencyStmBegin : Dword read FLatencyStmBegin write FLatencyStmBegin;
     property LatencyStmResponse : Dword read FLatencyStmResponse write FLatencyStmResponse;
@@ -107,7 +111,7 @@ begin
         end
       else ExtensionLength := 3;
 
-      i := 1;
+      i := 0;
       sName:= Copy(FileName, 0, Length(FileName)- (ExtensionLength + 5));
       aExtension := Copy(FileName, Length(FileName) - ExtensionLength, ExtensionLength + 1);
       aSeparator := '_';
@@ -132,10 +136,21 @@ begin
 end;
 
 destructor TRegData.Destroy;
+// With the current implementation
+// if undefined DEBUG, CloseFile should be called only once
+var
+  aTimeOutMs : longint;
 begin
+  aTimeOutMs := 2000;
   if Filename <> '' then
-    if TextRec(FFile).Mode = 55218 then
-      CloseFile(FFile);
+    if TextRec(FFile).Mode = 55218 then // file is opened read/write
+      begin
+        {$ifdef LINUX}
+         if FHostThreadID <> NO_THREADID then
+           WaitForThreadTerminate(FHostThreadID, aTimeOutMs);
+        {$endif }
+        CloseFile(FFile);
+      end;
   inherited Destroy;
 end;
 
@@ -144,8 +159,9 @@ procedure TRegData.SaveData(Data: string);
 begin
   if FFileName <> '' then
     begin
+
       if Pos('timestamps', FFileName) <> 0 then
-        WriteLn(FFile, Data)
+        WriteLn(FFile, Data)    // buggy?
       else
         Write(FFile, Data);
     end

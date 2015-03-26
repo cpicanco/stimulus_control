@@ -31,9 +31,6 @@ uses
  , Process
  , Regdata
  , zmqapi
- {$ifdef DEBUG}
- , debug_logger
- {$endif}
  ;
 
 type
@@ -72,6 +69,10 @@ type
 
 implementation
 
+{$ifdef DEBUG}
+uses debug_logger;
+{$endif}
+
 constructor TClientThread.Create(TrialIndex : integer; Code : string; CreateSuspended : boolean = True);
 begin
   FreeOnTerminate := True;
@@ -96,7 +97,7 @@ end;
 
 destructor TClientThread.Destroy;
 begin
-  //
+  FTimestampsData.HostThreadID := NO_THREADID;
   inherited Destroy;
 end;
 
@@ -142,34 +143,51 @@ var
   message : UTF8String;
 begin
   try
+    {$ifdef DEBUG}
+      FMsg := mt_Debug + 'Connecting to Server at: "' + FServerAddress + '"';
+      Synchronize( @Showstatus );
+    {$endif}
+
     FContext := TZMQContext.Create;
 	  FSubscriber := FContext.Socket( stSub );
     FSubscriber.connect( 'tcp://' + FServerAddress);
     FSubscriber.subscribe( '' );
 
     //message := '';
-    FSubscriber.recv( message );
+      FSubscriber.recv( message );
     // ('value', 'value', 'value')
+
+    {$ifdef DEBUG}
+      FMsg := mt_Debug + 'Client receive:' + #10#10 +  message;
+      Synchronize( @Showstatus );
+    {$endif}
+
     data := #40#39 + FTrialIndex + #39#44#32#39 + GetTimestampFromMessage(message) + #39#44#32#39 + FCode + #39#41;
 
     {$ifdef DEBUG}
-    if not Assigned(FTimestampsData) then
-      begin
-        FMsg := mt_Warning + 'TClientThread has an overloaded constructor. FTimestampsData was not assigned.';
-        Synchronize( @Showstatus );
-      end;
+      if not Assigned(FTimestampsData) then
+        begin
+          FMsg := mt_Warning + 'TClientThread has an overloaded constructor. FTimestampsData was not assigned.';
+          Synchronize( @Showstatus );
+        end;
+
+      FMsg := mt_Debug + 'Client will save data:' + #10#10 + data + #13#10;
+      Synchronize( @Showstatus );
+
+      FMsg := mt_Debug + 'TClientThread instance with ThreadID:' + IntToStr(Self.ThreadID);
+      Synchronize( @Showstatus );
+
+    {$endif}
 
     if Assigned(FTimestampsData) then
-    {$endif}
-      FTimestampsData.SaveData(data);
-
-    FMsg := data + #10#10 + '"' + FServerAddress + '"';
-    Synchronize( @Showstatus );
+      begin
+        FTimestampsData.HostThreadID := Self.ThreadID;
+        FTimestampsData.SaveData(data);
+      end;
 
   finally
     FSubscriber.Free;
     FContext.Free;
-    Terminate;
   end;
 end;
 
