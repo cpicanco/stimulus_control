@@ -245,9 +245,11 @@ var IndBlc, IndTrial : integer;
 begin
   IndBlc := FManager.CurrentBlc.Counter;
   IndTrial := FManager.CurrentTrial.Counter;
-  FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);
-
-  if IndBlc < FCfgSes.NumBlc then FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, FTimeStampsData, IndTrial, FTestMode)
+  if IndBlc < FCfgSes.NumBlc then
+    begin
+      FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);     //bug
+      FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, FTimeStampsData, IndTrial, FTestMode)
+    end
   else EndSess(Sender);
 end;
 
