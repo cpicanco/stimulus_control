@@ -108,6 +108,10 @@ type
 
 implementation
 
+{$ifdef DEBUG}
+uses debug_logger;
+{$endif}
+
 { TTrial }
 
 procedure TTrial.CreateClientThread(Code: string);
@@ -121,7 +125,9 @@ end;
 
 procedure TTrial.DebugStatus(msg: string);
 begin
-//
+ {$ifdef DEBUG}
+   DebugLn(mt_Debug +  msg);
+ {$endif}
 end;
 
 procedure TTrial.StartTrial(Sender: TObject);
