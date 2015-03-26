@@ -3,15 +3,15 @@
   <ProjectSession>
     <Version Value="9"/>
     <BuildModes Active="Debug"/>
-    <Units Count="47">
+    <Units Count="46">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="stimulus_control"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="58"/>
-        <CursorPos X="19" Y="87"/>
+        <TopLine Value="57"/>
+        <CursorPos X="143" Y="67"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -22,7 +22,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="background"/>
-        <EditorIndex Value="24"/>
+        <EditorIndex Value="14"/>
         <WindowIndex Value="0"/>
         <TopLine Value="8"/>
         <CursorPos X="28" Y="29"/>
@@ -35,8 +35,8 @@
         <UnitName Value="client"/>
         <EditorIndex Value="0"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="127"/>
-        <CursorPos X="5" Y="148"/>
+        <TopLine Value="134"/>
+        <CursorPos X="80" Y="164"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -44,12 +44,10 @@
         <Filename Value="units/draw_methods.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="draw_methods"/>
-        <EditorIndex Value="11"/>
         <WindowIndex Value="0"/>
         <TopLine Value="101"/>
         <CursorPos X="37" Y="122"/>
         <UsageCount Value="232"/>
-        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="forms/userconfigs.pas"/>
@@ -58,7 +56,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs"/>
-        <EditorIndex Value="19"/>
+        <EditorIndex Value="11"/>
         <WindowIndex Value="0"/>
         <TopLine Value="90"/>
         <CursorPos X="7" Y="110"/>
@@ -78,10 +76,11 @@
         <Filename Value="units/regdata.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="regdata"/>
-        <EditorIndex Value="2"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="9"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="122"/>
-        <CursorPos X="3" Y="143"/>
+        <TopLine Value="118"/>
+        <CursorPos X="17" Y="127"/>
         <UsageCount Value="208"/>
         <Loaded Value="True"/>
       </Unit6>
@@ -92,12 +91,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_trial_mirrored"/>
-        <EditorIndex Value="23"/>
         <WindowIndex Value="0"/>
         <TopLine Value="284"/>
         <CursorPos X="38" Y="285"/>
         <UsageCount Value="241"/>
-        <Loaded Value="True"/>
       </Unit7>
       <Unit8>
         <Filename Value="units/constants.pas"/>
@@ -112,21 +109,19 @@
         <Filename Value="units/custom_timer.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="custom_timer"/>
-        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
         <TopLine Value="9"/>
         <CursorPos X="24" Y="30"/>
         <UsageCount Value="241"/>
-        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="units/session.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="session"/>
-        <EditorIndex Value="17"/>
+        <EditorIndex Value="8"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="20" Y="24"/>
+        <TopLine Value="197"/>
+        <CursorPos X="18" Y="219"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit10>
@@ -134,10 +129,10 @@
         <Filename Value="units/blocs.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="blocs"/>
-        <EditorIndex Value="16"/>
+        <EditorIndex Value="6"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="17"/>
-        <CursorPos X="8" Y="37"/>
+        <TopLine Value="288"/>
+        <CursorPos X="3" Y="303"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -145,10 +140,12 @@
         <Filename Value="units/countermanager.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="countermanager"/>
+        <EditorIndex Value="10"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="3" Y="21"/>
+        <TopLine Value="483"/>
+        <CursorPos X="3" Y="502"/>
         <UsageCount Value="241"/>
+        <Loaded Value="True"/>
       </Unit12>
       <Unit13>
         <Filename Value="units/counter.pas"/>
@@ -181,9 +178,9 @@
         <Filename Value="units/response_key.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="response_key"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="5"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="409"/>
+        <TopLine Value="347"/>
         <CursorPos X="12" Y="347"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
@@ -192,10 +189,10 @@
         <Filename Value="units/trial_feature_positive.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_feature_positive"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="3"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="16"/>
-        <CursorPos X="5" Y="37"/>
+        <TopLine Value="218"/>
+        <CursorPos X="3" Y="250"/>
         <UsageCount Value="241"/>
         <Loaded Value="True"/>
       </Unit17>
@@ -203,34 +200,28 @@
         <Filename Value="units/trial_message.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_message"/>
-        <EditorIndex Value="8"/>
         <WindowIndex Value="0"/>
         <TopLine Value="13"/>
         <CursorPos X="8" Y="32"/>
         <UsageCount Value="228"/>
-        <Loaded Value="True"/>
       </Unit18>
       <Unit19>
         <Filename Value="units/trial_matching.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_matching"/>
-        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
         <TopLine Value="370"/>
         <CursorPos X="3" Y="397"/>
         <UsageCount Value="228"/>
-        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="units/trial_simple.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_simple"/>
-        <EditorIndex Value="10"/>
         <WindowIndex Value="0"/>
         <TopLine Value="71"/>
         <CursorPos X="36" Y="90"/>
         <UsageCount Value="228"/>
-        <Loaded Value="True"/>
       </Unit20>
       <Unit21>
         <Filename Value="forms/userconfigs_simple_discrimination_matrix.pas"/>
@@ -239,12 +230,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_simple_discrimination_matrix"/>
-        <EditorIndex Value="20"/>
         <WindowIndex Value="0"/>
         <TopLine Value="124"/>
         <CursorPos X="35" Y="133"/>
         <UsageCount Value="272"/>
-        <Loaded Value="True"/>
       </Unit21>
       <Unit22>
         <Filename Value="forms/userconfigs_get_matrix.pas"/>
@@ -253,9 +242,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="userconfigs_get_matrix"/>
-        <EditorIndex Value="21"/>
+        <EditorIndex Value="12"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="60"/>
+        <TopLine Value="1"/>
         <CursorPos X="64" Y="80"/>
         <UsageCount Value="263"/>
         <Loaded Value="True"/>
@@ -264,7 +253,7 @@
         <Filename Value="units/criatore.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="criatore"/>
-        <EditorIndex Value="22"/>
+        <EditorIndex Value="13"/>
         <WindowIndex Value="0"/>
         <TopLine Value="196"/>
         <CursorPos X="87" Y="218"/>
@@ -275,10 +264,10 @@
         <Filename Value="units/trial_abstract.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_abstract"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="55"/>
-        <CursorPos X="15" Y="75"/>
+        <TopLine Value="104"/>
+        <CursorPos X="50" Y="121"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit24>
@@ -286,10 +275,10 @@
         <Filename Value="units/bass_player.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="bass_player"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="40"/>
-        <CursorPos X="103" Y="50"/>
+        <TopLine Value="1"/>
+        <CursorPos X="48" Y="8"/>
         <UsageCount Value="222"/>
         <Loaded Value="True"/>
       </Unit25>
@@ -297,12 +286,10 @@
         <Filename Value="units/debug_logger.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="debug_logger"/>
-        <EditorIndex Value="4"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
-        <CursorPos X="1" Y="1"/>
+        <CursorPos X="11" Y="9"/>
         <UsageCount Value="218"/>
-        <Loaded Value="True"/>
       </Unit26>
       <Unit27>
         <Filename Value="units/config.pas"/>
@@ -310,17 +297,15 @@
         <WindowIndex Value="0"/>
         <TopLine Value="40"/>
         <CursorPos X="10" Y="58"/>
-        <UsageCount Value="182"/>
+        <UsageCount Value="181"/>
       </Unit27>
       <Unit28>
         <Filename Value="units/trial_mirrored_config.pas"/>
         <UnitName Value="trial_mirrored_config"/>
-        <EditorIndex Value="18"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
+        <TopLine Value="18"/>
         <CursorPos X="1" Y="1"/>
-        <UsageCount Value="203"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="202"/>
       </Unit28>
       <Unit29>
         <Filename Value="forms/drawtest.pas"/>
@@ -331,37 +316,32 @@
         <WindowIndex Value="0"/>
         <TopLine Value="124"/>
         <CursorPos X="27" Y="132"/>
-        <UsageCount Value="46"/>
+        <UsageCount Value="45"/>
       </Unit29>
       <Unit30>
         <Filename Value="units/session_config.pas"/>
         <UnitName Value="session_config"/>
-        <EditorIndex Value="1"/>
         <WindowIndex Value="0"/>
         <TopLine Value="79"/>
         <CursorPos X="1" Y="99"/>
-        <UsageCount Value="79"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="85"/>
       </Unit30>
       <Unit31>
         <Filename Value="units/interface_library.pas"/>
         <UnitName Value="interface_library"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="9"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="185"/>
-        <CursorPos X="4" Y="202"/>
-        <UsageCount Value="51"/>
-        <Loaded Value="True"/>
+        <TopLine Value="280"/>
+        <CursorPos X="56" Y="296"/>
+        <UsageCount Value="57"/>
       </Unit31>
       <Unit32>
         <Filename Value="units/escriba.pas"/>
         <UnitName Value="escriba"/>
-        <EditorIndex Value="25"/>
+        <EditorIndex Value="15"/>
         <WindowIndex Value="0"/>
         <TopLine Value="285"/>
         <CursorPos X="7" Y="306"/>
-        <UsageCount Value="50"/>
+        <UsageCount Value="58"/>
         <Loaded Value="True"/>
       </Unit32>
       <Unit33>
@@ -369,231 +349,227 @@
         <WindowIndex Value="0"/>
         <TopLine Value="627"/>
         <CursorPos X="1" Y="649"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit33>
       <Unit34>
         <Filename Value="units/trial_mirrored_stm.pas"/>
         <UnitName Value="trial_mirrored_stm"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="2"/>
         <WindowIndex Value="0"/>
-        <TopLine Value="358"/>
-        <CursorPos X="65" Y="345"/>
+        <TopLine Value="193"/>
+        <CursorPos X="10" Y="176"/>
         <UsageCount Value="108"/>
         <Loaded Value="True"/>
       </Unit34>
       <Unit35>
-        <Filename Value="dependency/delphizmq/zmqapi.pas"/>
-        <UnitName Value="zmqapi"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="13"/>
-        <CursorPos X="1" Y="1"/>
-        <UsageCount Value="0"/>
-      </Unit35>
-      <Unit36>
         <Filename Value="stimulus_control.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="1"/>
         <CursorPos X="10" Y="1"/>
-        <UsageCount Value="91"/>
-      </Unit36>
-      <Unit37>
-        <Filename Value="dependency/delphizmq/zmq.inc"/>
-        <WindowIndex Value="0"/>
-        <TopLine Value="1"/>
-        <CursorPos X="1" Y="1"/>
-        <UsageCount Value="0"/>
-      </Unit37>
-      <Unit38>
+        <UsageCount Value="90"/>
+      </Unit35>
+      <Unit36>
         <Filename Value="/usr/share/fpcsrc/2.6.4/rtl/inc/heaptrc.pp"/>
         <UnitName Value="heaptrc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="109"/>
         <CursorPos X="39" Y="17"/>
-        <UsageCount Value="5"/>
-      </Unit38>
-      <Unit39>
+        <UsageCount Value="4"/>
+      </Unit36>
+      <Unit37>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/wincontrol.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="5613"/>
         <CursorPos X="1" Y="5634"/>
-        <UsageCount Value="3"/>
-      </Unit39>
-      <Unit40>
+        <UsageCount Value="2"/>
+      </Unit37>
+      <Unit38>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/control.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="4826"/>
         <CursorPos X="1" Y="4849"/>
-        <UsageCount Value="2"/>
-      </Unit40>
-      <Unit41>
+        <UsageCount Value="1"/>
+      </Unit38>
+      <Unit39>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/unixlazfileutils.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="134"/>
         <CursorPos X="1" Y="157"/>
-        <UsageCount Value="8"/>
-      </Unit41>
-      <Unit42>
+        <UsageCount Value="7"/>
+      </Unit39>
+      <Unit40>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/lazutf8.pas"/>
         <UnitName Value="LazUTF8"/>
         <WindowIndex Value="0"/>
         <TopLine Value="210"/>
         <CursorPos X="1" Y="232"/>
-        <UsageCount Value="8"/>
-      </Unit42>
-      <Unit43>
+        <UsageCount Value="7"/>
+      </Unit40>
+      <Unit41>
         <Filename Value="/usr/share/lazarus/1.2.6/components/lazutils/lazfileutils.pas"/>
         <UnitName Value="LazFileUtils"/>
         <WindowIndex Value="0"/>
         <TopLine Value="965"/>
         <CursorPos X="1" Y="985"/>
-        <UsageCount Value="8"/>
-      </Unit43>
-      <Unit44>
+        <UsageCount Value="7"/>
+      </Unit41>
+      <Unit42>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/include/customform.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="433"/>
         <CursorPos X="1" Y="454"/>
-        <UsageCount Value="6"/>
-      </Unit44>
-      <Unit45>
+        <UsageCount Value="5"/>
+      </Unit42>
+      <Unit43>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/interfaces/gtk2/gtk2widgetset.inc"/>
         <WindowIndex Value="0"/>
         <TopLine Value="2387"/>
         <CursorPos X="1" Y="2408"/>
-        <UsageCount Value="7"/>
-      </Unit45>
-      <Unit46>
+        <UsageCount Value="5"/>
+      </Unit43>
+      <Unit44>
         <Filename Value="/usr/share/lazarus/1.2.6/lcl/interfaces/gtk2/gtk2wsforms.pp"/>
         <UnitName Value="Gtk2WSForms"/>
         <WindowIndex Value="0"/>
         <TopLine Value="739"/>
         <CursorPos X="24" Y="760"/>
+        <UsageCount Value="9"/>
+      </Unit44>
+      <Unit45>
+        <Filename Value="/usr/share/fpcsrc/2.6.4/rtl/objpas/classes/classesh.inc"/>
+        <WindowIndex Value="0"/>
+        <TopLine Value="82"/>
+        <CursorPos X="3" Y="103"/>
         <UsageCount Value="10"/>
-      </Unit46>
+      </Unit45>
     </Units>
+    <CustomDefines Count="2">
+      <Define0 Value="UseCThreads"/>
+      <Define1 Value="DEBUG"/>
+    </CustomDefines>
     <General>
       <ActiveWindowIndexAtStart Value="0"/>
     </General>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="28" Column="36" TopLine="7"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="271" Column="24" TopLine="242"/>
       </Position1>
       <Position2>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="84" Column="7" TopLine="63"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="303" Column="25" TopLine="283"/>
       </Position2>
       <Position3>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="83" Column="7" TopLine="62"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="414" Column="38" TopLine="382"/>
       </Position3>
       <Position4>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="73" Column="7" TopLine="61"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="415" Column="35" TopLine="383"/>
       </Position4>
       <Position5>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="454" Column="3" TopLine="433"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="416" Column="33" TopLine="384"/>
       </Position5>
       <Position6>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="301" Column="59" TopLine="286"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="417" Column="44" TopLine="385"/>
       </Position6>
       <Position7>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="329" Column="8" TopLine="302"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="419" Column="22" TopLine="387"/>
       </Position7>
       <Position8>
-        <Filename Value="units/response_key.pas"/>
-        <Caret Line="399" Column="7" TopLine="378"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="520" Column="18" TopLine="488"/>
       </Position8>
       <Position9>
-        <Filename Value="units/response_key.pas"/>
-        <Caret Line="30" Column="37" TopLine="9"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="526" Column="18" TopLine="494"/>
       </Position9>
       <Position10>
-        <Filename Value="units/trial_matching.pas"/>
-        <Caret Line="116" Column="52" TopLine="88"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="541" Column="30" TopLine="509"/>
       </Position10>
       <Position11>
-        <Filename Value="units/trial_matching.pas"/>
-        <Caret Line="30" Column="33" TopLine="10"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="554" Column="51" TopLine="522"/>
       </Position11>
       <Position12>
-        <Filename Value="units/trial_matching.pas"/>
-        <Caret Line="40" Column="4" TopLine="19"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="596" Column="42" TopLine="564"/>
       </Position12>
       <Position13>
-        <Filename Value="units/blocs.pas"/>
-        <Caret Line="80" Column="5" TopLine="68"/>
+        <Filename Value="units/countermanager.pas"/>
+        <Caret Line="502" Column="3" TopLine="369"/>
       </Position13>
       <Position14>
-        <Filename Value="units/blocs.pas"/>
-        <Caret Line="218" Column="12" TopLine="198"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="246" Column="28" TopLine="215"/>
       </Position14>
       <Position15>
         <Filename Value="units/blocs.pas"/>
-        <Caret Line="172" Column="7" TopLine="201"/>
+        <Caret Line="59" Column="39" TopLine="59"/>
       </Position15>
       <Position16>
         <Filename Value="units/blocs.pas"/>
-        <Caret Line="482" Column="3" TopLine="462"/>
+        <Caret Line="611" Column="5" TopLine="548"/>
       </Position16>
       <Position17>
-        <Filename Value="units/trial_matching.pas"/>
-        <Caret Line="41" Column="4" TopLine="20"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="217" Column="56" TopLine="217"/>
       </Position17>
       <Position18>
-        <Filename Value="units/trial_matching.pas"/>
-        <Caret Line="65" Column="7" TopLine="44"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="137" Column="3" TopLine="121"/>
       </Position18>
       <Position19>
-        <Filename Value="units/blocs.pas"/>
-        <Caret Line="516" Column="3" TopLine="496"/>
+        <Filename Value="units/trial_mirrored_stm.pas"/>
+        <Caret Line="207" Column="9" TopLine="135"/>
       </Position19>
       <Position20>
-        <Filename Value="units/blocs.pas"/>
-        <Caret Line="37" Column="8" TopLine="17"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="213" Column="13" TopLine="192"/>
       </Position20>
       <Position21>
-        <Filename Value="units/blocs.pas"/>
-        <Caret Line="546" Column="52" TopLine="550"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="220" Column="20" TopLine="198"/>
       </Position21>
       <Position22>
-        <Filename Value="units/regdata.pas"/>
-        <Caret Line="24" Column="20" TopLine="1"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
+        <Caret Line="211" Column="12" TopLine="209"/>
       </Position22>
       <Position23>
-        <Filename Value="units/response_key.pas"/>
-        <Caret Line="31" Column="33" TopLine="10"/>
+        <Filename Value="units/trial_mirrored_stm.pas"/>
+        <Caret Line="180" Column="3" TopLine="175"/>
       </Position23>
       <Position24>
-        <Filename Value="units/interface_library.pas"/>
-        <Caret Line="27" Column="37" TopLine="6"/>
+        <Filename Value="units/blocs.pas"/>
+        <Caret Line="303" Column="3" TopLine="288"/>
       </Position24>
       <Position25>
-        <Filename Value="units/interface_library.pas"/>
-        <Caret Line="205" Column="11" TopLine="169"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="140" Column="21" TopLine="115"/>
       </Position25>
       <Position26>
-        <Filename Value="units/trial_simple.pas"/>
-        <Caret Line="38" Column="5" TopLine="17"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="63" Column="20" TopLine="42"/>
       </Position26>
       <Position27>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="301" Column="6" TopLine="280"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="219" Column="18" TopLine="185"/>
       </Position27>
       <Position28>
-        <Filename Value="units/trial_feature_positive.pas"/>
-        <Caret Line="183" Column="5" TopLine="162"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="251" Column="66" TopLine="217"/>
       </Position28>
       <Position29>
-        <Filename Value="units/criatore.pas"/>
-        <Caret Line="29" Column="33" TopLine="8"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="63" Column="20" TopLine="42"/>
       </Position29>
       <Position30>
-        <Filename Value="units/interface_library.pas"/>
-        <Caret Line="254" Column="5" TopLine="242"/>
+        <Filename Value="units/session.pas"/>
+        <Caret Line="219" Column="18" TopLine="197"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>
