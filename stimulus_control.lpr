@@ -65,6 +65,7 @@ uses
   , trial_message
   , trial_feature_positive
   , blocs
+
   , session
   , session_config
 
@@ -73,6 +74,7 @@ uses
 
   {$ifdef DEBUG}
   , debug_logger
+  , SysUtils
   , FileUtil
   {$endif}
   ;
@@ -92,6 +94,7 @@ begin
   Application.Initialize;
   {$ifdef DEBUG}
   DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
+  DebugLn(mt_Debug + 'Application ThreadID:' + IntToStr(ThreadID));
   {$endif}
   Application.CreateForm(TUserConfig, UserConfig);
   Application.Run;
