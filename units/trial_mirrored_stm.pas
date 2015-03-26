@@ -437,7 +437,7 @@ begin
            //FormatFloat('00000000;;00000000',FData.ITIBEGIN) + #9 +
            //FormatFloat('00000000;;00000000',FData.ITIEND) + #9 +
            //'' + #9 +
-           ;
+           + Data;
 end;
 
 procedure TMRD.SetTimerCsq;

@@ -126,7 +126,7 @@ end;
 procedure TTrial.DebugStatus(msg: string);
 begin
  {$ifdef DEBUG}
-   DebugLn(mt_Debug +  msg);
+   DebugLn(msg);
  {$endif}
 end;
 
