@@ -203,36 +203,51 @@ begin
 end;
 
 procedure TFPE.KeyDown(var Key: Word; Shift: TShiftState);
-begin
 
+    function GetShiftEnum : TShiftStateEnum;
+    begin
+      if ssCtrl in Shift then Result := ssCtrl;
+      if ssAlt in Shift then Result := ssAlt;
+    end;
+
+begin
   inherited KeyDown (Key, Shift);
-  if Key = 27 {ESC} then FCanResponse:= False;
-  Invalidate;
+
+  if Key = 27 {ESC} then
+    begin
+      FCanResponse:= False;
+      Invalidate;
+    end;
 
   // This should be the last one.
-  if ssCtrl in Shift then
-    if Key = 81 {q} then
+  case GetShiftEnum of
+    ssCtrl :
       begin
-        Data := Data + '<>################## Sessão cancelada ##################<>' + #13#10;
+        if Key = 81 {q} then
+          begin
+            Data := Data + '<>################## Sessão cancelada ##################<>' + #13#10;
 
-        Result := 'NONE';
-        IETConsequence := 'NONE';
-        NextTrial := 'END';
-        None(Self);
-        EndTrial(Self);
+            Result := 'NONE';
+            IETConsequence := 'NONE';
+            NextTrial := 'END';
+            None(Self);
+            EndTrial(Self);
+          end;
       end;
-
-  if ssAlt in Shift then
-    if Key = 244 {f4} then
+    ssAlt :
       begin
-        Data := Data + '<>################## Sessão cancelada ##################<>' + #13#10;
+        if Key = 244 {f4} then
+          begin
+            Data := Data + '<>################## Sessão cancelada ##################<>' + #13#10;
 
-        Result := 'NONE';
-        IETConsequence := 'NONE';
-        NextTrial := 'END';
-        None(Self);
-        EndTrial(Self);
+            Result := 'NONE';
+            IETConsequence := 'NONE';
+            NextTrial := 'END';
+            None(Self);
+            EndTrial(Self);
+          end;
       end;
+  end;
 end;
 
 procedure TFPE.KeyUp(var Key: Word; Shift: TShiftState);
