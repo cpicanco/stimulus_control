@@ -114,14 +114,16 @@ function TClientThread.GetTimestampFromMessage(aMessage: Utf8String
 
   var aKey, aHeader : Utf8String;
 begin
-	aHeader := 'Pupil';
-	aKey := 'timestamp:';
-	Delete(  aMessage, Pos(aHeader, aMessage), Length(aHeader)  );
-	Delete(  aMessage, Pos(aKey, aMessage), Length(aKey)  );
+  if Pos('timestamp', aMessage) <> 0 then
+  begin
+	  aHeader := 'Pupil';
+	  aKey := 'timestamp:';
+	  Delete(  aMessage, Pos(aHeader, aMessage), Length(aHeader)  );
+	  Delete(  aMessage, Pos(aKey, aMessage), Length(aKey)  );
 
-	while Pos(#10, aMessage) <> 0 do
-		Delete(  aMessage, Pos(#10, aMessage), Length(#10)  );
-
+	  while Pos(#10, aMessage) <> 0 do
+		  Delete(  aMessage, Pos(#10, aMessage), Length(#10)  );
+  end;
 	Result := aMessage;
 
 end;
@@ -145,7 +147,7 @@ begin
     FSubscriber.connect( 'tcp://' + FServerAddress);
     FSubscriber.subscribe( '' );
 
-    message := '';
+    //message := '';
     FSubscriber.recv( message );
     // ('value', 'value', 'value')
     data := #40#39 + FTrialIndex + #39#44#32#39 + GetTimestampFromMessage(message) + #39#44#32#39 + FCode + #39#41;
