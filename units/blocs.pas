@@ -56,6 +56,7 @@ type
     FBlc: TCfgBlc;
     FBlcHeader: String;
     FCounterLabel : TLabel;
+    FCounterManager : TCounterManager;
     FData : String;
     FDataTicks : String;
     FIETMedia : TKey;
@@ -63,7 +64,6 @@ type
     FITIBegin : cardinal;
     FITIEnd : cardinal;
     FLastHeader: String;
-    FCounterManager : TCounterManager;
     FNextBlc: String;
     FOnBeginCorrection : TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
@@ -298,10 +298,11 @@ begin
   if FTrial.TimeOut > 0 then
     if FBackGround is TForm then TForm(FBackGround).Color:= 0;
 
+  if FCounterManager.CurrentTrial.Counter >= FBlc.NumTrials then
+        FTrial.CreateClientThread('B:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+
   if Assigned(FTrial) then
     begin
-      if FCounterManager.CurrentTrial.Counter >= FBlc.NumTrials then
-        FTrial.CreateClientThread('B:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
       //FreeAndNil(FTrial);
       FTrial.Free;
     end;
