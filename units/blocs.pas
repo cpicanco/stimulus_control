@@ -57,8 +57,11 @@ type
     FBlcHeader: String;
     FCounterLabel : TLabel;
     FCounterManager : TCounterManager;
-    FData : String;
-    FDataTicks : String;
+
+    // Trial data
+    FData : string;
+    //FDataTicks : string;
+
     FIETMedia : TKey;
     FIsCorrection : Boolean;
     FITIBegin : cardinal;
@@ -82,7 +85,6 @@ type
     FTimerCsq : TTimer;
     FTimerITI: TTimer;
     FTimerTO : TTimer;
-    FTimestampsData : TRegData;
     FTimeStart: cardinal;
     FTrial: TTrial;
     procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
@@ -105,7 +107,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; TimestampsData : TRegData; IndTent: Integer; TestMode: Boolean);
+    procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
     //property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
@@ -214,7 +216,8 @@ begin
   FRegData.SaveData (FData);
   //FRegDataTicks.SaveData(FDataTicks);
   FData := '';
-  FDataTicks := '';
+  //FDataTicks := '';
+
   s1 := '';
   s2 := '';
   s3 := '';
@@ -298,13 +301,14 @@ begin
   if FTrial.TimeOut > 0 then
     if FBackGround is TForm then TForm(FBackGround).Color:= 0;
 
-  if FCounterManager.CurrentTrial.Counter >= FBlc.NumTrials then
-        FTrial.CreateClientThread('B:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+  // now the program do not loose the last data
+  //if FCounterManager.CurrentTrial.Counter <= FBlc.NumTrials then
+  //      FTrial.CreateClientThread('C:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
 
   if Assigned(FTrial) then
     begin
-      //FreeAndNil(FTrial);
-      FTrial.Free;
+      FreeAndNil(FTrial);
+      //FTrial.Free;
     end;
 
   //SetFocus;
@@ -438,6 +442,7 @@ begin
           #13#10;
 
     end;
+
   //FDataTicks:= FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  #13#10;
 
   if (FTrial is TMsg) then else
@@ -512,7 +517,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; TimeStampsData: TRegData; IndTent: Integer; TestMode: Boolean);
+procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
 //var
 //  aFileName : string;
 
@@ -530,7 +535,6 @@ begin
   FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
   FRegData.SaveData(FBlc.Name);
 
-  FTimestampsData := TimestampsData;
   PlayTrial
 end;
 
@@ -555,7 +559,6 @@ begin
           FTrial.CounterManager := FCounterManager;
           FTrial.ServerAddress := FServerAddress;
           FTrial.TimeStart := FTimeStart;
-          FTrial.TimestampsData := FTimestampsData;
           FTrial.Parent := FBackGround;
           FTrial.Align := AlClient;
           FTrial.OnEndTrial := @TrialTerminate;
@@ -575,7 +578,7 @@ begin
     end
       else
         begin
-          if Assigned(FTrial) then Ftrial.Free;
+          if Assigned(FTrial) then FreeAndNil(FTrial);
           EndBlc(Self);
         end;
 

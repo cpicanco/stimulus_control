@@ -1620,6 +1620,7 @@ object UserConfig: TUserConfig
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   ParentBiDiMode = False
+  Position = poDesktopCenter
   LCLVersion = '1.2.6.0'
   object btnRun: TButton
     Left = 8

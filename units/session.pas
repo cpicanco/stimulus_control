@@ -33,6 +33,7 @@ uses Classes, Controls, SysUtils, LCLIntf
      , FileUtil
      , regdata
      , blocs
+     , timestamps_logger
      ;
 
 type
@@ -136,8 +137,6 @@ procedure TSession.EndSess(Sender: TObject);
 begin
   FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
   //FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
-  FRegData.Free;
-  FAudioDevice.Free;
   //FRegDataTicks.Free;
   If Assigned(OnEndSess) then FOnEndSess(Sender);
 end;
@@ -175,7 +174,7 @@ end;
 constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FBlc:= TBlc.Create(Self);
+  FBlc:= TBlc.Create(nil);
   FBlc.OnStmResponse:= @StmResponse;
   FBlc.OnConsequence:= @Consequence;
   FBlc.OnBkGndResponse:= @BkGndResponse;
@@ -193,6 +192,25 @@ end;
 
 destructor TSession.Destroy;
 begin
+  //events
+  FBlc.OnStmResponse := nil;
+  FBlc.OnConsequence := nil;
+  FBlc.OnBkGndResponse := nil;
+  FBlc.OnEndTrial := nil;
+  FBlc.OnHit := nil;
+  FBlc.OnMiss := nil;
+  FBlc.OnEndBlc := nil;
+  FBlc.OnCriteria := nil;
+
+  //external objects
+  FBackGround := nil;
+  FAudioDevice := nil;
+  FManager := nil;
+  FCfgSes := nil;
+
+  // internal objects
+  if Assigned(FRegData) then FreeAndNil(FRegData);
+  if Assigned(FBlc) then FreeAndNil(FBlc);
   inherited Destroy;
 end;
 
@@ -215,8 +233,17 @@ begin
       FileData:= 'Teste_000.txt';
     end;
 
-  FRegData := TRegData.Create(Self, FCfgSes.RootData + FileData);
-  FTimestampsData := TRegData.Create(Self, ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps');
+  FRegData := TRegData.Create(nil, FCfgSes.RootData + FileData);
+
+  {
+    File writing operations are called from a different thread
+    It is a hack for a while until I find a proper synchronize
+    implementation
+  }
+  FTimestampsData := TRegData.Create(nil, ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps');
+  UpdateTimestampsFileName(FTimestampsData.FileName);
+  FTimestampsData.Free;
+
   //FRegDataTicks:= TRegData.Create(Self, FCfgSes.RootData + 'Ticks_001.txt');
 
   FBlc.ShowCounter := ShowCounter;
@@ -229,6 +256,7 @@ begin
                     'Sessão:' + #9+ FSessName + #13#10 +
                     'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
                     'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
+
   FTimeStart := GetTickCount;
   FBlc.TimeStart := FTimeStart;
   //FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
@@ -248,7 +276,7 @@ begin
   if IndBlc < FCfgSes.NumBlc then
     begin
       FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);     //bug
-      FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, FTimeStampsData, IndTrial, FTestMode)
+      FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, IndTrial, FTestMode)
     end
   else EndSess(Sender);
 end;

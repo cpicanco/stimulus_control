@@ -117,6 +117,7 @@ type
     FSession : TSession;
     FManager : TCounterManager;
     FConfigs : TCfgSes;
+    FAudioDevice : TBassAudioDevice;
     FEscriba : TEscriba;
     FData : TRegData;
     function MeetCondition(aCol, aRow : integer): boolean;
@@ -427,8 +428,13 @@ end;
 
 procedure TUserConfig.EndSession(Sender: TObject);
 begin
+  if Assigned(FSession) then FreeAndNil(FSession);
+  if Assigned(FConfigs) then FreeAndNil(FConfigs);
+  if Assigned(FManager) then FreeAndNil(FManager);
+  //if Assigned(FAudioDevice) then FreeAndNil(FAudioDevice);
   bkgnd.SetFullScreen(False);
   bkgnd.Hide;
+  //if Assigned(bkgnd) then FreeAndNil(bkgnd);
   ShowMessage(rsEndSession)
 end;
 
@@ -470,7 +476,7 @@ begin
       Sleep(2000);
     end;
 
-  Client := TClientThread.Create( -1, 'The Client is Working', FData );
+  Client := TClientThread.Create( -1, 'The Client is Working');
   Client.OnShowStatus := @DebugStatus;
   Client.ServerAddress := leServerAddress.Text;
 
@@ -870,20 +876,22 @@ begin
           SetFullScreen(True);
         end;
 
-      FConfigs := TCfgSes.Create(bkgnd);
+      FConfigs := TCfgSes.Create(nil);
       FConfigs.LoadFromFile(OpenDialog1.Filename, False);
 
-      FManager := TCounterManager.Create(bkgnd);
+      FManager := TCounterManager.Create(nil);
+      if not Assigned(FAudioDevice) then FAudioDevice := TBassAudioDevice.Create(WindowHandle);
 
-      FSession := TSession.Create(bkgnd);
-      FSession.BackGround := bkgnd;
+      FSession := TSession.Create(nil);
       FSession.OnEndSess:= @EndSession;
+      FSession.AudioDevice := FAudioDevice;
+      FSession.BackGround := bkgnd;
+
       FSession.SessName := FConfigs.Name;
       FSession.SubjName := FConfigs.Subject;
-      FSession.TestMode := False;
       FSession.ShowCounter := False;
       FSession.ServerAddress := leServerAddress.Text;
-      FSession.AudioDevice := TBassAudioDevice.Create(WindowHandle);
+      FSession.TestMode := False;
 
       FSession.Play(FConfigs, FManager, aDataName);
     end;

@@ -325,13 +325,13 @@ begin
     begin
       if FFlagModCmps = True then
         begin
-          DataTicks:=
+          {DataTicks:=
             DataTicks +
             FormatFloat('####,####',GetTickCount - Ft) + #9 +
             'M1' + #9 +
             ExtractFileName(TKey(Sender).FullPath) + #9 +
             IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left) + #9 +
-            IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;
+            IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;}
           if FFirstResp = False then
             begin
               FLatMod := GetTickCount;
@@ -340,13 +340,13 @@ begin
         end
       else
         begin
-          DataTicks:=
+          {DataTicks:=
             DataTicks +
             FormatFloat('####,####',GetTickCount - Ft) + #9 +
             'C' + IntToStr(TKey(Sender).Tag + 1)+ #9 +
             ExtractFileName(TKey(Sender).FullPath) + #9 +
             IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left) + #9 +
-            IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;
+            IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;}
           if FFirstResp = False then
             begin
               FLatCmp := GetTickCount;
@@ -571,11 +571,11 @@ end;
 procedure TMTS.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   inherited MouseDown(Button, Shift, X, Y);
-  DataTicks := DataTicks +
+  {DataTicks := DataTicks +
              FormatFloat('####,####', GetTickCount - Ft) + #9 +
              '-' + #9 +
              '-' + #9 +
-             IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9;
+             IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9;}
   FDataBkGndI.Plus(1);
   //FDataBkGndS := FDataBkGndS + IntToStr(X)+ ',' + IntToStr(Y) + #9;      //obsoleto
   CounterManager.OnBkGndResponse(FDataBkGndI);
