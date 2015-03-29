@@ -10,7 +10,7 @@ from time import sleep
 
 def test_msg():
 	test_msg = "Pupil\ntimestamp:1389761135.56\n"
-	return test_msg
+	return test_msg 
  
 def main():
 	context = zmq.Context()
@@ -23,7 +23,7 @@ def main():
 	except zmq.ZMQError:
 		print "Could not set Socket."
  
-	for i in range(6000):
+	for i in range(60000):
 		socket.send( test_msg() )
 		sleep(0.01)
  

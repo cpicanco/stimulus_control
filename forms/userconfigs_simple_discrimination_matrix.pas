@@ -28,7 +28,7 @@ interface
 uses
     Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
     {$IFDEF LCLGTK2}
-    gtk2, gdk2, //glib2,
+    gtk2, gdk2, glib2,
     {$ENDIF}
     StdCtrls, Spin, Grids, ActnList
     , draw_methods;

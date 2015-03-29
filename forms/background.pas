@@ -28,7 +28,7 @@ interface
 uses
   LCLType, LCLIntf, {Math,}
   {$IFDEF LCLGTK2}
-  gtk2, gdk2, //glib2,
+  gtk2, gdk2, glib2,
   {$ENDIF}
   Classes, SysUtils, FileUtil, Forms
 , Controls, Graphics, Dialogs, {StdCtrls,} ExtCtrls

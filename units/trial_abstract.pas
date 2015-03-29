@@ -29,9 +29,9 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, LCLProc
 
   , session_config
   , client
-  , regdata
   , countermanager
   , custom_timer
+  , timestamps_logger
   ;
 
 type
@@ -43,7 +43,7 @@ type
     FCfgTrial: TCfgTrial;
     FClientThread : TClientThread;
     FData: string;
-    FDataTicks: string;
+    //FDataTicks: string;
     FFilename: string;
     FHeader: string;
     FHeaderTicks: string;
@@ -54,7 +54,6 @@ type
     FRootMedia: string;
     FServerAddress: string;
     FTimeOut: Integer;
-    FTimestampsData: TRegData;
     FTimeStart: cardinal;
     // events
     FOnBeginCorrection: TNotifyEvent;
@@ -70,7 +69,7 @@ type
     FClockThread : TClockThread;
   strict protected
     FIscorrection : Boolean;
-    procedure DebugStatus(msg : string);
+    procedure ClientStatus(msg : string);
     procedure StartTrial(Sender: TObject); virtual;
     procedure ThreadClock(Sender: TObject); virtual; abstract;
     procedure WriteData(Sender: TObject); virtual; abstract;
@@ -82,7 +81,7 @@ type
     property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
     property Data: string read FData write FData;
-    property DataTicks: string read FDataTicks write FDataTicks;
+    //property DataTicks: string read FDataTicks write FDataTicks;
     property FileName : string read FFilename write FFilename;
     property Header: string read FHeader write FHeader;
     property HeaderTicks: string read FHeaderTicks write FHeaderTicks;
@@ -92,7 +91,6 @@ type
     property RootMedia : string read FRootMedia write FRootMedia;
     property ServerAddress : string read FServerAddress write FServerAddress;
     property TimeOut : Integer read FTimeOut write FTimeOut;
-    property TimestampsData : TRegdata read FTimestampsData write FTimestampsData;
     property TimeStart : cardinal read FTimeStart write FTimeStart;
     property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse: TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
@@ -117,17 +115,18 @@ uses debug_logger;
 procedure TTrial.CreateClientThread(Code: string);
 begin
   FClientThread := TClientThread.Create( FCfgTrial.Id, Code);
-  FClientThread.OnShowStatus := @DebugStatus;
-  FClientThread.TimestampsData := FTimestampsData;
+  FClientThread.OnShowStatus := @ClientStatus;
   FClientThread.ServerAddress := FServerAddress;
   FClientThread.Start;
 end;
 
-procedure TTrial.DebugStatus(msg: string);
-begin
- {$ifdef DEBUG}
-   DebugLn(msg);
- {$endif}
+procedure TTrial.ClientStatus(msg: string);
+ begin
+  {$ifdef DEBUG}
+  DebugLn(msg);
+  {$else}
+  TimestampLn(msg);
+  {$endif}
 end;
 
 procedure TTrial.StartTrial(Sender: TObject);

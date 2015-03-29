@@ -28,9 +28,9 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   {$IFDEF LCLGTK2}
-  gtk2, gdk2, //glib2,
+  gtk2, gdk2, glib2,
   {$ENDIF}
-  Spin, {ValEdit,} Grids, ExtCtrls, draw_methods, math
+  Spin, ValEdit, Grids, ExtCtrls, draw_methods, math
   ;
 
 type
@@ -228,18 +228,6 @@ begin
     end;
   end;
 
-
-  {// lazarus 1.0.4 to 1.2.6 changes...
-  with Canvas do
-    begin
-      Brush.Style := bsClear;
-      Brush.Color := clWhite;
-      Pen.Style := psSolid;
-      Pen.Color := clBlack;
-      Pen.Mode := pmCopy;
-    end;
-  }
-  //LoadOldCanvas;
   OldCanvas.Free;
 end;
 
@@ -273,12 +261,19 @@ begin
   if (Sender = x0) or (Sender = x1) or (Sender = y0) or (Sender = y1) or (Sender = seNodes) then
     RefreshLine;
 
-  if Sender = seTrials then
+  if (Sender = seSize) and cbUseGrid.Checked
+    and (cbChooseGrid.ItemIndex <> 0) then
+      begin
+        cbChooseGridChange(Sender);
+      end;
+
+  if (Sender = seTrials) or (Sender = seNodes) then
     begin
       SetLength(FTrialsPerNode, Length(FLine));
       for i := Low(FTrialsPerNode) to High(FTrialsPerNode) do
         FTrialsPerNode[i] := seTrials.Value;
     end;
+
   Invalidate;
 end;
 
@@ -288,12 +283,19 @@ begin
   if (Sender = x0) or (Sender = x1) or (Sender = y0) or (Sender = y1) or (Sender = seNodes) then
     RefreshLine;
 
-  if Sender = seTrials then
+  if  (Sender = seSize) and cbUseGrid.Checked
+    and (cbChooseGrid.ItemIndex <> 0) then
+      begin
+        cbChooseGridChange(Sender);
+      end;
+
+  if (Sender = seTrials) or (Sender = seNodes) then
     begin
       SetLength(FTrialsPerNode, Length(FLine));
       for i := Low(FTrialsPerNode) to High(FTrialsPerNode) do
         FTrialsPerNode[i] := seTrials.Value;
     end;
+
   Invalidate;
 end;
 

@@ -146,6 +146,7 @@ begin
   if FCanResponse then
     begin
       CreateClientThread('C:'+ FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+
       FCanResponse:= False;
       //FDataSupport.StmDuration := GetTickCount;
 
@@ -203,15 +204,8 @@ begin
 end;
 
 procedure TFPE.KeyDown(var Key: Word; Shift: TShiftState);
-
-    function GetShiftEnum : TShiftStateEnum;
-    begin
-      if ssCtrl in Shift then Result := ssCtrl;
-      if ssAlt in Shift then Result := ssAlt;
-    end;
-
 begin
-  inherited KeyDown (Key, Shift);
+  //inherited KeyDown (Key, Shift);
 
   if Key = 27 {ESC} then
     begin
@@ -220,13 +214,11 @@ begin
     end;
 
   // This should be the last one.
-  case GetShiftEnum of
-    ssCtrl :
+   if ssCtrl in shift then
       begin
         if Key = 81 {q} then
           begin
-            Data := Data + '<>################## Sessão cancelada ##################<>' + #13#10;
-
+            Data := Data + #13#10 + '<>################## Sessão cancelada ##################<>' + #13#10;
             Result := 'NONE';
             IETConsequence := 'NONE';
             NextTrial := 'END';
@@ -234,21 +226,8 @@ begin
             EndTrial(Self);
           end;
       end;
-    ssAlt :
-      begin
-        if Key = 244 {f4} then
-          begin
-            Data := Data + '<>################## Sessão cancelada ##################<>' + #13#10;
-
-            Result := 'NONE';
-            IETConsequence := 'NONE';
-            NextTrial := 'END';
-            None(Self);
-            EndTrial(Self);
-          end;
-      end;
-  end;
 end;
+
 
 procedure TFPE.KeyUp(var Key: Word; Shift: TShiftState);
 begin

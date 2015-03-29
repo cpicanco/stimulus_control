@@ -40,7 +40,7 @@ object BresenhamLineForm: TBresenhamLineForm
         Anchors = [akLeft, akBottom]
         MaxValue = 2000
         OnClick = SpinClick
-        OnEditingDone = EditingDone
+        OnEditingDone = EditingCDone
         TabOrder = 0
         Value = 160
       end
@@ -52,7 +52,7 @@ object BresenhamLineForm: TBresenhamLineForm
         Anchors = [akLeft, akBottom]
         MaxValue = 2000
         OnClick = SpinClick
-        OnEditingDone = EditingDone
+        OnEditingDone = EditingCDone
         TabOrder = 1
         Value = 256
       end
@@ -74,7 +74,7 @@ object BresenhamLineForm: TBresenhamLineForm
         Anchors = [akLeft, akBottom]
         MaxValue = 2000
         OnClick = SpinClick
-        OnEditingDone = EditingDone
+        OnEditingDone = EditingCDone
         TabOrder = 0
         Value = 112
       end
@@ -86,7 +86,7 @@ object BresenhamLineForm: TBresenhamLineForm
         Anchors = [akLeft, akBottom]
         MaxValue = 2000
         OnClick = SpinClick
-        OnEditingDone = EditingDone
+        OnEditingDone = EditingCDone
         TabOrder = 1
         Value = 16
       end
@@ -112,7 +112,7 @@ object BresenhamLineForm: TBresenhamLineForm
       MinValue = 2
       OnChange = seNodesChange
       OnClick = SpinClick
-      OnEditingDone = EditingDone
+      OnEditingDone = EditingCDone
       TabOrder = 3
       Value = 10
     end
@@ -265,7 +265,7 @@ object BresenhamLineForm: TBresenhamLineForm
       MaxValue = 2000
       MinValue = 2
       OnClick = SpinClick
-      OnEditingDone = EditingDone
+      OnEditingDone = EditingCDone
       TabOrder = 8
       Value = 100
     end
@@ -323,7 +323,7 @@ object BresenhamLineForm: TBresenhamLineForm
         MaxValue = 2000
         MinValue = 2
         OnClick = SpinClick
-        OnEditingDone = EditingDone
+        OnEditingDone = EditingCDone
         TabOrder = 1
         Value = 10
       end

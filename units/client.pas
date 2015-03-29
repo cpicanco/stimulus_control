@@ -29,7 +29,6 @@ uses
    Classes
  , SysUtils
  , Process
- , Regdata
  , zmqapi
  ;
 
@@ -52,7 +51,7 @@ type
     FTrialIndex : string;
     FCode : string;
     FOnShowStatus: TShowStatusEvent;
-    FTimestampsData : TRegData;
+
     function GetTimestampFromMessage(aMessage : Utf8String) : Utf8String;
     procedure SetServerAddress(AValue: string);
     procedure ShowStatus;
@@ -60,11 +59,9 @@ type
     procedure Execute; override;
   public
     constructor Create(TrialIndex : integer; Code : string; CreateSuspended : boolean = True); overload;
-    constructor Create(TrialIndex : integer; Code : string; TimestampsData : TRegData; CreateSuspended : boolean = True); overload;
     destructor Destroy; override;
     property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
     property ServerAddress : string read FServerAddress write SetServerAddress;
-    property TimestampsData : TRegData read FTimestampsData write FTimestampsData;
   end;
 
 implementation
@@ -83,21 +80,9 @@ begin
   inherited Create(CreateSuspended);
 end;
 
-constructor TClientThread.Create(TrialIndex: integer; Code: string;
-  TimestampsData: TRegData; CreateSuspended: boolean);
-begin
-  FreeOnTerminate := True;
-
-  FTimestampsData := TimestampsData;
-  FTrialIndex := IntToStr(TrialIndex);
-  FCode := Code;
-  FServerAddress := '127.0.0.1:5000';
-  inherited Create(CreateSuspended);
-end;
-
 destructor TClientThread.Destroy;
 begin
-  FTimestampsData.HostThreadID := NO_THREADID;
+
   inherited Destroy;
 end;
 
@@ -154,36 +139,33 @@ begin
     FSubscriber.subscribe( '' );
 
     //message := '';
-      FSubscriber.recv( message );
-    // ('value', 'value', 'value')
+      try
+        FSubscriber.recv( message );
+      except
+        on E : Exception do
+          begin
+            {$ifdef DEBUG}
+              FMsg := mt_Exception + 'Connection to server "' + FServerAddress + '" failed saying: ' + #10#10 + E.Message;
+              Synchronize( @Showstatus );
+            {$endif}
+            Exit; // Terminate;
+          end;
+      end;
 
     {$ifdef DEBUG}
       FMsg := mt_Debug + 'Client receive:' + #10#10 +  message;
       Synchronize( @Showstatus );
     {$endif}
 
+    // ('value', 'value', 'value')
     data := #40#39 + FTrialIndex + #39#44#32#39 + GetTimestampFromMessage(message) + #39#44#32#39 + FCode + #39#41;
+    FMsg := data;
+    Synchronize( @Showstatus );
 
     {$ifdef DEBUG}
-      if not Assigned(FTimestampsData) then
-        begin
-          FMsg := mt_Warning + 'TClientThread has an overloaded constructor. FTimestampsData was not assigned.';
-          Synchronize( @Showstatus );
-        end;
-
-      FMsg := mt_Debug + 'Client will save data:' + #10#10 + data + #13#10;
-      Synchronize( @Showstatus );
-
       FMsg := mt_Debug + 'TClientThread instance with ThreadID:' + IntToStr(Self.ThreadID);
       Synchronize( @Showstatus );
-
     {$endif}
-
-    if Assigned(FTimestampsData) then
-      begin
-        FTimestampsData.HostThreadID := Self.ThreadID;
-        FTimestampsData.SaveData(data);
-      end;
 
   finally
     FSubscriber.Free;

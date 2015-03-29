@@ -32,9 +32,6 @@ uses
   , FileUtil
   ;
 
-const
-  NO_THREADID : TThreadID = 95025460;
-
 type
 
   { TRegData }
@@ -42,13 +39,13 @@ type
   TRegData = class(TComponent)
   private
     FFileName: string;
-    FHostThreadID: TThreadID;
     FITIBEGIN: DWord;             // intertrial interval begin
     FITIEND: DWord;               // intertrial interval end
     FLatencyStmBegin: Dword;      // stimulus onset
     FLatencyStmResponse: Dword;   // response latency to that stimulus onset
     FFile: TextFile;
     FSessionNumber: integer;
+    procedure UpdateFileName(NewFileName : string);
   public
     constructor Create(AOwner: TComponent; FileName: String); reintroduce;
     destructor Destroy; override;
@@ -56,14 +53,13 @@ type
     procedure AppendF;
     procedure AssignFFile;
     procedure CloseFFile;
-    property HostThreadID : TThreadID read FHostThreadID write FHostThreadID default 95025460;
     property SessionNumber : integer read FSessionNumber write FSessionNumber;
     property LatencyStmBegin : Dword read FLatencyStmBegin write FLatencyStmBegin;
     property LatencyStmResponse : Dword read FLatencyStmResponse write FLatencyStmResponse;
     property ITIBEGIN : DWord read FITIBEGIN write FITIBEGIN;
     property ITIEND : DWord read FITIEND write FITIEND;
     property DataFile : TextFile read FFile write FFile;
-    property FileName : string read FFileName;
+    property FileName : string read FFileName write UpdateFileName;
   end;
 
 implementation
@@ -80,6 +76,13 @@ implementation
 {$ifdef DEBUG}
 uses debug_logger, Dialogs;
 {$endif}
+
+procedure TRegData.UpdateFileName(NewFileName : string);
+begin
+  if (NewFileName <> '') and (NewFileName <> FFilename) then
+    if FileExistsUTF8(NewFileName) then
+      FFileName := NewFileName;
+end;
 
 constructor TRegData.Create(AOwner: TComponent; FileName: String);
 var
@@ -138,17 +141,10 @@ end;
 destructor TRegData.Destroy;
 // With the current implementation
 // if undefined DEBUG, CloseFile should be called only once
-var
-  aTimeOutMs : longint;
 begin
-  aTimeOutMs := 2000;
-  if Filename <> '' then
+  if FFilename <> '' then
     if TextRec(FFile).Mode = 55218 then // file is opened read/write
       begin
-        {$ifdef LINUX}
-         if FHostThreadID <> NO_THREADID then
-           WaitForThreadTerminate(FHostThreadID, aTimeOutMs);
-        {$endif }
         CloseFile(FFile);
       end;
   inherited Destroy;
@@ -159,15 +155,9 @@ procedure TRegData.SaveData(Data: string);
 begin
   if FFileName <> '' then
     begin
-
-      if Pos('timestamps', FFileName) <> 0 then
-        WriteLn(FFile, Data)    // buggy?
-      else
-        Write(FFile, Data);
+      Write(FFile, Data);
     end
-  {$ifdef DEBUG}
-  else WriteLn(FFile, mt_Warning + 'Filename is empty.' + '[' + Data + ']' + 'will not be saved.' + #13#10);
-  {$endif}
+  else {$ifdef DEBUG}  WriteLn( FFile, mt_Warning + 'Filename is empty.' + '[' + Data + ']' + 'will not be saved.' + #13#10)  {$endif} ;
 end;
 
 procedure TRegData.AppendF;
