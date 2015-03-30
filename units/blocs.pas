@@ -27,14 +27,14 @@ interface
 
 uses Classes, Controls, LCLIntf, LCLType,
      ExtCtrls, SysUtils, Graphics, Forms,
-     Dialogs,StdCtrls,
+     Dialogs,StdCtrls
 
-       session_config
+     , session_config
      , regdata
      , constants
      , response_key
      , countermanager
-     //, client
+     , custom_timer
      , trial_abstract
         , trial_message
      , trial_simple
@@ -45,6 +45,11 @@ uses Classes, Controls, LCLIntf, LCLType,
 
 type
 
+  TFakeTimer = record
+    Interval : LongInt;
+    Enabled : Boolean;
+  end;
+
   { TBlc }
 
   TBlc = class(TComponent)
@@ -52,22 +57,41 @@ type
     //FOnBeginTrial: TNotifyEvent;
     //FRegDataTicks: TRegData;
     //FClientThread : TClientThread;
-    FBackGround: TWinControl;
-    FBlc: TCfgBlc;
+
     FBlcHeader: String;
-    FCounterLabel : TLabel;
-    FCounterManager : TCounterManager;
+    FLastHeader: String;
+    FNextBlc: String;
+
+    // session/global parameters
+    FServerAddress: string;
+    FShowCounter : Boolean;
+    FTestMode: Boolean;
+    FIsCorrection : Boolean;
 
     // Trial data
     FData : string;
-    //FDataTicks : string;
-
-    FIETMedia : TKey;
-    FIsCorrection : Boolean;
+    FTimeStart: cardinal;
+    FFirstTrialBegin: cardinal;
     FITIBegin : cardinal;
     FITIEnd : cardinal;
-    FLastHeader: String;
-    FNextBlc: String;
+    //FDataTicks : string;
+
+    // Clock System
+    FTimer : TClockThread;
+    FTimerCsq : TFakeTimer;
+    FTimerITI: TFakeTimer;
+    FTimerTO : TFakeTimer;
+
+    // main objects/components
+    FBackGround: TWinControl;
+    FBlc: TCfgBlc;
+    FTrial: TTrial;
+    FRegData: TRegData;
+    FCounterManager : TCounterManager;
+    FCounterLabel : TLabel;
+    FIETMedia : TKey;
+
+    // events
     FOnBeginCorrection : TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
@@ -78,15 +102,6 @@ type
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
-    FRegData: TRegData;
-    FServerAddress: string;
-    FShowCounter : Boolean;
-    FTestMode: Boolean;
-    FTimerCsq : TTimer;
-    FTimerITI: TTimer;
-    FTimerTO : TTimer;
-    FTimeStart: cardinal;
-    FTrial: TTrial;
     procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
     procedure DebugStatus(msg : string);
     procedure PlayTrial;
@@ -99,9 +114,7 @@ type
     procedure IETResponse(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure StmResponse(Sender: TObject);
-    procedure TimerCsqTimer(Sender: TObject);
-    procedure TimerITITimer(Sender: TObject);
-    procedure TimerTOTimer(Sender: TObject);
+    procedure ClockThread(Sender: Tobject);
     procedure TrialTerminate(Sender: TObject);
     procedure WriteTrialData(Sender: TObject);
   public
@@ -130,7 +143,9 @@ type
 
 implementation
 
-//uses fUnit6;
+{$ifdef DEBUG}
+uses debug_logger;
+{$endif}
 
 procedure TBlc.EndBlc(Sender: TObject);
 begin
@@ -154,7 +169,7 @@ end;
 
 procedure TBlc.IETConsequence(Sender: TObject);
 begin
-  //BkGndResponse(Sender);
+  //
 end;
 
 procedure TBlc.IETResponse(Sender: TObject);
@@ -186,20 +201,20 @@ var s0, s1, s2, s3, s4 : string;
     if FTrial.IETConsequence = T_HIT then
       begin
         // FileName, HowManyLoops, Color, MediaDuration
-        Values := 'CSQ1.wav 1 255 1000';
+        Values := 'CSQ1.wav 1 255 0';
 
       end
     else
       if FTrial.IETConsequence = T_MISS then
         begin
           // FileName, HowManyLoops, Color, MediaDuration
-          Values := 'CSQ2.wav 1 0 1000';
+          Values := 'CSQ2.wav 1 0 0';
 
         end
       else
         if FTrial.IETConsequence = T_NONE then
           begin
-            Values := 'NONE 0 -1 0';
+            Values := 'NONE 1 -1 0';
           end
       else Values := FTrial.IETConsequence;
 
@@ -287,23 +302,17 @@ begin
   if FTestMode then FTimerITI.Interval:= 0
   else
     begin
-      if FBlc.ITI > 0 then FTimerITI.Interval:= FBlc.ITI
-      else FTimerITI.Interval:= 0;
+      FTimerITI.Interval:= FBlc.ITI;
+      FTimerTO.Interval:= FTrial.TimeOut;
+      FTimerCsq.Interval:= csqDuration;
 
-      if FTrial.TimeOut > 0 then FTimerTO.Interval:= FTrial.TimeOut
-      else FTimerTO.Interval:= 0;
-
-      if csqDuration > 0 then FTimerCsq.Interval:= csqDuration
-      else FTimerCsq.Interval:= 0;
       FITIBegin := GetTickCount;
     end;
 
   if FTrial.TimeOut > 0 then
     if FBackGround is TForm then TForm(FBackGround).Color:= 0;
 
-  // now the program do not loose the last data
-  //if FCounterManager.CurrentTrial.Counter <= FBlc.NumTrials then
-  //      FTrial.CreateClientThread('C:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+  if Assigned(OnEndTrial) then FOnEndTrial(Sender);
 
   if Assigned(FTrial) then
     begin
@@ -311,98 +320,176 @@ begin
       //FTrial.Free;
     end;
 
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'ITI - inter trial interval');
+    DebugLn(mt_Debug + '[Blc - ' + FBlc.Name + 'T - ' + IntToStr(FCounterManager.CurrentTrial.Counter)+ ']');
+    DebugLn(mt_Debug + 'Timer Intervals -> ITI:' + IntToStr(FTimerITI.Interval) + ' TO:' + IntToStr(FTimerTO.Interval) + 'Csq:' + IntToStr(FTimerCsq.Interval));
+  {$endif}
+
   //SetFocus;
 
   {
 
-    Note that from now on screen color should be equal to the Bloc background.
+    From now on screen color should be equal to the Bloc background or Black (time out).
 
   }
 
-  if Assigned(OnEndTrial) then FOnEndTrial(Sender);
-
   //showmessage(s0 + #13#10 +s1 + #13#10 +s2 + #13#10 +s3 + #13#10);
-    if (FTimerITI.Interval = 0)
-     and (FTimerTO.Interval = 0)
-     and (FTimerCsq.Interval = 0) then
-     begin
-       PlayTrial;
-     end else
+  if    (FTimerITI.Interval = 0)
+    and (FTimerTO.Interval  = 0)
+    and (FTimerCsq.Interval = 0) then
+   begin
+     {$ifdef DEBUG}
+       DebugLn(mt_Debug +  'Time Condition 1');
+     {$endif}
+     PlayTrial;
+     Exit;
+   end;
+
+  if    (FTimerITI.Interval > 0)
+    and (FTimerTO.Interval  > 0)
+    and (FTimerCsq.Interval > 0) then
+      begin // take ITI and ignore the rest
+        {$ifdef DEBUG}
+          DebugLn(mt_Debug +  'Time Condition 2');
+        {$endif}
+
+        //if ShowCounter then ShowCounterPlease('IET');
+        FTimerITI.Enabled := True;
+        FTimer := TClockThread.Create(True);
+        FTimer.Interval := FTimerITI.Interval;
+        FTimer.OnTimer := @ClockThread;
+        FTimer.Start;
+        Exit;
+      end
+    else
+      begin
+        // fixed ITI, time out and consequence off
+        if    (FTimerITI.Interval > 0)
+          and (FTimerTO.Interval  < 0)
+          and (FTimerCsq.Interval < 0) then
+            begin  // take ITI and ignore the rest
+              {$ifdef DEBUG}
+                DebugLn(mt_Debug +  'Time Condition 2');
+              {$endif}
+
+              //if ShowCounter then ShowCounterPlease('IET');
+              FTimerITI.Enabled:= True;
+              FTimer := TClockThread.Create(True);
+              FTimer.Interval := FTimerITI.Interval;
+              FTimer.OnTimer := @ClockThread;
+              FTimer.Start;
+              Exit;
+            end;
+
+        if  ( (FTimerITI.Interval > 0)
+          or  (FTimerCsq.Interval > 0) )
+
+          and (FTimerTO.Interval  = 0) then
+            begin
+              {$ifdef DEBUG}
+                DebugLn(mt_Debug +  'Time Condition 3');
+              {$endif}
+              CreateIETMedia(s1, s2, s3); // FileName, HowManyLoops, Color
+              //BlockInput(True);
+              FTimerCsq.Enabled:= True;
+              FTimer := TClockThread.Create(True);
+              FTimer.Interval := FTimerCsq.Interval;
+              FTimer.OnTimer := @ClockThread;
+              FTimer.Start;
+              Exit;
+            end;
+
+        if  ( (FTimerITI.Interval > 0)
+          or  (FTimerTO.Interval  > 0) )
+
+          and (FTimerCsq.Interval = 0) then
+          begin
+            {$ifdef DEBUG}
+              DebugLn(mt_Debug +  'Time Condition 4');
+            {$endif}
+            FTimerTO.Enabled:= True;
+            FTimer := TClockThread.Create(True);
+            FTimer.Interval := FTimerTO.Interval;
+            FTimer.OnTimer := @ClockThread;
+            FTimer.Start;
+          end;
+      end
+
+end;
+
+procedure TBlc.ClockThread(Sender: Tobject);
+begin
+  if FTimerCsq.Enabled then
     begin
-      if (FTimerITI.Interval > 0)
-       and (FTimerTO.Interval > 0)
-       and (FTimerCsq.Interval > 0) then
+      {$ifdef DEBUG}
+        DebugLn(mt_Debug +  'FTimerCsq.Enabled');
+      {$endif}
+      FTimerCsq.Enabled := False;
+
+      if Assigned(FIETMedia) then
+        begin
+          FreeAndNil(FIETMedia);
+        end;
+
+      if (FTimerITI.Interval > 0) then
         begin
           //if ShowCounter then ShowCounterPlease('IET');
+          FTimer.Interval := FTimerITI.Interval;
           FTimerITI.Enabled:= True;
+          Exit;
         end
       else
         begin
-          if (FTimerITI.Interval > 0)
-             and (FTimerTO.Interval = 0)
-             and (FTimerCsq.Interval = 0) then
-            begin
-              //if ShowCounter then ShowCounterPlease('IET');
-              FTimerITI.Enabled:= True;
-            end;
-          if ((FTimerITI.Interval > 0) or (FTimerCsq.Interval > 0))
-             and (FTimerTO.Interval = 0) then
-            begin
-              // FileName, HowManyLoops, Color
+          FITIEnd := GetTickCount;
+          FTimer.Running := False;
+          PlayTrial;
+          Exit;
+        end;
+    end;
 
-              CreateIETMedia(s1, s2, s3);
-              //BlockInput(True);
-              FTimerCsq.Enabled:= True;
-            end;
+  if FTimerTO.Enabled then
+    begin
+      {$ifdef DEBUG}
+        DebugLn(mt_Debug +  'FTimerTO.Enabled');
+      {$endif}
+      FTimerTO.Enabled := False;
 
-          if ((FTimerITI.Interval > 0) or (FTimerTO.Interval > 0))
-             and (FTimerCsq.Interval = 0) then
-            begin
-              FTimerTO.Enabled:= True;
-            end;
+      if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
+
+      if (FTimerITI.Interval > 0) then
+        begin
+          //if ShowCounter then ShowCounterPlease('IET');
+          FTimer.Interval := FTimerITI.Interval;
+          FTimerITI.Enabled:= True;
+          Exit;
         end
+      else
+        begin
+          FITIEnd := GetTickCount;
+          FTimer.Running := False;
+          PlayTrial;
+          Exit;
+        end;
     end;
 
-end;
-
-procedure TBlc.TimerCsqTimer(Sender: TObject);
-begin
-  FTimerCsq.Enabled := False;
-  if Assigned(FIETMedia) then
+  if FTimerITI.Enabled then
     begin
-      FreeAndNil(FIETMedia);
-      //BlockInput(False);
+      {$ifdef DEBUG}
+        DebugLn(mt_Debug +  'FTimerITI.Enabled');
+      {$endif}
+
+      FTimerITI.Enabled:= False;
+
+      if Assigned(FCounterLabel) then
+        begin
+          FCounterLabel.Free;
+        end;
+
+      FITIEnd := GetTickCount;
+      FTimer.Running := False;
+      PlayTrial;
     end;
-  if (FTimerITI.Interval > 0) then
-    begin
-      //if ShowCounter then ShowCounterPlease('IET');
-      FTimerITI.Enabled:= True;
-    end
-  else PlayTrial;
-end;
-
-procedure TBlc.TimerITITimer(Sender: TObject);
-begin
-  if Assigned(FCounterLabel) then
-    begin
-      FCounterLabel.Free;
-    end;
-  FTimerITI.Enabled:= False;
-  FITIEnd := GetTickCount;
-  PlayTrial;
-end;
-
-procedure TBlc.TimerTOTimer(Sender: TObject);
-begin
-  FTimerTO.Enabled := False;
-  if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
-
-  if (FTimerITI.Interval > 0) then
-    begin
-      //if ShowCounter then ShowCounterPlease('IET');
-      FTimerITI.Enabled:= True;
-    end
-  else PlayTrial;
 end;
 
 procedure TBlc.WriteTrialData(Sender: TObject);
@@ -410,7 +497,7 @@ var CountTr, NumTr, NameTr: String;
 begin
   if FTrial.Header <> FLastHeader then
     begin
-      FData:= FData + #13#10 + FBlcHeader + FTrial.Header + #9 + 'ITIBegin' + #9 + '--ITIEnd' + #13#10;
+      FData:= FData + #13#10 + FBlcHeader + #9 + 'ITIBegin' + #9 + '--ITIEnd' + FTrial.Header + #13#10;
       //FDataTicks:= FDataTicks + #13#10 + FBlcHeader + FTrial.HeaderTicks + #13#10;
     end;
   FLastHeader:= FTrial.Header;
@@ -428,7 +515,7 @@ begin
           NameTr + #9 +
           FTrial.Data + #9 +
           #32#32#32#32#32#32 + 'NA' + #9 +
-          #32#32#32#32#32#32 + 'NA' +
+          FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart) + #9 +
           #13#10;
     end
   else
@@ -440,11 +527,13 @@ begin
           FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
           FormatFloat('00000000;;00000000', FITIEND - FTimeStart) +
           #13#10;
-
     end;
 
   //FDataTicks:= FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  #13#10;
 
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'ITI:' + FormatFloat('00000000;;00000000', (FITIEND - FTimeStart) - (FITIBegin - FTimeStart)));
+  {$endif}
   if (FTrial is TMsg) then else
     if Assigned(OnConsequence) then FOnConsequence (Sender);
 end;
@@ -458,22 +547,20 @@ constructor TBlc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FData := '';
-  FTimerITI:= TTimer.Create(Self);
+
   with FTimerITI do begin
-    Enabled:= False;
-    OnTimer:= @TimerITITimer;
+    Interval := 0;
+    Enabled := False;
   end;
 
-  FTimerTO:= TTimer.Create(Self);
   with FTimerTO do begin
-    Enabled:= False;
-    OnTimer:= @TimerTOTimer;
+    Interval := 0;
+    Enabled := False;
   end;
 
-  FTimerCsq:= TTimer.Create(Self);
   with FTimerCsq do begin
-    Enabled:= False;
-    OnTimer:= @TimerCsqTimer;
+    Interval := 0;
+    Enabled := False;
   end;
 
 end;
@@ -541,6 +628,7 @@ end;
 procedure TBlc.PlayTrial;
 var IndTrial : integer;
 begin
+
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
 
   IndTrial := FCounterManager.CurrentTrial.Counter;
@@ -572,6 +660,7 @@ begin
           FTrial.Play(FTestMode, FIsCorrection);
           FTrial.Visible := True;
           FTrial.SetFocus;
+          if IndTrial = 0 then FFirstTrialBegin := GetTickCount;
         end else EndBlc(Self);
 
       FIsCorrection := False;
@@ -611,5 +700,6 @@ procedure TBlc.StmResponse(Sender: TObject);
 begin
   if Assigned(OnStmResponse) then FOnStmResponse (Sender);
 end;
+
 
 end.

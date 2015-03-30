@@ -57,6 +57,7 @@ uses
   , schedules_abstract
   , response_key
   , bass_player
+  , timestamps_logger
 
   // session, blocs, trials
   , trial_abstract
@@ -76,7 +77,6 @@ uses
   , debug_logger
   , SysUtils
   , FileUtil
-  //, timestamps_logger
   {$endif}
   ;
 
@@ -88,7 +88,7 @@ resourcestring
 begin
 
   {$ifdef DEBUG}
-  DebugLn(mt_Information + 'Logger initialized');
+  DebugLn(mt_Information + 'Debug Logger initialized');
   {$endif}
 
   Application.Title := ApplicationTitle;
