@@ -117,7 +117,7 @@ begin
   for i:= 0 to aLoops do
     begin
       BASS_ChannelPlay (FChannel, True);
-      while BASS_ChannelIsActive(FChannel) = BASS_ACTIVE_PLAYING do Application.ProcessMessages;
+      //while BASS_ChannelIsActive(FChannel) = BASS_ACTIVE_PLAYING do Application.ProcessMessages;
     end;
 
 end;

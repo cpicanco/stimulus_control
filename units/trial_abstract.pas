@@ -131,8 +131,9 @@ end;
 
 procedure TTrial.StartTrial(Sender: TObject);
 begin
-  FClockThread := TClockThread.Create(False);
+  FClockThread := TClockThread.Create(True);
   FClockThread.OnTimer := @ThreadClock; // descendents can implement the ThreadClock method
+  FClockThread.Start;
 end;
 
 destructor TTrial.Destroy;

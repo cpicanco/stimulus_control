@@ -60,7 +60,8 @@ begin
   FreeOnTerminate := True;
   FTickEvent := RTLEventCreate; //BasicEventCreate
   FInterval := 100;
-  //RTLeventSetEvent(FTickEvent);  //BasicSetEvent for synchronize threads
+  //BasicSetEvent for synchronize threads
+  //RTLeventSetEvent(FTickEvent);   // Here this event must never occur
   Running := True;
   inherited Create(CreateSuspended);
 end;
@@ -80,8 +81,8 @@ procedure TClockThread.Execute;
 begin
   while (not Terminated) and Running do
   begin
-    Synchronize(@Clock);
     RTLeventWaitFor(FTickEvent, Interval); //BasicEventWaitFor
+    Synchronize(@Clock);
   end;
 end;
 
