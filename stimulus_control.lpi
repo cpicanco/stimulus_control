@@ -15,23 +15,24 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
-      <MinorVersionNr Value="1"/>
       <RevisionNr Value="1"/>
+      <BuildNr Value="1"/>
+      <Language Value="0416"/>
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará" FileDescription="Stimulus Control Application" InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control App" ProductVersion=""/>
     </VersionInfo>
-    <BuildModes Count="2">
+    <BuildModes Count="3">
       <Item1 Name="Default" Default="True"/>
       <Item2 Name="Release">
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="stimulus_control.bin"/>
+            <Filename Value="stimulus_control.bin" ApplyConventions="False"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="/usr/local/lib/"/>
-            <OtherUnitFiles Value="forms;units;dependency/delphizmq"/>
+            <OtherUnitFiles Value="forms;units"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+            <SrcPath Value="dependency/delphizmq"/>
           </SearchPaths>
           <CodeGeneration>
             <TargetOS Value="linux"/>
@@ -62,6 +63,48 @@
           </Other>
         </CompilerOptions>
       </Item2>
+      <Item3 Name="NoClient">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control.bin" ApplyConventions="False"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="forms;units"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+            <SrcPath Value="dependency/delphizmq"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <CompilerMessages>
+              <MsgFileName Value=""/>
+            </CompilerMessages>
+            <CustomOptions Value="-dUseCThreads
+-dDEBUG
+-dNoClient"/>
+            <CompilerPath Value="$(CompPath)"/>
+          </Other>
+        </CompilerOptions>
+      </Item3>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
@@ -239,13 +282,13 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="stimulus_control.bin"/>
+      <Filename Value="stimulus_control.bin" ApplyConventions="False"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <Libraries Value="/usr/local/lib/"/>
-      <OtherUnitFiles Value="forms;units;dependency/delphizmq"/>
+      <OtherUnitFiles Value="forms;units"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      <SrcPath Value="dependency/delphizmq"/>
     </SearchPaths>
     <CodeGeneration>
       <TargetOS Value="linux"/>
