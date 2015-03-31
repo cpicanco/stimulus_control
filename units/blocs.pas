@@ -314,11 +314,7 @@ begin
 
   if Assigned(OnEndTrial) then FOnEndTrial(Sender);
 
-  if Assigned(FTrial) then
-    begin
-      FreeAndNil(FTrial);
-      //FTrial.Free;
-    end;
+  FTrial.Hide;
 
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'ITI - inter trial interval');
@@ -390,6 +386,7 @@ begin
               {$ifdef DEBUG}
                 DebugLn(mt_Debug +  'Time Condition 3');
               {$endif}
+
               CreateIETMedia(s1, s2, s3); // FileName, HowManyLoops, Color
               //BlockInput(True);
               FTimerCsq.Enabled:= True;
@@ -408,6 +405,7 @@ begin
             {$ifdef DEBUG}
               DebugLn(mt_Debug +  'Time Condition 4');
             {$endif}
+
             FTimerTO.Enabled:= True;
             FTimer := TClockThread.Create(True);
             FTimer.Interval := FTimerTO.Interval;
@@ -510,22 +508,24 @@ begin
 
   if (FCounterManager.CurrentTrial.Counter + 1) = 1 then
     begin
-      FData:= FData + CountTr + #9 +
+      FData:= CountTr + #9 +
           NumTr + #9 +
           NameTr + #9 +
           FTrial.Data + #9 +
           #32#32#32#32#32#32 + 'NA' + #9 +
           FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart) + #9 +
+          FData +
           #13#10;
     end
   else
     begin
-      FData:= FData + CountTr + #9 +
+      FData:= CountTr + #9 +
           NumTr + #9 +
           NameTr + #9 +
           FTrial.Data + #9 +
           FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
-          FormatFloat('00000000;;00000000', FITIEND - FTimeStart) +
+          FormatFloat('00000000;;00000000', FITIEND - FTimeStart) + #9 +
+          FData +
           #13#10;
     end;
 
@@ -628,6 +628,11 @@ end;
 procedure TBlc.PlayTrial;
 var IndTrial : integer;
 begin
+  if Assigned(FTrial) then
+    begin
+      FreeAndNil(FTrial);
+      //FTrial.Free;
+    end;
 
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
 

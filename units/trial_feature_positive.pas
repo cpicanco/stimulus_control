@@ -201,7 +201,7 @@ end;
 
 procedure TFPE.ThreadClock(Sender: TObject);
 begin
-  FSchedule.Clock;
+  if Visible then FSchedule.Clock;
 end;
 
 procedure TFPE.KeyDown(var Key: Word; Shift: TShiftState);
@@ -530,13 +530,13 @@ end;
 
 procedure TFPE.Miss(Sender: TObject);
 begin
-  if Assigned(OnMiss) then OnMiss (Sender);
+  if Assigned(OnMiss) then OnMiss(Sender);
 end;
 
 
 procedure TFPE.None(Sender: TObject);
 begin
-  if Assigned(OnNone) then OnNone (Sender);
+  if Assigned(OnNone) then OnNone(Sender);
 end;
 
 procedure TFPE.Response(Sender: TObject);

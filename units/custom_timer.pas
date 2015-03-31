@@ -47,7 +47,7 @@ type
 
     property Interval : longint read FInterval write FInterval;
     property OnTimer: TNotifyEvent read FOnTimer write FOnTimer;
-    property Running: Boolean read FRunning write FRunning default True;
+    property Running: Boolean read FRunning write FRunning;
   end;
 
 
@@ -62,7 +62,7 @@ begin
   FInterval := 100;
   //BasicSetEvent for synchronize threads
   //RTLeventSetEvent(FTickEvent);   // Here this event must never occur
-  Running := True;
+  FRunning := True;
   inherited Create(CreateSuspended);
 end;
 
@@ -74,7 +74,8 @@ end;
 
 procedure TClockThread.Clock;
 begin
-  if Assigned(FOnTimer) then FOnTimer(Self);
+  if Assigned(FOnTimer) then FOnTimer(Self)
+  else FRunning := False;
 end;
 
 procedure TClockThread.Execute;

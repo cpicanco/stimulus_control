@@ -59,7 +59,7 @@ type
     procedure Execute; override;
   public
     constructor Create(TrialIndex : integer; Code : string; CreateSuspended : boolean = True); overload;
-    destructor Destroy; override;
+    //destructor Destroy; override;
     property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
     property ServerAddress : string read FServerAddress write SetServerAddress;
   end;
@@ -79,13 +79,13 @@ begin
   FServerAddress := '127.0.0.1:5000';
   inherited Create(CreateSuspended);
 end;
-
+{
 destructor TClientThread.Destroy;
 begin
 
   inherited Destroy;
 end;
-
+}
 procedure TClientThread.ShowStatus;
 // this method is executed by the mainthread and can therefore access all GUI elements.
 begin
@@ -133,14 +133,21 @@ begin
       Synchronize( @Showstatus );
     {$endif}
 
+    {$ifdef NoClient}
+    {$else}
     FContext := TZMQContext.Create;
 	  FSubscriber := FContext.Socket( stSub );
     FSubscriber.connect( 'tcp://' + FServerAddress);
     FSubscriber.subscribe( '' );
+    {$endif}
 
     //message := '';
       try
+        {$ifdef NoClient}
+        message := 'Pupil' + #10 + 'timestamp:' + 'NoClient is defined'+ '#10';
+        {$else}
         FSubscriber.recv( message );
+        {$endif}
       except
         on E : Exception do
           begin
@@ -168,8 +175,13 @@ begin
     {$endif}
 
   finally
+    {$ifdef NoClient}
+    message := '';
+    {$else}
     FSubscriber.Free;
     FContext.Free;
+    {$endif}
+
   end;
 end;
 
