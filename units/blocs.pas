@@ -508,24 +508,24 @@ begin
 
   if (FCounterManager.CurrentTrial.Counter + 1) = 1 then
     begin
-      FData:= CountTr + #9 +
+      FData:= FData +
+          CountTr + #9 +
           NumTr + #9 +
           NameTr + #9 +
-          FTrial.Data + #9 +
           #32#32#32#32#32#32 + 'NA' + #9 +
           FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart) + #9 +
-          FData +
+          FTrial.Data + #9 +
           #13#10;
     end
   else
     begin
-      FData:= CountTr + #9 +
+      FData:= FData +
+          CountTr + #9 +
           NumTr + #9 +
           NameTr + #9 +
-          FTrial.Data + #9 +
           FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
           FormatFloat('00000000;;00000000', FITIEND - FTimeStart) + #9 +
-          FData +
+          FTrial.Data + #9 +
           #13#10;
     end;
 
