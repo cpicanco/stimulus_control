@@ -99,22 +99,16 @@ implementation
 constructor TMRD.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Header := '___Angle' + #9 +
+  Header :=  'StmBegin' + #9 +
+             '_Latency' + #9 +
+             '__StmEnd' + #9 +
+             '___Angle' + #9 +
              '______X1' + #9 +
              '______Y1' + #9 +
              '______X2' + #9 +
              '______Y2' + #9 +
              'ExpcResp' + #9 +
-             'RespFreq' + #9 +
-             'StmBegin' + #9 +
-             '_Latency' + #9 +
-             '__StmEnd'
-             //'__DBegin' + #9 +
-             //'DLatency' + #9 +
-             //'ITIBEGIN' + #9 +
-             //'_ITI_END' + #9 +
-             //'' + #9 +
-
+             'RespFreq'
              ;
   FDataSupport.Responses:= 0;
 end;
@@ -165,7 +159,7 @@ begin
       //FKey1.SchMan.Clock;
       //FKey2.SchMan.Clock
     end
-  else FSchedule.Clock;
+  else if Visible then FSchedule.Clock;
 end;
 
 procedure TMRD.KeyDown(var Key: Word; Shift: TShiftState);
@@ -182,7 +176,7 @@ begin
      begin
        if Key = 81 {q} then
          begin
-           Data := Data + #13#10 + '<>################## Sessão cancelada ##################<>' + #13#10;
+           Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
            Result := 'NONE';
            IETConsequence := 'NONE';
            NextTrial := 'END';
@@ -398,17 +392,30 @@ end;
 procedure TMRD.WriteData(Sender: TObject);  //
 begin
 
+  {
+  Header :=  'StmBegin' + #9 +
+             '_Latency' + #9 +
+             '__StmEnd' + #9 +
+             '___Angle' + #9 +
+             '______X1' + #9 +
+             '______Y1' + #9 +
+             '______X2' + #9 +
+             '______Y2' + #9 +
+             'ExpcResp' + #9 +
+             'RespFreq'
+             ;
+  }
   Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
+           FormatFloat('00000000;;00000000',FDataSupport.StmBegin - TimeStart) + #9 +
+           FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart) + #9 +
+           FormatFloat('00000000;;00000000',FDataSupport.StmEnd - TimeStart) + #9 +
            #32#32#32#32#32 + FormatFloat('000;;00', FCircles.angle) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[0].o.X]) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[0].o.Y]) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[1].o.X]) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[1].o.Y]) + #9 +
            #32#32#32#32#32#32#32 + FCircles.response + #9 +
-           Format('%-*.*d', [4,8,FDataSupport.Responses]) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.StmBegin - TimeStart) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.StmEnd - TimeStart)
+           Format('%-*.*d', [4,8,FDataSupport.Responses])
            //FormatFloat('00000000;;00000000',FData.LatencyStmResponse) + #9 +
            //FormatFloat('00000000;;00000000',FData.ITIBEGIN) + #9 +
            //FormatFloat('00000000;;00000000',FData.ITIEND) + #9 +
