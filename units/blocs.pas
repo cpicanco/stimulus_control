@@ -36,11 +36,13 @@ uses Classes, Controls, LCLIntf, LCLType,
      , countermanager
      , custom_timer
      , trial_abstract
+
         , trial_message
-     , trial_simple
-        , trial_mirrored_stm
-        , trial_feature_positive
-     , trial_matching
+        , trial_simple
+          , trial_mirrored_stm
+          , trial_feature_positive
+          , trial_calibration
+        , trial_matching
      ;
 
 type
@@ -641,6 +643,7 @@ begin
   if IndTrial < FBlc.NumTrials then
     begin
 
+      if FBlc.Trials[IndTrial].Kind = T_CLB then FTrial := TCLB.Create(Self);
       if FBlc.Trials[IndTrial].Kind = T_FPE then FTrial := TFPE.Create(Self);
       if FBlc.Trials[IndTrial].Kind = T_MRD then FTrial:= TMRD.Create(Self);
       if FBlc.Trials[IndTrial].Kind = T_MSG then FTrial:= TMSG.Create(Self);

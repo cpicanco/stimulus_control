@@ -27,9 +27,11 @@ interface
 
 uses
   LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls,
+  Dialogs, StdCtrls, ExtCtrls, Menus
 
-  criatore;
+  , criatore
+  , constants
+  ;
 
 type
 
@@ -63,6 +65,10 @@ type
     edtScreenLeft: TEdit;
     edtScreenTop: TEdit;
     lblLeftTop: TLabel;
+    miSaveAsTXTwithKeys: TMenuItem;
+    miSaveAsTXT: TMenuItem;
+    puMenu: TPopupMenu;
+    SaveDialog1: TSaveDialog;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure edtRowChange(Sender: TObject);
@@ -81,10 +87,13 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure edtScreenLeftChange(Sender: TObject);
+  published
+    procedure SaveAsTXT(Sender: TObject);
   private
     FBackground: TForm;
     FCanDraw    : Boolean;
     FDrawCoordenates : TAleatorizator;
+
     //FEscriba : TEscriba;
     //FOnPosCfg: TNotifyEvent;
   public
@@ -196,6 +205,32 @@ begin
     end;
 end;
 
+procedure TMatrixConfigForm.SaveAsTXT(Sender: TObject);
+var
+  L : TStringList;
+  i : integer;
+
+begin
+  if lbCoordenates.Items.Count > 0 then
+    if SaveDialog1.Execute then
+      begin
+        if Sender = miSaveAsTXT then
+          lbcoordenates.Items.SaveToFile(SaveDialog1.FileName);
+
+        if Sender = miSaveAsTXTwithKeys then
+          begin
+            L := TStringList.Create;
+            try
+              for i := 0 to lbCoordenates.Items.Count - 1 do
+                L.Append( _Comp + IntToStr(i + 1) + KBnd + lbCoordenates.Items.Strings[i] );
+              L.SaveToFile(SaveDialog1.FileName);
+            finally
+              L.Free;
+            end;
+          end;
+      end;
+end;
+
 procedure TMatrixConfigForm.edtWidthChange(Sender: TObject);
 begin
   if (TEdit(Sender).Text = '') or (TEdit(Sender).Text = '0') then
@@ -279,6 +314,7 @@ begin
   FCanDraw := True;
   edtScreenLeft.Text := IntToStr(Screen.Width);
   edtScreenTop.Text := IntToStr(Screen.Height);
+  SaveDialog1.InitialDir:= GetCurrentDir;
 end;
 
 procedure TMatrixConfigForm.btnClearAllClick(Sender: TObject);

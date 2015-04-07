@@ -64,7 +64,9 @@ uses
   , trial_simple
   , trial_matching
   , trial_message
+  , trial_mirrored_stm
   , trial_feature_positive
+  , trial_calibration
   , blocs
 
   , session
@@ -72,6 +74,7 @@ uses
 
   // helpers
   , draw_methods
+
 
   {$ifdef DEBUG}
   , debug_logger
