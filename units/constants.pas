@@ -173,6 +173,7 @@ const
   T_END = 'END';
 
   { Trial Kinds }
+  T_CLB = 'CLB';
   T_FPE = 'FPE';
   T_MRD = 'MRD';
   T_MSG = 'MSG';
