@@ -121,7 +121,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="28">
+    <Units Count="30">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -277,6 +277,16 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="timestamps_logger"/>
       </Unit27>
+      <Unit28>
+        <Filename Value="units/trial_calibration.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_calibration"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="backup/tool_ini.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="tool_ini"/>
+      </Unit29>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
