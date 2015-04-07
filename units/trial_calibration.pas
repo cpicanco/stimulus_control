@@ -170,10 +170,11 @@ begin
   with Canvas do
     begin
       Brush.Color := clBlack;
-      Brush.Style := bsSolid;
       Pen.Color   := clBlack;
+
+      Brush.Style := bsSolid;
       Pen.Style   := psSolid;
-      Pen.Mode    := pmCopy;
+      Pen.Mode    := pmBlack;
     end;
 
   Header := 'StmBegin' + #9 +
@@ -201,10 +202,10 @@ begin
   for i := Low(FCurrTrial.Dots) to High(FCurrTrial.Dots) do
     begin
       s1 := CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
-      FCurrTrial.Dots[i].X := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+      FCurrTrial.Dots[i].Y := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); // top, left, width, height
 
       NextSpaceDelimitedParameter;
-      FCurrTrial.Dots[i].Y := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+      FCurrTrial.Dots[i].X := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
 
       NextSpaceDelimitedParameter;
       FCurrTrial.Dots[i].Size := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
