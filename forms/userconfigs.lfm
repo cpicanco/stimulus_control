@@ -1,10 +1,10 @@
 object UserConfig: TUserConfig
-  Left = 461
+  Left = 440
   Height = 493
-  Top = 77
+  Top = 170
   Width = 407
-  HorzScrollBar.Page = 161
-  VertScrollBar.Page = 114
+  HorzScrollBar.Page = 272
+  VertScrollBar.Page = 104
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
   Caption = 'Configurar'
@@ -1652,10 +1652,10 @@ object UserConfig: TUserConfig
     Height = 455
     Top = 0
     Width = 407
-    ActivePage = tbGeneral
+    ActivePage = tbTools
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 0
+    TabIndex = 4
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
@@ -1939,6 +1939,75 @@ object UserConfig: TUserConfig
         Align = alClient
         BorderSpacing.Bottom = 40
         TabOrder = 1
+      end
+    end
+    object tbTools: TTabSheet
+      Caption = 'Ferramentas'
+      ClientHeight = 422
+      ClientWidth = 401
+      object btnTargetFile: TButton
+        AnchorSideLeft.Control = tbTools
+        AnchorSideRight.Control = tbTools
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 25
+        Top = 24
+        Width = 396
+        Anchors = [akTop, akLeft, akRight]
+        BorderSpacing.Right = 5
+        Caption = 'Arquivo alvo'
+        OnClick = btnClick
+        TabOrder = 0
+      end
+      object edtTarget: TEdit
+        AnchorSideLeft.Control = tbTools
+        AnchorSideRight.Control = tbTools
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 25
+        Top = 0
+        Width = 401
+        Anchors = [akTop, akLeft, akRight]
+        TabOrder = 1
+        Text = 'alvo'
+      end
+      object btnContentFile: TButton
+        AnchorSideLeft.Control = tbTools
+        AnchorSideRight.Control = tbTools
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 25
+        Top = 96
+        Width = 401
+        Anchors = [akTop, akLeft, akRight]
+        Caption = 'Novas configurações'
+        OnClick = btnClick
+        TabOrder = 2
+      end
+      object edtContent: TEdit
+        AnchorSideLeft.Control = tbTools
+        AnchorSideRight.Control = tbTools
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 25
+        Top = 72
+        Width = 401
+        Anchors = [akTop, akLeft, akRight]
+        TabOrder = 3
+        Text = 'conteúdo'
+      end
+      object btnApply: TButton
+        AnchorSideLeft.Control = tbTools
+        AnchorSideRight.Control = tbTools
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 33
+        Top = 384
+        Width = 401
+        Anchors = [akLeft, akRight, akBottom]
+        Caption = 'Aplicar novas configurações ao arquivo alvo'
+        OnClick = btnApplyClick
+        TabOrder = 4
       end
     end
   end

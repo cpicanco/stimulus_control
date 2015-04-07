@@ -56,9 +56,14 @@ type
     btnNextGeneral: TButton;
     btnNextTrials: TButton;
     btnClientTest: TButton;
+    btnTargetFile: TButton;
+    btnContentFile: TButton;
+    btnApply: TButton;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
     chkPlayOnSecondMonitor: TCheckBox;
+    edtTarget: TEdit;
+    edtContent: TEdit;
     gbRepetitions: TGroupBox;
     leServerAddress: TLabeledEdit;
     lblITI: TLabel;
@@ -83,10 +88,12 @@ type
     seCount: TSpinEdit;
     seITI: TSpinEdit;
     StringGrid1: TStringGrid;
+    tbTools: TTabSheet;
     tbSave: TTabSheet;
     tbGeneral: TTabSheet;
     tbStimuli: TTabSheet;
     tbTrials: TTabSheet;
+    procedure btnApplyClick(Sender: TObject);
     procedure btnCheckClick(Sender: TObject);
     procedure btnClientTestClick(Sender: TObject);
     procedure btnFillConditionClick(Sender: TObject);
@@ -97,7 +104,6 @@ type
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
-
     procedure chkUseMediaChange(Sender: TObject);
 
     procedure FormCreate(Sender: TObject);
@@ -110,6 +116,8 @@ type
       sIndex, tIndex: Integer);
     procedure StringGrid1DrawCell(Sender: TObject; aCol, aRow: Integer;
       Rect: TRect; aState: TGridDrawState);
+  published
+    procedure btnClick(Sender: TObject);
   private
     FRepetitionMatrix : array of array of boolean;
     FLastFocusedCol : integer;
@@ -461,6 +469,190 @@ end;
 procedure TUserConfig.btnCheckClick(Sender: TObject);
 begin
   //
+end;
+
+{
+
+  btnApplyClick may become a class in the near future
+
+}
+
+procedure TUserConfig.btnApplyClick(Sender: TObject);
+var
+
+  i, line,
+  //VirtualTrialValue,
+  NumTrials : integer;
+
+  s1,
+  Content : string;
+
+  NewFile,
+  Sections : TStringList;
+
+  IniTarget,
+  IniContent : TCIniFile;
+
+  {.
+   .
+   . For Bloc Sections first parameter is ignored, ex.:
+   .
+   . GetSection(0, 1, False); // Bloc 1
+   .
+   . For Trial Sections you can choose to pass the iBloc parameter or not, ex.:
+   .
+   . GetSection(1); // Trial 1, Bloc 1
+   . GetSection(1, 2); // Trial 1, Bloc 2
+   .
+   .}
+  function GetSection(iTrial: integer; iBloc : integer = 1; Trial : Boolean = True) : string;
+  var EndStr, Separator : string;
+  begin
+
+    Separator := #32 + '-' + #32;
+    EndStr := ']';
+
+    if Trial then
+      Result := '[Blc ' + IntToStr(iBloc) + Separator + 'T' + IntToStr(iTrial) + EndStr
+    else
+      Result := '[Blc ' + IntToStr(iBloc) + EndStr;
+  end;
+
+  function IncSection(aSection : string; iBloc : integer = 1; Trial : Boolean = True) : string;
+  var BeginStr, EndStr, Separator : string;
+    i : integer;
+  begin
+    Separator := #32 + '-' + #32;
+    if Trial then
+      BeginStr := '[Blc ' + IntToStr(iBloc) + Separator + 'T'
+    else
+      BeginStr := '[Blc ';
+    EndStr := ']';
+
+	  Delete(  aSection, Pos(BeginStr, aSection), Length(BeginStr)  );
+	  Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
+
+    i := StrToInt(aSection);
+    Inc(i);
+    Result := BeginStr + IntToStr(i) + EndStr;
+  end;
+
+
+  {
+  .
+  . If aSection is a Trial then Result is the trial number else Result is 0.
+  .
+  .}
+  function IsTrialSection(aSection : string) : integer;
+  var BeginStr, EndStr, Separator, iBloc : string;
+  begin
+    if Pos('T', aSection) <> 0 then
+      begin
+        Separator := #32 + '-' + #32;
+        iBloc := Copy(aSection, Pos('Blc', aSection) + 4, 1);
+        BeginStr := '[Blc ' + iBloc + Separator + 'T';
+        EndStr := ']';
+
+        Delete(  aSection, Pos(BeginStr, aSection), Length(BeginStr)  );
+        Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
+
+        Result := StrToInt(aSection);
+      end
+    else Result := 0;
+  end;
+
+begin
+  if FileExistsUTF8(edtTarget.Text) and FileExistsUTF8(edtContent.Text) then
+    begin
+
+      // initialize  string lists
+      NewFile := TStringList.Create;
+      NewFile.Duplicates := dupIgnore;
+
+      Sections := TStringList.Create;
+      Sections.Duplicates := dupIgnore;
+      try
+        Sections.LoadFromFile(edtTarget.Text);
+
+        // get content
+        IniContent := TCIniFile.Create(edtContent.Text);
+        try
+          IniContent.ReadSectionRaw('Trial', Sections);
+          Content := Sections.Text;
+        finally
+          IniContent.Free;
+        end;
+
+        // get target
+        IniTarget := TCIniFile.Create(edtTarget.Text);
+        try
+          // get sections
+          // Sections.Clear;
+          // IniTarget.ReadSections(Sections);
+
+          i := 1;
+          // get old number of trials
+          s1:= IniTarget.ReadString('Blc' + #32 + IntToStr(i), 'NumTrials', '0 0') + #32;
+          NumTrials:= StrToIntDef(Copy(s1, 0, Pos(#32, s1) - 1), 0);
+          //showmessage(inttostr(numtrials));
+
+          // get old virtual trial value
+          //Delete(s1, 1, Pos(#32, s1));
+          //if Length(s1) > 0 then while s1[1] = #32 do Delete(s1, 1, 1);
+          //VirtualTrialValue:= StrToIntDef(s1, 0);
+
+          // Update the NumTrial key
+          Inc(NumTrials);
+
+          //for this method we must have made a copy first
+          //IniTarget.WriteString(GetSection(0,1, False), 'NumTrials', IntToStr(NumTrials) + #32 + IntToStr(VirtualTrialValue) );
+          //IniTarget.UpdateFile;
+
+
+          // this method does not work with multiple blocs
+          // load/copy target stream
+          NewFile.LoadFromFile(edtTarget.Text);
+          i := NewFile.IndexOf('NumTrials=');
+
+          for i := 0 to NewFile.Count -1 do
+            begin
+              if Pos('NumTrials', NewFile.Strings[i]) <> 0 then Break;
+            end;
+
+          NewFile.Strings[i] := 'NumTrials=' + #9 + IntToStr(NumTrials) + #32 + '0';
+
+          //ShowMessage(NewFile.Strings[i]);
+
+        finally
+          IniTarget.Free;
+        end;
+        // insert the content before the first trial
+        s1 := NewFile.Text;
+        Insert(GetSection(0) + #13#10 + Content + #13#10, s1, Pos(GetSection(1), NewFile.Text));
+        NewFile.Text := s1;
+        // loop incrementing trial section numbers
+        for i := 0 to NumTrials -1 do
+          begin
+
+            // Make i + 1 turns to 0
+            line := NewFile.IndexOf(GetSection(i + 1));
+            if line <> -1 then
+              begin
+                NewFile[line] := GetSection(0);
+              end;
+
+            // Inc i
+            line := NewFile.IndexOf(GetSection(0));
+            NewFile[line] := GetSection(i + 1);
+          end;
+
+         NewFile.SaveToFile(edtTarget.Text + '.new');
+
+      finally
+        NewFile.Free;
+        Sections.Free;
+      end;
+    end;
 end;
 
 procedure TUserConfig.btnClientTestClick(Sender: TObject);
@@ -907,6 +1099,18 @@ begin
 
   if SaveDialog1.Execute then
     FEscriba.SaveMemoTextToTxt(SaveDialog1.FileName);
+end;
+
+procedure TUserConfig.btnClick(Sender: TObject);
+begin
+  OpenDialog1.InitialDir := GetCurrentDirUTF8;
+  if OpenDialog1.Execute then
+    begin
+      if Sender = btnTargetFile then
+        edtTarget.Text := OpenDialog1.FileName;
+      if Sender = btnContentFile then
+        edtContent.Text := OpenDialog1.FileName;;
+    end;
 end;
 
 end.

@@ -187,7 +187,9 @@ begin
 end;
 
 procedure TMRD.KeyUp(var Key: Word; Shift: TShiftState);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   inherited KeyUp(Key, Shift);
   if Key = 27 {ESC} then
     begin
@@ -202,14 +204,14 @@ begin
           if key = 32 then
             begin
               //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
-              FDataSupport.Latency := GetTickCount;
-              CreateClientThread('*R:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+              FDataSupport.Latency := TickCount;
+              CreateClientThread('*R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
               FShowStarter := False;
               Invalidate;
               StartTrial(Self);
             end;
         end
-      else CreateClientThread('R:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+      else CreateClientThread('R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
     end;
 end;
 
@@ -454,11 +456,14 @@ begin
 end;
 
 procedure TMRD.Response(Sender: TObject);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   Inc(FDataSupport.Responses);
+
   if FFirstResp then
     begin
-      FDataSupport.Latency := GetTickCount;
+      FDataSupport.Latency := TickCount;
       FFirstResp := False;
     end
   else;

@@ -231,7 +231,9 @@ end;
 
 
 procedure TFPE.KeyUp(var Key: Word; Shift: TShiftState);
+var TickCount : cardinal;
 begin
+  TickCount : GetTickCount;
   inherited KeyUp(Key, Shift);
   if Key = 27 {ESC} then FCanResponse:= True;
   Invalidate;
@@ -243,8 +245,8 @@ begin
         if Key = 32 then
           begin
             //if FUseMedia then ... not implemented yet
-            FDataSupport.StarterLatency := GetTickCount;
-            CreateClientThread('*R:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+            FDataSupport.StarterLatency := TickCount;
+            CreateClientThread('*R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
             FShowStarter := False;
             Invalidate;
             StartTrial(Self);
@@ -253,7 +255,7 @@ begin
     else
       begin
         //if FUseMedia then ... not implemented yet
-        CreateClientThread('R:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+        CreateClientThread('R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
         FSchedule.DoResponse;
       end;
   end;

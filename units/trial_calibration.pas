@@ -129,7 +129,7 @@ begin
       Invalidate;
     end;
 
-  if key = 98 {b} then
+  if key = 66 {b} then
     begin
       Result := 'NONE';
       IETConsequence := 'NONE';
