@@ -166,7 +166,7 @@ procedure TMRD.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   //inherited KeyDown (Key, Shift);
 
-  if Key = 27 {ESC} then
+  if (Key = 27 {ESC}) and (FCanResponse = True) then
     begin
       FCanResponse:= False;
       Invalidate;
