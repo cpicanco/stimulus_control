@@ -32,7 +32,7 @@ uses
 {$ifdef DEBUG}
 , debug_logger
 {$endif}
-
+, draw_methods
 , bass_player
 , client
 , session
@@ -59,6 +59,7 @@ type
     btnTargetFile: TButton;
     btnContentFile: TButton;
     btnApply: TButton;
+    btnExportStimulus: TButton;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
     chkPlayOnSecondMonitor: TCheckBox;
@@ -96,6 +97,7 @@ type
     procedure btnApplyClick(Sender: TObject);
     procedure btnCheckClick(Sender: TObject);
     procedure btnClientTestClick(Sender: TObject);
+    procedure btnExportStimulusClick(Sender: TObject);
     procedure btnFillConditionClick(Sender: TObject);
     procedure btnGridTypeClick(Sender: TObject);
     procedure btnNextGeneralClick(Sender: TObject);
@@ -685,6 +687,53 @@ begin
   end;
   {$endif}
   Sleep (1000);
+end;
+
+procedure TUserConfig.btnExportStimulusClick(Sender: TObject);
+var
+    Bitmap : TBitmap;
+
+    procedure DoWhiteBackGround;
+    begin
+      with Bitmap do
+        begin
+          Canvas.Brush.Color := clWhite;
+          Canvas.Pen.Mode := pmWhite;
+          Canvas.Pen.Color := clWhite;
+          Canvas.Rectangle(0,0,Width, Height);
+        end;
+    end;
+
+begin
+  if SaveDialog1.Execute then
+    begin
+
+      // create a bitmap to draw
+      Bitmap := TBitmap.Create;
+      with Bitmap do
+        try
+          begin
+            // give it a size
+            Width := 500;
+            Height := 500;
+
+            DoWhiteBackGround;
+            DrawCircle(Canvas, 0, 0, Width, False, 0, 0);
+            SaveToFile(SaveDialog1.FileName + '_1.bmp');
+
+            DoWhiteBackGround;
+            DrawCircle(Canvas, 0, 0, Width, True, 0, 360);
+            SaveToFile(SaveDialog1.FileName + '_2.bmp');
+
+            DoWhiteBackGround;
+            DrawCircle(Canvas, 0, 0, Width, True, 45, 1);
+            SaveToFile(SaveDialog1.FileName + '_3.bmp');
+          end;
+
+        finally
+          Bitmap.Free;
+        end;
+    end;
 end;
 
 procedure TUserConfig.btnFillConditionClick(Sender: TObject);
