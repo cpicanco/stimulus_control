@@ -1951,7 +1951,7 @@ object UserConfig: TUserConfig
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 25
-        Top = 24
+        Top = 272
         Width = 396
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Right = 5
@@ -1965,7 +1965,7 @@ object UserConfig: TUserConfig
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 25
-        Top = 0
+        Top = 248
         Width = 401
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 1
@@ -1977,7 +1977,7 @@ object UserConfig: TUserConfig
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 25
-        Top = 96
+        Top = 344
         Width = 401
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Novas configurações'
@@ -1990,7 +1990,7 @@ object UserConfig: TUserConfig
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 25
-        Top = 72
+        Top = 320
         Width = 401
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 3
@@ -2008,6 +2008,15 @@ object UserConfig: TUserConfig
         Caption = 'Aplicar novas configurações ao arquivo alvo'
         OnClick = btnApplyClick
         TabOrder = 4
+      end
+      object btnExportStimulus: TButton
+        Left = 8
+        Height = 25
+        Top = 8
+        Width = 140
+        Caption = 'Exportar estímulo'
+        OnClick = btnExportStimulusClick
+        TabOrder = 5
       end
     end
   end
@@ -2042,7 +2051,7 @@ object UserConfig: TUserConfig
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = '.txt'
-    Filter = 'TXT|*.txt'
+    Filter = 'TXT|*.txt|JPG|*.jpg'
     left = 328
     top = 264
   end

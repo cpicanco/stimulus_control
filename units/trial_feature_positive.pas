@@ -233,7 +233,7 @@ end;
 procedure TFPE.KeyUp(var Key: Word; Shift: TShiftState);
 var TickCount : cardinal;
 begin
-  TickCount : GetTickCount;
+  TickCount := GetTickCount;
   inherited KeyUp(Key, Shift);
   if Key = 27 {ESC} then FCanResponse:= True;
   Invalidate;
@@ -542,11 +542,13 @@ begin
 end;
 
 procedure TFPE.Response(Sender: TObject);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   Inc(FDataSupport.Responses);
   if FFirstResp then
     begin
-      FDataSupport.Latency := GetTickCount;
+      FDataSupport.Latency := TickCount;
       FFirstResp := False;
     end
   else;
