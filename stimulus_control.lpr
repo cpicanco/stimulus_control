@@ -54,10 +54,9 @@ uses
 
   // Responses, Schedules of Reinforcement, Stimuli
   , schedules
-  , schedules_abstract
+  , schedules_main
   , response_key
   , bass_player
-  , timestamps_logger
 
   // session, blocs, trials
   , trial_abstract
@@ -65,15 +64,17 @@ uses
   , trial_matching
   , trial_message
   , trial_mirrored_stm
+  
   , trial_feature_positive
   , trial_calibration
   , blocs
 
   , session
-  , session_config
+  , config_session
 
   // helpers
   , draw_methods
+  , timestamps_logger
 
 
   {$ifdef DEBUG}
