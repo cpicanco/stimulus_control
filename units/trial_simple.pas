@@ -21,17 +21,25 @@
 //
 unit trial_simple;
 
-{$MODE Delphi}
+{$mode objfpc}{$H+}
 
 interface
 
-uses Dialogs,
-     Classes, Types, SysUtils, Controls,
-     Graphics, ExtCtrls, StrUtils, {IdGlobal, IdGlobalProtocols,}
-     LCLIntf, LCLType, Forms,
-     custom_timer,
-     response_key, trial_abstract, countermanager,
-     session_config, counter, constants, interface_library;
+uses
+
+  LCLIntf, LCLType, Controls, Classes, SysUtils
+
+  // TTimer
+  , ExtCtrls
+
+  , response_key
+  , trial_abstract
+  //, countermanager
+  //, session_config
+  , counter
+  , constants
+  , interface_library
+  ;
 
 type
 
@@ -48,9 +56,7 @@ type
 
   TSimpl = Class(TTrial)
   protected
-    //FComparisonFocus : integer;
     FFirstResp : Boolean;
-    //FClockSwitchON : Boolean;
     FFlagCsq2Fired : Boolean;
     FTrialInterval: Integer;
     FCanPassTrial: Boolean;
@@ -63,8 +69,6 @@ type
     FDataBkGndS: String;
     FDataCsq: Byte;
     FTimerCsq: TTimer;
-    //FTimerClock: TTimer;
-    FClockThread: TClockThread;
     FFlagResp: Boolean;
     FKPlus: TSupportKey;
     FKMinus: TSupportKey;
@@ -84,7 +88,7 @@ type
     procedure TimerCsqTimer(Sender: TObject);
     procedure TimerClockTimer(Sender: TObject);
     procedure Dispenser(Csq: Byte; Usb: string);
-    procedure StartTrial;
+    procedure StartTrial(Sender: TObject); override;
     procedure EndTrial(Sender: TObject);
 
     procedure SetTimerCsq;
@@ -95,8 +99,8 @@ type
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy;override;
-    procedure Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean); override;
+    destructor Destroy; override;
+    procedure Play(TestMode: Boolean; Correction : Boolean); override;
     procedure DispenserPlusCall; override;
   end;
 
@@ -106,7 +110,7 @@ constructor TSimpl.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  FHeader:=  #9 +
+  Header :=  #9 +
              'Pos.Cmp.' + #9 +        //header do Relatório
              'Res.Cmp.' + #9 +
              'Lat.Cmp.' + #9 + #9 +
@@ -116,7 +120,7 @@ begin
              'UDsp.   ' + #9 +
              'Res.Frq.';
 
-  FHeaderTicks:= 'Tempo_ms' + #9 +
+  HeaderTicks := 'Tempo_ms' + #9 +
                  'Cmp.Tipo' + #9 +
                  'FileName' + #9 +
                  'Left....' + #9 +
@@ -129,7 +133,7 @@ begin
     begin
       Enabled:= False;
       Interval:= 1;
-      OnTimer:= TimerCsqTimer;
+      OnTimer:= @TimerCsqTimer;
     end;
 
   //This Timer controls Sch integer increment.
@@ -143,8 +147,6 @@ begin
       OnTimer:= TimerClockTimer;
     end;}
    FFlagCsq2Fired := False;
-  //FComparisonFocus := -1;
-  //FClockSwitchON := True;
 end;
 
 destructor TSimpl.Destroy;
@@ -164,30 +166,29 @@ begin
   Dispenser(FKPlus.Csq, FKPlus.Usb);
 end;
 
-procedure TSimpl.Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean);
+procedure TSimpl.Play(TestMode: Boolean; Correction : Boolean);
 var s1,sName,sLoop,sColor: String; R: TRect; a1: Integer;
 begin
-  FRootMedia := FCfgTrial.SList.Values[_RootMedia];
-  FManager := Manager;
+  RootMedia := CfgTrial.SList.Values[_RootMedia];
   Randomize;
   FFlagResp:= False;
-  FNextTrial:= '-1';
+  NextTrial:= '-1';
 
   if Correction then FIsCorrection := True
   else FIsCorrection := False;
 
-  Color:= StrToIntDef(FCfgTrial.SList.Values[_BkGnd], 0);
-  FCanPassTrial := StrToBoolDef(FCfgTrial.SList.Values[_AutoNxt], True);
+  Color:= StrToIntDef(CfgTrial.SList.Values[_BkGnd], 0);
+  FCanPassTrial := StrToBoolDef(CfgTrial.SList.Values[_AutoNxt], True);
   if FCanPassTrial = False then
     begin
-      FTrialInterval := StrToIntDef(FCfgTrial.SList.Values[_CustomNxtValue], 10000);
+      FTrialInterval := StrToIntDef(CfgTrial.SList.Values[_CustomNxtValue], 10000);
       SetTimerCsq;
     end;
 
   If TestMode then Cursor:= 0
-  else Cursor:= StrToIntDef(FCfgTrial.SList.Values[_Cursor], 0);
+  else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
 
-  FNumKeyC:= StrToIntDef(FCfgTrial.SList.Values[_NumComp], 0);
+  FNumKeyC:= StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
 
   SetLength(FVetSupportC, FNumKeyC);
   For a1:= 0 to FNumKeyC-1 do
@@ -198,11 +199,11 @@ begin
           Key.Tag:= a1;
           Key.Cursor:= Self.Cursor;
           Key.Parent:= Self;
-          Key.OnConsequence:= Consequence;
-          Key.OnConsequence2:= Consequence2;
-          Key.OnResponse:= Response;
+          Key.OnConsequence:= @Consequence;
+          Key.OnConsequence2:= @Consequence2;
+          Key.OnResponse:= @Response;
 
-          s1:= FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cBnd];
+          s1:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cBnd];
           R.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
           Delete(s1, 1, pos(#32, s1)); If Length(s1)>0 then While s1[1]=#32 do Delete(s1, 1, 1);
           R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
@@ -212,49 +213,49 @@ begin
           R.Bottom:= StrToIntDef(s1, 0);
           Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
-          s1:= FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cStm] + #32;
+          s1:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cStm] + #32;
           sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
           Delete(s1, 1, pos(#32, s1)); If Length(s1)>0 then While s1[1]=#32 do Delete(s1, 1, 1);
           sLoop := Copy(s1, 0, pos(#32, s1)-1);
           Delete(s1, 1, pos(#32, s1)); If Length(s1)>0 then While s1[1]=#32 do Delete(s1, 1, 1);
           sColor := Copy(s1, 0, pos(#32, s1)-1);
-          Key.Color := StrToIntDef(sColor, clRed);
+          Key.Color := StrToIntDef(sColor, $0000FF{clRed});
           Key.HowManyLoops:= StrToIntDef(sLoop, 0);
           Key.FullPath:= sName;
-          Key.SchMan.Kind:= FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cSch];
+          Key.SchMan.Kind:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cSch];
 
-          Csq:= StrToIntDef(FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cCsq], 0);
-          Usb := FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cUsb];//FRS232.GetUsbCsqFromValue ();
+          Csq:= StrToIntDef(CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cCsq], 0);
+          Usb := CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cUsb];//FRS232.GetUsbCsqFromValue ();
 
-          Msg:= FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cMsg];
-          Res:= FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cRes];
-          Nxt:= FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cNxt];
-          TO_ := StrToIntDef(FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cTO], 0);
-          IET := FCfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cIET];
+          Msg:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cMsg];
+          Res:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cRes];
+          Nxt:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cNxt];
+          TO_ := StrToIntDef(CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cTO], 0);
+          IET := CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cIET];
         end;
     end;
 
   with FKPlus do begin
-    Csq:= StrToIntDef(FCfgTrial.SList.Values[_Kplus + _cCsq], 0);
-    //Usb:= StrToIntDef(FCfgTrial.SList.Values[_Kplus + _cUsb], 0);
-    Msg:= FCfgTrial.SList.Values[_Kplus + _cMsg];
-    Res:= FCfgTrial.SList.Values[_Kplus + _cRes];
-    Nxt:= FCfgTrial.SList.Values[_Kplus + _cNxt];
-    IET := FCfgTrial.SList.Values[_Kplus + _cIET];
-    TO_:= StrToIntDef(FCfgTrial.SList.Values[_Kplus + _cTO],0);
+    Csq:= StrToIntDef(CfgTrial.SList.Values[_Kplus + _cCsq], 0);
+    //Usb:= StrToIntDef(CfgTrial.SList.Values[_Kplus + _cUsb], 0);
+    Msg:= CfgTrial.SList.Values[_Kplus + _cMsg];
+    Res:= CfgTrial.SList.Values[_Kplus + _cRes];
+    Nxt:= CfgTrial.SList.Values[_Kplus + _cNxt];
+    IET := CfgTrial.SList.Values[_Kplus + _cIET];
+    TO_:= StrToIntDef(CfgTrial.SList.Values[_Kplus + _cTO],0);
   end;
 
   with FKMinus do begin
-    Csq:= StrToIntDef(FCfgTrial.SList.Values[_Kminus + _cCsq], 0);
-    //Usb:= StrToIntDef(FCfgTrial.SList.Values[_Kminus + _cUsb], 0);
-    Msg:= FCfgTrial.SList.Values[_Kminus + _cMsg];
-    Res:= FCfgTrial.SList.Values[_Kminus + _cRes];
-    Nxt:= FCfgTrial.SList.Values[_Kminus + _cNxt];
-    IET := FCfgTrial.SList.Values[_Kminus + _cIET];
-    TO_:= StrToIntDef(FCfgTrial.SList.Values[_Kminus + _cTO],0);
+    Csq:= StrToIntDef(CfgTrial.SList.Values[_Kminus + _cCsq], 0);
+    //Usb:= StrToIntDef(CfgTrial.SList.Values[_Kminus + _cUsb], 0);
+    Msg:= CfgTrial.SList.Values[_Kminus + _cMsg];
+    Res:= CfgTrial.SList.Values[_Kminus + _cRes];
+    Nxt:= CfgTrial.SList.Values[_Kminus + _cNxt];
+    IET := CfgTrial.SList.Values[_Kminus + _cIET];
+    TO_:= StrToIntDef(CfgTrial.SList.Values[_Kminus + _cTO],0);
   end;
 
-  StartTrial;
+  StartTrial(Self);
 end;
 
 procedure TSimpl.SetTimerCsq;
@@ -262,9 +263,11 @@ begin
   FTimerCsq.Interval := FTrialInterval;
 end;
 
-procedure TSimpl.StartTrial;
+procedure TSimpl.StartTrial(Sender: TObject);
 var a1 : integer;
 begin
+  inherited StartTrial(Sender);
+
   if FCanPassTrial then FTimerCsq.Enabled:= False else FTimerCsq.Enabled:= True;
   if FIsCorrection then
     begin
@@ -280,13 +283,10 @@ begin
   Ft := GetTickCount;
   FLatCmp:= 0;
   FDurCmp := 0;
-  FClockThread := TClockThread.Create(False);
-  FClockThread.OnTimer := TimerClockTimer;
 end;
 
 procedure TSimpl.TimerCsqTimer(Sender: TObject);
 begin
-  FClockThread.FinishThreadExecution;
   FTimerCsq.Enabled:= False;
   FCanPassTrial := True;
   EndTrial(Sender);
@@ -298,11 +298,23 @@ begin
   for a1:= 0 to FNumKeyC-1 do FVetSupportC[a1].Key.SchMan.Clock;
 end;
 
-procedure TSimpl.WriteData;  //Dados do Relatório
-var Lat_Cmp,Dur_CmpResponse,Dur_Cmp, Res_Cmp, Disp, uDisp: String;
-    PosComps, Res_Frq: String;
+procedure TSimpl.WriteData(Sender: TObject);  //Dados do Relatório
+var
+    Lat_Cmp,
+    Dur_CmpResponse,
+    Dur_Cmp,
+    Res_Cmp,
+    Disp,
+    uDisp,
+    PosComps,
+    Res_Frq: String;
+
     a1: Integer;
 begin
+  Res_Frq := '';
+  PosComps := '';
+  Disp := '';
+  uDisp := '';
   for a1 := 0 to ComponentCount - 1 do
     begin
       if Components[a1] is TKey then
@@ -341,7 +353,7 @@ begin
   //Disp:= RightStr(IntToBin(FDataCsq, 9)+#0, 8);
   //uDisp := IntToStr(FDataUsb);
 
-  FData:= PosComps  + #9 +
+  Data := PosComps  + #9 +
           Res_Cmp   + #9 +
           Lat_Cmp  + #9 +  //#9
           Dur_CmpResponse + #9 +
@@ -349,16 +361,15 @@ begin
           Disp      + #9 +
           uDisp     + #9 +
           Res_Frq;
-          //   + #9 +
-          //FDataBkGndS;        //obsoleto
 
-  FManager.OnConsequence(Self);
-  if Assigned(OnWriteTrialData) then FOnWriteTrialData(Self);
+
+  CounterManager.OnConsequence(Self);
+  if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
 end;
 
 procedure TSimpl.EndCorrection(Sender: TObject);
 begin
-  if Assigned (OnEndCorrection) then FOnEndCorrection (Sender);
+  if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
 end;
 
 procedure TSimpl.EndTrial(Sender: TObject);
@@ -366,12 +377,12 @@ begin
   if FLatCmp = 0 then FLatCmp:= GetTickCount;
   WriteData(Sender);
   if FCanPassTrial then
-    if Assigned(OnEndTrial) then FOnEndTrial(sender);
+    if Assigned(OnEndTrial) then OnEndTrial(sender);
 end;
 
 procedure TSimpl.Hit(Sender: TObject);
 begin
-  if Assigned(OnHit) then FOnHit(Sender);
+  if Assigned(OnHit) then OnHit(Sender);
 end;
 
 procedure TSimpl.KeyDown(var Key: Word; Shift: TShiftState);
@@ -394,9 +405,9 @@ begin
       FDataCMsg:= FKPlus.Msg;
       FDataCsq:= FKPlus.Csq;
       //FDataUsb := FKPlus.Usb;
-      FResult:= FKPlus.Res;
-      FIETConsequence:= FKPlus.IET;
-      FTimeOut := FKPlus.TO_;
+      Result:= FKPlus.Res;
+      IETConsequence:= FKPlus.IET;
+      TimeOut := FKPlus.TO_;
       Dispenser(FKPlus.Csq, FKPlus.Usb);
     end;
 
@@ -405,9 +416,9 @@ begin
       FDataCMsg:= FKMinus.Msg;
       FDataCsq:= FKMinus.Csq;
       //FDataUsb := FKMinus.Usb;
-      FResult:= FKMinus.Res;
-      FTimeOut:= FKMinus.TO_;
-      FIETConsequence:= FKMinus.IET;
+      Result:= FKMinus.Res;
+      TimeOut:= FKMinus.TO_;
+      IETConsequence:= FKMinus.IET;
 
       Dispenser(FKMinus.Csq, FKMinus.Usb);
     end;
@@ -427,31 +438,31 @@ end;
 
 procedure TSimpl.Miss(Sender: TObject);
 begin
-  if Assigned(OnMiss) then FOnMiss (Sender);
+  if Assigned(OnMiss) then OnMiss (Sender);
 end;
 
 procedure TSimpl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   inherited MouseDown(Button,Shift, X, Y);
-  FDataTicks:= FDataTicks +
+  {DataTicks := DataTicks +
                FormatFloat('####,####',GetTickCount - Ft) + #9 +
                '-' + #9 +
                '-' + #9 +
-               IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9;
+               IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9; }
       FDataBkGndI.Plus(1);
-    //  FDataBkGndS := FDataBkGndS + IntToStr(X)+ ',' + IntToStr(Y) + #9;          //obsoleto
-      FManager.OnBkgndResponse(FDataBkGndI);
-      if Assigned(OnBkGndResponse) then FOnBkGndResponse(Self);
+
+      CounterManager.OnBkgndResponse(FDataBkGndI);
+      if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;
 
 procedure TSimpl.None(Sender: TObject);
 begin
-  if Assigned(OnNone) then FOnMiss (Sender);
+  if Assigned(OnNone) then OnMiss (Sender);
 end;
 
 procedure TSimpl.BeginCorrection(Sender: TObject);
 begin
-  if Assigned (OnBeginCorrection) then FOnBeginCorrection (Sender);
+  if Assigned (OnBeginCorrection) then OnBeginCorrection (Sender);
 end;
 
 procedure TSimpl.Consequence(Sender: TObject);
@@ -464,19 +475,19 @@ begin
     if (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) or
        (FVetSupportC[TKey(Sender).Tag].Res = T_MISS)  then
       begin
-        if FVetSupportC[TKey(Sender).Tag].Res = T_HIT then FResult := 'HIT';
+        if FVetSupportC[TKey(Sender).Tag].Res = T_HIT then Result := 'HIT';
 
-        if FVetSupportC[TKey(Sender).Tag].Res = T_MISS then FResult := 'MISS';
+        if FVetSupportC[TKey(Sender).Tag].Res = T_MISS then Result := 'MISS';
 
       end
-    else FResult := 'NONE';
+    else Result := 'NONE';
 
       //FDataCsq:= FVetSupportC[TKey(Sender).Tag].Csq;
       //FDataUsb := FVetSupportC[TKey(Sender).Tag].Usb;
-      FTimeOut := FVetSupportC[TKey(Sender).Tag].TO_;
-      FIETConsequence := FVetSupportC[TKey(Sender).Tag].IET;
-      if FVetSupportC[TKey(Sender).Tag].Nxt = T_CRT then FNextTrial := T_CRT
-      else FNextTrial := FVetSupportC[TKey(Sender).Tag].Nxt;
+      TimeOut := FVetSupportC[TKey(Sender).Tag].TO_;
+      IETConsequence := FVetSupportC[TKey(Sender).Tag].IET;
+      if FVetSupportC[TKey(Sender).Tag].Nxt = T_CRT then NextTrial := T_CRT
+      else NextTrial := FVetSupportC[TKey(Sender).Tag].Nxt;
 
     if FVetSupportC[TKey(Sender).Tag].Msg = 'GONOGO' then
       begin       //GONOGO serve apenas para a diferenciação entre Go e NoGo nos esquemas RRRT
@@ -485,17 +496,17 @@ begin
 
          if (FFlagCsq2Fired = False) and (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) then
            begin
-             FResult := 'MISS';
+             Result := 'MISS';
            end;
          if (FFlagCsq2Fired = False) and (FVetSupportC[TKey(Sender).Tag].Res = T_MISS) then
            begin
              FDataCsq := 0;
              FDataUSB := '0';
-             FTimeOut := 0;
-             FResult := 'HIT';
+             TimeOut := 0;
+             Result := 'HIT';
            end;
 
-         if FFlagCsq2Fired and (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) then FTimeOut := 0;
+         if FFlagCsq2Fired and (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) then TimeOut := 0;
          if FFlagCsq2Fired and (FVetSupportC[TKey(Sender).Tag].Res = T_MISS) then
            begin
              FDataCsq := 0;
@@ -505,9 +516,9 @@ begin
     else FDataCMsg:= FVetSupportC[TKey(Sender).Tag].Msg;
 
       //Dispenser(FDataCsq, FDataUsb);
-      if FResult = 'HIT' then  Hit(Sender);
-      if FResult = 'MISS' then  Miss(Sender);
-      if FResult = 'NONE' then  None(Sender);
+      if Result = 'HIT' then  Hit(Sender);
+      if Result = 'MISS' then  Miss(Sender);
+      if Result = 'NONE' then  None(Sender);
 
       if FCanPassTrial then FTimerCsq.Enabled:= True else
         begin
@@ -529,13 +540,13 @@ procedure TSimpl.Response(Sender: TObject);
 begin
   if FFlagResp then
     begin
-      FDataTicks:=
-             FDataTicks +
+      {DataTicks :=
+             DataTicks +
              FormatFloat('####,####',GetTickCount - Ft) + #9 +
              'C' + IntToStr(TKey(Sender).Tag + 1) + #9 +
              ExtractFileName(TKey(Sender).FullPath) + #9 +
              IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left) + #9 +
-             IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;
+             IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9; }
 
        if FFirstResp = False then
         begin
@@ -544,8 +555,8 @@ begin
         end;
 
       TKey(Sender).IncCounterResponse;
-      if Assigned(FManager.OnStmResponse) then FManager.OnStmResponse (Sender);
-      if Assigned(OnStmResponse) then FOnStmResponse (Self);
+      if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);
+      if Assigned(OnStmResponse) then OnStmResponse (Self);
     end;
 end;
 

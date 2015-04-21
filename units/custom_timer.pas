@@ -27,25 +27,27 @@ unit custom_timer;
 
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils;
+uses LCLIntf, LCLType, Controls, Classes, SysUtils;
 type
 
   { TClockThread }
 
   TClockThread = class(TThread)
   private
+    FRunning: Boolean;
     FTickEvent: PRTLEvent;  //old THandle
     FInterval: longint;     //old cardinal
     FOnTimer:TNotifyEvent;
+    procedure Clock;
   protected
     procedure Execute; override;
   public
     constructor Create(CreateSuspended: Boolean);
     destructor Destroy; override;
-    procedure FinishThreadExecution;
-    procedure Clock;
+
     property Interval : longint read FInterval write FInterval;
     property OnTimer: TNotifyEvent read FOnTimer write FOnTimer;
+    property Running: Boolean read FRunning write FRunning;
   end;
 
 
@@ -58,34 +60,31 @@ begin
   FreeOnTerminate := True;
   FTickEvent := RTLEventCreate; //BasicEventCreate
   FInterval := 100;
-
+  //BasicSetEvent for synchronize threads
+  //RTLeventSetEvent(FTickEvent);   // Here this event must never occur
+  FRunning := True;
   inherited Create(CreateSuspended);
 end;
 
 destructor TClockThread.Destroy;
 begin
   RTLEventDestroy(FTickEvent); //BasicEventDestroy
-  inherited;
-end;
-
-procedure TClockThread.Execute;
-begin
-  while (not Terminated) do
-  begin
-      Synchronize(@Clock);
-      RTLeventWaitFor(FTickEvent, Interval); //BasicEventWaitFor
-    end;
-end;
-
-procedure TClockThread.FinishThreadExecution;
-begin
-  Terminate;
-  RTLeventSetEvent(FTickEvent);  //BasicSetEvent
+  inherited Destroy;
 end;
 
 procedure TClockThread.Clock;
 begin
-  if Assigned(OnTimer) then Ontimer(Self);
+  if Assigned(FOnTimer) then FOnTimer(Self)
+  else FRunning := False;
+end;
+
+procedure TClockThread.Execute;
+begin
+  while (not Terminated) and Running do
+  begin
+    RTLeventWaitFor(FTickEvent, Interval); //BasicEventWaitFor
+    Synchronize(@Clock);
+  end;
 end;
 
 end.

@@ -44,4 +44,3 @@ tests/zmq_subscriber/*.rst
 tests/zmq_subscriber/zmq_subscriber
 tests/zmq_subscriber/*.sublime-project
 tests/zmq_subscriber/*.sublime-workspace
-

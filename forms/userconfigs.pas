@@ -29,13 +29,17 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls, types,
   StdCtrls, ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons
 
-, bass_player
+{$ifdef DEBUG}
+, debug_logger
+{$endif}
 , draw_methods
-, regdata
+, bass_player
+, client
 , session
 , session_config
 , countermanager
 , escriba
+, regdata
 , constants
 ;
 
@@ -44,25 +48,33 @@ type
   { TUserConfig }
 
   TUserConfig = class(TForm)
+    btnFillCondition: TButton;
     btnRun: TButton;
     btnRandomize: TButton;
     btnSave: TButton;
     btnNextStimuli: TButton;
     btnNextGeneral: TButton;
     btnNextTrials: TButton;
+    btnClientTest: TButton;
+    btnTargetFile: TButton;
+    btnContentFile: TButton;
+    btnApply: TButton;
+    btnExportStimulus: TButton;
     cbShowRepetitions: TCheckBox;
-    chkUseMedia: TCheckBox;
-    btnFillType: TButton;
+    btnGridType: TButton;
     chkPlayOnSecondMonitor: TCheckBox;
+    edtTarget: TEdit;
+    edtContent: TEdit;
     gbRepetitions: TGroupBox;
-    Image1: TImage;
-    Image2: TImage;
+    leServerAddress: TLabeledEdit;
     lblITI: TLabel;
-    lblmilisec: TLabel;
     leParticipant: TLabeledEdit;
-    leSchedule: TLabeledEdit;
+    leFillValue: TLabeledEdit;
     leSessionName: TLabeledEdit;
     Memo1: TMemo;
+    piFillEven: TMenuItem;
+    piFillOdd: TMenuItem;
+    piFillAll: TMenuItem;
     piMatrix: TMenuItem;
     piAxes: TMenuItem;
     OpenDialog1: TOpenDialog;
@@ -70,49 +82,60 @@ type
     piExpectedResponse: TMenuItem;
     OpenPictureDialog1: TOpenPictureDialog;
     pgRodar: TPageControl;
-    pmRand: TPopupMenu;
-    pmFillType: TPopupMenu;
+    pmRandomize: TPopupMenu;
+    pmGridType: TPopupMenu;
+    pmFillCondition: TPopupMenu;
     SaveDialog1: TSaveDialog;
     seCount: TSpinEdit;
     seITI: TSpinEdit;
     StringGrid1: TStringGrid;
+    tbTools: TTabSheet;
     tbSave: TTabSheet;
     tbGeneral: TTabSheet;
     tbStimuli: TTabSheet;
     tbTrials: TTabSheet;
+    procedure btnApplyClick(Sender: TObject);
     procedure btnCheckClick(Sender: TObject);
-    procedure btnFillTypeClick(Sender: TObject);
+    procedure btnClientTestClick(Sender: TObject);
+    procedure btnExportStimulusClick(Sender: TObject);
+    procedure btnFillConditionClick(Sender: TObject);
+    procedure btnGridTypeClick(Sender: TObject);
     procedure btnNextGeneralClick(Sender: TObject);
     procedure btnNextStimuliClick(Sender: TObject);
     procedure btnNextTrialsClick(Sender: TObject);
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
-
     procedure chkUseMediaChange(Sender: TObject);
 
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure FormPaint(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
     procedure piClick(Sender: TObject);
+    procedure piFillEvenClick(Sender: TObject);
     procedure StringGrid1Click(Sender: TObject);
     procedure StringGrid1ColRowMoved(Sender: TObject; IsColumn: Boolean;
       sIndex, tIndex: Integer);
     procedure StringGrid1DrawCell(Sender: TObject; aCol, aRow: Integer;
       Rect: TRect; aState: TGridDrawState);
+  published
+    procedure btnClick(Sender: TObject);
   private
     FRepetitionMatrix : array of array of boolean;
-    FLastColCheckRepetition : integer;
+    FLastFocusedCol : integer;
     FNumTrials : integer;
     FSession : TSession;
     FManager : TCounterManager;
     FConfigs : TCfgSes;
+    FAudioDevice : TBassAudioDevice;
     FEscriba : TEscriba;
-    procedure RandTrialIndex;
-    procedure ResetRepetionMatrix;
+    FData : TRegData;
+    function MeetCondition(aCol, aRow : integer): boolean;
     procedure CheckRepetitionCol(aCol : integer);
     procedure EndSession(Sender : TObject);
+    procedure RandTrialIndex;
+    procedure ResetRepetionMatrix;
+    procedure DebugStatus(Message: String);
     //SimpleGui : TSimpleGui;
     //FData : TRegData;
     //FConfig : TConfig;
@@ -133,8 +156,8 @@ resourcestring
   rsContingency = 'Contingência';
   rsPositive = 'Positiva';
   rsNegative = 'Negativa';
-  rsDefaultPositiveCsq = 'CSQ+';
-  rsDefaultNegativeCsq = 'CSQ-';
+  rsDefaultPositiveCsq = 'NONE,MISS,HIT,';
+  rsDefaultNegativeCsq = 'NONE,HIT,MISS,';
   rsSize = 'Tamanho';
   rsDefBlc = 'Bloco 1';
   rsEndSession = 'Fim.';
@@ -153,14 +176,6 @@ uses background, userconfigs_trial_mirrored, userconfigs_simple_discrimination_m
 
 { TUserConfig }
 
-procedure TUserConfig.FormPaint(Sender: TObject);
-  //var p1, p2 : TPoint;
-begin
-  //TopBottomLine(Canvas, lblGeneral);
-  //TopBottomLine(Canvas, lblArea);
-  //TopBottomLine(Canvas, lblStimulus);
-end;
-
 
 procedure TUserConfig.ImageDblClick(Sender: TObject);
 begin
@@ -170,12 +185,11 @@ end;
 
 procedure TUserConfig.piClick(Sender: TObject);
 begin
-  if (TMenuItem(Sender) = piAxes) and (btnFillType.Caption <> rsFillTypeAxes) then
+  if (TMenuItem(Sender) = piAxes) and (btnGridType.Caption <> rsFillTypeAxes) then
     begin
-      btnFillType.Caption := rsFillTypeAxes;
-      leSchedule.Text := 'FT 20';
-      StringGrid1.ColCount := 9;
+      btnGridType.Caption := rsFillTypeAxes;
 
+      StringGrid1.ColCount := 9;
       with StringGrid1 do
         begin
           Cells[0, 0] := rsTrials;
@@ -192,10 +206,10 @@ begin
       ResetRepetionMatrix;
     end;
 
-  if (TMenuItem(Sender) = piMatrix) and (btnFillType.Caption <> rsFillTypeMatriz) then
+  if (TMenuItem(Sender) = piMatrix) and (btnGridType.Caption <> rsFillTypeMatriz) then
     begin
-      btnFillType.Caption := rsFillTypeMatriz;
-      leSchedule.Text := 'FRFT 3 40 0 0';
+      btnGridType.Caption := rsFillTypeMatriz;
+
       StringGrid1.ColCount := 4;
       with StringGrid1 do
         begin
@@ -209,25 +223,28 @@ begin
     end;
 
   if TMenuItem(Sender) = piTrials then
-    begin
       btnRandomize.Hint := rsRandomizeTrials;
-    end;
 
   if TMenuItem(Sender) = piExpectedResponse then
-    begin
       btnRandomize.Hint := rsRandomizeResponses;
-    end;
 
   TMenuItem(Sender).Checked := True;
 end;
 
+procedure TUserConfig.piFillEvenClick(Sender: TObject);
+begin
+
+end;
+
+
 procedure TUserConfig.StringGrid1Click(Sender: TObject);
 begin
   //showmessage(inttostr(StringGrid1.Col) + ' ' + inttostr(StringGrid1.Row));
-  if cbShowRepetitions.Checked and (StringGrid1.Col <> 0) then
+  if StringGrid1.Col <> 0 then
     begin
-      FLastColCheckRepetition := StringGrid1.Col;
-      CheckRepetitionCol(StringGrid1.Col);
+      FLastFocusedCol := StringGrid1.Col;
+      leFillValue.EditLabel.Caption := StringGrid1.Cells[StringGrid1.Col,0];
+      if cbShowRepetitions.Checked then CheckRepetitionCol(StringGrid1.Col);
     end;
 end;
 
@@ -237,7 +254,7 @@ begin
   if not IsColumn then
     begin
       ResetRepetionMatrix;
-      if (FLastColCheckRepetition <> -1) and cbShowRepetitions.Checked then CheckRepetitionCol(FLastColCheckRepetition);
+      if (FLastFocusedCol <> -1) and cbShowRepetitions.Checked then CheckRepetitionCol(FLastFocusedCol);
     end;
 end;
 
@@ -280,10 +297,31 @@ begin
   end;
 end;
 
+function TUserConfig.MeetCondition(aCol, aRow : integer): boolean;
+//var
+//  aRowString : string;
+begin
+  //conditions needs aCol;
+  Result := False;
+
+  if piFillAll.Checked then
+    Result := piFillAll.Checked;
+
+  if piFillOdd.Checked then
+    if (StrToIntDef(StringGrid1.Cells[0, aRow], 2) mod 2) <> 0 then
+      Result := piFillOdd.Checked;
+
+  if piFillEven.Checked then
+    if (StrToIntDef(StringGrid1.Cells[0, aRow], 1) mod 2) = 0 then
+      Result := piFillEven.Checked;
+end;
+
 procedure TUserConfig.RandTrialIndex;
-var i, NumTrials, RandLine: integer;
-    InCell : string;
-    StrArray : array of string;
+var
+  i, NumTrials, RandLine: integer;
+  InCell : string;
+  StrArray : array of string;
+
   procedure SaveLine (Line : integer);
   var j : integer;
   begin
@@ -293,6 +331,7 @@ var i, NumTrials, RandLine: integer;
         StrArray[j] := InCell;
       end;
   end;
+
   procedure SendToLine (Line : integer);
   var j : integer;
   begin
@@ -302,6 +341,7 @@ var i, NumTrials, RandLine: integer;
         StringGrid1.Cells[(j), (Line)] := InCell;
       end;
   end;
+
   procedure ChangeLines (New, Old : integer);
   var j : integer;
   begin
@@ -311,6 +351,7 @@ var i, NumTrials, RandLine: integer;
         StringGrid1.Cells[(j), (New)] := InCell;
       end;
   end;
+
 begin
   Randomize;
   SetLength(StrArray, StringGrid1.ColCount);
@@ -344,10 +385,19 @@ begin
   StringGrid1.Invalidate;
 end;
 
+procedure TUserConfig.DebugStatus(Message: String);
+begin
+  ShowMessage(Message);
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'zmq Client said:' + Message);
+  {$endif}
+end;
+
 procedure TUserConfig.CheckRepetitionCol(aCol : integer);
-var aRowCount, aColCount, aRow, i, j,
-    aBeginRow, aEndRow, Count : integer;
-    LastLine, Reset : Boolean;
+var
+  aRowCount, aRow, i,
+  aBeginRow, aEndRow, Count : integer;
+  LastLine, Reset : Boolean;
 
 begin
   Count := 1;
@@ -355,7 +405,6 @@ begin
   LastLine := False;
 
   aRowCount := StringGrid1.RowCount;
-  aColCount := StringGrid1.ColCount;
 
   for aRow := 1 to aRowCount -2 do
     begin
@@ -389,7 +438,13 @@ end;
 
 procedure TUserConfig.EndSession(Sender: TObject);
 begin
-  bkgnd.Free;
+  if Assigned(FSession) then FreeAndNil(FSession);
+  if Assigned(FConfigs) then FreeAndNil(FConfigs);
+  if Assigned(FManager) then FreeAndNil(FManager);
+  //if Assigned(FAudioDevice) then FreeAndNil(FAudioDevice);
+  bkgnd.SetFullScreen(False);
+  bkgnd.Hide;
+  //if Assigned(bkgnd) then FreeAndNil(bkgnd);
   ShowMessage(rsEndSession)
 end;
 
@@ -410,18 +465,293 @@ begin
     end;
 
   ResetRepetionMatrix;
-  if FLastColCheckRepetition <> -1 then CheckRepetitionCol(FLastColCheckRepetition);
+  if FLastFocusedCol <> -1 then CheckRepetitionCol(FLastFocusedCol);
 end;
 
 procedure TUserConfig.btnCheckClick(Sender: TObject);
 begin
-//
+  //
+end;
+
+{
+
+  btnApplyClick may become a class in the near future
+
+}
+
+procedure TUserConfig.btnApplyClick(Sender: TObject);
+var
+
+  i, line,
+  //VirtualTrialValue,
+  NumTrials : integer;
+
+  s1,
+  Content : string;
+
+  NewFile,
+  Sections : TStringList;
+
+  IniTarget,
+  IniContent : TCIniFile;
+
+  {.
+   .
+   . For Bloc Sections first parameter is ignored, ex.:
+   .
+   . GetSection(0, 1, False); // Bloc 1
+   .
+   . For Trial Sections you can choose to pass the iBloc parameter or not, ex.:
+   .
+   . GetSection(1); // Trial 1, Bloc 1
+   . GetSection(1, 2); // Trial 1, Bloc 2
+   .
+   .}
+  function GetSection(iTrial: integer; iBloc : integer = 1; Trial : Boolean = True) : string;
+  var EndStr, Separator : string;
+  begin
+
+    Separator := #32 + '-' + #32;
+    EndStr := ']';
+
+    if Trial then
+      Result := '[Blc ' + IntToStr(iBloc) + Separator + 'T' + IntToStr(iTrial) + EndStr
+    else
+      Result := '[Blc ' + IntToStr(iBloc) + EndStr;
+  end;
+
+  function IncSection(aSection : string; iBloc : integer = 1; Trial : Boolean = True) : string;
+  var BeginStr, EndStr, Separator : string;
+    i : integer;
+  begin
+    Separator := #32 + '-' + #32;
+    if Trial then
+      BeginStr := '[Blc ' + IntToStr(iBloc) + Separator + 'T'
+    else
+      BeginStr := '[Blc ';
+    EndStr := ']';
+
+	  Delete(  aSection, Pos(BeginStr, aSection), Length(BeginStr)  );
+	  Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
+
+    i := StrToInt(aSection);
+    Inc(i);
+    Result := BeginStr + IntToStr(i) + EndStr;
+  end;
+
+
+  {
+  .
+  . If aSection is a Trial then Result is the trial number else Result is 0.
+  .
+  .}
+  function IsTrialSection(aSection : string) : integer;
+  var BeginStr, EndStr, Separator, iBloc : string;
+  begin
+    if Pos('T', aSection) <> 0 then
+      begin
+        Separator := #32 + '-' + #32;
+        iBloc := Copy(aSection, Pos('Blc', aSection) + 4, 1);
+        BeginStr := '[Blc ' + iBloc + Separator + 'T';
+        EndStr := ']';
+
+        Delete(  aSection, Pos(BeginStr, aSection), Length(BeginStr)  );
+        Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
+
+        Result := StrToInt(aSection);
+      end
+    else Result := 0;
+  end;
+
+begin
+  if FileExistsUTF8(edtTarget.Text) and FileExistsUTF8(edtContent.Text) then
+    begin
+
+      // initialize  string lists
+      NewFile := TStringList.Create;
+      NewFile.Duplicates := dupIgnore;
+
+      Sections := TStringList.Create;
+      Sections.Duplicates := dupIgnore;
+      try
+        Sections.LoadFromFile(edtTarget.Text);
+
+        // get content
+        IniContent := TCIniFile.Create(edtContent.Text);
+        try
+          IniContent.ReadSectionRaw('Trial', Sections);
+          Content := Sections.Text;
+        finally
+          IniContent.Free;
+        end;
+
+        // get target
+        IniTarget := TCIniFile.Create(edtTarget.Text);
+        try
+          // get sections
+          // Sections.Clear;
+          // IniTarget.ReadSections(Sections);
+
+          i := 1;
+          // get old number of trials
+          s1:= IniTarget.ReadString('Blc' + #32 + IntToStr(i), 'NumTrials', '0 0') + #32;
+          NumTrials:= StrToIntDef(Copy(s1, 0, Pos(#32, s1) - 1), 0);
+          //showmessage(inttostr(numtrials));
+
+          // get old virtual trial value
+          //Delete(s1, 1, Pos(#32, s1));
+          //if Length(s1) > 0 then while s1[1] = #32 do Delete(s1, 1, 1);
+          //VirtualTrialValue:= StrToIntDef(s1, 0);
+
+          // Update the NumTrial key
+          Inc(NumTrials);
+
+          //for this method we must have made a copy first
+          //IniTarget.WriteString(GetSection(0,1, False), 'NumTrials', IntToStr(NumTrials) + #32 + IntToStr(VirtualTrialValue) );
+          //IniTarget.UpdateFile;
+
+
+          // this method does not work with multiple blocs
+          // load/copy target stream
+          NewFile.LoadFromFile(edtTarget.Text);
+          i := NewFile.IndexOf('NumTrials=');
+
+          for i := 0 to NewFile.Count -1 do
+            begin
+              if Pos('NumTrials', NewFile.Strings[i]) <> 0 then Break;
+            end;
+
+          NewFile.Strings[i] := 'NumTrials=' + #9 + IntToStr(NumTrials) + #32 + '0';
+
+          //ShowMessage(NewFile.Strings[i]);
+
+        finally
+          IniTarget.Free;
+        end;
+        // insert the content before the first trial
+        s1 := NewFile.Text;
+        Insert(GetSection(0) + #13#10 + Content + #13#10, s1, Pos(GetSection(1), NewFile.Text));
+        NewFile.Text := s1;
+        // loop incrementing trial section numbers
+        for i := 0 to NumTrials -1 do
+          begin
+
+            // Make i + 1 turns to 0
+            line := NewFile.IndexOf(GetSection(i + 1));
+            if line <> -1 then
+              begin
+                NewFile[line] := GetSection(0);
+              end;
+
+            // Inc i
+            line := NewFile.IndexOf(GetSection(0));
+            NewFile[line] := GetSection(i + 1);
+          end;
+
+         NewFile.SaveToFile(edtTarget.Text + '.new');
+
+      finally
+        NewFile.Free;
+        Sections.Free;
+      end;
+    end;
+end;
+
+procedure TUserConfig.btnClientTestClick(Sender: TObject);
+var
+  Filename : UTF8String;
+  Client : TClientThread;
+begin
+
+  if not Assigned(FData) then
+    begin
+      Filename := GetCurrentDirUTF8 + '/Test_000.timestamps';
+      FData := TRegData.Create(Self, Filename);
+      Sleep(2000);
+    end;
+
+  Client := TClientThread.Create( -1, 'The Client is Working');
+  Client.OnShowStatus := @DebugStatus;
+  Client.ServerAddress := leServerAddress.Text;
+
+  {$ifdef DEBUG}
+  try
+  {$endif}
+    Client.Start;
+  {$ifdef DEBUG}
+  except
+    on E:exception do
+      begin
+        DebugLn(mt_Exception + E.Message );
+      end;
+  end;
+  {$endif}
+  Sleep (1000);
+end;
+
+procedure TUserConfig.btnExportStimulusClick(Sender: TObject);
+var
+    Bitmap : TBitmap;
+
+    procedure DoWhiteBackGround;
+    begin
+      with Bitmap do
+        begin
+          Canvas.Brush.Color := clWhite;
+          Canvas.Pen.Mode := pmWhite;
+          Canvas.Pen.Color := clWhite;
+          Canvas.Rectangle(0,0,Width, Height);
+        end;
+    end;
+
+begin
+  if SaveDialog1.Execute then
+    begin
+
+      // create a bitmap to draw
+      Bitmap := TBitmap.Create;
+      with Bitmap do
+        try
+          begin
+            // give it a size
+            Width := 500;
+            Height := 500;
+
+            DoWhiteBackGround;
+            DrawCircle(Canvas, 0, 0, Width, False, 0, 0);
+            SaveToFile(SaveDialog1.FileName + '_1.bmp');
+
+            DoWhiteBackGround;
+            DrawCircle(Canvas, 0, 0, Width, True, 0, 360);
+            SaveToFile(SaveDialog1.FileName + '_2.bmp');
+
+            DoWhiteBackGround;
+            DrawCircle(Canvas, 0, 0, Width, True, 45, 1);
+            SaveToFile(SaveDialog1.FileName + '_3.bmp');
+          end;
+
+        finally
+          Bitmap.Free;
+        end;
+    end;
+end;
+
+procedure TUserConfig.btnFillConditionClick(Sender: TObject);
+var
+    aRow,
+    aRowCount : integer;
+
+begin
+  if (FLastFocusedCol <> -1) and (FLastFocusedCol <> 0) then
+    begin
+      aRowCount := StringGrid1.RowCount;
+      for aRow := 1 to aRowCount -1 do
+        if MeetCondition(FLastFocusedCol, aRow) then StringGrid1.Cells[FLastFocusedCol, aRow] := leFillValue.Text;
+    end;
 end;
 
 procedure TUserConfig.btnNextGeneralClick(Sender: TObject);
 begin
-  //FEscriba.Name := leSessionName.Text;
-
   pgRodar.TabIndex := 1;
 end;
 
@@ -432,7 +762,7 @@ end;
 
 procedure TUserConfig.btnNextTrialsClick(Sender: TObject);
 var
-  aTrial, aStm, aBlc, aCol, NumTrials : integer;
+  aTrial, aStm, aBlc, NumTrials : integer;
   aHStm : integer;
   aValues : string;
 
@@ -508,7 +838,8 @@ begin
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          //FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(False, '1','0');
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[8, aTrial + 1];
@@ -557,7 +888,8 @@ begin
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          //FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
+          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(False, '1','0');
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
           FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ExpectedResponse] := StringGrid1.Cells[2, aTrial + 1];
@@ -592,12 +924,13 @@ end;
 
 procedure TUserConfig.chkUseMediaChange(Sender: TObject);
 begin
-  Image1.Visible := chkUseMedia.Checked;
-  Image2.Visible := chkUseMedia.Checked
+  //GUI to select custom images from media files was not implemented yet
+  //Image1.Visible := chkUseMedia.Checked;
+  //Image2.Visible := chkUseMedia.Checked
 end;
 
 
-procedure TUserConfig.btnFillTypeClick(Sender: TObject);
+procedure TUserConfig.btnGridTypeClick(Sender: TObject);
 var
   aRow, aCol, aNode, aTrial, aAxis : integer;
   cAngle,              //Angle
@@ -617,7 +950,7 @@ var
 
     with StringGrid1 do
       begin
-        if (aRow +1) > RowCount then RowCount := aRow +1;
+        if (aRow +1) > RowCount then RowCount := aRow + 1;
         Cells[0, aRow] := IntToStr(aRow);    //Trial Number
         Cells[1, aRow] := cAngle;
         Cells[2, aRow] := cX0;
@@ -626,7 +959,7 @@ var
         Cells[5, aRow] := cY1;
         Cells[6, aRow] := IntToStr(Round(Random * 1));
         Cells[7, aRow] := cSize;
-        Cells[8, aRow] := leSchedule.Text;
+        Cells[8, aRow] := 'FT 20';
         Inc(aRow);
         end;
   end;
@@ -652,7 +985,7 @@ var
       begin
         if (aRow + 1) > RowCount then RowCount := aRow + 1;
         Cells[0, aRow] := IntToStr(aRow);    //Trial Number
-        Cells[1, aRow] := leSchedule.Text;
+        Cells[1, aRow] := 'FRFT 3 40 0 0';
         Cells[2, aRow] := aContingency;
         Cells[3, aRow] := aConsequence;
         aCol := 4;
@@ -699,12 +1032,12 @@ begin
               cAngle := List[aAxis].Angle;
               cSize := IntToStr(List[aAxis].Size);
               for aNode := Low(List[aAxis].Line) to High(List[aAxis].Line) do
-                for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] -1 do AddAxesToGrid;
+                for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] - 1 do AddAxesToGrid;
             end;
-        FNumTrials := aRow -1;
+        FNumTrials := aRow - 1;
         BresenhamLineForm.Free;
         ResetRepetionMatrix;
-        FLastColCheckRepetition := -1;
+        FLastFocusedCol := -1;
       end;
   end;
 
@@ -720,16 +1053,15 @@ begin
             FNumTrials := aRow - 1;
             MatrixForm.Free;
             ResetRepetionMatrix;
-            FLastColCheckRepetition := -1;
+            FLastFocusedCol := -1;
           end;
     end;
 end;
 
 procedure TUserConfig.FormCreate(Sender: TObject);
-var aRowCount, aColCount, i,j : integer;
 begin
   Randomize;
-  FLastColCheckRepetition := -1;
+  FLastFocusedCol := -1;
   StringGrid1.ColCount := 9;
   Caption := Application.Title + ' - ' + 'cpicanco@ufpa.br';
 
@@ -744,8 +1076,8 @@ begin
       Cells[6, 0] := rsExpectedResponse;
       Cells[7, 0] := rsSize;
       Cells[8, 0] := rsSchedule;
-      aRowCount := RowCount;
-      aColCount := ColCount;
+      //aRowCount := RowCount;
+      //aColCount := ColCount;
     end;
 
   ResetRepetionMatrix;
@@ -776,7 +1108,8 @@ begin
 
   if OpenDialog1.Execute then
     begin
-      bkgnd := Tbkgnd.Create(Application);
+      if not Assigned(bkgnd) then
+        bkgnd := Tbkgnd.Create(Application);
       with bkgnd do
         begin
           if chkPlayOnSecondMonitor.Checked then Left := Screen.Width + 1;
@@ -784,19 +1117,22 @@ begin
           SetFullScreen(True);
         end;
 
-      FConfigs := TCfgSes.Create(bkgnd);
+      FConfigs := TCfgSes.Create(nil);
       FConfigs.LoadFromFile(OpenDialog1.Filename, False);
 
-      FManager := TCounterManager.Create(bkgnd);
+      FManager := TCounterManager.Create(nil);
+      if not Assigned(FAudioDevice) then FAudioDevice := TBassAudioDevice.Create(WindowHandle);
 
-      FSession := TSession.Create(bkgnd);
-      FSession.BackGround := bkgnd;
+      FSession := TSession.Create(nil);
       FSession.OnEndSess:= @EndSession;
+      FSession.AudioDevice := FAudioDevice;
+      FSession.BackGround := bkgnd;
+
       FSession.SessName := FConfigs.Name;
       FSession.SubjName := FConfigs.Subject;
-      FSession.TestMode := False;
       FSession.ShowCounter := False;
-      FSession.AudioDevice := TBassAudioDevice.Create(WindowHandle);
+      FSession.ServerAddress := leServerAddress.Text;
+      FSession.TestMode := False;
 
       FSession.Play(FConfigs, FManager, aDataName);
     end;
@@ -812,6 +1148,18 @@ begin
 
   if SaveDialog1.Execute then
     FEscriba.SaveMemoTextToTxt(SaveDialog1.FileName);
+end;
+
+procedure TUserConfig.btnClick(Sender: TObject);
+begin
+  OpenDialog1.InitialDir := GetCurrentDirUTF8;
+  if OpenDialog1.Execute then
+    begin
+      if Sender = btnTargetFile then
+        edtTarget.Text := OpenDialog1.FileName;
+      if Sender = btnContentFile then
+        edtContent.Text := OpenDialog1.FileName;;
+    end;
 end;
 
 end.

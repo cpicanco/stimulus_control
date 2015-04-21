@@ -23,17 +23,27 @@ unit trial_mirrored_stm;
 
 {$mode objfpc}{$H+}
 
-//{$MODE Delphi}
-
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils,
-     counter,
-     dialogs,
-     session_config,
-     countermanager,
-     trial_abstract, custom_timer, constants, client,
-     draw_methods, schedules_abstract, response_key;
+uses
+
+  LCLIntf, LCLType, Controls, Classes, SysUtils
+
+  //, counter
+  //, countermanager
+  //, client
+
+  {$ifdef DEBUG}
+  , debug_logger
+  , dialogs
+  {$endif}
+  , session_config
+  , trial_abstract
+  , constants
+  , draw_methods
+  , schedules_abstract
+  , response_key
+  ;
 
 type
 
@@ -56,11 +66,7 @@ type
     FUseMedia : Boolean;
     FShowStarter : Boolean;
     FCanResponse : Boolean;
-    FClockThread : TClockThread;
-    FClientThread : TClientThread;
-    FList : TStringList;
-    procedure CreateClientThread(Code : string);
-    procedure DebugStatus(msg : string);
+    //FList : TStringList;
   protected
     procedure BeginCorrection (Sender : TObject);
     procedure EndCorrection (Sender : TObject);
@@ -69,8 +75,8 @@ type
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
-    procedure TimerClockTimer(Sender: TObject);
-    procedure StartTrial;
+    procedure ThreadClock(Sender: TObject); override;
+    procedure StartTrial(Sender: TObject); override;
     procedure BeginStarter;
     procedure EndTrial(Sender: TObject);
     procedure WriteData(Sender: TObject); override;
@@ -83,9 +89,7 @@ type
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy;override;
-
-    procedure Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(TestMode: Boolean; Correction : Boolean); override;
 
   end;
 
@@ -95,118 +99,134 @@ implementation
 constructor TMRD.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FHeader := '___Angle' + #9 +
+  Header :=  'StmBegin' + #9 +
+             '_Latency' + #9 +
+             '__StmEnd' + #9 +
+             '___Angle' + #9 +
              '______X1' + #9 +
              '______Y1' + #9 +
              '______X2' + #9 +
              '______Y2' + #9 +
              'ExpcResp' + #9 +
-             'RespFreq' + #9 +
-             'StmBegin' + #9 +
-             '_Latency' + #9 +
-             '__StmEnd'
-             //'__DBegin' + #9 +
-             //'DLatency' + #9 +
-             //'ITIBEGIN' + #9 +
-             //'_ITI_END' + #9 +
-             //'' + #9 +
-
+             'RespFreq'
              ;
   FDataSupport.Responses:= 0;
 end;
 
-destructor TMRD.Destroy;
-begin
-  //do something
-  FClockThread.FinishThreadExecution;
-  inherited Destroy;
-end;
 
 procedure TMRD.BeginCorrection(Sender: TObject);
 begin
-  if Assigned (OnBeginCorrection) then FOnBeginCorrection (Sender);
+  if Assigned (OnBeginCorrection) then OnBeginCorrection (Sender);
 end;
 
 procedure TMRD.EndCorrection(Sender: TObject);
 begin
-  if Assigned (OnEndCorrection) then FOnEndCorrection (Sender);
+  if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
 end;
 
 procedure TMRD.Consequence(Sender: TObject);
 begin
   if FCanResponse then
     begin
-      CreateClientThread('Consequence');
+      CreateClientThread('C:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+
       FCanResponse:= False;
       //FDataSupport.StmDuration := GetTickCount;
 
-      //FResult := 'HIT';
-      //FResult := 'MISS';
-      FResult := 'NONE';
+      Result := 'HIT';
+      //Result := 'MISS';
+      //Result := 'NONE';
 
-      if FCircles.NextTrial = T_CRT then FNextTrial := T_CRT
-      else FNextTrial := FCircles.NextTrial;
+      FCircles.Result := Result;
+      IETConsequence := 'NONE';
+
+      if FCircles.NextTrial = T_CRT then NextTrial := T_CRT
+      else NextTrial := FCircles.NextTrial;
 
       //Dispenser(FDataCsq, FDataUsb);
-      //if FResult = 'HIT' then  Hit(Sender);
-      //if FResult = 'MISS' then  Miss(Sender);
-      if FResult = 'NONE' then  None(Sender);
+      if Result = 'HIT' then  Hit(Sender);
+      //if Result = 'MISS' then  Miss(Sender);
+      //if Result = 'NONE' then  None(Sender);
 
     EndTrial(Sender);
     end;
 end;
 
-procedure TMRD.TimerClockTimer(Sender: TObject);
+procedure TMRD.ThreadClock(Sender: TObject);
 begin
   if FUseMedia then
     begin
-      FKey1.SchMan.Clock;
-      FKey2.SchMan.Clock
+      //FKey1.SchMan.Clock;
+      //FKey2.SchMan.Clock
     end
-  else FSchedule.Clock;
+  else if Visible then FSchedule.Clock;
 end;
 
 procedure TMRD.KeyDown(var Key: Word; Shift: TShiftState);
 begin
-  inherited KeyDown (Key, Shift);
-  if Key = 27 {ESC} then FCanResponse:= False;
-  Invalidate;
+  //inherited KeyDown (Key, Shift);
+
+  if (Key = 27 {ESC}) and (FCanResponse = True) then
+    begin
+      FCanResponse:= False;
+      Invalidate;
+    end;
+
+  if ssCtrl in Shift then
+     begin
+       if Key = 81 {q} then
+         begin
+           Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
+           Result := 'NONE';
+           IETConsequence := 'NONE';
+           NextTrial := 'END';
+           None(Self);
+           EndTrial(Self);
+         end;
+     end;
 end;
 
 procedure TMRD.KeyUp(var Key: Word; Shift: TShiftState);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   inherited KeyUp(Key, Shift);
-  if Key = 27 {ESC} then FCanResponse:= True;
-  Invalidate;
+  if Key = 27 {ESC} then
+    begin
+      FCanResponse:= True;
+      Invalidate;
+    end;
+
+  if FCanResponse then
+    begin
+      if FShowStarter then
+        begin
+          if key = 32 then
+            begin
+              //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
+              FDataSupport.Latency := TickCount;
+              CreateClientThread('*R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+              FShowStarter := False;
+              Invalidate;
+              StartTrial(Self);
+            end;
+        end
+      else CreateClientThread('R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+    end;
 end;
 
 procedure TMRD.KeyPress(var Key: Char);
 begin
   inherited KeyPress(Key);
-  if FCanResponse then
-    begin
-      if FShowStarter then
-        begin
-          if (key in [#32]) then
-            begin
-              //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
-              FDataSupport.Latency := GetTickCount;
-              CreateClientThread('*R:' + IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Date) + #32 +
-                                  IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Time));
-              FShowStarter := False;
-              Invalidate;
-              StartTrial;
-            end;
-        end
-      else CreateClientThread('R:' + IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Date) + #32 +
-                                  IntToStr(TTimeStamp(DateTimeToTimeStamp(Now)).Time));
-    end;
+  // do nothing
 
 end;
 
 procedure TMRD.Paint;
-var i : integer;
+//var i : integer;
 begin
+  inherited Paint;
+
   if FCanResponse then
     begin
       if FShowStarter then
@@ -226,9 +246,9 @@ begin
     end;
 end;
 
-procedure TMRD.Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean);
+procedure TMRD.Play(TestMode: Boolean; Correction : Boolean);
 var
-  s1, sName, sLoop, sColor, sGap, sGapDegree, sGapLength : string;
+  s1, sName, sLoop, sColor{, sGap, sGapDegree, sGapLength} : string;
   R : TRect;
   a1 : Integer;
 
@@ -246,25 +266,24 @@ var
         Color := StrToIntDef(sColor, $0000FF {clRed} );
         HowManyLoops:= StrToIntDef(sLoop, 0);
         FullPath:= sName;
-        SchMan.Kind:= FCfgTrial.SList.Values[_Schedule];
+        SchMan.Kind:= CfgTrial.SList.Values[_Schedule];
         //Visible := False;
       end;
   end;
 
 begin
   FCanResponse:= False;
-  FNextTrial:= '-1';
-  FManager := Manager;
+  NextTrial := '-1';
   Randomize;
 
 
-  FUseMedia := StrToBoolDef(FCfgTrial.SList.Values[_UseMedia], False);
+  FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
 
-  FShowStarter := StrToBoolDef(FCfgTrial.SList.Values[_ShowStarter], False);
+  FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
   //FStarterSchedule :=  necessary?
 
   if FUseMedia then
-    FRootMedia := FCfgTrial.SList.Values[_RootMedia]
+    RootMedia := CfgTrial.SList.Values[_RootMedia]
   else
     begin
       SetLength(FCircles.C, 2);
@@ -274,26 +293,25 @@ begin
   else FIsCorrection := False;
 
   //self descends TCustomControl
-  Color:= StrToIntDef(FCfgTrial.SList.Values[_BkGnd], 0);
+  Color:= StrToIntDef(CfgTrial.SList.Values[_BkGnd], 0);
   if TestMode then Cursor:= 0
-  else Cursor:= StrToIntDef(FCfgTrial.SList.Values[_Cursor], 0);
+  else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
 
   FSchedule := TSchMan.Create(self);
   with FSchedule do
     begin
-      //OnConsequence2 := @Consequence2;
       OnConsequence:= @Consequence;
       OnResponse:= @Response;
     end;
 
-  FCircles.angle := StrToFloatDef(FCfgTrial.SList.Values[_Angle], 0.0);
-  FCircles.response := FCfgTrial.SList.Values[_Comp + '1' + _cGap];
-  FCircles.NextTrial := FCfgTrial.SList.Values[_NextTrial];
-  FSchedule.Kind:= FCfgTrial.SList.Values[_Schedule];
+  FCircles.angle := StrToFloatDef(CfgTrial.SList.Values[_Angle], 0.0);
+  FCircles.response := CfgTrial.SList.Values[_Comp + '1' + _cGap];
+  FCircles.NextTrial := CfgTrial.SList.Values[_NextTrial];
+  FSchedule.Kind:= CfgTrial.SList.Values[_Schedule];
 
   for a1 := 0 to 1 do
     begin
-        s1:= FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
+        s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
 
         R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
         NextSpaceDelimitedParameter;
@@ -306,7 +324,7 @@ begin
 
        if FUseMedia then
          begin
-           s1:= FCfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
+           s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
 
            sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
            NextSpaceDelimitedParameter;
@@ -324,20 +342,22 @@ begin
             begin
               o := Point(R.Left, R.Top);
               size := R.Right;
-              gap := StrToBoolDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
+              gap := StrToBoolDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
               if gap then
                   begin
-                    gap_degree := StrToIntDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
-                    gap_length := StrToIntDef( FCfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
+                    gap_degree := StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
+                    gap_length := StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
                   end;
             end;
       end;
-  if FShowStarter then BeginStarter else StartTrial;
-  //showmessage(BoolToStr(FShowStarter));
+  if FShowStarter then BeginStarter else StartTrial(Self);
+
+  {$ifdef DEBUG}
+  DebugLn(mt_Information + 'Starter:' + BoolToStr(FShowStarter));
+  {$endif}
 end;
 
-procedure TMRD.StartTrial;
-var a1 : integer;
+procedure TMRD.StartTrial(Sender: TObject);
 
   procedure KeyStart(var aKey : TKey);
   begin
@@ -346,6 +366,8 @@ var a1 : integer;
   end;
 
 begin
+  inherited StartTrial(Sender);
+
   if FIsCorrection then
     begin
       BeginCorrection (Self);
@@ -360,13 +382,11 @@ begin
   FFirstResp := True;
   FCanResponse:= True;
   FDataSupport.StmBegin := GetTickCount;
-  FClockThread := TClockThread.Create(False);
-  FClockThread.OnTimer := @TimerClockTimer;
 end;
 
 procedure TMRD.BeginStarter;
 begin
-  CreateClientThread('BeginStarter');
+  CreateClientThread('S:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
   FCanResponse:= True;
   Invalidate;
 end;
@@ -374,22 +394,35 @@ end;
 procedure TMRD.WriteData(Sender: TObject);  //
 begin
 
-  FData := //Format('%-*.*d', [4,8,FCfgTrial.Id + 1]) + #9 +
+  {
+  Header :=  'StmBegin' + #9 +
+             '_Latency' + #9 +
+             '__StmEnd' + #9 +
+             '___Angle' + #9 +
+             '______X1' + #9 +
+             '______Y1' + #9 +
+             '______X2' + #9 +
+             '______Y2' + #9 +
+             'ExpcResp' + #9 +
+             'RespFreq'
+             ;
+  }
+  Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
+           FormatFloat('00000000;;00000000',FDataSupport.StmBegin - TimeStart) + #9 +
+           FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart) + #9 +
+           FormatFloat('00000000;;00000000',FDataSupport.StmEnd - TimeStart) + #9 +
            #32#32#32#32#32 + FormatFloat('000;;00', FCircles.angle) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[0].o.X]) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[0].o.Y]) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[1].o.X]) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[1].o.Y]) + #9 +
            #32#32#32#32#32#32#32 + FCircles.response + #9 +
-           Format('%-*.*d', [4,8,FDataSupport.Responses]) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.StmBegin - TimeStart) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.StmEnd - TimeStart)
+           Format('%-*.*d', [4,8,FDataSupport.Responses])
            //FormatFloat('00000000;;00000000',FData.LatencyStmResponse) + #9 +
            //FormatFloat('00000000;;00000000',FData.ITIBEGIN) + #9 +
            //FormatFloat('00000000;;00000000',FData.ITIEND) + #9 +
            //'' + #9 +
-           ;
+           + Data;
 end;
 
 procedure TMRD.SetTimerCsq;
@@ -401,45 +434,36 @@ procedure TMRD.EndTrial(Sender: TObject);
 begin
   FDataSupport.StmEnd := GetTickCount;
   WriteData(Sender);
-  FManager.OnConsequence(Self);
-  if Assigned(OnWriteTrialData) then FOnWriteTrialData (Self);
-  if Assigned(OnEndTrial) then FOnEndTrial(sender);
+  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+  if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
+  if Assigned(OnEndTrial) then OnEndTrial(Sender);
 end;
 
 procedure TMRD.Hit(Sender: TObject);
 begin
-  if Assigned(OnHit) then FOnHit(Sender);
+  if Assigned(OnHit) then OnHit(Sender);
 end;
 
 procedure TMRD.Miss(Sender: TObject);
 begin
-  if Assigned(OnMiss) then FOnMiss (Sender);
+  if Assigned(OnMiss) then OnMiss (Sender);
 end;
 
 
 procedure TMRD.None(Sender: TObject);
 begin
-  if Assigned(OnNone) then FOnNone (Sender);
-end;
-
-procedure TMRD.CreateClientThread(Code: string);
-begin
-  FClientThread := TClientThread.Create( True, FCfgTrial.Id, Code, FileName );
-  FClientThread.OnShowStatus := @DebugStatus;
-  FClientThread.Start;
-end;
-
-procedure TMRD.DebugStatus(msg: string);
-begin
-
+  if Assigned(OnNone) then OnNone (Sender);
 end;
 
 procedure TMRD.Response(Sender: TObject);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   Inc(FDataSupport.Responses);
+
   if FFirstResp then
     begin
-      FDataSupport.Latency := GetTickCount;
+      FDataSupport.Latency := TickCount;
       FFirstResp := False;
     end
   else;
@@ -449,8 +473,8 @@ begin
       else;
 
   Invalidate;
-  if Assigned(FManager.OnStmResponse) then FManager.OnStmResponse (Sender);
-  if Assigned(OnStmResponse) then FOnStmResponse (Self);
+  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);
+  if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
 
 end.

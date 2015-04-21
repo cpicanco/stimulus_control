@@ -27,8 +27,8 @@ unit response_key;  // media_key may be a good name
 interface
 
 uses Dialogs,
-     LCLIntf, LCLType, LMessages, Messages, SysUtils, Variants, Classes,
-     Graphics, Controls, Forms, StdCtrls, ExtCtrls, FileUtil,
+     LCLIntf, LCLType, {LMessages,} SysUtils, Variants, Classes,
+     Graphics, Controls, Forms, ExtCtrls, FileUtil,
      bass_player,
      schedules_abstract,
      counter
@@ -45,9 +45,12 @@ type
     stmImage : TImage;
   end;
 
+  { TKey }
+
   TKey = class(TCustomControl)
   private
     FAudioChannel : TBassChannel;
+    FKeyPress: TNotifyEvent;
     FSchMan: TSchMan;
     FCounterResponse : TCounter;
     FOnConsequence: TNotifyEvent;
@@ -70,6 +73,7 @@ type
     procedure Response (Sender: TObject);
     //procedure CMMouseEnter(var msg: TMessage); message CM_MOUSEENTER;
     //procedure CMMouseLeave(var msg: TMessage); message CM_MOUSELEAVE;
+  protected
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); overload; override;
     procedure MouseDown(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);reintroduce; overload;
     procedure MouseDown(Sender : TObject; Button: Smallint; ShiftState: Smallint; X: Integer; Y: Integer); reintroduce; overload;
@@ -97,6 +101,7 @@ type
     property OnMouseDown;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnKeyPress: TNotifyEvent read FKeyPress write FKeyPress;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnConsequence2: TNotifyEvent read FOnConsequence2 write FOnConsequence2;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
@@ -111,7 +116,7 @@ constructor TKey.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   Height:= 45;
-  Width:= 60;
+  Width:= 45;
   EditMode := False;
   FLRespPnt[0] := 0;
   FLRespPnt[1] := 0;
@@ -200,7 +205,7 @@ begin
     end
   else
     begin
-      PaintKey(Color);
+      if Color <> -1 then PaintKey(Color);
     end;
 end;
 
@@ -227,7 +232,7 @@ begin
     end;}
 end;
 
-procedure TKey.SetFileName(Path: String);                 //REVISAR
+procedure TKey.SetFileName(Path: string);                 //REVISAR
 var
     s1, s2 : String;
 

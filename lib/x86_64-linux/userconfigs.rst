@@ -35,12 +35,12 @@ userconfigs.rspositive='Positiva'
 userconfigs.rsnegative='Negativa'
 
 
-# hash value = 297019
-userconfigs.rsdefaultpositivecsq='CSQ+'
+# hash value = 210295484
+userconfigs.rsdefaultpositivecsq='NONE,MISS,HIT,'
 
 
-# hash value = 297021
-userconfigs.rsdefaultnegativecsq='CSQ-'
+# hash value = 54124940
+userconfigs.rsdefaultnegativecsq='NONE,HIT,MISS,'
 
 
 # hash value = 176391359

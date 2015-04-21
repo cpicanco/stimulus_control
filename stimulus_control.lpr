@@ -24,52 +24,64 @@ program stimulus_control;
 {$mode objfpc}{$H+}
 
 uses
+
   {$IFDEF UNIX}
     {$IFDEF UseCThreads}
-      cthreads,
-      cmem,
+      cthreads
+    , cmem
     {$ENDIF}
-  //heaptrc,
+  //, heaptrc
   {$ENDIF}
-  Interfaces, // this includes the LCL widgetset
-  Forms,
+  , Interfaces // this includes the LCL widgetset
+  , Forms
 
   //Forms
-  userconfigs,
-  userconfigs_trial_mirrored,
-  userconfigs_get_matrix,
-  userconfigs_simple_discrimination_matrix,
-  background,
+  , userconfigs
+  , userconfigs_trial_mirrored
+  , userconfigs_get_matrix
+  , userconfigs_simple_discrimination_matrix
+  , background
 
   //units
-  client,
-  criatore,
-  escriba,
-  custom_timer,
-  regdata,
-  constants,
-  counter,
-  countermanager,
+  , client
+  , criatore
+  , escriba
+  , custom_timer
+  , regdata
+  , constants
+  , counter
+  , countermanager
 
   // Responses, Schedules of Reinforcement, Stimuli
-  schedules,
-  schedules_abstract,
-  response_key,
-  bass_player,
+  , schedules
+  , schedules_main
+  , response_key
+  , bass_player
 
   // session, blocs, trials
-  trial_abstract,
-  trial_simple,
-  trial_matching,
-  trial_message,
-  trial_feature_positive,
-  blocs,
-  session,
-  session_config,
+  , trial_abstract
+  , trial_simple
+  , trial_matching
+  , trial_message
+  , trial_mirrored_stm
+  
+  , trial_feature_positive
+  , trial_calibration
+  , blocs
+
+  , session
+  , config_session
 
   // helpers
-  draw_methods
+  , draw_methods
+  , timestamps_logger
 
+
+  {$ifdef DEBUG}
+  , debug_logger
+  , SysUtils
+  , FileUtil
+  {$endif}
   ;
 
 {$R *.res}
@@ -78,8 +90,17 @@ resourcestring
   ApplicationTitle = 'Controle de Estímulos';
 
 begin
+
+  {$ifdef DEBUG}
+  DebugLn(mt_Information + 'Debug Logger initialized');
+  {$endif}
+
   Application.Title := ApplicationTitle;
   Application.Initialize;
+  {$ifdef DEBUG}
+  DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
+  DebugLn(mt_Debug + 'Application ThreadID:' + IntToStr(ThreadID));
+  {$endif}
   Application.CreateForm(TUserConfig, UserConfig);
   Application.Run;
 end.

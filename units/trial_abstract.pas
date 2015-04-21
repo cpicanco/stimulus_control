@@ -25,66 +25,124 @@ unit trial_abstract;
 
 interface
 
-uses LCLIntf, LCLType, LMessages, Controls, Classes, SysUtils,
-     session_config, countermanager;
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, LCLProc
+
+  , session_config
+  , client
+  , countermanager
+  , custom_timer
+  , timestamps_logger
+  ;
+
 type
 
   { TTrial }
 
   TTrial = class(TCustomControl)
-  protected
-    FTimeStart: cardinal;
-    FFileName : string;
-    FRootMedia: string;
-    FIETConsequence: string;
-    FTimeOut : Integer;
-    FManager : TCounterManager;
-    FResult: String;
-    FHeader: String;
-    FHeaderTicks: String;
-    FData: String;
-    FDataTicks: String;
-    FNextTrial: String;
-    FIsCorrection : Boolean;
+  private
     FCfgTrial: TCfgTrial;
-    FOnWriteTrialData: TNotifyEvent;
-    FOnBeginCorrection : TNotifyEvent;
-    FOnEndCorrection : TNotifyEvent;
+    FClientThread : TClientThread;
+    FData: string;
+    //FDataTicks: string;
+    FFilename: string;
+    FHeader: string;
+    FHeaderTicks: string;
+    FIETConsequence: string;
+    FCounterManager : TCounterManager;
+    FNextTrial: string;
+    FResult: string;
+    FRootMedia: string;
+    FServerAddress: string;
+    FTimeOut: Integer;
+    FTimeStart: cardinal;
+    // events
+    FOnBeginCorrection: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
+    FOnConsequence: TNotifyEvent;
+    FOnEndCorrection: TNotifyEvent;
+    FOnEndTrial: TNotifyEvent;
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnNone: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
-    FOnConsequence: TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
+    FOnWriteTrialData: TNotifyEvent;
+    FClockThread : TClockThread;
+  strict protected
+    FIscorrection : Boolean;
+    procedure ClientStatus(msg : string);
+    procedure StartTrial(Sender: TObject); virtual;
+    procedure ThreadClock(Sender: TObject); virtual; abstract;
     procedure WriteData(Sender: TObject); virtual; abstract;
   public
-    procedure Play(Manager : TCounterManager; TestMode: Boolean; Correction : Boolean); virtual; abstract;
+    destructor Destroy; override;
     procedure DispenserPlusCall; virtual; abstract;
+    procedure Play(TestMode: Boolean; Correction : Boolean); virtual; abstract;
+    procedure CreateClientThread(Code : string);
+    property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
-    property RootMedia : string read FRootMedia;
+    property Data: string read FData write FData;
+    //property DataTicks: string read FDataTicks write FDataTicks;
     property FileName : string read FFilename write FFilename;
-    property IETConsequence : string read FIETConsequence;
-    property Result: String read FResult;
-    property Header: String read FHeader;
-    property HeaderTicks: String read FHeaderTicks;
-    property Data: String read FData;
-    property DataTicks: String read FDataTicks;
-    property NextTrial: String read FNextTrial;
-    property OnEndTrial: TNotifyEvent read FOnEndTrial write FOnEndTrial;
-    property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
-    property OnWriteTrialData: TNotifyEvent read FOnWriteTrialData write FOnWriteTrialData;
-    property OnStmResponse: TNotifyEvent read FOnStmResponse write FOnStmResponse;
+    property Header: string read FHeader write FHeader;
+    property HeaderTicks: string read FHeaderTicks write FHeaderTicks;
+    property IETConsequence : string read FIETConsequence write FIETConsequence;
+    property NextTrial: string read FNextTrial write FNextTrial;
+    property Result: string read FResult write FResult;
+    property RootMedia : string read FRootMedia write FRootMedia;
+    property ServerAddress : string read FServerAddress write FServerAddress;
+    property TimeOut : Integer read FTimeOut write FTimeOut;
+    property TimeStart : cardinal read FTimeStart write FTimeStart;
+    property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse: TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
+    property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
+    property OnEndCorrection : TNotifyEvent read FOnEndCorrection write FOnEndCorrection;
+    property OnEndTrial: TNotifyEvent read FOnEndTrial write FOnEndTrial;
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
     property OnNone: TNotifyEvent read FOnNone write FOnNone;
-    property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
-    property OnEndCorrection : TNotifyEvent read FOnEndCorrection write FOnEndCorrection;
-    property TimeOut : Integer read FTimeOut;
-    property TimeStart : cardinal read FTimeStart write FTimeStart;
+    property OnStmResponse: TNotifyEvent read FOnStmResponse write FOnStmResponse;
+    property OnWriteTrialData: TNotifyEvent read FOnWriteTrialData write FOnWriteTrialData;
   end;
 
 implementation
+
+{$ifdef DEBUG}
+uses debug_logger;
+{$endif}
+
+{ TTrial }
+
+procedure TTrial.CreateClientThread(Code: string);
+begin
+  FClientThread := TClientThread.Create( FCfgTrial.Id, Code);
+  FClientThread.OnShowStatus := @ClientStatus;
+  FClientThread.ServerAddress := FServerAddress;
+  FClientThread.Start;
+end;
+
+procedure TTrial.ClientStatus(msg: string);
+ begin
+  {$ifdef DEBUG}
+  DebugLn(msg);
+  {$else}
+  TimestampLn(msg);
+  {$endif}
+end;
+
+procedure TTrial.StartTrial(Sender: TObject);
+begin
+  FClockThread := TClockThread.Create(True);
+  FClockThread.OnTimer := @ThreadClock; // descendents can implement the ThreadClock method
+  FClockThread.Start;
+end;
+
+destructor TTrial.Destroy;
+begin
+  if Assigned(FClockThread) then
+    FClockThread.Running := False;
+  inherited Destroy;
+end;
+
+
 
 end.

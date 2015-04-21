@@ -1,9 +1,9 @@
 object bkgnd: Tbkgnd
-  Left = 713
+  Left = 486
   Height = 240
-  Top = 254
+  Top = 230
   Width = 320
-  Caption = 'bkgnd'
+  Caption = 'Fundo'
   Color = clWhite
   DragKind = dkDock
   OnCreate = FormCreate
