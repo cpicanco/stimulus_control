@@ -98,6 +98,9 @@ begin
 
   {$ifdef DEBUG}
   DebugLn(mt_Information + 'Debug Logger initialized');
+    {$ifdef WINDOWS}
+    DebugLn(mt_Information + 'Inp32(0):' + IntToStr(Inp32(0)));
+    {$endif}
   {$endif}
 
   Application.Title := ApplicationTitle;
