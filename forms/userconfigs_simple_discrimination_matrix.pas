@@ -230,17 +230,19 @@ var
   end;
 
   procedure GetCoordenates(var CoordenateString : string);
-  var i  : integer;
+  var pos42, i  : integer;
   begin
     // ASCII, Decimals
     // #32 (space)
     // #42 ( * )
 
     // delete #42 in the string
-    {if Length(CoordenateString) > 0 then
-      for i := 0 to (Length(CoordenateString) - 1) do
-        while CoordenateString[i] = #42 do
-          Delete(CoordenateString, 1, i);   }
+    pos42 := Pos( #42, CoordenateString );
+    while pos42 <> 0  do
+      begin
+        Delete( CoordenateString, 1, pos42 -1 );
+        pos42 := Pos( #42, CoordenateString );
+      end;
 
     // Assign values to local variables
     aTop   := StrToIntDef( Copy( CoordenateString, 0, pos( #32, CoordenateString ) - 1), 0);
