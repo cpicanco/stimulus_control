@@ -40,7 +40,7 @@ end;
 
 initialization
 begin
-  Logger := TRegData.Create(nil, GetCurrentDirUTF8 + '/_Log_001.txt');
+  Logger := TRegData.Create(nil, GetCurrentDirUTF8 + PathDelim + '_Log_001.txt');
 end
 
 finalization
