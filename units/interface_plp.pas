@@ -34,18 +34,15 @@ uses
     Ports,
   {$ENDIF}
 
-  custom_timer
+    custom_timer
   ;
 
 type
-{
-  {$IFDEF WINDOWS}
 
-  TInp32 = function(Address: ShortInt): BYTE; stdcall;
-  TOut32 = procedure(Address: ShortInt; Data: BYTE); stdcall;
-
-  {$ENDIF}
-}
+  {
+    alternative
+    http://wiki.freepascal.org/Hardware_Access#Using_inpout32.dll_for_Windows
+  }
 
   { TPLP }
 
@@ -53,13 +50,6 @@ type
   private
     FTimer : TClockThread;
     FAutoOff : Boolean;
-  {
-  {$IFDEF WINDOWS}
-    FInpout32: THandle;
-    FInp32: TInp32;
-    FOut32: TOut32;
-  {$ENDIF}
-  }
   public
     constructor Create (AOwner : TComponent); override;
     destructor Destroy; override;
@@ -76,8 +66,8 @@ type
  {$ENDIF}
 
  {$IFDEF WINDOWS}
- //function Inp32(EndPorta: integer): BYTE stdcall; external 'inpout32';
- //procedure Out32(EndPorta: integer; Valor:BYTE); stdcall; external 'inpout32';
+ function Inp32(EndPorta: integer): BYTE stdcall; external 'inpout32';
+ procedure Out32(EndPorta: integer; Valor:BYTE); stdcall; external 'inpout32';
  {$ENDIF}
 
 var FPLP : TPLP;
@@ -88,29 +78,12 @@ implementation
 
 constructor TPLP.Create(AOwner : TComponent);
 begin
-{
- {
- http://wiki.freepascal.org/Hardware_Access#Using_inpout32.dll_for_Windows
- }
 
-{$IFDEF WINDOWS}
-   FInpout32 := LoadLibrary('inpout32.dll');
-   if (FInpout32 <> 0) then
-   begin
-     FInp32 := GetProcAddress(FInpout32, 'Inp32');
-     if (@FInp32 = nil) then ShowMessage('Error Inp32');
-     FOut32 := GetProcAddress(FInpout32, 'Out32');
-     if (@FOut32 = nil) then ShowMessage('Error Out32');
-   end
-   else ShowMessage ('Error Inpout32');
-{$ENDIF}
-}
-
-//$378 $278 $3BC
-//Usual addresses of the PC Parallel Port
-//In linux $3BC for /dev/lp0, $378 for /dev/lp1, and $278 for /dev/lp2
-//For now, need to check the bios settings
-//of the target machine before compile.
+// $378 $278 $3BC
+// Usual addresses of the PC Parallel Port
+// In linux $3BC for /dev/lp0, $378 for /dev/lp1, and $278 for /dev/lp2
+// For now, need to check the bios settings
+// of the target machine before compile.
 
 {$IFDEF Linux}
    if ioperm($378, 8, 1) = -1 then Showmessage('Error ioperm $378 on') else;
@@ -121,11 +94,6 @@ end;
 
 destructor TPLP.Destroy;
 begin
-{
-{$IFDEF WINDOWS}
-  FreeLibrary(FInpout32);
-{$ENDIF}
-}
 
 {$IFDEF Linux}
   if ioperm($378, 8, 0) = -1 then Showmessage('Error ioperm $378 off') else;
@@ -150,7 +118,7 @@ begin
   if FTimer.Running then FTimer.Running := False;
 
 {$IFDEF WINDOWS}
-  //Out32($378, 0);
+  Out32($378, 0);
   //FOut32($278, 0);
   //FOut32($3BC, 0);
 {$ENDIF}
@@ -165,7 +133,7 @@ end;
 procedure TPLP.OutPortOn(Data: BYTE);
 begin
 {$IFDEF WINDOWS}
-  //Out32($378, Data);
+  Out32($378, Data);
   //FOut32($278, Data);
   //FOut32($3BC, Data);
 {$ENDIF}
@@ -179,7 +147,7 @@ begin
   FTimer := TClockThread.Create(True);
   FTimer.Interval := 50;
   if FAutoOff then
-    FTimer.OnTimer := @OutPortOff // descendents can implement the ThreadClock method
+    FTimer.OnTimer := @OutPortOff
   else FTimer.OnTimer := @OutPortNone;
   FTimer.Start;
 end;
