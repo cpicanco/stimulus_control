@@ -26,9 +26,9 @@ interface
 
 uses
     Dialogs, Classes, StdCtrls, Graphics, SysUtils, Forms, FileUtil
-, session_config
-, constants
-;
+  , config_session
+  , constants
+  ;
 
 type
 

@@ -27,12 +27,12 @@ uses
 
   {$IFDEF UNIX}
     {$IFDEF UseCThreads}
-      cthreads
-    , cmem
+      cthreads ,
+      cmem ,
     {$ENDIF}
   //, heaptrc
   {$ENDIF}
-  , Interfaces // this includes the LCL widgetset
+  Interfaces // this includes the LCL widgetset
   , Forms
 
   //Forms
@@ -80,7 +80,7 @@ uses
   {$ifdef DEBUG}
   , debug_logger
   , SysUtils
-  , FileUtil
+  , FileUtil, interface_rs232
   {$endif}
   ;
 
