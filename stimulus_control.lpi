@@ -121,7 +121,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="30">
+    <Units Count="31">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -287,6 +287,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="tool_ini"/>
       </Unit29>
+      <Unit30>
+        <Filename Value="units/interface_rs232.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="interface_rs232"/>
+      </Unit30>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -296,9 +301,9 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="forms;units"/>
+      <Libraries Value="dependency/inpout32;dependency/lbass/windows/64"/>
+      <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
-      <SrcPath Value="dependency/delphizmq"/>
     </SearchPaths>
     <CodeGeneration>
       <Optimizations>

@@ -29,7 +29,7 @@ uses Classes, Controls, LCLIntf, LCLType,
      ExtCtrls, SysUtils, Graphics, Forms,
      Dialogs,StdCtrls
 
-     , session_config
+     , config_session
      , regdata
      , constants
      , response_key

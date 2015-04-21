@@ -27,7 +27,7 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, LCLProc
 
-  , session_config
+  , config_session
   , client
   , countermanager
   , custom_timer

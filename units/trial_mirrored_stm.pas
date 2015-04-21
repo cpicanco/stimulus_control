@@ -37,7 +37,7 @@ uses
   , debug_logger
   , dialogs
   {$endif}
-  , session_config
+  , config_session
   , trial_abstract
   , constants
   , draw_methods

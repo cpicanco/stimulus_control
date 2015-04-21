@@ -28,7 +28,7 @@ interface
 uses Classes, Controls, SysUtils, LCLIntf
      //,dialogs
      , bass_player
-     , session_config
+     , config_session
      , countermanager
      , FileUtil
      , regdata

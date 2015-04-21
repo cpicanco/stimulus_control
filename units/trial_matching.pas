@@ -38,7 +38,7 @@ uses
  , response_key
  , trial_abstract
  //, countermanager
- //, session_config
+ //, config_session
  , counter
  , constants
  ;
