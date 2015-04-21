@@ -30,12 +30,11 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units"/>
+            <Libraries Value="dependency/inpout32;dependency/lbass/windows/64"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
-            <SrcPath Value="dependency/delphizmq"/>
           </SearchPaths>
           <CodeGeneration>
-            <TargetOS Value="linux"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -71,12 +70,11 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units"/>
+            <Libraries Value="dependency/inpout32;dependency/lbass/windows/64"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
-            <SrcPath Value="dependency/delphizmq"/>
           </SearchPaths>
           <CodeGeneration>
-            <TargetOS Value="linux"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -301,7 +299,6 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <Libraries Value="dependency/inpout32;dependency/lbass/windows/64"/>
       <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>

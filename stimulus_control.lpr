@@ -72,6 +72,10 @@ uses
   , session
   , config_session
 
+  //PLP, RS232
+  , interface_rs232
+  , interface_plp
+
   // helpers
   , draw_methods
   , timestamps_logger
@@ -80,8 +84,9 @@ uses
   {$ifdef DEBUG}
   , debug_logger
   , SysUtils
-  , FileUtil, interface_rs232
+  , FileUtil
   {$endif}
+
   ;
 
 {$R *.res}

@@ -237,10 +237,10 @@ var
     // #42 ( * )
 
     // delete #42 in the string
-    if Length(CoordenateString) > 0 then
+    {if Length(CoordenateString) > 0 then
       for i := 0 to (Length(CoordenateString) - 1) do
         while CoordenateString[i] = #42 do
-          Delete(CoordenateString, 1, i);
+          Delete(CoordenateString, 1, i);   }
 
     // Assign values to local variables
     aTop   := StrToIntDef( Copy( CoordenateString, 0, pos( #32, CoordenateString ) - 1), 0);

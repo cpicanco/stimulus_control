@@ -34,7 +34,7 @@ uses
     Ports,
   {$ENDIF}
 
-  , custom_timer
+  custom_timer
   ;
 
 type
@@ -52,6 +52,7 @@ type
   TPLP = class (TComponent)
   private
     FTimer : TClockThread;
+    FAutoOff : Boolean;
   {
   {$IFDEF WINDOWS}
     FInpout32: THandle;
@@ -75,8 +76,8 @@ type
  {$ENDIF}
 
  {$IFDEF WINDOWS}
- //function Inp32(EndPorta: ShortInt): BYTE stdcall; external 'inpout32';
- procedure Out32(EndPorta: ShortInt; Valor:BYTE); stdcall; external 'inpout32';
+ //function Inp32(EndPorta: integer): BYTE stdcall; external 'inpout32';
+ //procedure Out32(EndPorta: integer; Valor:BYTE); stdcall; external 'inpout32';
  {$ENDIF}
 
 var FPLP : TPLP;
@@ -136,10 +137,7 @@ end;
 
 procedure TPLP.OnTimerMethod(AutoOff: Boolean);
 begin
-  if AutoOff then
-    FCsqTimer.OnTimer := OutPortOff
-  else
-    FCsqTimer.OnTimer := OutPortNone;
+  FAutoOff := AutoOff;
 end;
 
 procedure TPLP.OutPortNone (Sender: TObject);
@@ -151,9 +149,8 @@ procedure TPLP.OutPortOff (Sender: TObject);
 begin
   if FTimer.Running then FTimer.Running := False;
 
-  FCsqTimer.Enabled := False;
 {$IFDEF WINDOWS}
-  Out32($378, 0);
+  //Out32($378, 0);
   //FOut32($278, 0);
   //FOut32($3BC, 0);
 {$ENDIF}
@@ -163,13 +160,12 @@ begin
   //port[$278] := 0;
   //port[$3BC] := Data;
 {$ENDIF}
-  ;
 end;
 
 procedure TPLP.OutPortOn(Data: BYTE);
 begin
 {$IFDEF WINDOWS}
-  Out32($378, Data);
+  //Out32($378, Data);
   //FOut32($278, Data);
   //FOut32($3BC, Data);
 {$ENDIF}
@@ -179,11 +175,12 @@ begin
   //port[$278] := Data;
   //port[$3BC] := Data;
 {$ENDIF}
-  FCsqTimer.Enabled := True;
 
   FTimer := TClockThread.Create(True);
   FTimer.Interval := 50;
-  FTimer.OnTimer := @OutPortOff; // descendents can implement the ThreadClock method
+  if FAutoOff then
+    FTimer.OnTimer := @OutPortOff // descendents can implement the ThreadClock method
+  else FTimer.OnTimer := @OutPortNone;
   FTimer.Start;
 end;
 
