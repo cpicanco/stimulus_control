@@ -29,10 +29,11 @@ uses Classes, Controls, SysUtils, LCLIntf
      //,dialogs
      , bass_player
      , session_config
-     //, trial_mirrored_config
      , countermanager
+     , FileUtil
      , regdata
      , blocs
+     , timestamps_logger
      ;
 
 type
@@ -41,40 +42,42 @@ type
 
   TSession = class(TComponent)
   private
-    FAudioDevice: TBassAudioDevice;
-    FTimeStart : cardinal;
-    FManager : TCounterManager;
-    FCrtReached : Boolean;
-    FBlc: TBlc;
-    FRegData: TRegData;
-    //FRegDataTicks: TRegData;
-    FCfgSes: TCfgSes;
-    FOnEndSess: TNotifyEvent;
-    FSubjName: String;
-    FSessName: String;
-    FBackGround: TWinControl;
-    FTestMode: Boolean;
-    FShowCounter : Boolean;
-    FOnStmResponse: TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
-    FOnBkGndResponse: TNotifyEvent;
-    //FOnBeginTrial: TNotifyEvent;
-    FOnEndBlc: TNotifyEvent;
-    FOnConsequence: TNotifyEvent;
     //FOnBeginSess: TNotifyEvent;
+    //FOnBeginTrial: TNotifyEvent;
+    //FOnCriteria: TNotifyEvent;
+    //FRegDataTicks: TRegData;
+    FAudioDevice: TBassAudioDevice;
+    FBackGround: TWinControl;
+    FBlc: TBlc;
+    FCfgSes: TCfgSes;
+    FCrtReached : Boolean;
+    FManager : TCounterManager;
+    FOnBkGndResponse: TNotifyEvent;
+    FOnConsequence: TNotifyEvent;
+    FOnEndBlc: TNotifyEvent;
+    FOnEndSess: TNotifyEvent;
+    FOnEndTrial: TNotifyEvent;
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
-    //FOnCriteria: TNotifyEvent;
-    procedure EndSess(Sender: TObject);
-    procedure SetBackGround(BackGround: TWinControl);
+    FOnStmResponse: TNotifyEvent;
+    FRegData: TRegData;
+    FTimestampsData : TRegData;
+    FServerAddress: string;
+    FSessName: String;
+    FShowCounter : Boolean;
+    FSubjName: String;
+    FTestMode: Boolean;
+    FTimeStart : cardinal;
+    procedure BkGndResponse(Sender: TObject);
     procedure BlcEndBlc(Sender: TObject);
-    procedure StmResponse(Sender:TObject);
     procedure Consequence(Sender: TObject);
+    procedure Criteria(Sender: TObject);
+    procedure EndSess(Sender: TObject);
+    procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
-    procedure BkGndResponse(Sender: TObject);
-    procedure EndTrial(Sender: TObject);
-    procedure Criteria(Sender: TObject);
+    procedure SetBackGround(BackGround: TWinControl);
+    procedure StmResponse(Sender:TObject);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -83,18 +86,20 @@ type
     procedure PlayBlc(Sender: TObject);
     property AudioDevice : TBassAudioDevice read FAudioDevice write FAudioDevice;
     property BackGround: TWinControl read FBackGround write SetBackGround;
+    property ServerAddress : string read FServerAddress write FServerAddress;
     property SessName: String  read FSessName write FSessName;
+    property ShowCounter : Boolean read FShowCounter write FShowCounter;
     property SubjName: String  read FSubjName write FSubjName;
     property TestMode: Boolean  read FTestMode write FTestMode;
-    property ShowCounter : Boolean read FShowCounter write FShowCounter;
-    property OnEndSess: TNotifyEvent read FOnEndSess write FOnEndSess;
-    property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
+  public
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
-    property OnEndTrial : TNotifyEvent read FOnEndTrial write FOnEndTrial;
     property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
+    property OnEndSess: TNotifyEvent read FOnEndSess write FOnEndSess;
+    property OnEndTrial : TNotifyEvent read FOnEndTrial write FOnEndTrial;
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
+    property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
 
   end;
 
@@ -132,8 +137,6 @@ procedure TSession.EndSess(Sender: TObject);
 begin
   FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
   //FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
-  FRegData.Free;
-  FAudioDevice.Free;
   //FRegDataTicks.Free;
   If Assigned(OnEndSess) then FOnEndSess(Sender);
 end;
@@ -171,7 +174,7 @@ end;
 constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FBlc:= TBlc.Create(Self);
+  FBlc:= TBlc.Create(nil);
   FBlc.OnStmResponse:= @StmResponse;
   FBlc.OnConsequence:= @Consequence;
   FBlc.OnBkGndResponse:= @BkGndResponse;
@@ -189,6 +192,25 @@ end;
 
 destructor TSession.Destroy;
 begin
+  //events
+  FBlc.OnStmResponse := nil;
+  FBlc.OnConsequence := nil;
+  FBlc.OnBkGndResponse := nil;
+  FBlc.OnEndTrial := nil;
+  FBlc.OnHit := nil;
+  FBlc.OnMiss := nil;
+  FBlc.OnEndBlc := nil;
+  FBlc.OnCriteria := nil;
+
+  //external objects
+  FBackGround := nil;
+  FAudioDevice := nil;
+  FManager := nil;
+  FCfgSes := nil;
+
+  // internal objects
+  if Assigned(FRegData) then FreeAndNil(FRegData);
+  if Assigned(FBlc) then FreeAndNil(FBlc);
   inherited Destroy;
 end;
 
@@ -211,11 +233,22 @@ begin
       FileData:= 'Teste_000.txt';
     end;
 
-  FRegData:= TRegData.Create(Self, FCfgSes.RootData + FileData);
+  FRegData := TRegData.Create(nil, FCfgSes.RootData + FileData);
+
+  {
+    File writing operations are called from a different thread
+    It is a hack for a while until I find a proper synchronize
+    implementation
+  }
+  FTimestampsData := TRegData.Create(nil, ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps');
+  UpdateTimestampsFileName(FTimestampsData.FileName);
+  FTimestampsData.Free;
+
   //FRegDataTicks:= TRegData.Create(Self, FCfgSes.RootData + 'Ticks_001.txt');
 
   FBlc.ShowCounter := ShowCounter;
   FBlc.RegData:= FRegData;
+  FBlc.ServerAddress:= FServerAddress;
   //FBlc.RegDataTicks := FRegDataTicks;
   FBlc.BackGround:= FBackGround;
 
@@ -223,6 +256,7 @@ begin
                     'Sessão:' + #9+ FSessName + #13#10 +
                     'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
                     'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
+
   FTimeStart := GetTickCount;
   FBlc.TimeStart := FTimeStart;
   //FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
@@ -230,6 +264,7 @@ begin
   //                  'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
   //                  'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
   FManager.OnBeginSess(Self);
+
   PlayBlc(Self);
 end;
 
@@ -238,9 +273,11 @@ var IndBlc, IndTrial : integer;
 begin
   IndBlc := FManager.CurrentBlc.Counter;
   IndTrial := FManager.CurrentTrial.Counter;
-  FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);
-
-  if IndBlc < FCfgSes.NumBlc then FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, IndTrial, FTestMode)
+  if IndBlc < FCfgSes.NumBlc then
+    begin
+      FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);     //bug
+      FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, IndTrial, FTestMode)
+    end
   else EndSess(Sender);
 end;
 

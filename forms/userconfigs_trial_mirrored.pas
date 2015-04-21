@@ -28,7 +28,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   {$IFDEF LCLGTK2}
-  gtk2, gdk2, //glib2,
+  gtk2, gdk2, glib2,
   {$ENDIF}
   Spin, ValEdit, Grids, ExtCtrls, draw_methods, math
   ;
@@ -106,7 +106,7 @@ type
     procedure seNodesChange(Sender: TObject);
     procedure SpinChange(Sender: TObject);
     procedure SpinClick(Sender: TObject);
-    procedure EditingDone(Sender: TObject);
+    procedure EditingCDone(Sender: TObject);
   private
     FCurrentTrial : integer;
     FGrid : TPoints;
@@ -147,8 +147,33 @@ implementation
 { TBresenhamLineForm }
 
 procedure TBresenhamLineForm.FormPaint(Sender: TObject);
-var i, mX, mY:  integer; mP : TPoint;
+var
+  i, mX, mY:  integer;
+  mP : TPoint;
+  OldCanvas : TCanvas;
+
+  procedure SaveOldCanvas;
+  begin
+    OldCanvas.Brush.Color := Canvas.Brush.Color;
+    OldCanvas.Brush.Style := Canvas.Brush.Style;
+
+    OldCanvas.Pen.Color := Canvas.Pen.Color;
+    OldCanvas.Pen.Style := Canvas.Pen.Style;
+    OldCanvas.Pen.Mode := Canvas.Pen.Mode;
+  end;
+
+  procedure LoadOldCanvas;
+  begin
+    Canvas.Brush.Color := OldCanvas.Brush.Color;
+    Canvas.Brush.Style := OldCanvas.Brush.Style;
+
+    Canvas.Pen.Color := OldCanvas.Pen.Color;
+    Canvas.Pen.Style := OldCanvas.Pen.Style;
+    Canvas.Pen.Mode := OldCanvas.Pen.Mode;
+  end;
 begin
+  OldCanvas := TCanvas.Create;
+  SaveOldCanvas;
 
   mP := ScreenToClient(Point(Mouse.CursorPos.X, Mouse.CursorPos.Y));
   mX := mP.X;
@@ -186,9 +211,9 @@ begin
       DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
     end;
 
-  Canvas.Pen.Color:= clBlack;
+  LoadOldCanvas;
   case cbChooseGrid.ItemIndex of
-    0:{nothing};
+    0:{ do nothing };
     1..2:begin
 
       for i := Low(FGrid) to High(FGrid)do
@@ -197,23 +222,13 @@ begin
           mX := mP.X;
           mY := mP.Y;
 
-          Canvas.Ellipse(mX -5, mY -5, mX +5, mY +5);
-          Canvas.TextOut(mX, mY, FGridNames[i])
+          Canvas.Ellipse(mX-10, mY-10, mX +10, mY +10);
+          Canvas.TextOut(mX-10, mY-10, FGridNames[i])
       end;
     end;
   end;
 
-
-  {// lazarus 1.0.4 to 1.2.6 changes...
-  with Canvas do
-    begin
-      Brush.Style := bsClear;
-      Brush.Color := clWhite;
-      Pen.Style := psSolid;
-      Pen.Color := clBlack;
-      Pen.Mode := pmCopy;
-    end;
-  }
+  OldCanvas.Free;
 end;
 
 procedure TBresenhamLineForm.PreviewTimerStartTimer(Sender: TObject);
@@ -246,27 +261,41 @@ begin
   if (Sender = x0) or (Sender = x1) or (Sender = y0) or (Sender = y1) or (Sender = seNodes) then
     RefreshLine;
 
-  if Sender = seTrials then
+  if (Sender = seSize) and cbUseGrid.Checked
+    and (cbChooseGrid.ItemIndex <> 0) then
+      begin
+        cbChooseGridChange(Sender);
+      end;
+
+  if (Sender = seTrials) or (Sender = seNodes) then
     begin
       SetLength(FTrialsPerNode, Length(FLine));
       for i := Low(FTrialsPerNode) to High(FTrialsPerNode) do
         FTrialsPerNode[i] := seTrials.Value;
     end;
+
   Invalidate;
 end;
 
-procedure TBresenhamLineForm.EditingDone(Sender: TObject);
+procedure TBresenhamLineForm.EditingCDone(Sender: TObject);
   var i : integer;
 begin
   if (Sender = x0) or (Sender = x1) or (Sender = y0) or (Sender = y1) or (Sender = seNodes) then
     RefreshLine;
 
-  if Sender = seTrials then
+  if  (Sender = seSize) and cbUseGrid.Checked
+    and (cbChooseGrid.ItemIndex <> 0) then
+      begin
+        cbChooseGridChange(Sender);
+      end;
+
+  if (Sender = seTrials) or (Sender = seNodes) then
     begin
       SetLength(FTrialsPerNode, Length(FLine));
       for i := Low(FTrialsPerNode) to High(FTrialsPerNode) do
         FTrialsPerNode[i] := seTrials.Value;
     end;
+
   Invalidate;
 end;
 

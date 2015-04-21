@@ -11,7 +11,6 @@ object MatrixConfigForm: TMatrixConfigForm
   ClientHeight = 244
   ClientWidth = 358
   Color = clBtnFace
-  DockSite = True
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
@@ -27,7 +26,7 @@ object MatrixConfigForm: TMatrixConfigForm
     Top = 8
     Width = 181
     Caption = 'Linhas X Colunas da Matriz'
-    ClientHeight = 34
+    ClientHeight = 35
     ClientWidth = 177
     ParentShowHint = False
     ShowHint = True
@@ -46,7 +45,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtRow: TEdit
       Left = 1
-      Height = 24
+      Height = 23
       Hint = 'Linhas.'
       Top = 6
       Width = 36
@@ -59,7 +58,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtCol: TEdit
       Left = 57
-      Height = 24
+      Height = 23
       Hint = 'Colunas.'
       Top = 6
       Width = 36
@@ -72,10 +71,10 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object cbSquare: TCheckBox
       Left = 99
-      Height = 24
+      Height = 21
       Hint = 'Marque esta caixa para que o número de colunas permaneça igual ao número de linhas.'
       Top = 8
-      Width = 93
+      Width = 79
       Caption = 'Quadrada'
       OnClick = cbSquareClick
       TabOrder = 2
@@ -87,7 +86,7 @@ object MatrixConfigForm: TMatrixConfigForm
     Top = 64
     Width = 181
     Caption = 'Comprimento X Altura'
-    ClientHeight = 34
+    ClientHeight = 35
     ClientWidth = 177
     TabOrder = 1
     object lbl2: TLabel
@@ -104,7 +103,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtWidth: TEdit
       Left = 1
-      Height = 24
+      Height = 23
       Hint = 'Comprimento do estímulo, em pixels.'
       Top = 6
       Width = 36
@@ -117,7 +116,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtHeight: TEdit
       Left = 57
-      Height = 24
+      Height = 23
       Hint = 'Altura, do estímulo, em pixels.'
       Top = 6
       Width = 36
@@ -130,10 +129,10 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object cbSSquare: TCheckBox
       Left = 99
-      Height = 24
+      Height = 21
       Hint = 'Marque esta caixa para que a altura permaneça igual ao comprimento.'
       Top = 8
-      Width = 94
+      Width = 79
       Caption = 'Quadrado'
       OnClick = cbSSquareClick
       ParentShowHint = False
@@ -146,9 +145,8 @@ object MatrixConfigForm: TMatrixConfigForm
     Height = 127
     Top = 8
     Width = 159
-    DragKind = dkDock
-    DragMode = dmAutomatic
     ItemHeight = 0
+    PopupMenu = puMenu
     ScrollWidth = 157
     TabOrder = 8
     TopIndex = -1
@@ -159,7 +157,7 @@ object MatrixConfigForm: TMatrixConfigForm
     Top = 141
     Width = 159
     Caption = 'Definições Gerais'
-    ClientHeight = 54
+    ClientHeight = 55
     ClientWidth = 155
     TabOrder = 3
     object lblLeftTop: TLabel
@@ -176,16 +174,16 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object chkCustomResolution: TCheckBox
       Left = 10
-      Height = 24
+      Height = 21
       Hint = 'Selecione esta opção para visualizar o tamanho real do estímulo.'#13#10'A resolução atual do monitor é utilizada como referência.'
       Top = 2
-      Width = 162
+      Width = 143
       Caption = 'Usar esta resolução:'
       TabOrder = 0
     end
     object edtScreenLeft: TEdit
       Left = 1
-      Height = 24
+      Height = 23
       Top = 25
       Width = 62
       OnChange = edtScreenLeftChange
@@ -194,7 +192,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtScreenTop: TEdit
       Left = 92
-      Height = 24
+      Height = 23
       Top = 25
       Width = 62
       TabOrder = 2
@@ -240,7 +238,7 @@ object MatrixConfigForm: TMatrixConfigForm
     Top = 120
     Width = 181
     Caption = 'Distância entre Estímulos'
-    ClientHeight = 75
+    ClientHeight = 76
     ClientWidth = 177
     TabOrder = 2
     object lbl1: TLabel
@@ -257,7 +255,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtDisty: TEdit
       Left = 57
-      Height = 24
+      Height = 23
       Hint = 'Distância vertical, em pixels, entre a borda inferior de um estímulo e a superior de outro.'
       Top = 6
       Width = 36
@@ -270,7 +268,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtDistx: TEdit
       Left = 1
-      Height = 24
+      Height = 23
       Hint = 'Distância horizontal, em pixels, entre a borda direita de um estímulo e a esquerda de outro.'
       Top = 6
       Width = 36
@@ -283,10 +281,10 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object chkPlotEquallySpaced: TCheckBox
       Left = 99
-      Height = 24
+      Height = 21
       Hint = 'Igualar a distância vertical à horizontal.'
       Top = 30
-      Width = 72
+      Width = 62
       Caption = 'Igualar'
       OnClick = chkPlotEquallySpacedClick
       ParentShowHint = False
@@ -295,10 +293,10 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object chkPlotProportional: TCheckBox
       Left = 99
-      Height = 24
+      Height = 21
       Hint = 'Distribuir os estímulos no monitor de acordo com a resolução. Divide-se o comprimento pelo número de linhas e a altura pelo número de colunas.'
       Top = 8
-      Width = 90
+      Width = 74
       Caption = 'Distribuir'
       OnClick = chkPlotProportionalClick
       ParentShowHint = False
@@ -324,5 +322,25 @@ object MatrixConfigForm: TMatrixConfigForm
     Caption = 'Voltar'
     OnClick = btnCancelClick
     TabOrder = 9
+  end
+  object puMenu: TPopupMenu
+    left = 288
+    top = 24
+    object miSaveAsTXT: TMenuItem
+      Caption = 'Salvar Como TXT'
+      OnClick = SaveAsTXT
+    end
+    object miSaveAsTXTwithKeys: TMenuItem
+      Caption = 'Salvar Como TXT (com chaves)'
+      OnClick = SaveAsTXT
+    end
+  end
+  object SaveDialog1: TSaveDialog
+    Width = 780
+    Height = 585
+    DefaultExt = '.TXT'
+    Filter = 'txt|.txt'
+    left = 221
+    top = 24
   end
 end

@@ -18,7 +18,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.
 //
-unit session_config;
+unit config_session;
 
 {$mode objfpc}{$H+}
 
@@ -98,22 +98,22 @@ type
   TCfgSes = class(TComponent)
   protected
     //Fddd: Cardinal;
+    FBlcs: TVetCfgBlc;
+    FCol: integer;
+    FData: string;
+    FEdtMode : Boolean;
+    FIniFile: TCIniFile;
+    FLoaded : Boolean;
+    FMedia: string;
+    FName: string;
     FNumBlc: Integer;
     FNumPos: Integer;
-    FCol: integer;
-    FRow: integer;
-    FLoaded : Boolean;
-    FEdtMode : Boolean;
-    FName: string;
-    FSubject: string;
-    FMedia: string;
-    FData: string;
-    FType : string;
-    FRootMedia: string;
-    FRootData: string;
-    FIniFile: TCIniFile;
     FPositions : array of TCoordenates;
-    FBlcs: TVetCfgBlc;
+    FRootData: string;
+    FRootMedia: string;
+    FRow: integer;
+    FSubject: string;
+    FType : string;
     function GetCfgBlc(Ind: Integer): TCfgBlc;
   published
   public
@@ -123,21 +123,21 @@ type
     function LoadTreeFromFile(FileName:string; aTree : TTreeView):Boolean;
     procedure SetLengthVetBlc;
     procedure SetLengthVetTrial (Blc : Integer);
-    property CfgBlc[Ind: Integer]: TCfgBlc read GetCfgBlc;
     property Blcs : TVetCfgBlc read FBlcs write FBlcs;
-    property Name: string read FName write FName;
-    property Subject : string read FSubject write FSubject;
-    property NumBlc: Integer read FNumBlc write FNumBlc;
-    property Data : string read FData write FData;
-    property RootData: string read FRootData write FRootData;
-    property Media: string read FMedia write FMedia;
-    property RootMedia: string read FRootMedia write FRootMedia;
-    property NumPos: Integer read FNumPos write FNumPos;
-    property Row : integer read FRow write FRow;
+    property CfgBlc[Ind: Integer]: TCfgBlc read GetCfgBlc;
     property Col : integer read FCol write FCol;
-    property IsLoaded : Boolean read FLoaded write FLoaded;
+    property Data : string read FData write FData;
     property EditMode : Boolean read FEdtMode write FEdtMode;
+    property IsLoaded : Boolean read FLoaded write FLoaded;
+    property Media: string read FMedia write FMedia;
+    property Name: string read FName write FName;
+    property NumBlc: Integer read FNumBlc write FNumBlc;
+    property NumPos: Integer read FNumPos write FNumPos;
+    property RootData: string read FRootData write FRootData;
+    property RootMedia: string read FRootMedia write FRootMedia;
+    property Row : integer read FRow write FRow;
     property SesType : string read FType write FType;
+    property Subject : string read FSubject write FSubject;
   end;
 resourcestring
   messuCfgSessionMainError = 'Valor não encontrado: Main, Name or NumBlc.';
