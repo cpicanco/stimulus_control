@@ -41,7 +41,7 @@ uses
   , trial_abstract
   , constants
   , draw_methods
-  , schedules_abstract
+  , schedules_main
   , response_key
   ;
 
