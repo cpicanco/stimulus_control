@@ -25,6 +25,11 @@ lib/x86_64-linux/*.or
 lib/x86_64-linux/*.res
 lib/x86_64-linux/*.ppu
 lib/x86_64-linux/*.rst
+lib/i386-win32/*.o
+lib/i386-win32/*.or
+lib/i386-win32/*.res
+lib/i386-win32/*.ppu
+lib/i386-win32/*.rst
 forms/*.*~
 forms/backup/*
 units/*.*~
