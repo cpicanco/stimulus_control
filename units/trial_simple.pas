@@ -38,7 +38,8 @@ uses
   //, config_session
   , counter
   , constants
-  , interface_library
+  , interface_rs232
+  , interface_plp
   ;
 
 type
