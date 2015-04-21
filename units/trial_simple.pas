@@ -443,13 +443,15 @@ begin
 end;
 
 procedure TSimpl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   inherited MouseDown(Button,Shift, X, Y);
-  {DataTicks := DataTicks +
-               FormatFloat('####,####',GetTickCount - Ft) + #9 +
+  DataTicks := DataTicks +
+               FormatFloat('####,####',TickCount - Ft) + #9 +
                '-' + #9 +
                '-' + #9 +
-               IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9; }
+               IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9;
       FDataBkGndI.Plus(1);
 
       CounterManager.OnBkgndResponse(FDataBkGndI);
@@ -538,20 +540,22 @@ begin
 end;
 
 procedure TSimpl.Response(Sender: TObject);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   if FFlagResp then
     begin
-      {DataTicks :=
+      DataTicks :=
              DataTicks +
-             FormatFloat('####,####',GetTickCount - Ft) + #9 +
+             FormatFloat('####,####',TickCount - Ft) + #9 +
              'C' + IntToStr(TKey(Sender).Tag + 1) + #9 +
              ExtractFileName(TKey(Sender).FullPath) + #9 +
              IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left) + #9 +
-             IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9; }
+             IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;
 
        if FFirstResp = False then
         begin
-          FLatCmp := GetTickCount;
+          FLatCmp := TickCount;
           FFirstResp := True;
         end;
 
