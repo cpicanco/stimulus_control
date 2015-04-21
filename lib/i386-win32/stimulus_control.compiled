@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\Rafael\lazarus\fpc\2.6.4\bin\i386-win32\fpc.exe" Date="1162572796"/>
+  <Params Value=" -MObjFPC -Scghi -Twin32 -g -gl -Xg -Xs -WG -vewnhil -FiC:\Rafael\GitHub\validation_project\lib\i386-win32 -FuC:\Rafael\GitHub\validation_project\forms -FuC:\Rafael\GitHub\validation_project\units -FuC:\Rafael\GitHub\validation_project\dependency\bass -FuC:\Rafael\GitHub\validation_project\dependency\delphizmq -FuC:\Rafael\GitHub\validation_project\dependency\synaser -FuC:\Rafael\lazarus\lcl\units\i386-win32\win32 -FuC:\Rafael\lazarus\lcl\units\i386-win32 -FuC:\Rafael\lazarus\components\lazutils\lib\i386-win32 -FuC:\Rafael\lazarus\packager\units\i386-win32 -FuC:\Rafael\GitHub\validation_project\ -FUC:\Rafael\GitHub\validation_project\lib\i386-win32\ -l -dLCL -dLCLwin32 stimulus_control.lpr"/>
+</CONFIG>
