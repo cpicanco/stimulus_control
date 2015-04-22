@@ -3,8 +3,8 @@ object UserConfig: TUserConfig
   Height = 493
   Top = 117
   Width = 407
-  HorzScrollBar.Page = 267
-  VertScrollBar.Page = 99
+  HorzScrollBar.Page = 287
+  VertScrollBar.Page = 485
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
   Caption = 'Configurar'
@@ -1633,9 +1633,9 @@ object UserConfig: TUserConfig
   end
   object chkPlayOnSecondMonitor: TCheckBox
     Left = 72
-    Height = 19
-    Top = 466
-    Width = 89
+    Height = 21
+    Top = 464
+    Width = 95
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
     TabOrder = 1
@@ -1651,10 +1651,10 @@ object UserConfig: TUserConfig
     Height = 455
     Top = 0
     Width = 407
-    ActivePage = tbTools
+    ActivePage = tbGeneral
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 4
+    TabIndex = 0
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
@@ -1859,7 +1859,7 @@ object UserConfig: TUserConfig
         Top = 8
         Width = 144
         Caption = 'Mostrar Repetições'
-        ClientHeight = 33
+        ClientHeight = 34
         ClientWidth = 140
         TabOrder = 4
         object seCount: TSpinEdit
@@ -1942,8 +1942,8 @@ object UserConfig: TUserConfig
     end
     object tbTools: TTabSheet
       Caption = 'Ferramentas'
-      ClientHeight = 427
-      ClientWidth = 399
+      ClientHeight = 422
+      ClientWidth = 401
       object btnTargetFile: TButton
         AnchorSideLeft.Control = tbTools
         AnchorSideRight.Control = tbTools
@@ -1951,7 +1951,7 @@ object UserConfig: TUserConfig
         Left = 0
         Height = 25
         Top = 272
-        Width = 394
+        Width = 396
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Right = 5
         Caption = 'Arquivo alvo'
@@ -1963,9 +1963,9 @@ object UserConfig: TUserConfig
         AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 23
+        Height = 25
         Top = 248
-        Width = 399
+        Width = 401
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 1
         Text = 'alvo'
@@ -1977,7 +1977,7 @@ object UserConfig: TUserConfig
         Left = 0
         Height = 25
         Top = 344
-        Width = 399
+        Width = 401
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Novas configurações'
         OnClick = btnClick
@@ -1988,9 +1988,9 @@ object UserConfig: TUserConfig
         AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 23
+        Height = 25
         Top = 320
-        Width = 399
+        Width = 401
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 3
         Text = 'conteúdo'
@@ -2001,8 +2001,8 @@ object UserConfig: TUserConfig
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 33
-        Top = 389
-        Width = 399
+        Top = 384
+        Width = 401
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Aplicar novas configurações ao arquivo alvo'
         OnClick = btnApplyClick
@@ -2018,6 +2018,14 @@ object UserConfig: TUserConfig
         TabOrder = 5
       end
     end
+  end
+  object cbDataTicks: TCheckBox
+    Left = 180
+    Height = 21
+    Top = 464
+    Width = 107
+    Caption = 'Registrar ticks'
+    TabOrder = 3
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Options = [ofPathMustExist, ofEnableSizing, ofViewDetail]

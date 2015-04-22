@@ -50,6 +50,7 @@ type
     FBlc: TBlc;
     FCfgSes: TCfgSes;
     FCrtReached : Boolean;
+    FDataTicks: Boolean;
     FManager : TCounterManager;
     FOnBkGndResponse: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
@@ -91,6 +92,7 @@ type
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
     property SubjName: String  read FSubjName write FSubjName;
     property TestMode: Boolean  read FTestMode write FTestMode;
+    property DataTicks : Boolean read FDataTicks write FDataTicks;
   public
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
@@ -136,7 +138,10 @@ end;
 procedure TSession.EndSess(Sender: TObject);
 begin
   FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
-  FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
+
+  if DataTicks then
+    FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
+
   if Assigned(OnEndSess) then FOnEndSess(Sender);
 end;
 
@@ -216,7 +221,9 @@ end;
 
 procedure TSession.DoEndSess(Sender: TObject);
 begin
-  FRegDataTicks.SaveData(#13#10 + 'Sessão Cancelada' + #13#10);
+  if DataTicks then
+    FRegDataTicks.SaveData(#13#10 + 'Sessão Cancelada' + #13#10);
+
   FRegData.SaveData(#13#10 + 'Sessão Cancelada' + #13#10);
   EndSess(Sender);
 end;
@@ -234,7 +241,9 @@ begin
     end;
 
   FRegData := TRegData.Create(nil, FCfgSes.RootData + FileData);
-  FRegDataTicks:= TRegData.Create(nil, FCfgSes.RootData + 'Ticks_000.txt');
+
+  if DataTicks then
+    FRegDataTicks:= TRegData.Create(nil, FCfgSes.RootData + 'Ticks_000.txt');
 
   {
     File writing operations are called from a different thread
@@ -248,7 +257,8 @@ begin
   FBlc.ShowCounter := ShowCounter;
   FBlc.RegData:= FRegData;
   FBlc.ServerAddress:= FServerAddress;
-  FBlc.RegDataTicks := FRegDataTicks;
+  if DataTicks then
+    FBlc.RegDataTicks := FRegDataTicks;
   FBlc.BackGround:= FBackGround;
 
   FRegData.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
@@ -258,10 +268,13 @@ begin
 
   FTimeStart := GetTickCount;
   FBlc.TimeStart := FTimeStart;
-  FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
+
+  if DataTicks then
+    FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
                     'Sessão:' + #9+ FSessName + #13#10 +
                     'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
                     'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
+
   FManager.OnBeginSess(Self);
 
   PlayBlc(Self);
