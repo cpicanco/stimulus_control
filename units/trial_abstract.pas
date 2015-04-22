@@ -27,7 +27,7 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, LCLProc
 
-  , session_config
+  , config_session
   , client
   , countermanager
   , custom_timer
@@ -43,7 +43,7 @@ type
     FCfgTrial: TCfgTrial;
     FClientThread : TClientThread;
     FData: string;
-    //FDataTicks: string;
+    FDataTicks: string;
     FFilename: string;
     FHeader: string;
     FHeaderTicks: string;
@@ -81,7 +81,7 @@ type
     property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
     property Data: string read FData write FData;
-    //property DataTicks: string read FDataTicks write FDataTicks;
+    property DataTicks: string read FDataTicks write FDataTicks;
     property FileName : string read FFilename write FFilename;
     property Header: string read FHeader write FHeader;
     property HeaderTicks: string read FHeaderTicks write FHeaderTicks;

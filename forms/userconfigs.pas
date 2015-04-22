@@ -36,7 +36,7 @@ uses
 , bass_player
 , client
 , session
-, session_config
+, config_session
 , countermanager
 , escriba
 , regdata

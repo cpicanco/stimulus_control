@@ -30,7 +30,7 @@ uses Dialogs,
      LCLIntf, LCLType, {LMessages,} SysUtils, Variants, Classes,
      Graphics, Controls, Forms, ExtCtrls, FileUtil,
      bass_player,
-     schedules_abstract,
+     schedules_main,
      counter
      ;
 

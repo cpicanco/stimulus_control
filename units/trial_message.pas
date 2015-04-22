@@ -66,22 +66,23 @@ implementation
 
 procedure TMSG.Click;
 begin
-  inherited Click;
   FLat := GetTickCount;
-  {
+  inherited Click;
+
+
   DataTicks := DataTicks +
                FormatFloat('####,####',FLat - Ft) + #9 +
                'BkgndClk' + #9 +
                '-' + #9 +
                '-' + #9 +
-               '-' + #13#10 + #9 + #9; }
+               '-' + #13#10 + #9 + #9;
 
   EndTrial(Self);
 end;
 
 procedure TMSG.Consequence(Sender: TObject);
 begin
-If FFlagResp then
+  if FFlagResp then
     begin
       FFlagResp:= False;
       FLat := GetTickCount;
@@ -157,12 +158,12 @@ end;
 procedure TMSG.MemoClick(Sender: TObject);
 begin
   FLat := GetTickCount;
-  {DataTicks:= DataTicks +
+  DataTicks:= DataTicks +
                FormatFloat('####,####',FLat - Ft) + #9 +
                'MemoClk' + #9 +
                '-' + #9 +
                '-' + #9 +
-               '-' + #13#10 + #9 + #9;}
+               '-' + #13#10 + #9 + #9;
 
   EndTrial(Self);
 end;
@@ -228,12 +229,12 @@ procedure TMSG.TimerCsqTimer(Sender: TObject);
 begin
   FTimerCsq.Enabled:= False;
   FLat := GetTickCount;
-  {DataTicks:= DataTicks +
+  DataTicks:= DataTicks +
                FormatFloat('####,####',FLat - Ft) + #9 +
                'TimeCsq' + #9 +
                '-' + #9 +
                '-' + #9 +
-               '-' + #13#10 + #9 + #9;}
+               '-' + #13#10 + #9 + #9;
   FCanPassTrial := True;
   EndTrial(Self);
 end;

@@ -35,13 +35,15 @@ uses
   //IntToBin
   , strutils
 
- , response_key
- , trial_abstract
- //, countermanager
- //, session_config
- , counter
- , constants
- ;
+  , response_key
+  , trial_abstract
+  //, countermanager
+  //, config_session
+  , counter
+  , constants
+  , interface_rs232
+  , interface_plp
+  ;
 
 type
   TSupportKey = Record
@@ -181,7 +183,7 @@ end;
 procedure TMTS.Dispenser(Csq: Byte; Usb: string);
 begin
   //FRS232.Dispenser(Usb);
-  //FPLP.OutPortOn (Csq);
+  FPLP.OutPortOn (Csq);
 end;
 
 procedure TMTS.DispenserPlusCall;
@@ -319,37 +321,39 @@ begin
 end;
 
 procedure TMTS.Response(Sender: TObject);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   //ShowMessage(Sender.ClassName);
   if FFlagResp then
     begin
       if FFlagModCmps = True then
         begin
-          {DataTicks:=
+          DataTicks:=
             DataTicks +
-            FormatFloat('####,####',GetTickCount - Ft) + #9 +
+            FormatFloat('####,####',TickCount - Ft) + #9 +
             'M1' + #9 +
             ExtractFileName(TKey(Sender).FullPath) + #9 +
             IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left) + #9 +
-            IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;}
+            IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;
           if FFirstResp = False then
             begin
-              FLatMod := GetTickCount;
+              FLatMod := TickCount;
               FFirstResp := True;
             end else;
         end
       else
         begin
-          {DataTicks:=
-            DataTicks +
-            FormatFloat('####,####',GetTickCount - Ft) + #9 +
-            'C' + IntToStr(TKey(Sender).Tag + 1)+ #9 +
-            ExtractFileName(TKey(Sender).FullPath) + #9 +
-            IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left) + #9 +
-            IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;}
+          DataTicks:=
+          DataTicks +
+          FormatFloat('####,####',TickCount - Ft) + #9 +
+          'C' + IntToStr(TKey(Sender).Tag + 1)+ #9 +
+          ExtractFileName(TKey(Sender).FullPath) + #9 +
+          IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left) + #9 +
+          IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;
           if FFirstResp = False then
             begin
-              FLatCmp := GetTickCount;
+              FLatCmp := TickCount;
               FFirstResp := True;
             end else;
         end;
@@ -514,8 +518,8 @@ begin
       ShowKeyC;
     end else begin
       FDataCMsg:= FKPlus.Msg;
-      //FDataCsq:= FKPlus.Csq;
-      //FDataUsb := FKPlus.Usb;
+      FDataCsq:= FKPlus.Csq;
+      FDataUsb := StrToInt(FKPlus.Usb);
       Result:= FKPlus.Res;
       IETConsequence:= FKPlus.IET;
       TimeOut := FKPlus.TO_;
@@ -533,8 +537,8 @@ begin
       ShowKeyC;
     end else begin
       FDataCMsg:= FKMinus.Msg;
-      //FDataCsq:= FKMinus.Csq;
-      //FDataUsb := FKMinus.Usb;
+      FDataCsq:= FKMinus.Csq;
+      FDataUsb := StrToInt(FKMinus.Usb);
       Result:= FKMinus.Res;
       TimeOut:= FKMinus.TO_;
       IETConsequence:= FKMinus.IET;
@@ -569,13 +573,15 @@ begin
 end;
 
 procedure TMTS.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var TickCount : cardinal;
 begin
+  TickCount := GetTickCount;
   inherited MouseDown(Button, Shift, X, Y);
-  {DataTicks := DataTicks +
-             FormatFloat('####,####', GetTickCount - Ft) + #9 +
+  DataTicks := DataTicks +
+             FormatFloat('####,####', TickCount - Ft) + #9 +
              '-' + #9 +
              '-' + #9 +
-             IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9;}
+             IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9;
   FDataBkGndI.Plus(1);
   //FDataBkGndS := FDataBkGndS + IntToStr(X)+ ',' + IntToStr(Y) + #9;      //obsoleto
   CounterManager.OnBkGndResponse(FDataBkGndI);
@@ -727,7 +733,7 @@ end;
 procedure TMTS.Consequence2(Sender: TObject);
 begin
   if FFlagCsq2Fired = False then FFlagCsq2Fired := True;
-  //FPLP.OutPortOn (FKPlus.Csq);
+  FPLP.OutPortOn (FKPlus.Csq);
   //FRS232.Dispenser(FKPlus.Usb);
 end;
 
