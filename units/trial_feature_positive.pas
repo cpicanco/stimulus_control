@@ -29,14 +29,14 @@ uses LCLIntf, LCLType, {LMessages,} Controls, Classes, SysUtils
 
   //, counter
   , dialogs
-  , session_config
+  , config_session
   //, countermanager
   , trial_abstract
   //, custom_timer
   , constants
   //, client
   , draw_methods
-  , schedules_abstract
+  , schedules_main
   , response_key
   ;
 
@@ -65,7 +65,7 @@ type
 
     {
       CSQ2 occurs as soon as the subject's response meets the response schedule, i.e., always contingent.
-      CSQ2 is only available for TSchRRRT instances, see units/schedules_abstract.
+      CSQ2 is only available for TSchRRRT instances, see units/schedules_main.
     }
     CSQ2 : string;
 

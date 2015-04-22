@@ -161,8 +161,14 @@ begin
         Break;
       end;
   aBackground.Free;
+  {$IFDEF WINDOWS}
+  Close;
+  {$ELSE}
   Free;
+  {$ENDIF}
 end;
+
+
 
 procedure TMatrixConfigForm.btnOKClick(Sender: TObject);
 var i : integer;
@@ -177,7 +183,11 @@ begin
   if lbCoordenates.Items.Text <> '' then
     TMatrixForm(Application.Components[i]).SetMatrix(lbCoordenates.Items);
   aBackground.Free;
+  {$IFDEF WINDOWS}
+  Close;
+  {$ELSE}
   Free;
+  {$ENDIF}
 end;
 
 procedure TMatrixConfigForm.edtDistxChange(Sender: TObject);
@@ -352,4 +362,4 @@ begin
 end;
 end.
 
-
+

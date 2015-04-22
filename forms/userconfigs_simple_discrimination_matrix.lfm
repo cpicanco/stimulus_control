@@ -40,9 +40,9 @@ object MatrixForm: TMatrixForm
     end
     object cbPreview: TCheckBox
       Left = 8
-      Height = 24
+      Height = 19
       Top = 128
-      Width = 79
+      Width = 61
       Caption = 'Preview'
       OnChange = cbPreviewChange
       TabOrder = 2
@@ -53,7 +53,7 @@ object MatrixForm: TMatrixForm
       Top = 8
       Width = 141
       Caption = 'N° Tentativas'
-      ClientHeight = 30
+      ClientHeight = 31
       ClientWidth = 137
       TabOrder = 3
       object btnEditNodes: TButton
@@ -66,7 +66,7 @@ object MatrixForm: TMatrixForm
       end
       object seTrials: TSpinEdit
         Left = 2
-        Height = 27
+        Height = 23
         Top = 1
         Width = 71
         MaxValue = 2000
@@ -90,16 +90,16 @@ object MatrixForm: TMatrixForm
       Top = 8
       Width = 159
       Caption = 'Estímulos'
-      ClientHeight = 54
+      ClientHeight = 55
       ClientWidth = 155
       TabOrder = 5
       object cbUseStimuliSet: TCheckBox
         AnchorSideLeft.Control = cbChooseGrid
         AnchorSideBottom.Control = cbChooseGrid
         Left = 0
-        Height = 24
-        Top = -1
-        Width = 87
+        Height = 19
+        Top = 4
+        Width = 70
         Anchors = [akLeft, akBottom]
         BorderSpacing.Bottom = 1
         Caption = 'Conjunto'
@@ -109,9 +109,9 @@ object MatrixForm: TMatrixForm
         AnchorSideLeft.Control = cbUseStimuliSet
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = cbUseStimuliSet
-        Left = 100
+        Left = 83
         Height = 25
-        Top = -1
+        Top = 4
         Width = 54
         BorderSpacing.Left = 13
         Caption = 'Editar'
@@ -120,11 +120,11 @@ object MatrixForm: TMatrixForm
       object cbChooseGrid: TComboBox
         AnchorSideRight.Control = btnEditNodes1
         Left = 0
-        Height = 29
+        Height = 23
         Top = 24
         Width = 154
         Enabled = False
-        ItemHeight = 0
+        ItemHeight = 15
         ItemIndex = 0
         Items.Strings = (
           'NA'
@@ -150,12 +150,12 @@ object MatrixForm: TMatrixForm
       Top = 8
       Width = 141
       Caption = 'GapLength'
-      ClientHeight = 30
+      ClientHeight = 31
       ClientWidth = 137
       TabOrder = 7
       object seGapLength: TSpinEdit
         Left = 2
-        Height = 27
+        Height = 23
         Top = 1
         Width = 71
         MaxValue = 359

@@ -29,7 +29,12 @@ uses
    Classes
  , SysUtils
  , Process
+
+ {$ifdef NoClient}
+ //no zmqapi
+ {$else}
  , zmqapi
+ {$endif}
  ;
 
 type
@@ -45,8 +50,12 @@ type
   TClientThread = class(TThread)
   private
     FServerAddress: string;
+    {$ifdef NoClient}
+    //no zmqapi
+    {$else}
     FContext : TZMQContext;
-	  FSubscriber : TZMQSocket;
+    FSubscriber : TZMQSocket;
+    {$endif}
     FMsg : string;
     FTrialIndex : string;
     FCode : string;
@@ -134,9 +143,10 @@ begin
     {$endif}
 
     {$ifdef NoClient}
+    // do not create contexts
     {$else}
     FContext := TZMQContext.Create;
-	  FSubscriber := FContext.Socket( stSub );
+    FSubscriber := FContext.Socket( stSub );
     FSubscriber.connect( 'tcp://' + FServerAddress);
     FSubscriber.subscribe( '' );
     {$endif}

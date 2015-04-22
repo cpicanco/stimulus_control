@@ -37,8 +37,8 @@ type
 
   { TBresenhamLineForm }
   TTrialsPerNode = array of integer;
-  { TCustomAxis }
 
+  { TCustomAxis }
   TCustomAxis = record
     Trials : integer;
     Angle : string;
@@ -108,6 +108,7 @@ type
     procedure SpinClick(Sender: TObject);
     procedure EditingCDone(Sender: TObject);
   private
+
     FCurrentTrial : integer;
     FGrid : TPoints;
     FGridNames : array of string;
@@ -175,12 +176,12 @@ begin
   OldCanvas := TCanvas.Create;
   SaveOldCanvas;
 
-  mP := ScreenToClient(Point(Mouse.CursorPos.X, Mouse.CursorPos.Y));
-  mX := mP.X;
-  mY := mP.Y;
-
   if FDrawEllipseC then
     begin
+     mP := ScreenToClient(Point(Mouse.CursorPos.X, Mouse.CursorPos.Y));
+     mX := mP.X;
+     mY := mP.Y;
+
      Canvas.Brush.Color:= clGreen;
      Canvas.Brush.Style:= bsSolid;
      Canvas.Ellipse(mX -5, mY -5, mX +5, mY +5);
@@ -518,27 +519,40 @@ end;
 
 procedure TBresenhamLineForm.FormMouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
+var
+  NeedUpdate : boolean;
 begin
+  NeedUpdate := False;
   if (x1.value - X)*(x1.value - X) +
      (y1.value - Y)*(y1.value - Y) < 300 then
     begin
-      FDrawEllipseC := True;
-      Invalidate;
+      if not FDrawEllipseC then
+        begin
+          FDrawEllipseC := True;
+          Self.Cursor := crDrag;
+        end;
     end
   else
     begin
-      FDrawEllipseC := False;
-      Invalidate;
+      if FDrawEllipseC then
+        begin
+          FDrawEllipseC := False;
+          Self.Cursor := crDefault;
+        end;
     end;
 
   if FCapturing then
     begin
       X1.Value := X;
       Y1.Value := Y;
-
       RefreshLine;
+      NeedUpdate := True;
+    end;
 
-      Invalidate;
+  if NeedUpdate then
+    begin
+      NeedUpdate := False;
+      Invalidate; // need to avoid flickering on windows
     end;
 end;
 
@@ -691,7 +705,7 @@ begin
     with FScreenBounds do
       SetBounds(Left, Top, Right - Left, Bottom - Top);
       {$IFDEF WINDOWS}
-        Application.ShowInTaskBar := False;
+        Application.TaskBarBehavior := tbDefault;
       {$ENDIF}
 
       {$IFDEF LCLGTK2}

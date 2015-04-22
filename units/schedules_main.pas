@@ -19,7 +19,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.
 //
-unit schedules_abstract;
+unit schedules_main;
 
 {$mode objfpc}{$H+}
 

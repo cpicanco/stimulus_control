@@ -28,7 +28,7 @@ interface
 uses Classes, Controls, SysUtils, LCLIntf
      //,dialogs
      , bass_player
-     , session_config
+     , config_session
      , countermanager
      , FileUtil
      , regdata
@@ -45,7 +45,6 @@ type
     //FOnBeginSess: TNotifyEvent;
     //FOnBeginTrial: TNotifyEvent;
     //FOnCriteria: TNotifyEvent;
-    //FRegDataTicks: TRegData;
     FAudioDevice: TBassAudioDevice;
     FBackGround: TWinControl;
     FBlc: TBlc;
@@ -61,6 +60,7 @@ type
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
     FRegData: TRegData;
+    FRegDataTicks: TRegData;
     FTimestampsData : TRegData;
     FServerAddress: string;
     FSessName: String;
@@ -107,7 +107,7 @@ implementation
 
 procedure TSession.BkGndResponse(Sender: TObject);
 begin
-  If Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
+  if Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
 end;
 
 procedure TSession.BlcEndBlc(Sender: TObject);
@@ -129,16 +129,15 @@ begin
         end;
     end;
 
-  If Assigned(OnEndBlc) then FOnEndBlc(Sender);
+  if Assigned(OnEndBlc) then FOnEndBlc(Sender);
   PlayBlc(Sender);
 end;
 
 procedure TSession.EndSess(Sender: TObject);
 begin
   FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
-  //FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
-  //FRegDataTicks.Free;
-  If Assigned(OnEndSess) then FOnEndSess(Sender);
+  FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
+  if Assigned(OnEndSess) then FOnEndSess(Sender);
 end;
 
 procedure TSession.EndTrial(Sender: TObject);
@@ -210,13 +209,14 @@ begin
 
   // internal objects
   if Assigned(FRegData) then FreeAndNil(FRegData);
+  if Assigned(FRegDataTicks) then FreeAndNil(FRegDataTicks);
   if Assigned(FBlc) then FreeAndNil(FBlc);
   inherited Destroy;
 end;
 
 procedure TSession.DoEndSess(Sender: TObject);
 begin
-  //FRegDataTicks.SaveData(#13#10 + 'Sessão Cancelada' + #13#10);
+  FRegDataTicks.SaveData(#13#10 + 'Sessão Cancelada' + #13#10);
   FRegData.SaveData(#13#10 + 'Sessão Cancelada' + #13#10);
   EndSess(Sender);
 end;
@@ -234,6 +234,7 @@ begin
     end;
 
   FRegData := TRegData.Create(nil, FCfgSes.RootData + FileData);
+  FRegDataTicks:= TRegData.Create(nil, FCfgSes.RootData + 'Ticks_000.txt');
 
   {
     File writing operations are called from a different thread
@@ -244,12 +245,10 @@ begin
   UpdateTimestampsFileName(FTimestampsData.FileName);
   FTimestampsData.Free;
 
-  //FRegDataTicks:= TRegData.Create(Self, FCfgSes.RootData + 'Ticks_001.txt');
-
   FBlc.ShowCounter := ShowCounter;
   FBlc.RegData:= FRegData;
   FBlc.ServerAddress:= FServerAddress;
-  //FBlc.RegDataTicks := FRegDataTicks;
+  FBlc.RegDataTicks := FRegDataTicks;
   FBlc.BackGround:= FBackGround;
 
   FRegData.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
@@ -259,10 +258,10 @@ begin
 
   FTimeStart := GetTickCount;
   FBlc.TimeStart := FTimeStart;
-  //FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
-  //                  'Sessão:' + #9+ FSessName + #13#10 +
-  //                  'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
-  //                  'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
+  FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
+                    'Sessão:' + #9+ FSessName + #13#10 +
+                    'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
+                    'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
   FManager.OnBeginSess(Self);
 
   PlayBlc(Self);

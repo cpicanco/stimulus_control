@@ -27,12 +27,12 @@ uses
 
   {$IFDEF UNIX}
     {$IFDEF UseCThreads}
-      cthreads
-    , cmem
+      cthreads ,
+      cmem ,
     {$ENDIF}
   //, heaptrc
   {$ENDIF}
-  , Interfaces // this includes the LCL widgetset
+  Interfaces // this includes the LCL widgetset
   , Forms
 
   //Forms
@@ -72,6 +72,10 @@ uses
   , session
   , config_session
 
+  //PLP, RS232
+  , interface_rs232
+  , interface_plp
+
   // helpers
   , draw_methods
   , timestamps_logger
@@ -82,6 +86,7 @@ uses
   , SysUtils
   , FileUtil
   {$endif}
+
   ;
 
 {$R *.res}
@@ -93,6 +98,9 @@ begin
 
   {$ifdef DEBUG}
   DebugLn(mt_Information + 'Debug Logger initialized');
+    {$ifdef WINDOWS}
+    DebugLn(mt_Information + 'Inp32(0):' + IntToStr(Inp32(0)));
+    {$endif}
   {$endif}
 
   Application.Title := ApplicationTitle;

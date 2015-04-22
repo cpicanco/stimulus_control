@@ -29,7 +29,7 @@ uses Classes, Controls, LCLIntf, LCLType,
      ExtCtrls, SysUtils, Graphics, Forms,
      Dialogs,StdCtrls
 
-     , session_config
+     , config_session
      , regdata
      , constants
      , response_key
@@ -57,7 +57,6 @@ type
   TBlc = class(TComponent)
   private
     //FOnBeginTrial: TNotifyEvent;
-    //FRegDataTicks: TRegData;
     //FClientThread : TClientThread;
 
     FBlcHeader: String;
@@ -76,7 +75,7 @@ type
     FFirstTrialBegin: cardinal;
     FITIBegin : cardinal;
     FITIEnd : cardinal;
-    //FDataTicks : string;
+    FDataTicks : string;
 
     // Clock System
     FTimer : TClockThread;
@@ -89,6 +88,7 @@ type
     FBlc: TCfgBlc;
     FTrial: TTrial;
     FRegData: TRegData;
+    FRegDataTicks: TRegData;
     FCounterManager : TCounterManager;
     FCounterLabel : TLabel;
     FIETMedia : TKey;
@@ -123,7 +123,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
-    //property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
+    property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
     property RegData: TRegData read FRegData write FRegData;
@@ -152,7 +152,7 @@ uses debug_logger;
 procedure TBlc.EndBlc(Sender: TObject);
 begin
   FRegData.SaveData(#13#10);
-  //FRegDataTicks.SaveData(#13#10);
+  FRegDataTicks.SaveData(#13#10);
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
 end;
 
@@ -231,9 +231,9 @@ var s0, s1, s2, s3, s4 : string;
   end;
 begin
   FRegData.SaveData (FData);
-  //FRegDataTicks.SaveData(FDataTicks);
+  FRegDataTicks.SaveData(FDataTicks);
   FData := '';
-  //FDataTicks := '';
+  FDataTicks := '';
 
   s1 := '';
   s2 := '';
@@ -498,7 +498,7 @@ begin
   if FTrial.Header <> FLastHeader then
     begin
       FData:= FData + #13#10 + FBlcHeader + #9 + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + #13#10;
-      //FDataTicks:= FDataTicks + #13#10 + FBlcHeader + FTrial.HeaderTicks + #13#10;
+      FDataTicks:= FDataTicks + #13#10 + FBlcHeader + FTrial.HeaderTicks + #13#10;
     end;
   FLastHeader:= FTrial.Header;
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
@@ -531,7 +531,7 @@ begin
           #13#10;
     end;
 
-  //FDataTicks:= FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  #13#10;
+  FDataTicks:= FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  #13#10;
 
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'ITI:' + FormatFloat('00000000;;00000000', (FITIEND - FTimeStart) - (FITIBegin - FTimeStart)));

@@ -29,7 +29,7 @@ uses
   LCLIntf, LCLType, {LMessages,} SysUtils, Classes, Graphics, Controls,
   {StdCtrls,} ExtCtrls, {Math,} Forms, Dialogs,
 
-  session_config;
+  config_session;
 
 type
 
@@ -569,4 +569,4 @@ begin
 end;
 
 
-end.
+end.
