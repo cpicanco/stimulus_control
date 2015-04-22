@@ -62,6 +62,7 @@ type
     btnExportStimulus: TButton;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
+    cbDataTicks: TCheckBox;
     chkPlayOnSecondMonitor: TCheckBox;
     edtTarget: TEdit;
     edtContent: TEdit;
@@ -1127,6 +1128,7 @@ begin
       FSession.OnEndSess:= @EndSession;
       FSession.AudioDevice := FAudioDevice;
       FSession.BackGround := bkgnd;
+      FSession.DataTicks := cbDataTicks.Checked;
 
       FSession.SessName := FConfigs.Name;
       FSession.SubjName := FConfigs.Subject;

@@ -152,7 +152,10 @@ uses debug_logger;
 procedure TBlc.EndBlc(Sender: TObject);
 begin
   FRegData.SaveData(#13#10);
-  FRegDataTicks.SaveData(#13#10);
+
+  if Assigned(RegDataTicks) then
+    RegDataTicks.SaveData(#13#10);
+
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
 end;
 
@@ -231,7 +234,10 @@ var s0, s1, s2, s3, s4 : string;
   end;
 begin
   FRegData.SaveData (FData);
-  FRegDataTicks.SaveData(FDataTicks);
+
+  if Assigned(RegDataTicks) then
+    RegDataTicks.SaveData(FDataTicks);
+
   FData := '';
   FDataTicks := '';
 
