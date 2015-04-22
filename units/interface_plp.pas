@@ -25,16 +25,18 @@ unit interface_plp;
 
 interface
 
-// this unit was not implemented yet
+// this unit was not finished yet
 
 uses
-    Classes, SysUtils,
+    Classes
+  , SysUtils
+  , Dialogs
 
   {$IFDEF Linux}
-    Ports,
+  , Ports
   {$ENDIF}
 
-    custom_timer
+  , custom_timer
   ;
 
 type
