@@ -503,7 +503,7 @@ var CountTr, NumTr, NameTr: String;
 begin
   if FTrial.Header <> FLastHeader then
     begin
-      FData:= FData + #13#10 + FBlcHeader + #9 + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + #13#10;
+      FData:= FData + #13#10 + FBlcHeader + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + #13#10;
       FDataTicks:= FDataTicks + #13#10 + FBlcHeader + FTrial.HeaderTicks + #13#10;
     end;
   FLastHeader:= FTrial.Header;
