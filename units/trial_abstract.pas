@@ -67,6 +67,8 @@ type
     FOnStmResponse: TNotifyEvent;
     FOnWriteTrialData: TNotifyEvent;
     FClockThread : TClockThread;
+    function GetClockThreadInterval: integer;
+    procedure SetClockThreadInterval(AValue: integer);
   strict protected
     FIscorrection : Boolean;
     procedure ClientStatus(msg : string);
@@ -74,6 +76,7 @@ type
     procedure ThreadClock(Sender: TObject); virtual; abstract;
     procedure WriteData(Sender: TObject); virtual; abstract;
   public
+    constructor Create (AOwner : TComponent); override;
     destructor Destroy; override;
     procedure DispenserPlusCall; virtual; abstract;
     procedure Play(TestMode: Boolean; Correction : Boolean); virtual; abstract;
@@ -102,6 +105,7 @@ type
     property OnNone: TNotifyEvent read FOnNone write FOnNone;
     property OnStmResponse: TNotifyEvent read FOnStmResponse write FOnStmResponse;
     property OnWriteTrialData: TNotifyEvent read FOnWriteTrialData write FOnWriteTrialData;
+    property ClockThreadInterval : integer read GetClockThreadInterval write SetClockThreadInterval;
   end;
 
 implementation
@@ -120,6 +124,16 @@ begin
   FClientThread.Start;
 end;
 
+function TTrial.GetClockThreadInterval: integer;
+begin
+  Result := FClockThread.Interval;
+end;
+
+procedure TTrial.SetClockThreadInterval(AValue: integer);
+begin
+  FClockThread.Interval := AValue;
+end;
+
 procedure TTrial.ClientStatus(msg: string);
  begin
   {$ifdef DEBUG}
@@ -131,9 +145,14 @@ end;
 
 procedure TTrial.StartTrial(Sender: TObject);
 begin
-  FClockThread := TClockThread.Create(True);
   FClockThread.OnTimer := @ThreadClock; // descendents can implement the ThreadClock method
   FClockThread.Start;
+end;
+
+constructor TTrial.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FClockThread := TClockThread.Create(True);
 end;
 
 destructor TTrial.Destroy;

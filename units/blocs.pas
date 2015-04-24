@@ -322,7 +322,7 @@ begin
 
   if Assigned(OnEndTrial) then FOnEndTrial(Sender);
 
-  FTrial.Hide;
+  //FTrial.Hide;
 
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'ITI - inter trial interval');

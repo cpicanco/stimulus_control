@@ -366,8 +366,6 @@ procedure TMRD.StartTrial(Sender: TObject);
   end;
 
 begin
-  inherited StartTrial(Sender);
-
   if FIsCorrection then
     begin
       BeginCorrection (Self);
@@ -382,6 +380,7 @@ begin
   FFirstResp := True;
   FCanResponse:= True;
   FDataSupport.StmBegin := GetTickCount;
+  inherited StartTrial(Sender);
 end;
 
 procedure TMRD.BeginStarter;
@@ -432,6 +431,7 @@ end;
 
 procedure TMRD.EndTrial(Sender: TObject);
 begin
+  Hide;
   FDataSupport.StmEnd := GetTickCount;
   WriteData(Sender);
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);

@@ -143,6 +143,23 @@ begin
   if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
 end;
 
+{
+Limited hold need to be controlled by a TTrial descendent.
+
+The current scope is the TFPE.
+
+This change may lead to an upgrade with no backward compatibility.
+This upgrade aims to
+ 1) implement a central Thread Timer for improved performance;
+ 2) Schedules clocks should wait for an event
+   instead actively increment integers. This will change completely the current Clock implementation;
+
+For now, this change means that in the TFPE,
+ a schedule can not control the end of trial anymore.
+
+ See StartTrial and ThreadClock procedures for the limited hold implementation.
+
+}
 procedure TFPE.Consequence(Sender: TObject);
 begin
   if FCanResponse then
@@ -201,7 +218,7 @@ end;
 
 procedure TFPE.ThreadClock(Sender: TObject);
 begin
-  if Visible then FSchedule.Clock;
+  Consequence;
 end;
 
 procedure TFPE.KeyDown(var Key: Word; Shift: TShiftState);
@@ -357,7 +374,9 @@ begin
   with FSchedule do
     begin
       OnConsequence2 := @Consequence2;
-      OnConsequence:= @Consequence;
+
+      // see Consequence
+      //OnConsequence:= @Consequence;
       OnResponse:= @Response;
     end;
 
@@ -449,30 +468,32 @@ end;
 
 procedure TFPE.StartTrial(Sender: TObject);
 //var a1 : integer;
-
+  {
   procedure KeyStart(var aKey : TKey);
   begin
     aKey.Play;
     aKey.Visible:= True;
   end;
-
+  }
 begin
-  inherited StartTrial(Sender);
-
   if FIsCorrection then
     begin
       BeginCorrection(Self);
     end;
-
+  {
   if FUseMedia then
     begin
       // not implemented yet
     end;
+  }
 
   FFlagCsq2Fired := False;
   FFirstResp := True;
   FCanResponse:= True;
   FDataSupport.StmBegin := GetTickCount;
+
+  ClockThreadInterval := FSchedule.LimitedHold;
+  inherited StartTrial(Sender);
 end;
 
 procedure TFPE.BeginStarter;
@@ -517,6 +538,7 @@ end;
 
 procedure TFPE.EndTrial(Sender: TObject);
 begin
+  Hide;
   FDataSupport.StmEnd := GetTickCount;
   WriteData(Sender);
 
