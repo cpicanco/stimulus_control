@@ -29,6 +29,9 @@ uses Classes, SysUtils,
      schedules;
 
 type
+
+  { TSchMan }
+
   TSchMan = class(TComponent)
   protected
     FAbsSch: TAbsSch;
@@ -41,10 +44,12 @@ type
     procedure AbsSchResponce(Sender: TObject);
     procedure SetKind(Kind: String);
     function GetTime : integer;
+    function GetLimitedHold : integer;
   public
     procedure Clock;
     procedure DoResponse;
     procedure Play;
+    property LimitedHold : integer read GetLimitedhold;
     property Kind: String write SetKind;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnConsequence2: TNotifyEvent read FOnConsequence2 write FOnConsequence2;
@@ -198,7 +203,17 @@ end;
 function TSchMan.GetTime: integer;
 begin
   if FAbsSchLoaded then Result:= FAbsSch.Time
-  else Result:= -1;
+  else Result := -1;
+end;
+
+function TSchMan.GetLimitedHold: integer;
+begin
+  // Value 2 is not garanted to be the limited hold right now
+  // it is necessary to create a standard
+  // but we need a schedules and schedules_main refactoring first.
+  // This refactoring will follow a Behavior Analysis ontology
+  if FAbsSchLoaded then Result := FAbsSch.Value2
+  else Result := -1;
 end;
 
 procedure TSchMan.Play;
