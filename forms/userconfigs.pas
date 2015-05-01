@@ -111,6 +111,7 @@ type
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
+    procedure cbDrawTrialGroupChange(Sender: TObject);
     procedure chkUseMediaChange(Sender: TObject);
 
     procedure FormCreate(Sender: TObject);
@@ -269,12 +270,18 @@ end;
 
 procedure TUserConfig.StringGrid1DrawCell(Sender: TObject; aCol, aRow: Integer;
   Rect: TRect; aState: TGridDrawState);
-var OldCanvas : TCanvas;
+var
+  OldCanvas : TCanvas;
+
+  i, aInc : integer;
+
   procedure SaveOldCanvas;
   begin
     OldCanvas.Brush.Style := StringGrid1.Canvas.Brush.Style;
     OldCanvas.Pen.Width := StringGrid1.Canvas.Pen.Width;
     OldCanvas.Pen.Color := StringGrid1.Canvas.Pen.Color;
+    OldCanvas.Pen.Mode := StringGrid1.Canvas.Pen.Mode;
+
   end;
 
   procedure LoadOldCanvas;
@@ -282,24 +289,48 @@ var OldCanvas : TCanvas;
     StringGrid1.Canvas.Brush.Style := OldCanvas.Brush.Style;
     StringGrid1.Canvas.Pen.Width := OldCanvas.Pen.Width;
     StringGrid1.Canvas.Pen.Color := OldCanvas.Pen.Color;
+    StringGrid1.Canvas.Pen.Mode := OldCanvas.Pen.Mode;
   end;
 
 begin
   OldCanvas := TCanvas.Create;
+  SaveOldCanvas;
   try
     if (aCol >= Low(FRepetitionMatrix)) and
        (aCol <= High(FRepetitionMatrix)) then
-         if (aRow >= Low(FRepetitionMatrix[aCol])) and
-            (aRoW <= High(FRepetitionMatrix[aCol])) then
-    if FRepetitionMatrix[aCol,aRow] then
-      begin
-        SaveOldCanvas;
-        StringGrid1.Canvas.Brush.Style := bsClear;
-        StringGrid1.Canvas.Pen.Width:= 3;
-        StringGrid1.Canvas.Pen.Color := clRed;
-        StringGrid1.Canvas.Rectangle(Rect);
-        LoadOldCanvas;
-      end;
+      if (aRow >= Low(FRepetitionMatrix[aCol])) and
+        (aRoW <= High(FRepetitionMatrix[aCol])) then
+        if FRepetitionMatrix[aCol,aRow] then
+          begin
+            StringGrid1.Canvas.Brush.Style := bsClear;
+            StringGrid1.Canvas.Pen.Width:= 3;
+            StringGrid1.Canvas.Pen.Color := clRed;
+            StringGrid1.Canvas.Rectangle(Rect);
+            LoadOldCanvas;
+          end;
+
+  if cbDrawTrialGroup.Checked then
+    begin
+      StringGrid1.Canvas.Pen.Color := clBlue;
+      aInc := StrToInt(edtTrialGroup.Text);
+      i := 0;
+
+      while i <= StringGrid1.RowCount -1 do
+        begin
+          if aRow = i then
+            begin
+              StringGrid1.Canvas.Pen.Color := clBlue;
+              StringGrid1.Canvas.Pen.Width := 2;
+              StringGrid1.Canvas.Pen.Mode := pmMerge;
+
+              StringGrid1.Canvas.MoveTo(Rect.Left -1, Rect.Bottom -2);
+              StringGrid1.Canvas.LineTo(Rect.Right -1, Rect.Bottom -2);
+              LoadOldCanvas;
+            end;
+          Inc(i, aInc);
+        end;
+      LoadOldCanvas;
+    end;
 
   finally
     OldCanvas.Free;
@@ -1211,6 +1242,11 @@ begin
 
   if SaveDialog1.Execute then
     FEscriba.SaveMemoTextToTxt(SaveDialog1.FileName);
+end;
+
+procedure TUserConfig.cbDrawTrialGroupChange(Sender: TObject);
+begin
+  Invalidate;
 end;
 
 procedure TUserConfig.btnClick(Sender: TObject);

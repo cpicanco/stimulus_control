@@ -1930,6 +1930,7 @@ object UserConfig: TUserConfig
           Top = 3
           Width = 21
           Checked = True
+          OnChange = cbDrawTrialGroupChange
           State = cbChecked
           TabOrder = 0
         end
