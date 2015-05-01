@@ -176,6 +176,15 @@ begin
   OldCanvas := TCanvas.Create;
   SaveOldCanvas;
 
+  if cbUseGrid.Checked then
+    begin
+      Canvas.Pen.Color:= clRed;
+      Canvas.Rectangle(FCentralRect);
+      Canvas.Pen.Color:= clDefault;
+    end;
+
+  Canvas.Pen.Color := clBlack;
+
   if FDrawEllipseC then
     begin
      mP := ScreenToClient(Point(Mouse.CursorPos.X, Mouse.CursorPos.Y));
@@ -193,6 +202,7 @@ begin
       PlotPixel(Canvas, FBresenhamLine[i], clBlack);
     end;
 
+  Canvas.Font.Color := clBlack;
   for i := Low(FLine) to High(FLine) do
     begin
       mX := FLine[i].X;
@@ -201,9 +211,6 @@ begin
       Canvas.TextOut(mX, mY -25, IntToStr(FTrialsPerNode[i]))
     end;
 
-  Canvas.Pen.Color:= clRed;
-  Canvas.Rectangle(FCentralRect);
-  Canvas.Pen.Color:= clBlack;
   Canvas.TextOut(x0.Value + 10, y0.Value + 10 , FAngle);
 
   if cbPreview.Checked then
@@ -257,8 +264,13 @@ begin
 end;
 
 procedure TBresenhamLineForm.SpinClick(Sender: TObject);
-  var i : integer;
+  var
+    Previewing : Boolean;
+    i : integer;
 begin
+  Previewing := cbPreview.Checked;
+  cbPreview.Checked := False;
+
   if (Sender = x0) or (Sender = x1) or (Sender = y0) or (Sender = y1) or (Sender = seNodes) then
     RefreshLine;
 
@@ -275,6 +287,7 @@ begin
         FTrialsPerNode[i] := seTrials.Value;
     end;
 
+  cbPreview.Checked := Previewing;
   Invalidate;
 end;
 
@@ -303,16 +316,10 @@ end;
 procedure TBresenhamLineForm.RefreshLine;
 begin
   FBresenhamLine := BresenhamLine(x0.value, x1.Value, y0.value, y1.value);
-  if cbCentralized.Checked then
-      begin
-        FLine := GetLine(FBresenhamLine);
-        CentralizeStm;
-      end
-    else
-      begin
-        FLine := GetLine(FBresenhamLine);
-        FMirroredLine := GetMirroredLine(FLine);
-      end;
+  FLine := GetLine(FBresenhamLine);
+  if cbCentralized.Checked then CentralizeStm
+  else FMirroredLine := GetMirroredLine(FLine);
+
   FAngle := GetAngleFromPoints(Point(x0.value,y0.value), Point(x1.Value, y1.value));
 end;
 
@@ -365,23 +372,22 @@ end;
 
 procedure TBresenhamLineForm.btnShowClick(Sender: TObject);
 begin
-
   with StringGrid1 do
-  if (FAxis.CanRead) and (Cells[0, Row] <> '') then
-    begin
-      //showmessage(IntToStr(Row));
-      FAngle := FAxis.List[Row -1].Angle;
-      seSize.value := FAxis.List[Row -1].Size;
-      FBresenhamLine := FAxis.List[Row -1].BresenhamLine;
-      FLine := FAxis.List[Row -1].Line;
-      FMirroredLine := GetMirroredLine(FLine);
-      FTrialsPerNode := FAxis.List[Row -1].TrialsPerNode;
+    if (FAxis.CanRead) and (Cells[0, Row] <> '') then
+      begin
+        //showmessage(IntToStr(Row));
+        FAngle := FAxis.List[Row -1].Angle;
+        seSize.value := FAxis.List[Row -1].Size;
+        FBresenhamLine := FAxis.List[Row -1].BresenhamLine;
+        FLine := FAxis.List[Row -1].Line;
+        FMirroredLine := GetMirroredLine(FLine);
+        FTrialsPerNode := FAxis.List[Row -1].TrialsPerNode;
 
-      x0.value := FLine[Low(FLine)].X;
-      y0.value := FLine[Low(FLine)].Y;
-      x1.value := FLine[High(FLine)].X;
-      y1.value := FLine[High(FLine)].Y;
-    end;
+        x0.value := FLine[Low(FLine)].X;
+        y0.value := FLine[Low(FLine)].Y;
+        x1.value := FLine[High(FLine)].X;
+        y1.value := FLine[High(FLine)].Y;
+      end;
   Invalidate;
 end;
 
