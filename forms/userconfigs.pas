@@ -63,16 +63,20 @@ type
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
     cbDataTicks: TCheckBox;
+    cbDrawTrialGroup: TCheckBox;
     chkPlayOnSecondMonitor: TCheckBox;
+    edtTrialGroup: TEdit;
     edtTarget: TEdit;
     edtContent: TEdit;
     gbRepetitions: TGroupBox;
+    gbTrialGroup: TGroupBox;
     leServerAddress: TLabeledEdit;
     lblITI: TLabel;
     leParticipant: TLabeledEdit;
     leFillValue: TLabeledEdit;
     leSessionName: TLabeledEdit;
     Memo1: TMemo;
+    piTrialGroup: TMenuItem;
     piFillEven: TMenuItem;
     piFillOdd: TMenuItem;
     piFillAll: TMenuItem;
@@ -124,7 +128,7 @@ type
   private
     FRepetitionMatrix : array of array of boolean;
     FLastFocusedCol : integer;
-    FNumTrials : integer;
+    //FNumTrials : integer;
     FSession : TSession;
     FManager : TCounterManager;
     FConfigs : TCfgSes;
@@ -134,7 +138,7 @@ type
     function MeetCondition(aCol, aRow : integer): boolean;
     procedure CheckRepetitionCol(aCol : integer);
     procedure EndSession(Sender : TObject);
-    procedure RandTrialIndex;
+    procedure RandTrialOrder(BeginRow, EndRow : integer);
     procedure ResetRepetionMatrix;
     procedure DebugStatus(Message: String);
     //SimpleGui : TSimpleGui;
@@ -167,6 +171,7 @@ resourcestring
   rsFillTypeMatriz = 'Matriz';
   rsRandomizeTrials = 'Randomizar ordem das tentativas';
   rsRandomizeResponses = 'Randomizar respostas';
+  rsRandomizeGroupTrial = 'Randomizar em grupos ordem das tentativas';
 
 
 implementation
@@ -225,6 +230,9 @@ begin
 
   if TMenuItem(Sender) = piTrials then
       btnRandomize.Hint := rsRandomizeTrials;
+
+  if TMenuItem(Sender) = piTrialGroup then
+      btnRandomize.Hint := rsRandomizeGroupTrial;
 
   if TMenuItem(Sender) = piExpectedResponse then
       btnRandomize.Hint := rsRandomizeResponses;
@@ -317,7 +325,10 @@ begin
       Result := piFillEven.Checked;
 end;
 
-procedure TUserConfig.RandTrialIndex;
+{
+  Each trial is a Row in the StringGrid1 except the first.
+}
+procedure TUserConfig.RandTrialOrder(BeginRow, EndRow : integer);
 var
   i, NumTrials, RandLine: integer;
   InCell : string;
@@ -328,7 +339,7 @@ var
   begin
     for j := 0 to StringGrid1.ColCount - 1 do
       begin
-        InCell := StringGrid1.Cells[(j), (Line)];
+        InCell := StringGrid1.Cells[j, Line];
         StrArray[j] := InCell;
       end;
   end;
@@ -339,7 +350,7 @@ var
     for j := 0 to StringGrid1.ColCount - 1 do
       begin
         InCell := StrArray[j];
-        StringGrid1.Cells[(j), (Line)] := InCell;
+        StringGrid1.Cells[j, Line] := InCell;
       end;
   end;
 
@@ -348,27 +359,25 @@ var
   begin
     for j := 0 to StringGrid1.ColCount - 1 do
       begin
-        InCell := StringGrid1.Cells[(j), (Old)];
-        StringGrid1.Cells[(j), (New)] := InCell;
+        InCell := StringGrid1.Cells[j, Old];
+        StringGrid1.Cells[j, New] := InCell;
       end;
   end;
 
 begin
-  Randomize;
   SetLength(StrArray, StringGrid1.ColCount);
-  NumTrials := FNumTrials;
-  for i := 0 to NumTrials - 1 do
+
+  for i := BeginRow to EndRow do
     begin
-      if NumTrials > 1 then
-        begin
-          RandLine := Round (Random * (NumTrials - 1));
-          //if ArraySize > 2 then
-          //  while r = n do r := Round (Random * (ArraySize - 1));
-          SaveLine (i + 1);
-          ChangeLines (i + 1, RandLine + 1);
-          SendToLine (RandLine + 1);
-        end
-      else;
+      RandLine := Random(EndRow - BeginRow) + BeginRow;
+      {$ifdef DEBUG}
+        DebugLn(mt_Information + 'RandTrialOrder  ' + IntToStr(BeginRow) + ',' +  IntToStr(EndRow) );
+        DebugLn(mt_Information + IntToStr(i) + ',' + IntToStr(RandLine));
+      {$endif}
+
+      SaveLine (i);
+      ChangeLines (i, RandLine);
+      SendToLine (RandLine);
     end;
 end;
 
@@ -450,19 +459,38 @@ begin
 end;
 
 procedure TUserConfig.btnRandomizeClick(Sender: TObject);
-var aRow : integer;
+var
+  aRow,
+  BeginRow, EndRow: integer;
 
 begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Information + 'btnRandomizeClick');
+  {$endif}
+
   if piTrials.Checked then
     begin
-      RandTrialIndex;
+      RandTrialOrder(1, StringGrid1.RowCount -1);
+    end;
+
+  if piTrialGroup.Checked then
+    begin
+      aRow {increment} := StrToInt(edtTrialGroup.Text);
+      BeginRow := 1;
+      EndRow :=  aRow {increment} + 1;
+      while EndRow <= StringGrid1.RowCount - 1 do
+        begin
+          RandTrialOrder(BeginRow, EndRow -1);
+          Inc(BeginRow, aRow {increment});
+          Inc(EndRow, aRow {increment});
+        end;
     end;
 
   if piExpectedResponse.Checked then
     begin
       with StringGrid1 do
-      for aRow := 1 to RowCount -1 do
-        Cells[6, aRow] := IntToStr(Round(Random * 1))
+        for aRow := 1 to RowCount -1 do
+          Cells[6, aRow] := IntToStr(Round(Random * 1))
     end;
 
   ResetRepetionMatrix;
@@ -779,11 +807,17 @@ var
                 StringGrid1.Cells[7, aTrial + 1];
   end;
 
-  function GetGapBool(StmNumber : integer) : Boolean;
+  // '0' false; '1' true
+  function GetGapString(StmNumber : integer) : String;
+  var aGap : Boolean;
   begin
-    Result := StrToBool(StringGrid1.Cells[6 {expected response}, aTrial + 1]);  //0 is false, any other value is true
-    if (StmNumber = 1) then
-    else Result := not Result;
+    if StmNumber = 1 then
+      Result := StringGrid1.Cells[6 {expected response}, aTrial + 1]
+    else
+      begin
+        aGap := StrToBool(StringGrid1.Cells[6 , aTrial + 1]);
+        Result := BoolToStr(not aGap, '1', '0');
+      end;
   end;
 
   function GetNumComp : integer;
@@ -851,7 +885,7 @@ begin
           for aStm := 1 to 2 do
             begin
               FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cBnd] := GetBndString(aStm);
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap] := BoolToStr(GetGapBool(aStm), '1','0');
+              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap] := GetGapString(aStm);
               FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := '0';
               FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := '360'
             end;
@@ -933,11 +967,12 @@ end;
 
 procedure TUserConfig.btnGridTypeClick(Sender: TObject);
 var
-  aRow, aCol, aNode, aTrial, aAxis : integer;
+  aRow, aCol, aNode, aTrial, aAxis, aRepeat : integer;
   cAngle,              //Angle
   cSize,               //Size. width, heigth
   cX0, cY0,            //line
   cX1, cY1 : string;   //MirroredLine
+  Closed : Boolean;
 
   procedure AddAxesToGrid;
   begin
@@ -947,6 +982,9 @@ var
         cY0 := IntToStr(List[aAxis].Line[aNode].Y);
         cX1 := IntToStr(List[aAxis].MirroredLine[aNode].X);
         cY1 := IntToStr(List[aAxis].MirroredLine[aNode].Y);
+        if aTrial = 0 then
+          Closed := True
+        else Closed := False;
       end;
 
     with StringGrid1 do
@@ -958,11 +996,11 @@ var
         Cells[3, aRow] := cY0;
         Cells[4, aRow] := cX1;
         Cells[5, aRow] := cY1;
-        Cells[6, aRow] := IntToStr(Round(Random * 1));
+        Cells[6, aRow] := BoolToStr(Closed, '1', '0');
         Cells[7, aRow] := cSize;
         Cells[8, aRow] := 'FT 20';
         Inc(aRow);
-        end;
+      end;
   end;
 
   procedure AddMatrixTrialToGrid;
@@ -1021,21 +1059,41 @@ var
   end;
 
 begin
+  {
+    Example:
+
+    4 axis {0, 45, 90, 135}
+    3 nodes per axis
+    2 trials per node
+    ______________________________
+
+    Equals to a Group of 24 trials to repeat.
+
+    It gives 96 trials repeating by 4.
+    ______________________________
+
+
+  }
   if piAxes.Checked then
   begin
     aRow := 1;
     BresenhamLineForm := TBresenhamLineForm.Create(Application);
     if BresenhamLineForm.ShowModal = mrOk then
       begin
-        with BresenhamLineForm.Axis do
-          for aAxis := Low(List) to High(List) do
-            begin
-              cAngle := List[aAxis].Angle;
-              cSize := IntToStr(List[aAxis].Size);
-              for aNode := Low(List[aAxis].Line) to High(List[aAxis].Line) do
-                for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] - 1 do AddAxesToGrid;
-            end;
-        FNumTrials := aRow - 1;
+        for aRepeat := 0 to BresenhamLineForm.seRepeat.Value -1 do
+          with BresenhamLineForm.Axis do
+            for aAxis := Low(List) to High(List) do
+              begin
+                cAngle := List[aAxis].Angle;
+                cSize := IntToStr(List[aAxis].Size);
+                for aNode := Low(List[aAxis].Line) to High(List[aAxis].Line) do
+                  for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] - 1 do AddAxesToGrid;
+              end;
+
+        //FNumTrials := aRow - 1;
+        {$ifdef DEBUG}
+          DebugLn(mt_Information + BresenhamLineForm.ClassName +  ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
+        {$endif}
         BresenhamLineForm.Free;
         ResetRepetionMatrix;
         FLastFocusedCol := -1;
@@ -1051,7 +1109,10 @@ begin
           begin
             for aTrial := Low(MatrixForm.Trials) to High(MatrixForm.Trials) do AddMatrixTrialToGrid;
 
-            FNumTrials := aRow - 1;
+            //FNumTrials := aRow - 1;
+            {$ifdef DEBUG}
+              DebugLn(mt_Information + MatrixForm.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
+            {$endif}
             MatrixForm.Free;
             ResetRepetionMatrix;
             FLastFocusedCol := -1;
