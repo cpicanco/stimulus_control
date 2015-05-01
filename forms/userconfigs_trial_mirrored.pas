@@ -73,9 +73,11 @@ type
     gbTrials: TGroupBox;
     lbNodes: TLabel;
     lbSize: TLabel;
+    lbRepeat: TLabel;
     Panel1: TPanel;
     seNodes: TSpinEdit;
     seSize: TSpinEdit;
+    seRepeat: TSpinEdit;
     seTrials: TSpinEdit;
     StringGrid1: TStringGrid;
     PreviewTimer: TTimer;
@@ -161,6 +163,7 @@ var
     OldCanvas.Pen.Color := Canvas.Pen.Color;
     OldCanvas.Pen.Style := Canvas.Pen.Style;
     OldCanvas.Pen.Mode := Canvas.Pen.Mode;
+    OldCanvas.Pen.Width := Canvas.Pen.Width;
   end;
 
   procedure LoadOldCanvas;
@@ -171,6 +174,7 @@ var
     Canvas.Pen.Color := OldCanvas.Pen.Color;
     Canvas.Pen.Style := OldCanvas.Pen.Style;
     Canvas.Pen.Mode := OldCanvas.Pen.Mode;
+    Canvas.Pen.Width := OldCanvas.Pen.Width;
   end;
 begin
   OldCanvas := TCanvas.Create;
@@ -180,7 +184,6 @@ begin
     begin
       Canvas.Pen.Color:= clRed;
       Canvas.Rectangle(FCentralRect);
-      Canvas.Pen.Color:= clDefault;
     end;
 
   Canvas.Pen.Color := clBlack;
@@ -216,10 +219,11 @@ begin
   if cbPreview.Checked then
     begin
       DrawCircle(Canvas, FLine[FCurrentTrial].X, FLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
-      DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
+      DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, True, 0, 1);
     end;
 
   LoadOldCanvas;
+
   case cbChooseGrid.ItemIndex of
     0:{ do nothing };
     1..2:begin
