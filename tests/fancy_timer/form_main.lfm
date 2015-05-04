@@ -50,12 +50,13 @@ object Form1: TForm1
     Left = 104
     Height = 64
     Top = 36
-    Width = 170
+    Width = 192
     Caption = 'FClock'
     ClientHeight = 47
-    ClientWidth = 166
+    ClientWidth = 188
     TabOrder = 4
     object LabelCounter: TLabel
+      Tag = -1
       Left = 8
       Height = 32
       Top = 8
@@ -67,18 +68,18 @@ object Form1: TForm1
     end
   end
   object btnStart2: TButton
-    Left = 296
+    Left = 384
     Height = 25
-    Top = 64
+    Top = 60
     Width = 75
     Caption = 'start'
     OnClick = btnStart2Click
     TabOrder = 5
   end
   object btnRestart2: TButton
-    Left = 296
+    Left = 384
     Height = 25
-    Top = 92
+    Top = 88
     Width = 75
     Caption = 'restart'
     Enabled = False
@@ -86,22 +87,36 @@ object Form1: TForm1
     TabOrder = 6
   end
   object btnStop2: TButton
-    Left = 296
+    Left = 384
     Height = 25
-    Top = 124
+    Top = 172
     Width = 75
     Caption = 'stop'
     Enabled = False
     OnClick = btnStop2Click
     TabOrder = 7
   end
-  object Button1: TButton
-    Left = 296
+  object edtRestart: TEdit
+    Left = 384
     Height = 25
-    Top = 168
+    Top = 116
     Width = 75
-    Caption = 'Button1'
-    OnClick = Button1Click
     TabOrder = 8
+    Text = '0'
+  end
+  object lblFN: TLabel
+    Tag = -1
+    AnchorSideLeft.Control = btnStart2
+    AnchorSideTop.Control = btnRestart2
+    AnchorSideRight.Control = btnRestart2
+    Left = 314
+    Height = 15
+    Top = 93
+    Width = 65
+    Anchors = [akTop, akRight]
+    BorderSpacing.Top = 5
+    BorderSpacing.Right = 5
+    Caption = 'max: FN -1'
+    ParentColor = False
   end
 end
