@@ -41,8 +41,9 @@ type
     btnStop: TButton;
     btnRestart: TButton;
     btnStop2: TButton;
-    Button1: TButton;
+    edtRestart: TEdit;
     GroupBox1: TGroupBox;
+    lblFN: TLabel;
     LabelCounter: TLabel;
     btnAssigned: TButton;
     procedure btnRestart2Click(Sender: TObject);
@@ -51,7 +52,6 @@ type
     procedure btnStop2Click(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure btnRestartClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnAssignedClick(Sender: TObject);
   private
@@ -94,44 +94,6 @@ begin
   FClock.Start;
 end;
 
-procedure TForm1.btnStop2Click(Sender: TObject);
-begin
-
-end;
-
-procedure TForm1.btnStart2Click(Sender: TObject);
-var
-  i : integer;
-
-begin
-  btnStart2.Enabled := False;
-  btnStop2.Enabled := True;
-  btnRestart2.Enabled := True;
-
-  SetLength(FClocks, FN);
-  SetLength(FCardinals, FN);
-
-  for i := 0 to FN -1 do
-    begin
-      FCardinals[i] := 0;
-      FClocks[i] := TClockThread.Create(True);
-      FClocks[i].Host := FLabels[i];
-      //FClocks[i].Interval := 500;
-      FClocks[i].OnTimer := @OnClockTimerEx;
-      FClocks[i].OnTerminate := @OnClockTerminateEX;
-      //FClocks[i].WaitFor;
-    end;
-
-  for i := 0 to FN -1 do
-    begin
-      FClocks[i].Start;
-    end;
-end;
-
-procedure TForm1.btnRestart2Click(Sender: TObject);
-begin
-
-end;
 
 procedure TForm1.btnStopClick(Sender: TObject);
 begin
@@ -151,9 +113,15 @@ begin
   RTLeventSetEvent(FClock.ResumeEvent);
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.OnClockTimer(Sender: TObject);
 begin
-  FLabels[0].Caption := 'oi';
+  LabelCounter.Caption := IntToStr(FCardinal);
+  Inc(FCardinal);
+end;
+
+procedure TForm1.OnClockTerminate(Sender: TObject);
+begin
+  LabelCounter.Caption := IntToStr(TClockThread(Sender).ThreadID);
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -168,10 +136,12 @@ begin
       FLabels[i] := TLabel.Create(Self);
       FLabels[i].Caption := '0';
       FLabels[i].Tag := i;
-      FLabels[i].Left := 380;
-      FLabels[i].Top := 64 + (i * 20);
+      FLabels[i].Left := btnStart2.Left + btnStart2.Width + 20;
+      FLabels[i].Top := btnStart2.Top + (i * 20);
       FLabels[i].Parent := Self;
     end;
+
+  lblFN.Caption := 'max: ' + IntToStr(FN) + ' -1';
 end;
 
 procedure TForm1.btnAssignedClick(Sender: TObject);
@@ -179,6 +149,58 @@ begin
   // FreeOnTerminate := True does not assign 'nil' to FClock
   // But it will free the thread's resources.
   ShowMessage(BoolToStr(Assigned(FClock), 'True', 'False'));
+end;
+
+procedure TForm1.btnStart2Click(Sender: TObject);
+var
+  i : integer;
+
+begin
+  btnStart2.Enabled := False;
+  btnStop2.Enabled := True;
+  btnRestart2.Enabled := True;
+
+  SetLength(FClocks, FN);
+  SetLength(FCardinals, FN);
+
+  for i := 0 to FN -1 do
+    begin
+      FCardinals[i] := 0;
+      FClocks[i] := TClockThread.Create(True);
+      FClocks[i].Host := FLabels[i];
+      FClocks[i].Interval := 10;
+      FClocks[i].OnTimer := @OnClockTimerEx;
+      FClocks[i].OnTerminate := @OnClockTerminateEX;
+      //FClocks[i].WaitFor;
+    end;
+
+  for i := 0 to FN -1 do
+    begin
+      FClocks[i].Start;
+    end;
+end;
+
+procedure TForm1.btnRestart2Click(Sender: TObject);
+var
+  aThread : integer;
+begin
+  aThread := StrToIntDef(edtRestart.Text, 0);
+
+  FCardinals[aThread] := 0;
+  FLabels[aThread].Caption := IntToStr(FCardinals[aThread]);
+  RTLeventSetEvent(FClocks[aThread].ResumeEvent);
+
+end;
+
+procedure TForm1.btnStop2Click(Sender: TObject);
+var i : integer;
+begin
+  btnStart2.Enabled := True;
+  btnRestart2.Enabled := False;
+  btnStop2.Enabled := False;
+
+  for i := 0 to FN -1 do
+    FClocks[i].Terminate;
 end;
 
 procedure TForm1.OnClockTimerEx(Sender: TObject);
@@ -203,16 +225,6 @@ begin
 
 end;
 
-procedure TForm1.OnClockTimer(Sender: TObject);
-begin
-  LabelCounter.Caption := IntToStr(FCardinal);
-  Inc(FCardinal);
-end;
-
-procedure TForm1.OnClockTerminate(Sender: TObject);
-begin
-  LabelCounter.Caption := IntToStr(TClockThread(Sender).ThreadID);
-end;
 
 end.
 
