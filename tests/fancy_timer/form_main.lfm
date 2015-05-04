@@ -1,0 +1,122 @@
+object Form1: TForm1
+  Left = 300
+  Height = 456
+  Top = 182
+  Width = 713
+  Caption = 'Form1'
+  ClientHeight = 456
+  ClientWidth = 713
+  OnCreate = FormCreate
+  LCLVersion = '1.2.6.0'
+  object btnStart: TButton
+    Left = 16
+    Height = 25
+    Top = 60
+    Width = 75
+    Caption = 'start'
+    OnClick = btnStartClick
+    TabOrder = 0
+  end
+  object btnStop: TButton
+    Left = 16
+    Height = 25
+    Top = 124
+    Width = 75
+    Caption = 'stop'
+    Enabled = False
+    OnClick = btnStopClick
+    TabOrder = 1
+  end
+  object btnRestart: TButton
+    Left = 16
+    Height = 25
+    Top = 92
+    Width = 75
+    Caption = 'restart'
+    Enabled = False
+    OnClick = btnRestartClick
+    TabOrder = 2
+  end
+  object btnAssigned: TButton
+    Left = 16
+    Height = 25
+    Top = 176
+    Width = 75
+    Caption = 'assigned'
+    OnClick = btnAssignedClick
+    TabOrder = 3
+  end
+  object GroupBox1: TGroupBox
+    Left = 104
+    Height = 64
+    Top = 36
+    Width = 192
+    Caption = 'FClock'
+    ClientHeight = 47
+    ClientWidth = 188
+    TabOrder = 4
+    object LabelCounter: TLabel
+      Tag = -1
+      Left = 8
+      Height = 32
+      Top = 8
+      Width = 155
+      Caption = 'No Instance'
+      Font.Height = -29
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+  object btnStart2: TButton
+    Left = 384
+    Height = 25
+    Top = 60
+    Width = 75
+    Caption = 'start'
+    OnClick = btnStart2Click
+    TabOrder = 5
+  end
+  object btnRestart2: TButton
+    Left = 384
+    Height = 25
+    Top = 88
+    Width = 75
+    Caption = 'restart'
+    Enabled = False
+    OnClick = btnRestart2Click
+    TabOrder = 6
+  end
+  object btnStop2: TButton
+    Left = 384
+    Height = 25
+    Top = 172
+    Width = 75
+    Caption = 'stop'
+    Enabled = False
+    OnClick = btnStop2Click
+    TabOrder = 7
+  end
+  object edtRestart: TEdit
+    Left = 384
+    Height = 25
+    Top = 116
+    Width = 75
+    TabOrder = 8
+    Text = '0'
+  end
+  object lblFN: TLabel
+    Tag = -1
+    AnchorSideLeft.Control = btnStart2
+    AnchorSideTop.Control = btnRestart2
+    AnchorSideRight.Control = btnRestart2
+    Left = 314
+    Height = 15
+    Top = 93
+    Width = 65
+    Anchors = [akTop, akRight]
+    BorderSpacing.Top = 5
+    BorderSpacing.Right = 5
+    Caption = 'max: FN -1'
+    ParentColor = False
+  end
+end
