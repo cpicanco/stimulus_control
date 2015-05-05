@@ -49,3 +49,6 @@ tests/zmq_subscriber/*.sublime-workspace
 tests/fancy_timer/fancy_timer
 tests/fancy_timer/fancy_timer.ico
 tests/fancy_timer/lib/*
+tests/schedules/fancy_timer
+tests/schedules/fancy_timer.ico
+tests/schedules/lib/*
