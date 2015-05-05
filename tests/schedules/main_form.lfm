@@ -1,0 +1,71 @@
+object FormSchedules: TFormSchedules
+  Left = 380
+  Height = 193
+  Top = 213
+  Width = 494
+  Caption = 'Schedules of Reinforcement'
+  ClientHeight = 193
+  ClientWidth = 494
+  OnCreate = FormCreate
+  LCLVersion = '1.2.6.0'
+  object ListBoxSchedules: TListBox
+    Left = 8
+    Height = 83
+    Top = 32
+    Width = 100
+    Items.Strings = (
+      'EXT'
+      'CRF'
+      'FR 5'
+      'VR 5 3'
+      'FI 5000'
+      'VI 5000 3000'
+      'FT 5000'
+      'VT 5000 3000'
+      'DRL 5000'
+      'DRH 5 5000'
+    )
+    ItemHeight = 21
+    OnClick = ListBoxSchedulesClick
+    ScrollWidth = 89
+    TabOrder = 0
+  end
+  object PanelCumulativeRecord: TPanel
+    Left = 114
+    Height = 183
+    Top = 5
+    Width = 375
+    Align = alClient
+    BorderSpacing.Left = 114
+    BorderSpacing.Top = 5
+    BorderSpacing.Right = 5
+    BorderSpacing.Bottom = 5
+    BevelOuter = bvLowered
+    Color = clTeal
+    ParentColor = False
+    TabOrder = 1
+  end
+  object PanelOperandum: TPanel
+    Left = 8
+    Height = 56
+    Top = 120
+    Width = 98
+    Caption = 'Operandum'
+    Color = clSilver
+    Font.Color = clBlack
+    Font.Height = -13
+    Font.Name = 'Sans'
+    ParentColor = False
+    ParentFont = False
+    TabOrder = 2
+    OnMouseDown = PanelOperandumMouseDown
+  end
+  object LabelSchedules: TLabel
+    Left = 8
+    Height = 15
+    Top = 11
+    Width = 54
+    Caption = 'Schedule'
+    ParentColor = False
+  end
+end
