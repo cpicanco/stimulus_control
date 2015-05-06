@@ -53,7 +53,7 @@ const
   _MaxCorrection = 'MaxCorrection';
   _ITI = 'ITI';
 
-  // Blc Trial
+  // Blc and Trial
   _BkGnd = 'BkGnd';
 
   // Trial
@@ -61,6 +61,7 @@ const
   _AutoNxt = 'AutoNxt';
   _CustomNxtValue = 'CustomNxtValue';
   _Kind = 'Kind';
+  _LimitedHold = 'LimitedHold';
 
   // MRD
   _UseMedia = 'UseMedia';
@@ -86,7 +87,7 @@ const
   _Delay = 'Delay';
 
   // SIMPLE
-  _NumComp = 'NumComp';   // number of stimuli on screen
+  _NumComp = 'NumComp';   // number of stimuli on screen / comparisons
   _cBnd = 'Bnd';          // top left width height
   _cStm = 'Stm';          // stimulus path
   _cSch = 'Sch';          // reinforcement schedule

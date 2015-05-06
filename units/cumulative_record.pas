@@ -47,7 +47,7 @@ type
     procedure Paint; override;
     procedure IncNX(n : integer);
     procedure DecNY(n : integer);
-    procedure DrawEvent(LeftTop : Boolean);
+    procedure DrawEvent(OnLeftTop : Boolean);
   end;
 
 implementation
@@ -121,9 +121,10 @@ begin
   Paint;
 end;
 
-procedure TCummulativeRecord.DrawEvent(LeftTop : Boolean);
+
+procedure TCummulativeRecord.DrawEvent(OnLeftTop : Boolean);
 begin
-  if LeftTop then
+  if OnLeftTop then
     begin
       Canvas.MoveTo(Canvas.PenPos.X - 6, Canvas.PenPos.Y - 6);
       Canvas.LineTo(Canvas.PenPos.X + 6, Canvas.PenPos.Y + 6);

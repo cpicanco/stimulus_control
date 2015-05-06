@@ -322,7 +322,7 @@ begin
 
   if Assigned(OnEndTrial) then FOnEndTrial(Sender);
 
-  FTrial.Hide;
+  //FTrial.Hide;
 
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'ITI - inter trial interval');
@@ -448,7 +448,7 @@ begin
       else
         begin
           FITIEnd := GetTickCount;
-          FTimer.Running := False;
+          FTimer.Terminate;
           PlayTrial;
           Exit;
         end;
@@ -473,7 +473,7 @@ begin
       else
         begin
           FITIEnd := GetTickCount;
-          FTimer.Running := False;
+          FTimer.Terminate;
           PlayTrial;
           Exit;
         end;
@@ -493,7 +493,7 @@ begin
         end;
 
       FITIEnd := GetTickCount;
-      FTimer.Running := False;
+      FTimer.Terminate;
       PlayTrial;
     end;
 end;

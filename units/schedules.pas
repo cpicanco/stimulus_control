@@ -21,184 +21,210 @@
 //
 unit schedules;
 
-{$MODE Delphi}
+{$mode objfpc}{$H+}
 
 interface
 
-uses Classes, SysUtils;
+uses
+  Classes, SysUtils
+
+, custom_timer
+;
 
 type
+
+  { TAbsSch }
+
   TAbsSch = class(TComponent)
   private
+    FClockThread : TClockThread;
     FOnConsequence  : TNotifyEvent;
-    FOnConsequence2  : TNotifyEvent;
     FOnResponse  : TNotifyEvent;
-    FValue  : Integer;
-    FValue2 : Integer;
-    FVariation  : Integer;
-    FVariation2 : Integer;
-    FTimeCount: integer;
+    FParameter1  : integer;
+    FParameter2 : integer;
+    FParameter3  : integer;
+    FParameter4 : integer;
+    FResponseCounter : integer;
     procedure Consequence;
-    procedure Consequence2;
     procedure Response;
   public
-    procedure Clock; virtual; abstract;
+    destructor Destroy; override;
+    procedure AssignParameters; virtual; abstract;
     procedure DoResponse; virtual; abstract;
     procedure Reset; virtual; abstract;
-    procedure Reset2; virtual; abstract;
-    property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
-    property OnConsequence2: TNotifyEvent read FOnConsequence2 write FOnConsequence2;
-    property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
-    property Value: Integer read FValue write FValue;
-    property Value2: Integer read FValue2 write FValue2;
-    property Variation: Integer read FVariation write FVariation;
-    property Variation2: Integer read FVariation2 write FVariation2;
-    property Time : integer read FTimeCount default 0;
+    procedure StartClock;
+    property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
+    property OnResponse : TNotifyEvent read FOnResponse write FOnResponse;
+    property Parameter1 : Integer read FParameter1 write FParameter1;
+    property Parameter2 : Integer read FParameter2 write FParameter2;
+    property Parameter3 : Integer read FParameter3 write FParameter3;
+    property Parameter4 : Integer read FParameter4 write FParameter4;
   end;
+
+  { TSchRR }
 
   TSchRR = class(TAbsSch)
   private
-    FCountResp: Integer;
-    FNumResp: Integer;
+    FResponseRatio,
+    FRatioVariation,
+    FRatio : Integer;
   public
-    procedure Clock; override;
+    procedure AssignParameters; override;
     procedure DoResponse; override;
     procedure Reset; override;
-    procedure Reset2; override;
   end;
+
+  { TSchRI }
 
   TSchRI = class(TAbsSch)
   private
-    FFlagReinf: Boolean;
+    FFlagClock: Boolean;
+    FTimeInterval,
+    FIntervalVariation,
     FInterval: Integer;
+    procedure UpdateInterval;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Clock; override;
+    procedure AssignParameters; override;
+    procedure Clock(Sender : TObject);
     procedure DoResponse; override;
     procedure Reset; override;
-    procedure Reset2; override;
   end;
+
+  { TSchRT }
 
   TSchRT = class(TAbsSch)
   private
+    FTimeInterval,
+    FIntervalVariation,
     FInterval: Integer;
+    procedure UpdateInterval;
   public
-    procedure Clock; override;
+    constructor Create(AOwner : TComponent); override;
+    procedure AssignParameters; override;
+    procedure Clock(Sender : TObject);
     procedure DoResponse; override;
     procedure Reset; override;
-    procedure Reset2; override;
   end;
 
-  TSchDRL = class(TAbsSch)
-  private
-    FFlagTime: Boolean;
-    FInterval: Integer;
-  public
-    constructor Create (AOwner : TComponent); override;
-    procedure Clock; override;
-    procedure DoResponse; override;
-    procedure Reset; override;
-    procedure Reset2; override;
-  end;
+  { TSchDRH }
 
   TSchDRH = class(TAbsSch)
   private
-    FFlagFirst : Boolean;
-    FTotalResp : Integer;
-    FCountResp : Integer;
-    FNumResp: Integer;
-    FFlagTime: Boolean;
-    FInterval: Integer;
+    //FResponseRatio,
+    //FRatioVariation,
+    //FTimeInterval,
+    //FIntervalVariation,
+    FRatio,
+    FInterval : Integer;
   public
-    constructor Create (AOwner : TComponent); override;
-    procedure Clock; override;
+    constructor Create(AOwner : TComponent); override;
+    procedure AssignParameters; override;
+    procedure Clock(Sender : TObject);
     procedure DoResponse; override;
     procedure Reset; override;
-    procedure Reset2; override;
   end;
 
-  TSchRRRT = class(TAbsSch)    //Tempo controla a passagem da tentativa, Razão controla ativação da interface, A tentativa passa mais rápido se a razão não for atingida e dura mais se for;
+  { TSchDRL }
+
+  TSchDRL = class(TAbsSch)
   private
-    FFlagFirst : Boolean;      //Somente a primeira ativação de interface incrementa o tempo (FInterval)
-    FCountResp: Integer;       //Contador da razão (respostas)
-    FNumResp: Integer;         //Razão (variável ou fixa) produz ativação de interface (USB ou PPP)
-    // FInterval = Contador de tempo
-    FInterval: Integer;        //A variação 2 é o incremento possível do tempo;
+    FInterval : Integer;
+    //FIntervalVariation : integer;
+    //FTimeInterval : integer;
+    FFlagClock : Boolean;
+    //procedure DestroyClock;
+    //procedure CreateClock;
   public
-    constructor Create (AOwner : TComponent); override;
-    procedure Clock; override;
+    constructor Create(AOwner : TComponent); override;
+    procedure AssignParameters; override;
+    procedure Clock(Sender : TObject);
     procedure DoResponse; override;
     procedure Reset; override;
-    procedure Reset2; override;
+
   end;
 
 implementation
 
 { TSchRR }
 
-procedure TSchRR.Clock;
+procedure TSchRR.AssignParameters;
 begin
-  //do nothing
+  FResponseRatio := FParameter1;
+  FRatioVariation := FParameter2;
 end;
+
 
 procedure TSchRR.DoResponse;
 begin
   Response;
-  Inc(FCountResp);
-  if FCountResp = FNumResp then Consequence;
+  if FResponseCounter = FRatio then Consequence;
 end;
 
 procedure TSchRR.Reset;
 begin
-  FCountResp:= 0;
-  FNumResp:= FValue - FVariation + Random((2 * Variation) + 1);
-  if FNumResp < 1 then FNumResp := 1;
-end;
-
-procedure TSchRR.Reset2;
-begin
-
+  FResponseCounter := 0;
+  FRatio := FResponseRatio - FRatioVariation + Random((2 * FRatioVariation) + 1);
+  if FRatio < 1 then FRatio := FResponseRatio;
 end;
 
 { TSchRI }
 
 constructor TSchRI.Create(AOwner: TComponent);
 begin
-  Inherited Create(AOwner);
-  FFlagReinf:= False;
+  inherited Create(AOwner);
+  FClockThread := TClockThread.Create(True);
+  FClockThread.OnTimer := @Clock;
+  FFlagClock := False;
+end;
+
+procedure TSchRI.AssignParameters;
+begin
+  FTimeInterval := FParameter1;
+  FIntervalVariation := FParameter2;
+end;
+
+procedure TSchRI.Clock(Sender : TObject);
+begin
+  FClockThread.Enabled := False;
+  FFlagClock := True;
 end;
 
 procedure TSchRI.DoResponse;
 begin
   Response;
-  if FFlagReinf then Consequence;
+  if FFlagClock then Consequence;
 end;
 
 procedure TSchRI.Reset;
 begin
-  FTimeCount:= 0;
-  FFlagReinf:= False;
-  FInterval:= FValue-FVariation+(Random((2*FVariation)+1));
-  if FInterval < 1 then FInterval := 1;
+  FFlagClock:= False;
+  UpdateInterval;
 end;
 
-procedure TSchRI.Reset2;
+procedure TSchRI.UpdateInterval;
+var NewInterval : integer;
 begin
+  NewInterval := FTimeInterval - FIntervalVariation + Random((2 * FIntervalVariation) + 1);
+  if NewInterval < 1 then FInterval := FTimeInterval
+  else FInterval := NewInterval;
 
+  FClockThread.Interval := FInterval;
+  FClockThread.Enabled := True;
 end;
 
-procedure TSchRI.Clock;
-begin
-  Inc(FTimeCount);
-  FFlagReinf:= FTimeCount >= FInterval;
-end;
 
 { TSchRT }
 
-procedure TSchRT.Clock;
+procedure TSchRT.AssignParameters;
 begin
-  Inc(FTimeCount);
-  if FTimeCount >= FInterval then Consequence;
+  FTimeInterval := FParameter1;
+  FIntervalVariation := FParameter2;
+end;
+
+procedure TSchRT.Clock(Sender : TObject);
+begin
+  Consequence;
 end;
 
 procedure TSchRT.DoResponse;
@@ -208,162 +234,124 @@ end;
 
 procedure TSchRT.Reset;
 begin
-  FTimeCount:= 0;
-  FInterval:= FValue-FVariation+Random((2*Variation)+1);
-  if FInterval < 1 then FInterval := 1;
+  UpdateInterval;
 end;
 
-procedure TSchRT.Reset2;
+procedure TSchRT.UpdateInterval;
+var NewInterval : integer;
 begin
+  NewInterval := FTimeInterval - FIntervalVariation + Random((2 * FIntervalVariation) + 1);
+  if NewInterval < 1 then FInterval := FTimeInterval
+  else FInterval := NewInterval;
 
+  FClockThread.Interval := FInterval;
+end;
+
+constructor TSchRT.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FClockThread := TClockThread.Create(True);
+  FClockThread.OnTimer := @Clock;
 end;
 
 { TSchDRH }
 
-procedure TSchDRH.Clock;
-begin
-  if FFlagTime then
-    begin
-      Inc(FTimeCount);
-      If FTimeCount >= FInterval then Reset;
-    end;
-end;
-
 constructor TSchDRH.Create(AOwner: TComponent);
 begin
   inherited Create (AOwner);
-  FFlagFirst := False;
+  FClockThread := TClockThread.Create(True);
+  FClockThread.OnTimer := @Clock;
+end;
+
+procedure TSchDRH.AssignParameters;
+begin
+  FRatio := Parameter1;
+  FInterval := Parameter2;
+  //FRatioVariation := Parameter3;
+  //FIntervalVariation := Parameter4;
+
+  FClockThread.Interval := FInterval;
+end;
+
+procedure TSchDRH.Clock(Sender : TObject);
+begin
+  FResponseCounter := 0;
 end;
 
 procedure TSchDRH.DoResponse;
 begin
   Response;
-  if not FFlagTime then FFlagTime:= True;
-  Inc(FTotalResp);
-  Inc(FCountResp);
-  if FCountResp = FNumResp then Consequence;
+  if FResponseCounter = FRatio then Consequence;
 end;
 
 procedure TSchDRH.Reset;
 begin
-  FFlagTime := False;
-  FCountResp:= 0;
-  FTimeCount := 0;
-  FNumResp  := FValue - FVariation + Random((2 * Variation) + 1);
-  FInterval := FValue2 - FVariation2 + Random((2 * Variation2) + 1);
-  if FNumResp < 1 then FNumResp := 1;
-  if FInterval < 1 then FInterval := 1;
-end;
-
-procedure TSchDRH.Reset2;
-begin
-
+  FResponseCounter := 0;
 end;
 
 { TSchDRL }
 
-procedure TSchDRL.Clock;
-begin
-  If FFlagTime then Inc(FTimeCount);
-end;
-
 constructor TSchDRL.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FFlagTime := False;
+  FClockThread := TClockThread.Create(True);
+  FClockThread.OnTimer := @Clock;
+  FFlagClock := False;
+end;
+
+procedure TSchDRL.AssignParameters;
+begin
+  FInterval := Parameter1;
+  FClockThread.Interval := FInterval;
+end;
+
+procedure TSchDRL.Clock(Sender : TObject);
+begin
+  FFlagClock := True;
 end;
 
 procedure TSchDRL.DoResponse;
 begin
   Response;
-  if FFlagTime = False then FFlagTime:= True;
-  if FInterval <= FTimeCount  then Consequence else FTimeCount:= 0;
+  if FFlagClock then Consequence
+  else Reset;
 end;
 
 procedure TSchDRL.Reset;
 begin
-  FTimeCount:= 0;
-  FInterval:= FValue-FVariation+Random((2*Variation)+1);
-  if FInterval < 1 then FInterval := 1;
-end;
-
-procedure TSchDRL.Reset2;
-begin
-
-end;
-
-{ TSchRRRT }
-
-procedure TSchRRRT.Clock;
-begin
-  Inc(FTimeCount);
-  if FTimeCount >= FInterval then Consequence;
-end;
-
-constructor TSchRRRT.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FFlagFirst := True;
-end;
-
-procedure TSchRRRT.DoResponse;
-begin
-  Response;
-  Inc(FCountResp);
-  if FCountResp = FNumResp then
-    begin
-      if FFlagFirst then
-        begin
-          FFlagFirst := False;
-          if FVariation2 > 0 then Inc(Finterval,FVariation2);
-        end;
-      Consequence2;
-    end;
-end;
-
-procedure TSchRRRT.Reset;
-begin
-  FFlagFirst:= True;
-  FTimeCount:= 0;
-  FCountResp:= 0;
-  FInterval := FValue2;
-  if FInterval < 1 then FInterval := 1;
-  //FInterval := FValue2 - FVariation2 + Random((2 * Variation2) + 1); //Variável e Fixo
-end;
-
-procedure TSchRRRT.Reset2;
-begin
-  FCountResp:= 0;
-  FNumResp  := FValue - FVariation + Random((2 * Variation) + 1);
-  if FNumResp = 0 then FNumResp := 1;
+  FClockThread.Reset;
+  FFlagClock:= False;
 end;
 
 { TAbsSch }
 
-procedure TAbsSch.Consequence;      //Ativação das interfaces e/ou Passagem de tentativa
+procedure TAbsSch.Consequence;
 begin
   Reset;
-  If Assigned(OnConsequence) then
+  if Assigned(OnConsequence) then
     begin
       FOnConsequence(Self);
     end;
 end;
 
-//Consequence2 serve Apenas para a ativação das interfaces
-procedure TAbsSch.Consequence2;
-begin
-  Reset2;
-  If Assigned(OnConsequence2) then
-    begin
-      FOnConsequence2(Self);
-    end;
-end;
-
 procedure TAbsSch.Response;
 begin
-  if Assigned (OnResponse) then FOnResponse(Self);
+  Inc(FResponseCounter);
+  if Assigned(OnResponse) then OnResponse(Self);
 end;
 
+destructor TAbsSch.Destroy;
+begin
+  if Assigned(FClockThread) then FClockThread.Terminate;
+  inherited Destroy;
+end;
+
+procedure TAbsSch.StartClock;
+begin
+  if Assigned(FClockThread) then
+    FClockThread.Start;
+end;
+
+
+
 end.
-
-
