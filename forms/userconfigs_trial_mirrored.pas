@@ -87,7 +87,6 @@ type
     x1: TSpinEdit;
     y0: TSpinEdit;
     y1: TSpinEdit;
-    procedure btnAddAxisClick(Sender: TObject);
     procedure btnMinimizeClick(Sender: TObject);
     procedure btnShowClick(Sender: TObject);
     procedure cbCentralizedChange(Sender: TObject);
@@ -95,12 +94,14 @@ type
     procedure cbNox0y0Change(Sender: TObject);
     procedure cbPreviewChange(Sender: TObject);
     procedure cbUseGridChange(Sender: TObject);
+    procedure EditingCDone(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure FormMouseMove(Sender: TObject;
+      Shift: TShiftState; X, Y: Integer);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure FormPaint(Sender: TObject);
@@ -109,7 +110,7 @@ type
     procedure seNodesChange(Sender: TObject);
     procedure SpinChange(Sender: TObject);
     procedure SpinClick(Sender: TObject);
-    procedure EditingCDone(Sender: TObject);
+procedure btnAddAxisClick(Sender: TObject);
   private
 
     FCurrentTrial : integer;
@@ -279,7 +280,7 @@ begin
   if (Sender = x0) or (Sender = x1) or (Sender = y0) or (Sender = y1) or (Sender = seNodes) then
     RefreshLine;
 
-  if (Sender = seSize) and cbUseGrid.Checked
+  if (Sender = seSize) or (Sender = seBorder) and cbUseGrid.Checked
     and (cbChooseGrid.ItemIndex <> 0) then
       begin
         cbChooseGridChange(Sender);
@@ -302,7 +303,7 @@ begin
   if (Sender = x0) or (Sender = x1) or (Sender = y0) or (Sender = y1) or (Sender = seNodes) then
     RefreshLine;
 
-  if  (Sender = seSize) and cbUseGrid.Checked
+  if  (Sender = seSize) or (Sender = seBorder) and cbUseGrid.Checked
     and (cbChooseGrid.ItemIndex <> 0) then
       begin
         cbChooseGridChange(Sender);
@@ -496,7 +497,7 @@ begin
     if Button = mbLeft then
     begin
       if (x1.value - X)*(x1.value - X) +
-         (y1.value - Y)*(y1.value - Y) < 300 then
+         (y1.value - Y)*(y1.value - Y) < 50 then
         begin
           FCapturing := True;
           x1.Value := X;
@@ -505,7 +506,7 @@ begin
         end
       else
       if (x0.value - X)*(x0.value - X) +
-         (y0.value - Y)*(y0.value - Y) < 300 then
+         (y0.value - Y)*(y0.value - Y) < 50 then
         begin
           FCapturing := True;
           x0.Value := X;
@@ -514,7 +515,7 @@ begin
         end;
     for i := Low(FGrid) to High(FGrid) do
       if (FGrid[i].X - X)*(FGrid[i].X - X) +
-      (FGrid[i].Y - Y)*(FGrid[i].Y - Y) < 600 then
+      (FGrid[i].Y - Y)*(FGrid[i].Y - Y) < 50 then
         begin
           x1.Value := FGrid[i].X;
           y1.Value := FGrid[i].Y;
