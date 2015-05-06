@@ -96,9 +96,9 @@ object BresenhamLineForm: TBresenhamLineForm
     object lbNodes: TLabel
       AnchorSideLeft.Control = seNodes
       AnchorSideBottom.Control = seNodes
-      Left = 152
+      Left = 120
       Height = 15
-      Top = 63
+      Top = 60
       Width = 47
       Anchors = [akLeft, akBottom]
       BorderSpacing.Bottom = 5
@@ -106,9 +106,9 @@ object BresenhamLineForm: TBresenhamLineForm
       ParentColor = False
     end
     object seNodes: TSpinEdit
-      Left = 152
+      Left = 120
       Height = 25
-      Top = 83
+      Top = 80
       Width = 71
       MaxValue = 2000
       MinValue = 2
@@ -119,9 +119,9 @@ object BresenhamLineForm: TBresenhamLineForm
       Value = 3
     end
     object cbChooseGrid: TComboBox
-      Left = 296
+      Left = 8
       Height = 25
-      Top = 25
+      Top = 80
       Width = 104
       Enabled = False
       ItemHeight = 0
@@ -138,9 +138,9 @@ object BresenhamLineForm: TBresenhamLineForm
     object cbUseGrid: TCheckBox
       AnchorSideLeft.Control = cbChooseGrid
       AnchorSideBottom.Control = cbChooseGrid
-      Left = 296
+      Left = 8
       Height = 21
-      Top = 3
+      Top = 58
       Width = 58
       Anchors = [akLeft, akBottom]
       BorderSpacing.Bottom = 1
@@ -149,19 +149,19 @@ object BresenhamLineForm: TBresenhamLineForm
       TabOrder = 3
     end
     object btnMinimize: TButton
-      Left = 656
-      Height = 61
+      Left = 616
+      Height = 56
       Top = 8
-      Width = 112
+      Width = 144
       Caption = 'Minimizar Aba'
       OnClick = btnMinimizeClick
       TabOrder = 0
     end
     object btnFinish: TButton
-      Left = 1096
+      Left = 1088
       Height = 56
       Top = 8
-      Width = 83
+      Width = 88
       Anchors = [akTop, akRight]
       Caption = 'Fechar'
       ModalResult = 11
@@ -170,7 +170,7 @@ object BresenhamLineForm: TBresenhamLineForm
     end
     object gbAddRmvAxis: TGroupBox
       AnchorSideTop.Control = Panel1
-      Left = 424
+      Left = 376
       Height = 145
       Top = 1
       Width = 229
@@ -210,10 +210,10 @@ object BresenhamLineForm: TBresenhamLineForm
         TabOrder = 0
       end
       object btnAddAxis: TButton
-        Left = 62
+        Left = 64
         Height = 25
-        Top = 101
-        Width = 48
+        Top = 99
+        Width = 72
         Anchors = [akLeft, akBottom]
         Caption = '+'
         Font.Height = -33
@@ -222,10 +222,10 @@ object BresenhamLineForm: TBresenhamLineForm
         TabOrder = 1
       end
       object btnRmvAxis: TButton
-        Left = 110
+        Left = 144
         Height = 25
-        Top = 101
-        Width = 48
+        Top = 99
+        Width = 72
         Anchors = [akLeft, akBottom]
         Caption = '-'
         Font.Height = -33
@@ -245,10 +245,10 @@ object BresenhamLineForm: TBresenhamLineForm
     object lbSize: TLabel
       AnchorSideLeft.Control = seSize
       AnchorSideBottom.Control = seSize
-      Left = 232
+      Left = 296
       Height = 15
       Hint = 'Tentativas por nódulo. Para editar cada nódulo separadamente clique em ''Editar''.'
-      Top = 63
+      Top = 8
       Width = 53
       Anchors = [akLeft, akBottom]
       BorderSpacing.Bottom = 5
@@ -258,10 +258,10 @@ object BresenhamLineForm: TBresenhamLineForm
       ShowHint = True
     end
     object seSize: TSpinEdit
-      Left = 232
+      Left = 296
       Height = 25
       Hint = 'Tamanho em pixels da janela dos estímulos.'
-      Top = 83
+      Top = 28
       Width = 71
       Anchors = [akLeft, akBottom]
       MaxValue = 2000
@@ -272,25 +272,25 @@ object BresenhamLineForm: TBresenhamLineForm
       Value = 110
     end
     object cbPreview: TCheckBox
-      Left = 8
+      Left = 616
       Height = 21
-      Top = 120
+      Top = 72
       Width = 69
       Caption = 'Preview'
       OnChange = cbPreviewChange
       TabOrder = 8
     end
     object cbCentralized: TCheckBox
-      Left = 96
+      Left = 616
       Height = 21
-      Top = 120
+      Top = 96
       Width = 85
       Caption = 'Centralizar'
       OnChange = cbCentralizedChange
       TabOrder = 9
     end
     object cbNox0y0: TCheckBox
-      Left = 208
+      Left = 616
       Height = 21
       Top = 120
       Width = 138
@@ -301,16 +301,16 @@ object BresenhamLineForm: TBresenhamLineForm
       TabOrder = 10
     end
     object gbTrials: TGroupBox
-      Left = 8
+      Left = 192
       Height = 52
-      Top = 63
-      Width = 141
+      Top = 60
+      Width = 136
       Caption = 'Tentativas por nódulo'
       ClientHeight = 35
-      ClientWidth = 137
+      ClientWidth = 132
       TabOrder = 5
       object btnEditNodes: TButton
-        Left = 76
+        Left = 72
         Height = 25
         Top = 5
         Width = 54
@@ -319,7 +319,7 @@ object BresenhamLineForm: TBresenhamLineForm
         TabOrder = 0
       end
       object seTrials: TSpinEdit
-        Left = 2
+        Left = 0
         Height = 25
         Top = 5
         Width = 71
@@ -333,20 +333,20 @@ object BresenhamLineForm: TBresenhamLineForm
       end
     end
     object Button1: TButton
-      Left = 656
-      Height = 74
-      Top = 72
-      Width = 160
+      Left = 951
+      Height = 56
+      Top = 8
+      Width = 129
       Caption = 'Adicionar Eixos'
       ModalResult = 1
       TabOrder = 13
     end
     object seRepeat: TSpinEdit
-      Left = 314
+      Left = 880
       Height = 25
       Hint = 'Repetições'
-      Top = 83
-      Width = 71
+      Top = 33
+      Width = 65
       Anchors = [akLeft, akBottom]
       MinValue = 1
       OnClick = SpinClick
@@ -357,10 +357,10 @@ object BresenhamLineForm: TBresenhamLineForm
     object lbRepeat: TLabel
       AnchorSideLeft.Control = seRepeat
       AnchorSideBottom.Control = seRepeat
-      Left = 314
+      Left = 880
       Height = 15
       Hint = 'Repetições'
-      Top = 63
+      Top = 13
       Width = 65
       Anchors = [akLeft, akBottom]
       BorderSpacing.Bottom = 5
