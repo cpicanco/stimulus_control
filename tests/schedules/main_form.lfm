@@ -1,11 +1,11 @@
 object FormSchedules: TFormSchedules
-  Left = 380
-  Height = 193
-  Top = 213
-  Width = 494
+  Left = 321
+  Height = 292
+  Top = 191
+  Width = 556
   Caption = 'Schedules of Reinforcement'
-  ClientHeight = 193
-  ClientWidth = 494
+  ClientHeight = 292
+  ClientWidth = 556
   OnCreate = FormCreate
   LCLVersion = '1.2.6.0'
   object ListBoxSchedules: TListBox
@@ -23,7 +23,7 @@ object FormSchedules: TFormSchedules
       'FT 5000'
       'VT 5000 3000'
       'DRL 5000'
-      'DRH 5 5000'
+      'DRH 5 3000'
     )
     ItemHeight = 21
     OnClick = ListBoxSchedulesClick
@@ -32,14 +32,14 @@ object FormSchedules: TFormSchedules
   end
   object PanelCumulativeRecord: TPanel
     Left = 114
-    Height = 183
+    Height = 237
     Top = 5
-    Width = 375
+    Width = 437
     Align = alClient
     BorderSpacing.Left = 114
     BorderSpacing.Top = 5
     BorderSpacing.Right = 5
-    BorderSpacing.Bottom = 5
+    BorderSpacing.Bottom = 50
     BevelOuter = bvLowered
     Color = clTeal
     ParentColor = False
@@ -47,9 +47,9 @@ object FormSchedules: TFormSchedules
   end
   object PanelOperandum: TPanel
     Left = 8
-    Height = 56
+    Height = 54
     Top = 120
-    Width = 98
+    Width = 100
     Caption = 'Operandum'
     Color = clSilver
     Font.Color = clBlack
@@ -67,5 +67,77 @@ object FormSchedules: TFormSchedules
     Width = 54
     Caption = 'Schedule'
     ParentColor = False
+  end
+  object PanelClock: TPanel
+    Left = 114
+    Height = 21
+    Top = 264
+    Width = 100
+    Anchors = [akLeft, akBottom]
+    Caption = '0'
+    TabOrder = 3
+  end
+  object PanelLatency: TPanel
+    Left = 225
+    Height = 21
+    Top = 264
+    Width = 100
+    Anchors = [akLeft, akBottom]
+    Caption = '0'
+    TabOrder = 4
+  end
+  object PanelEnd: TPanel
+    Left = 337
+    Height = 21
+    Top = 264
+    Width = 100
+    Anchors = [akLeft, akBottom]
+    Caption = '0'
+    TabOrder = 5
+  end
+  object lblClock: TLabel
+    Left = 114
+    Height = 15
+    Top = 246
+    Width = 33
+    Anchors = [akLeft, akBottom]
+    Caption = 'Clock'
+    ParentColor = False
+  end
+  object lblLatency: TLabel
+    Left = 225
+    Height = 15
+    Top = 246
+    Width = 46
+    Anchors = [akLeft, akBottom]
+    Caption = 'Latency'
+    ParentColor = False
+  end
+  object lblScheduleEnd: TLabel
+    Left = 337
+    Height = 15
+    Top = 246
+    Width = 23
+    Anchors = [akLeft, akBottom]
+    Caption = 'End'
+    ParentColor = False
+  end
+  object lblResponseDelta: TLabel
+    Left = 448
+    Height = 15
+    Top = 246
+    Width = 30
+    Anchors = [akLeft, akBottom]
+    Caption = 'Delta'
+    ParentColor = False
+  end
+  object PanelDelta: TPanel
+    Left = 448
+    Height = 21
+    Top = 264
+    Width = 100
+    Anchors = [akLeft, akBottom]
+    Caption = '0'
+    TabOrder = 6
   end
 end

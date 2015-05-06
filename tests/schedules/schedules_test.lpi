@@ -32,9 +32,9 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="4">
+    <Units Count="3">
       <Unit0>
-        <Filename Value="schedules_test.pas"/>
+        <Filename Value="schedules_test.lpr"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="schedules_test"/>
       </Unit0>
@@ -42,19 +42,15 @@
         <Filename Value="main_form.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormSchedules"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="main_form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="temp.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="formRScheduleView"/>
-      </Unit2>
-      <Unit3>
         <Filename Value="cumulative_record.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="cumulative_record"/>
-      </Unit3>
+      </Unit2>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
