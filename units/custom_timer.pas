@@ -23,31 +23,35 @@ unit custom_timer;
 
 {$mode objfpc}{$H+}
 
-//{$MODE Delphi}
-
 interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils;
+
 type
 
   { TClockThread }
 
   TClockThread = class(TThread)
   private
-    FRunning: Boolean;
-    FTickEvent: PRTLEvent;  //old THandle
-    FInterval: longint;     //old cardinal
+    FMustReset,
+    FEnabled: Boolean;
+    FHost: TObject;
+    FRTLEvent: PRTLEvent;
+    FInterval: longint;
     FOnTimer:TNotifyEvent;
     procedure Clock;
+    procedure SetEnabled(AValue: Boolean);
   protected
     procedure Execute; override;
   public
     constructor Create(CreateSuspended: Boolean);
     destructor Destroy; override;
-
+    procedure Reset;
+    property Enabled : Boolean read FEnabled write SetEnabled;
+    property Host: TObject read FHost write FHost;
     property Interval : longint read FInterval write FInterval;
-    property OnTimer: TNotifyEvent read FOnTimer write FOnTimer;
-    property Running: Boolean read FRunning write FRunning;
+    property OnTimer : TNotifyEvent read FOnTimer write FOnTimer;
+    property RTLEvent : PRTLEvent read FRTLEvent;
   end;
 
 
@@ -58,33 +62,55 @@ implementation
 constructor TClockThread.Create(CreateSuspended: Boolean);
 begin
   FreeOnTerminate := True;
-  FTickEvent := RTLEventCreate; //BasicEventCreate
-  FInterval := 100;
-  //BasicSetEvent for synchronize threads
-  //RTLeventSetEvent(FTickEvent);   // Here this event must never occur
-  FRunning := True;
+  FInterval := 1000;
+  FEnabled := True;
+  FMustReset := False;
+  FRTLEvent := RTLEventCreate;
   inherited Create(CreateSuspended);
 end;
 
 destructor TClockThread.Destroy;
 begin
-  RTLEventDestroy(FTickEvent); //BasicEventDestroy
+  RTLEventDestroy(FRTLEvent);
   inherited Destroy;
+end;
+
+procedure TClockThread.Reset;
+begin
+  if not FMustReset then
+  begin
+    FMustReset := True;
+    RTLeventSetEvent(FRTLEvent);
+  end
 end;
 
 procedure TClockThread.Clock;
 begin
-  if Assigned(FOnTimer) then FOnTimer(Self)
-  else FRunning := False;
+  if not Enabled then Exit;
+  if FMustReset then
+    begin
+      FMustReset := False;
+      Exit;
+    end;
+  if Assigned(FOnTimer) then FOnTimer(Self);
+end;
+
+procedure TClockThread.SetEnabled(AValue: Boolean);
+begin
+  if FEnabled = AValue then Exit;
+  FEnabled := AValue;
+  RTLeventSetEvent(RTLEvent);
 end;
 
 procedure TClockThread.Execute;
 begin
-  while (not Terminated) and Running do
-  begin
-    RTLeventWaitFor(FTickEvent, Interval); //BasicEventWaitFor
-    Synchronize(@Clock);
-  end;
+  while not Terminated do
+    if Enabled then
+      begin
+        RTLeventWaitFor(FRTLEvent, Interval);
+        Synchronize(@Clock);
+      end
+    else RTLeventWaitFor(FRTLEvent);
 end;
 
 end.
