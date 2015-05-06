@@ -125,11 +125,11 @@ object BresenhamLineForm: TBresenhamLineForm
       Width = 136
       Enabled = False
       ItemHeight = 0
-      ItemIndex = 0
       Items.Strings = (
         'NA'
         'Ângulos'
-        'Ângulos (C)'
+        'Ângulos com Recuo'
+        ''
       )
       OnChange = cbChooseGridChange
       TabOrder = 4
