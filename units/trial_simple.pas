@@ -44,6 +44,8 @@ uses
 
 type
 
+  { Need testing, refactoring and implementation of new timing schedules }
+
   TSupportKey = Record
     Key: TKey;
     Csq: BYTE;
@@ -54,6 +56,8 @@ type
     IET: string;
     TO_: Integer;
   end;
+
+  { TSimpl }
 
   TSimpl = Class(TTrial)
   protected
@@ -77,8 +81,8 @@ type
     FPLP : TPLP;
     FVetSupportC: Array of TSupportKey;
     procedure BeginCorrection (Sender : TObject);
-    procedure EndCorrection (Sender : TObject);
-
+    procedure EndCorrection(Sender : TObject);
+    procedure LimitedHoldOnTimer(Sender : TObject);
     procedure Consequence(Sender: TObject);
     procedure Consequence2(Sender: TObject);
     procedure Response(Sender: TObject);
@@ -87,7 +91,6 @@ type
     procedure None(Sender: TObject);
 
     procedure TimerCsqTimer(Sender: TObject);
-    procedure TimerClockTimer(Sender: TObject);
     procedure Dispenser(Csq: Byte; Usb: string);
     procedure StartTrial(Sender: TObject); override;
     procedure EndTrial(Sender: TObject);
@@ -128,26 +131,8 @@ begin
                  'Top.....';
 
   FDataBkGndI := TCounter.Create;
-
-  FTimerCsq:= TTimer.Create(Self);
-  with FTimerCsq do
-    begin
-      Enabled:= False;
-      Interval:= 1;
-      OnTimer:= @TimerCsqTimer;
-    end;
-
-  //This Timer controls Sch integer increment.
-  //Native TTimer was substituted for
-  //a threaded custom timer (uTrial -> TClockThread) for better performance
-  {FTimerClock:= TTimer.Create(Self);
-  with FTimerClock do
-    begin
-      Enabled:= False;
-      Interval:= 100;
-      OnTimer:= TimerClockTimer;
-    end;}
-   FFlagCsq2Fired := False;
+  //
+  FFlagCsq2Fired := False;
 end;
 
 destructor TSimpl.Destroy;
@@ -293,11 +278,6 @@ begin
   EndTrial(Sender);
 end;
 
-procedure TSimpl.TimerClockTimer(Sender: TObject);
-var a1: Integer;
-begin
-  for a1:= 0 to FNumKeyC-1 do FVetSupportC[a1].Key.SchMan.Clock;
-end;
 
 procedure TSimpl.WriteData(Sender: TObject);  //Dados do Relatório
 var
@@ -371,6 +351,11 @@ end;
 procedure TSimpl.EndCorrection(Sender: TObject);
 begin
   if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
+end;
+
+procedure TSimpl.LimitedHoldOnTimer(Sender: TObject);
+begin
+
 end;
 
 procedure TSimpl.EndTrial(Sender: TObject);

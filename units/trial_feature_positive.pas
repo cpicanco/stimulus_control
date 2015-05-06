@@ -91,7 +91,9 @@ type
     procedure BeginCorrection (Sender : TObject);
     procedure EndCorrection (Sender : TObject);
     procedure Consequence(Sender: TObject);
-    procedure Consequence2(Sender: TObject);
+
+    procedure TrialResult(Sender: TObject);
+
     procedure Response(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
@@ -160,7 +162,7 @@ For now, this change means that in the TFPE,
  See StartTrial and ThreadClock procedures for the limited hold implementation.
 
 }
-procedure TFPE.Consequence(Sender: TObject);
+procedure TFPE.TrialResult(Sender: TObject);
 begin
   if FCanResponse then
     begin
@@ -177,7 +179,6 @@ begin
       else
         begin
           if FCurrTrial.response = 'Negativa' then  Result := T_HIT else Result := T_MISS;
-          // within trial user defined differential consequences is not implemented yet
           IETConsequence := FDataSupport.CSQMISS;
         end;
 
@@ -193,11 +194,14 @@ begin
       else
       if Result = T_NONE then  None(Sender);
 
-    EndTrial(Sender);
+    if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+
+    // if not LimitedHold then
+    // end trial
     end;
 end;
 
-procedure TFPE.Consequence2(Sender: TObject);
+procedure TFPE.Consequence(Sender: TObject);
 var
   aConsequence : TKey;
 
@@ -218,7 +222,8 @@ end;
 
 procedure TFPE.ThreadClock(Sender: TObject);
 begin
-  Consequence;
+  TrialResult(Sender);
+  EndTrial(Sender);
 end;
 
 procedure TFPE.KeyDown(var Key: Word; Shift: TShiftState);
@@ -348,9 +353,8 @@ begin
   Randomize;
 
   FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
-
   FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
-  //FStarterSchedule :=  not implemented
+  FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
   RootMedia := CfgTrial.SList.Values[_RootMedia];
 
@@ -373,10 +377,7 @@ begin
   FSchedule := TSchMan.Create(self);
   with FSchedule do
     begin
-      OnConsequence2 := @Consequence2;
-
-      // see Consequence
-      //OnConsequence:= @Consequence;
+      OnConsequence := @Consequence;
       OnResponse:= @Response;
     end;
 
@@ -492,7 +493,7 @@ begin
   FCanResponse:= True;
   FDataSupport.StmBegin := GetTickCount;
 
-  ClockThreadInterval := FSchedule.LimitedHold;
+  ClockThreadInterval := FLimitedHold;
   inherited StartTrial(Sender);
 end;
 
@@ -542,7 +543,6 @@ begin
   FDataSupport.StmEnd := GetTickCount;
   WriteData(Sender);
 
-  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
   if Assigned(OnEndTrial) then OnEndTrial(sender);
 end;

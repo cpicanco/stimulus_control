@@ -70,6 +70,7 @@ type
     function GetClockThreadInterval: integer;
     procedure SetClockThreadInterval(AValue: integer);
   strict protected
+    FLimitedHold : integer;
     FIscorrection : Boolean;
     procedure ClientStatus(msg : string);
     procedure StartTrial(Sender: TObject); virtual;
@@ -158,7 +159,7 @@ end;
 destructor TTrial.Destroy;
 begin
   if Assigned(FClockThread) then
-    FClockThread.Running := False;
+      FClockThread.Terminate;
   inherited Destroy;
 end;
 

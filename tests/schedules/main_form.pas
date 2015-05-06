@@ -137,7 +137,6 @@ begin
 
   FClock := TClockThread.Create(True);
   FClock.OnTimer := @ClockOnTimer;
-  FClock.Interval := 1000;
   FClock.Start;
 end;
 
