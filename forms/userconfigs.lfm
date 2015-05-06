@@ -1,9 +1,9 @@
 object UserConfig: TUserConfig
-  Left = 432
+  Left = 431
   Height = 493
-  Top = 117
+  Top = 112
   Width = 407
-  HorzScrollBar.Page = 287
+  HorzScrollBar.Page = 401
   VertScrollBar.Page = 485
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
@@ -1651,10 +1651,10 @@ object UserConfig: TUserConfig
     Height = 455
     Top = 0
     Width = 407
-    ActivePage = tbGeneral
+    ActivePage = tbTrials
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
@@ -1854,7 +1854,7 @@ object UserConfig: TUserConfig
         TabOrder = 3
       end
       object gbRepetitions: TGroupBox
-        Left = 104
+        Left = 251
         Height = 51
         Top = 8
         Width = 144
@@ -1914,6 +1914,34 @@ object UserConfig: TUserConfig
         PopupMenu = pmFillCondition
         ShowHint = True
         TabOrder = 6
+      end
+      object gbTrialGroup: TGroupBox
+        Left = 104
+        Height = 51
+        Top = 8
+        Width = 144
+        Caption = 'Grupo de Tentativas'
+        ClientHeight = 34
+        ClientWidth = 140
+        TabOrder = 7
+        object cbDrawTrialGroup: TCheckBox
+          Left = 8
+          Height = 21
+          Top = 3
+          Width = 21
+          Checked = True
+          OnChange = cbDrawTrialGroupChange
+          State = cbChecked
+          TabOrder = 0
+        end
+        object edtTrialGroup: TEdit
+          Left = 48
+          Height = 25
+          Top = 3
+          Width = 80
+          TabOrder = 1
+          Text = '24'
+        end
       end
     end
     object tbSave: TTabSheet
@@ -2038,6 +2066,13 @@ object UserConfig: TUserConfig
     object piTrials: TMenuItem
       Caption = 'Ordem das Tentativas'
       Checked = True
+      GroupIndex = 2
+      RadioItem = True
+      ShowAlwaysCheckable = True
+      OnClick = piClick
+    end
+    object piTrialGroup: TMenuItem
+      Caption = 'Grupo de Tentativas'
       GroupIndex = 2
       RadioItem = True
       ShowAlwaysCheckable = True

@@ -91,6 +91,7 @@ end;
 
 procedure TCLB.EndTrial(Sender: TObject);
 begin
+  Hide;
   FCurrTrial.StmEnd := GetTickCount;
   WriteData(Sender);
 
