@@ -117,7 +117,7 @@ end;
 
 procedure TPLP.OutPortOff (Sender: TObject);
 begin
-  if FTimer.Running then FTimer.Running := False;
+  FTimer.Terminate;
 
 {$IFDEF WINDOWS}
   Out32($378, 0);

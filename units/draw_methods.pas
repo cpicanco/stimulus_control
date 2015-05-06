@@ -190,9 +190,9 @@ end;
 
 procedure DrawCircle(Canvas: TCanvas; left, top, size: integer; gap: Boolean;
   gap_degree, gap_length: integer);
-  var
-      fix : integer;
-      inner_arc : TArc;
+var
+  fix : integer;
+  inner_arc : TArc;
 begin
       with Canvas do
         begin
@@ -223,9 +223,9 @@ begin
 
           if {is to draw an arc} gap {on inner circle circumference} then
             begin
-              Pen.Mode := pmCopy;
               Pen.Color := clBlack;
-              Pen.Width := 4;
+              Pen.Mode := pmCopy;
+              Pen.Width := 5;
               with inner_arc do
                 //Arc(p1.X + 1, p1.Y + 1, p2.X - 1, p2.Y - 1, 16 * gap_degree, 16 * gap_length);
                 Arc(p1.X , p1.Y , p2.X , p2.Y , 16 * gap_degree, 16 * gap_length);

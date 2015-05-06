@@ -71,6 +71,7 @@ type
     procedure BeginCorrection (Sender : TObject);
     procedure EndCorrection (Sender : TObject);
     procedure Consequence(Sender: TObject);
+    procedure TrialResult(Sender : TObject);
     procedure Response(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
@@ -126,6 +127,11 @@ end;
 
 procedure TMRD.Consequence(Sender: TObject);
 begin
+
+end;
+
+procedure TMRD.TrialResult(Sender: TObject);
+begin
   if FCanResponse then
     begin
       CreateClientThread('C:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
@@ -148,18 +154,21 @@ begin
       //if Result = 'MISS' then  Miss(Sender);
       //if Result = 'NONE' then  None(Sender);
 
-    EndTrial(Sender);
+    if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
     end;
 end;
 
 procedure TMRD.ThreadClock(Sender: TObject);
 begin
-  if FUseMedia then
+  {if FUseMedia then
     begin
       //FKey1.SchMan.Clock;
       //FKey2.SchMan.Clock
     end
-  else if Visible then FSchedule.Clock;
+  else}
+  //if Visible then FSchedule.Clock;
+  TrialResult(Sender);
+  EndTrial(Sender);
 end;
 
 procedure TMRD.KeyDown(var Key: Word; Shift: TShiftState);
@@ -280,7 +289,7 @@ begin
   FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
 
   FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
-  //FStarterSchedule :=  necessary?
+  FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
 
   if FUseMedia then
     RootMedia := CfgTrial.SList.Values[_RootMedia]
@@ -370,16 +379,18 @@ begin
     begin
       BeginCorrection (Self);
     end;
-
+  {
   if FUseMedia then
     begin
       KeyStart(FKey1);
       KeyStart(FKey2);
     end;
-
+  }
   FFirstResp := True;
   FCanResponse:= True;
   FDataSupport.StmBegin := GetTickCount;
+
+  ClockThreadInterval := FLimitedHold;
   inherited StartTrial(Sender);
 end;
 
@@ -434,7 +445,7 @@ begin
   Hide;
   FDataSupport.StmEnd := GetTickCount;
   WriteData(Sender);
-  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+
   if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
   if Assigned(OnEndTrial) then OnEndTrial(Sender);
 end;

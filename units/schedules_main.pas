@@ -41,7 +41,6 @@ type
     FAbsSchLoaded: Boolean;
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
-    FOnUpdateInterval: TNotifyEvent;
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
     procedure SetKind(Kind: String);
@@ -51,8 +50,6 @@ type
     property Kind: String write SetKind;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
-    property OnUpdateInterval : TNotifyEvent read FOnUpdateInterval write FOnUpdateInterval;
-
   end;
 
 implementation

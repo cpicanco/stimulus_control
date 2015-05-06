@@ -46,6 +46,9 @@ uses
   ;
 
 type
+
+  { Needs a complete review, see trial_simple notes }
+
   TSupportKey = Record
     Key    : TKey;
     Csq    : Byte;
@@ -114,7 +117,6 @@ type
     procedure KeyPress(var Key: Char); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure StartTrial(Sender: TObject); override;
-    procedure ThreadClock(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -647,16 +649,6 @@ begin
 
   if FTimerDelay.Interval > 0 then FTimerDelay.Enabled:= True
   else ShowKeyC;
-end;
-
-procedure TMTS.ThreadClock(Sender: TObject);
-var a1: Integer;
-begin
-  if FSupportS.Key.Visible then FSupportS.Key.SchMan.Clock;
-  if not FFlagModCmps then
-    for a1:= 0 to FNumKeyC-1 do
-      if FVetSupportC[a1].Key.Visible then
-          FVetSupportC[a1].Key.SchMan.Clock;
 end;
 
 procedure TMTS.BeginCorrection(Sender: TObject);

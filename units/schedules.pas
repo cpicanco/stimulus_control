@@ -323,25 +323,6 @@ begin
   FFlagClock:= False;
 end;
 
-{
-procedure TSchDRL.DestroyClock;
-begin
-  FClockThread.OnTimer := nil;
-  FClockThread.Terminate;
-  RTLeventSetEvent(FClockThread.RTLEvent);
-  FClockThread.Free;
-  FClockThread := nil;
-end;
-
-procedure TSchDRL.CreateClock;
-begin
-  FClockThread := TClockThread.Create(True);
-  FClockThread.FreeOnTerminate := False;
-  FClockThread.Interval := FInterval;
-  FClockThread.OnTimer := @Clock;
-end;
- }
-
 { TAbsSch }
 
 procedure TAbsSch.Consequence;
