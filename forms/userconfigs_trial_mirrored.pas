@@ -74,10 +74,12 @@ type
     lbNodes: TLabel;
     lbSize: TLabel;
     lbRepeat: TLabel;
+    lbBorder: TLabel;
     Panel1: TPanel;
     seNodes: TSpinEdit;
     seSize: TSpinEdit;
     seRepeat: TSpinEdit;
+    seBorder: TSpinEdit;
     seTrials: TSpinEdit;
     StringGrid1: TStringGrid;
     PreviewTimer: TTimer;
@@ -86,7 +88,6 @@ type
     y0: TSpinEdit;
     y1: TSpinEdit;
     procedure btnAddAxisClick(Sender: TObject);
-    procedure btnFinishClick(Sender: TObject);
     procedure btnMinimizeClick(Sender: TObject);
     procedure btnShowClick(Sender: TObject);
     procedure cbCentralizedChange(Sender: TObject);
@@ -409,7 +410,7 @@ end;
 procedure TBresenhamLineForm.cbChooseGridChange(Sender: TObject);
 var i: integer; aDegree : Float;
 begin
-  i := seSize.value div 2;
+  i := (seSize.value div 2) + seBorder.Value;
   case cbChooseGrid.ItemIndex of
     0 : FCentralRect := Rect(0, 0, Screen.Width, Screen.Height);
     1 : FCentralRect := GetCentralRect(0, 0, 0, 0);
@@ -485,11 +486,6 @@ begin
         end;
     end;
   FAxis.CanRead := True;
-end;
-
-procedure TBresenhamLineForm.btnFinishClick(Sender: TObject);
-begin
-
 end;
 
 procedure TBresenhamLineForm.FormMouseDown(Sender: TObject;
