@@ -219,7 +219,7 @@ begin
   if cbPreview.Checked then
     begin
       DrawCircle(Canvas, FLine[FCurrentTrial].X, FLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
-      DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, True, 0, 1);
+      DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, True, 0, 360);
     end;
 
   LoadOldCanvas;
