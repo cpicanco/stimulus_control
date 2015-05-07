@@ -355,8 +355,11 @@ end;
 
 destructor TAbsSch.Destroy;
 begin
-  FClockThread.Enabled := False;
-  if Assigned(FClockThread) then FClockThread.Terminate;
+  if Assigned(FClockThread) then
+    begin
+      FClockThread.Enabled := False;
+      FClockThread.Terminate;
+    end;
   inherited Destroy;
 end;
 
