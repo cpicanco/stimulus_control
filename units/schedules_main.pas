@@ -46,7 +46,7 @@ type
     procedure SetKind(Kind: String);
   public
     procedure DoResponse;
-    procedure Start;
+    function StartMethod : TThreadMethod;
     property Kind: String write SetKind;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
@@ -163,9 +163,9 @@ begin
   if FAbsSchLoaded then FAbsSch.DoResponse;
 end;
 
-procedure TSchMan.Start;
+function TSchMan.StartMethod : TThreadMethod;
 begin
-  if FAbsSchLoaded then FAbsSch.StartClock;
+  Result := FAbsSch.StartMethod;
 end;
 
 end.
