@@ -822,7 +822,7 @@ end;
 
 procedure TUserConfig.btnNextTrialsClick(Sender: TObject);
 var
-  aTrial, aStm, aBlc, NumTrials : integer;
+  aTrial, aStm, aBlc, aNumTrials : integer;
   aHStm : integer;
   aValues : string;
   T : TCfgTrial;
@@ -875,7 +875,7 @@ var
   end;
 
 begin
-  NumTrials := StringGrid1.RowCount -1;
+  aNumTrials := StringGrid1.RowCount -1;
 
   if piAxes.Checked then
     begin
@@ -896,10 +896,12 @@ begin
           Name := rsDefBlc;
           BkGnd := clWhite;
           VirtualTrialValue:= 1;
-          NumTrials:= NumTrials;
+          NumTrials := aNumTrials;
         end;
+      FEscriba.Blcs[aBlc] := B;
       FEscriba.SetBlc(aBlc, True);
       FEscriba.SetLengthVetTrial(aBlc);
+      B := FEscriba.Blcs[aBlc];
 
       for aTrial := Low(B.Trials) to High(B.Trials) do
         begin
@@ -930,6 +932,7 @@ begin
               SList.EndUpdate;
 
             end;
+          FEscriba.Blcs[aBlc].Trials[aTrial] := T;
           FEscriba.SetTrial(aTrial);
         end;
     end;
@@ -944,7 +947,7 @@ begin
       FEscriba.SesType  := 'CIC';
       FEscriba.Data := 'Data';
       FEscriba.Media:= 'Media';
-     // FEscriba.SetVariables;
+      // FEscriba.SetVariables;
       FEscriba.SetMain;
 
       B := FEscriba.Blcs[aBlc];
@@ -953,14 +956,15 @@ begin
           Name := rsDefBlc;
           BkGnd := clWhite;
           VirtualTrialValue:= 1;
-          NumTrials:= NumTrials;
+          NumTrials := aNumTrials;
         end;
+      FEscriba.Blcs[aBlc] := B;
       FEscriba.SetBlc(aBlc, True);
       FEscriba.SetLengthVetTrial(aBlc);
+      B := FEscriba.Blcs[aBlc];
 
       for aTrial := Low(B.Trials) to High(B.Trials) do
         begin
-
           T := FEscriba.Blcs[aBlc].Trials[aTrial];
           with T do
             begin
@@ -977,8 +981,7 @@ begin
               SList.Values[_LimitedHold] := '4000';
               SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
               SList.Values[_ExpectedResponse] := StringGrid1.Cells[2, aTrial + 1];
-              // configurar o IET
-              SList.Values[_Trial + _cIET] := StringGrid1.Cells[3, aTrial + 1];
+              SList.Values[_Trial + _cIET] := StringGrid1.Cells[3, aTrial + 1];   // configure the IETConsenquence
               SList.Values[_NextTrial] := '0';
 
               aHStm := GetNumComp;
@@ -995,6 +998,7 @@ begin
                 end;
               SList.EndUpdate;
             end;
+          FEscriba.Blcs[aBlc].Trials[aTrial] := T;
           FEscriba.SetTrial(aTrial);
         end;
     end;
@@ -1117,7 +1121,6 @@ begin
     It gives 96 trials repeating by 4.
     ______________________________
 
-
   }
   if piAxes.Checked then
   begin
@@ -1144,7 +1147,19 @@ begin
         FLastFocusedCol := -1;
       end;
   end;
+  {
+    Example:
 
+    3 x 3 matriz = 9 positions
+    2 trials per position
+    ______________________________
+
+    Equals to a Group of 18 trials to repeat.
+
+    It gives 72 trials repeating it by 4.
+    ______________________________
+
+  }
   if piMatrix.Checked then
     begin
       aRow := 1;
