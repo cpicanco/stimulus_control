@@ -149,6 +149,7 @@ const
   KShowStarter = 'Starter=' + #9; //boolean
   KAngle = 'Angle=' + #9;
   KExpectedResponse = 'Response=' + #9;
+  KLimitedHold = 'LimitedHold=' + #9;
   KSchedule = 'Schedule=' + #9;
   KNextTrial = 'NextTrial=' + #9;
   KcGap = 'Gap=' + #9;                 //boolean
@@ -208,6 +209,9 @@ const
   //report  messages
   rmKeyPlus = 'Tecla +';
   rmKeyMinus = 'Tecla -';
+
+resourcestring
+  ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
 
 implementation
 
