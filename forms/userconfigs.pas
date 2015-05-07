@@ -825,6 +825,8 @@ var
   aTrial, aStm, aBlc, NumTrials : integer;
   aHStm : integer;
   aValues : string;
+  T : TCfgTrial;
+  B : TCfgBlc;
 
   function GetBndString (StmNumber : integer) : string;
   begin
@@ -888,39 +890,46 @@ begin
      // FEscriba.SetVariables;
       FEscriba.SetMain;
 
-      FEscriba.Blcs[aBlc].Name := rsDefBlc;
-      FEscriba.Blcs[aBlc].BkGnd := clWhite;
-      FEscriba.Blcs[aBlc].VirtualTrialValue:= 1;
-      FEscriba.Blcs[aBlc].NumTrials:= NumTrials;
-      FEscriba.SetBlc(aBlc, True);
-
-      FEscriba.SetLengthVetTrial(aBlc);
-      for aTrial := Low(FEscriba.Blcs[aBlc].Trials) to High(FEscriba.Blcs[aBlc].Trials) do
+      B := FEscriba.Blcs[aBlc];
+      with B do
         begin
-          FEscriba.Blcs[aBlc].Trials[aTrial].Id := aTrial + 1;
-          FEscriba.Blcs[aBlc].Trials[aTrial].Kind := T_MRD;
-          FEscriba.Blcs[aBlc].Trials[aTrial].NumComp := 2;
+          Name := rsDefBlc;
+          BkGnd := clWhite;
+          VirtualTrialValue:= 1;
+          NumTrials:= NumTrials;
+        end;
+      FEscriba.SetBlc(aBlc, True);
+      FEscriba.SetLengthVetTrial(aBlc);
 
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
-          //FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(False, '1','0');
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[8, aTrial + 1];
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_NextTrial] := '0';
-
-          FEscriba.Blcs[aBlc].Trials[aTrial].Name := FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Angle] + #32 + IntToStr(FEscriba.Blcs[aBlc].Trials[aTrial].Id);
-
-          for aStm := 1 to 2 do
+      for aTrial := Low(B.Trials) to High(B.Trials) do
+        begin
+          T := FEscriba.Blcs[aBlc].Trials[aTrial];
+          with T do
             begin
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cBnd] := GetBndString(aStm);
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap] := GetGapString(aStm);
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := '0';
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := '360'
+              Id := aTrial + 1;
+              Kind := T_MRD;
+              NumComp := 2;
+              Name := SList.Values[_Angle] + #32 + IntToStr(Id);
+
+              SList.BeginUpdate;
+              SList.Values[_BkGnd] := IntToStr (clWhite);
+              SList.Values[_Cursor] := IntToStr (crDefault);
+              SList.Values[_UseMedia] := BoolToStr(False, '1','0');
+              SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
+              SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
+              SList.Values[_Schedule] := StringGrid1.Cells[8, aTrial + 1];
+              SList.Values[_NextTrial] := '0';
+
+              for aStm := 1 to 2 do
+                begin
+                  SList.Values[_Comp + IntToStr(aStm) + _cBnd] := GetBndString(aStm);
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap] := GetGapString(aStm);
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := '0';
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := '360'
+                end;
+              SList.EndUpdate;
+
             end;
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.EndUpdate;
           FEscriba.SetTrial(aTrial);
         end;
     end;
@@ -938,49 +947,54 @@ begin
      // FEscriba.SetVariables;
       FEscriba.SetMain;
 
-      FEscriba.Blcs[aBlc].Name := rsDefBlc;
-      FEscriba.Blcs[aBlc].BkGnd := clWhite;
-      FEscriba.Blcs[aBlc].VirtualTrialValue:= 1;
-      FEscriba.Blcs[aBlc].NumTrials:= NumTrials;
-      FEscriba.SetBlc(aBlc, True);
-
-      FEscriba.SetLengthVetTrial(aBlc);
-      for aTrial := Low(FEscriba.Blcs[aBlc].Trials) to High(FEscriba.Blcs[aBlc].Trials) do
+      B := FEscriba.Blcs[aBlc];
+      with B do
         begin
-          FEscriba.Blcs[aBlc].Trials[aTrial].Id := aTrial + 1;
-          FEscriba.Blcs[aBlc].Trials[aTrial].Kind := T_FPE;
-          FEscriba.Blcs[aBlc].Trials[aTrial].NumComp := GetNumComp;
+          Name := rsDefBlc;
+          BkGnd := clWhite;
+          VirtualTrialValue:= 1;
+          NumTrials:= NumTrials;
+        end;
+      FEscriba.SetBlc(aBlc, True);
+      FEscriba.SetLengthVetTrial(aBlc);
 
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.BeginUpdate;
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_BkGnd] := IntToStr (clWhite);
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Cursor] := IntToStr (crDefault);
-          //FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(chkUseMedia.Checked, '1','0');
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_UseMedia] := BoolToStr(False, '1','0');
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_ExpectedResponse] := StringGrid1.Cells[2, aTrial + 1];
-          // configurar o IET
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Trial + _cIET] := StringGrid1.Cells[3, aTrial + 1];
+      for aTrial := Low(B.Trials) to High(B.Trials) do
+        begin
 
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_NextTrial] := '0';
-
-          FEscriba.Blcs[aBlc].Trials[aTrial].Name := StringGrid1.Cells[2, aTrial + 1] + #32 + IntToStr(FEscriba.Blcs[aBlc].Trials[aTrial].Id);
-
-
-          aHStm := GetNumComp;
-
-          for aStm := 0 to aHStm do
+          T := FEscriba.Blcs[aBlc].Trials[aTrial];
+          with T do
             begin
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cBnd] := StringGrid1.Cells[aStm + 4 + (aHStm -1), aTrial + 1];
-              aValues :=  StringGrid1.Cells[aStm + 3, aTrial + 1] + #32;
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap] := Copy( aValues, 0, pos( #32, aValues ) - 1);
-              NextValue(aValues);
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := Copy( aValues, 0, pos( #32, aValues ) - 1);
-              NextValue(aValues);
-              FEscriba.Blcs[aBlc].Trials[aTrial].SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := Copy( aValues, 0, pos( #32, aValues ) - 1);
+              Id := aTrial + 1;
+              Kind := T_FPE;
+              NumComp := GetNumComp;
+              Name := StringGrid1.Cells[2, aTrial + 1] + #32 + IntToStr(Id);
 
+              SList.BeginUpdate;
+              SList.Values[_BkGnd] := IntToStr (clWhite);
+              SList.Values[_Cursor] := IntToStr (crDefault);
+              SList.Values[_UseMedia] := BoolToStr(False, '1','0');
+              SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
+              SList.Values[_LimitedHold] := '4000';
+              SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
+              SList.Values[_ExpectedResponse] := StringGrid1.Cells[2, aTrial + 1];
+              // configurar o IET
+              SList.Values[_Trial + _cIET] := StringGrid1.Cells[3, aTrial + 1];
+              SList.Values[_NextTrial] := '0';
+
+              aHStm := GetNumComp;
+              for aStm := 0 to aHStm do
+                begin
+                  SList.Values[_Comp + IntToStr(aStm) + _cBnd] := StringGrid1.Cells[aStm + 4 + (aHStm -1), aTrial + 1];
+                  aValues :=  StringGrid1.Cells[aStm + 3, aTrial + 1] + #32;
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap] := Copy( aValues, 0, pos( #32, aValues ) - 1);
+                  NextValue(aValues);
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := Copy( aValues, 0, pos( #32, aValues ) - 1);
+                  NextValue(aValues);
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := Copy( aValues, 0, pos( #32, aValues ) - 1);
+
+                end;
+              SList.EndUpdate;
             end;
-          FEscriba.Blcs[aBlc].Trials[aTrial].SList.EndUpdate;
           FEscriba.SetTrial(aTrial);
         end;
     end;
@@ -1029,7 +1043,7 @@ var
         Cells[5, aRow] := cY1;
         Cells[6, aRow] := BoolToStr(Closed, '1', '0');
         Cells[7, aRow] := cSize;
-        Cells[8, aRow] := 'FT 20';
+        Cells[8, aRow] := 'FT 2000';
         Inc(aRow);
       end;
   end;
@@ -1055,7 +1069,7 @@ var
       begin
         if (aRow + 1) > RowCount then RowCount := aRow + 1;
         Cells[0, aRow] := IntToStr(aRow);    //Trial Number
-        Cells[1, aRow] := 'FRFT 3 40 0 0';
+        Cells[1, aRow] := 'FR 3 0';
         Cells[2, aRow] := aContingency;
         Cells[3, aRow] := aConsequence;
         aCol := 4;
