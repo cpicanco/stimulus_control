@@ -379,6 +379,8 @@ begin
                   FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_UseMedia] + KEnter +
                 KShowStarter +
                   FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_ShowStarter] + KEnter +
+                KLimitedHold +
+                    FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_LimitedHold] + KEnter +
                 KSchedule +
                   FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Schedule] + KEnter +
                 KExpectedResponse +
