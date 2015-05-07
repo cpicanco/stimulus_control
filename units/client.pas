@@ -154,7 +154,7 @@ begin
     //message := '';
       try
         {$ifdef NoClient}
-        message := 'Pupil' + #10 + 'timestamp:' + 'NoClient is defined'+ '#10';
+        message := 'Pupil' + #10 + 'timestamp:' + 'NoClient is defined'+ #10;
         {$else}
         FSubscriber.recv( message );
         {$endif}
