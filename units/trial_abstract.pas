@@ -165,7 +165,10 @@ end;
 destructor TTrial.Destroy;
 begin
   if Assigned(FClockThread) then
-    FClockThread.Terminate;
+    begin
+      FClockThread.Enabled := False;
+      FClockThread.Terminate;
+    end;
   inherited Destroy;
 end;
 
