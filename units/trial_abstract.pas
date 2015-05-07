@@ -42,13 +42,13 @@ type
   private
     FCfgTrial: TCfgTrial;
     FClientThread : TClientThread;
+    FCounterManager : TCounterManager;
     FData: string;
     FDataTicks: string;
     FFilename: string;
     FHeader: string;
     FHeaderTicks: string;
     FIETConsequence: string;
-    FCounterManager : TCounterManager;
     FNextTrial: string;
     FResult: string;
     FRootMedia: string;
@@ -67,9 +67,8 @@ type
     FOnStmResponse: TNotifyEvent;
     FOnWriteTrialData: TNotifyEvent;
     FClockThread : TClockThread;
-    function GetClockThreadInterval: integer;
-    procedure SetClockThreadInterval(AValue: integer);
   strict protected
+    FClockList : array of TThreadMethod;
     FLimitedHold : integer;
     FIscorrection : Boolean;
     procedure ClientStatus(msg : string);
@@ -106,7 +105,6 @@ type
     property OnNone: TNotifyEvent read FOnNone write FOnNone;
     property OnStmResponse: TNotifyEvent read FOnStmResponse write FOnStmResponse;
     property OnWriteTrialData: TNotifyEvent read FOnWriteTrialData write FOnWriteTrialData;
-    property ClockThreadInterval : integer read GetClockThreadInterval write SetClockThreadInterval;
   end;
 
 implementation
@@ -125,16 +123,6 @@ begin
   FClientThread.Start;
 end;
 
-function TTrial.GetClockThreadInterval: integer;
-begin
-  Result := FClockThread.Interval;
-end;
-
-procedure TTrial.SetClockThreadInterval(AValue: integer);
-begin
-  FClockThread.Interval := AValue;
-end;
-
 procedure TTrial.ClientStatus(msg: string);
  begin
   {$ifdef DEBUG}
@@ -144,10 +132,28 @@ procedure TTrial.ClientStatus(msg: string);
   {$endif}
 end;
 
+  {
+    FLimitedhold is controlled by a TTrial descendent.
+  }
+
 procedure TTrial.StartTrial(Sender: TObject);
+var
+  i : integer;
 begin
-  FClockThread.OnTimer := @ThreadClock; // descendents can implement the ThreadClock method
-  FClockThread.Start;
+  if FLimitedHold > 0 then
+    begin
+      FClockThread.Interval := FLimitedHold;
+      FClockThread.OnTimer := @ThreadClock;
+
+      SetLength(FClockList, Length(FClockList) + 1);
+      FClockList[Length(FClockList) - 1] := @FClockThread.Start;
+    end;
+
+  if Length(FClockList) > 0 then
+    for i := 0 to Length(FClockList) -1 do
+      TThreadMethod(FClockList[i]);
+
+  SetLength(FClockList, 0);
 end;
 
 constructor TTrial.Create(AOwner: TComponent);
@@ -159,7 +165,7 @@ end;
 destructor TTrial.Destroy;
 begin
   if Assigned(FClockThread) then
-      FClockThread.Terminate;
+    FClockThread.Terminate;
   inherited Destroy;
 end;
 

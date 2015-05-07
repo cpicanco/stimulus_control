@@ -47,12 +47,14 @@ type
     FResponseCounter : integer;
     procedure Consequence;
     procedure Response;
+    procedure Pass;
+    function GetStartMethod : TThreadMethod;
   public
     destructor Destroy; override;
     procedure AssignParameters; virtual; abstract;
     procedure DoResponse; virtual; abstract;
     procedure Reset; virtual; abstract;
-    procedure StartClock;
+    property StartMethod : TThreadMethod read GetStartMethod;
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse : TNotifyEvent read FOnResponse write FOnResponse;
     property Parameter1 : Integer read FParameter1 write FParameter1;
@@ -340,16 +342,22 @@ begin
   if Assigned(OnResponse) then OnResponse(Self);
 end;
 
-destructor TAbsSch.Destroy;
+procedure TAbsSch.Pass;
 begin
-  if Assigned(FClockThread) then FClockThread.Terminate;
-  inherited Destroy;
+  // do nothing
 end;
 
-procedure TAbsSch.StartClock;
+function TAbsSch.GetStartMethod: TThreadMethod;
 begin
-  if Assigned(FClockThread) then
-    FClockThread.Start;
+  if Assigned(FClockThread) then Result := @FClockThread.Start
+  else Result := @Self.Pass;
+end;
+
+destructor TAbsSch.Destroy;
+begin
+  FClockThread.Enabled := False;
+  if Assigned(FClockThread) then FClockThread.Terminate;
+  inherited Destroy;
 end;
 
 
