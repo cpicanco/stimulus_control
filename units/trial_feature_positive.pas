@@ -75,7 +75,6 @@ type
 
   TFPE = Class(TTrial)
   private
-    //FIETCode : string;
     FNumComp : integer;
     FDataSupport : TDataSupport;
     FCurrTrial: TCurrentTrial;
@@ -85,25 +84,21 @@ type
     FUseMedia : Boolean;
     FShowStarter : Boolean;
     FCanResponse : Boolean;
-    //FClientThread : TClientThread;
-    //FList : TStringList;
   protected
     procedure BeginCorrection (Sender : TObject);
-    procedure EndCorrection (Sender : TObject);
+    procedure BeginStarter;
     procedure Consequence(Sender: TObject);
-
-    procedure TrialResult(Sender: TObject);
-
-    procedure Response(Sender: TObject);
+    procedure EndCorrection (Sender : TObject);
+    procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
-    procedure ThreadClock(Sender: TObject); override;
-    procedure StartTrial(Sender: TObject); override;
-    procedure BeginStarter;
-    procedure EndTrial(Sender: TObject);
-    procedure WriteData(Sender: TObject); override;
+    procedure Response(Sender: TObject);
     procedure SetTimerCsq;
+    procedure StartTrial(Sender: TObject); override;
+    procedure ThreadClock(Sender: TObject); override;
+    procedure TrialResult(Sender: TObject);
+    procedure WriteData(Sender: TObject); override;
     //TCustomControl
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
@@ -116,7 +111,6 @@ type
   end;
 
 implementation
-
 
 constructor TFPE.Create(AOwner: TComponent);
 begin
@@ -145,30 +139,12 @@ begin
   if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
 end;
 
-{
-Limited hold need to be controlled by a TTrial descendent.
-
-The current scope is the TFPE.
-
-This change may lead to an upgrade with no backward compatibility.
-This upgrade aims to
- 1) implement a central Thread Timer for improved performance;
- 2) Schedules clocks should wait for an event
-   instead actively increment integers. This will change completely the current Clock implementation;
-
-For now, this change means that in the TFPE,
- a schedule can not control the end of trial anymore.
-
- See StartTrial and ThreadClock procedures for the limited hold implementation.
-
-}
 procedure TFPE.TrialResult(Sender: TObject);
 begin
   if FCanResponse then
     begin
       CreateClientThread('C:'+ FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
 
-      FCanResponse:= False;
       //FDataSupport.StmDuration := GetTickCount;
 
       if FFlagCsq2Fired then
@@ -182,22 +158,10 @@ begin
           IETConsequence := FDataSupport.CSQMISS;
         end;
 
-      FCurrTrial.Result := Result;
-
       if FCurrTrial.NextTrial = T_CRT then NextTrial := T_CRT
       else NextTrial := FCurrTrial.NextTrial;
 
-      //Dispenser(FDataCsq, FDataUsb);
-      if Result = T_HIT then  Hit(Sender)
-      else
-      if Result = T_MISS then  Miss(Sender)
-      else
-      if Result = T_NONE then  None(Sender);
-
-    if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
-
-    // if not LimitedHold then
-    // end trial
+      if not (FLimitedHold > 0) then EndTrial(Sender);
     end;
 end;
 
@@ -217,6 +181,7 @@ begin
     aConsequence.Color := 255;
     aConsequence.FullPath := RootMedia + FDataSupport.CSQ2;
     aConsequence.Play;
+    if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
     //aConsequence.FullScreen;
 end;
 
@@ -257,8 +222,11 @@ var TickCount : cardinal;
 begin
   TickCount := GetTickCount;
   inherited KeyUp(Key, Shift);
-  if Key = 27 {ESC} then FCanResponse:= True;
-  Invalidate;
+  if Key = 27 {ESC} then
+    begin
+      FCanResponse:= True;
+      Invalidate;
+    end;
 
   if FCanResponse then
   begin
@@ -379,9 +347,14 @@ begin
     begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
+      Kind := CfgTrial.SList.Values[_Schedule];
+      if Loaded then
+        begin
+          SetLength(FClockList, Length(FClockList) +1);
+          FClockList[Length(FClockList) -1] := StartMethod;
+        end
+      else raise Exception.Create(ExceptionNoScheduleFound);
     end;
-
-  FSchedule.Kind:= CfgTrial.SList.Values[_Schedule];
 
   // allow user defined differential consequences
   // we expect somthing like:
@@ -493,7 +466,6 @@ begin
   FCanResponse:= True;
   FDataSupport.StmBegin := GetTickCount;
 
-  ClockThreadInterval := FLimitedHold;
   inherited StartTrial(Sender);
 end;
 
@@ -539,8 +511,18 @@ end;
 
 procedure TFPE.EndTrial(Sender: TObject);
 begin
+  FCanResponse := False;
   Hide;
   FDataSupport.StmEnd := GetTickCount;
+
+  FCurrTrial.Result := Result;
+
+  if Result = T_HIT then  Hit(Sender)
+  else
+    if Result = T_MISS then  Miss(Sender)
+    else
+      if Result = T_NONE then  None(Sender);
+
   WriteData(Sender);
 
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
@@ -580,7 +562,7 @@ begin
   //  if Sender is TKey then TKey(Sender).IncCounterResponse
   //    else;
 
-  Invalidate;
+  //Invalidate;
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
