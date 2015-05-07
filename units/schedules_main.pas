@@ -48,11 +48,16 @@ type
     procedure DoResponse;
     function StartMethod : TThreadMethod;
     property Kind: String write SetKind;
+    property Loaded : Boolean read FAbsSchLoaded;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
   end;
 
 implementation
+
+{$ifdef DEBUG}
+  uses debug_logger;
+{$endif}
 
 procedure TSchMan.SetKind(Kind: String);
 var
@@ -138,9 +143,16 @@ begin
     end;
 
   FAbsSchLoaded := Assigned(FAbsSch);
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'FAbsSchLoaded:'+ BoolToStr(FAbsSchLoaded, 'True', 'False') );
+  {$endif}
 
   if FAbsSchLoaded then
     begin
+      {$ifdef DEBUG}
+        DebugLn(mt_Debug + 'Schedule:' + aSchedule + #32 +
+          Parameter1  + #32 + Parameter2  + #32 + Parameter3 + #32 + Parameter4  );
+      {$endif}
       FAbsSch.OnConsequence := @Consequence;
       FAbsSch.OnResponse := @Response;
       FAbsSch.AssignParameters;

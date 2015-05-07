@@ -57,10 +57,17 @@ type
 
 implementation
 
+{$ifdef DEBUG}
+  uses debug_logger;
+{$endif}
+
 { TClockThread }
 
 constructor TClockThread.Create(CreateSuspended: Boolean);
 begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'TClockThread.Create at:' + TimeToStr(Time) + TimeSeparator + IntToStr(GetTickCount));
+  {$endif}
   FreeOnTerminate := True;
   FInterval := 1000;
   FEnabled := True;
@@ -71,6 +78,10 @@ end;
 
 destructor TClockThread.Destroy;
 begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'TClockThread.Destroy:' + IntToStr(ThreadID));
+    DebugLn(mt_Debug + 'Thread.Interval:' + IntToStr(Interval));
+  {$endif}
   RTLEventDestroy(FRTLEvent);
   inherited Destroy;
 end;
