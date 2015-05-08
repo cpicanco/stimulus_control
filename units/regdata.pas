@@ -39,10 +39,6 @@ type
   TRegData = class(TComponent)
   private
     FFileName: string;
-    FITIBEGIN: DWord;             // intertrial interval begin
-    FITIEND: DWord;               // intertrial interval end
-    FLatencyStmBegin: Dword;      // stimulus onset
-    FLatencyStmResponse: Dword;   // response latency to that stimulus onset
     FFile: TextFile;
     FSessionNumber: integer;
     procedure UpdateFileName(NewFileName : string);
@@ -54,10 +50,6 @@ type
     procedure AssignFFile;
     procedure CloseFFile;
     property SessionNumber : integer read FSessionNumber write FSessionNumber;
-    property LatencyStmBegin : Dword read FLatencyStmBegin write FLatencyStmBegin;
-    property LatencyStmResponse : Dword read FLatencyStmResponse write FLatencyStmResponse;
-    property ITIBEGIN : DWord read FITIBEGIN write FITIBEGIN;
-    property ITIEND : DWord read FITIEND write FITIEND;
     property DataFile : TextFile read FFile write FFile;
     property FileName : string read FFileName write UpdateFileName;
   end;
@@ -171,6 +163,7 @@ begin
 end;
 
 procedure TRegData.CloseFFile;
+var IsOpened : Boolean;
 begin
   CloseFile(FFile);
 end;
