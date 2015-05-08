@@ -72,6 +72,9 @@ type
     FLimitedHold : integer;
     FIscorrection : Boolean;
     procedure ClientStatus(msg : string);
+    {$ifdef DEBUG}
+       procedure ClockStatus(msg : string);
+    {$endif}
     procedure StartTrial(Sender: TObject); virtual;
     procedure ThreadClock(Sender: TObject); virtual; abstract;
     procedure WriteData(Sender: TObject); virtual; abstract;
@@ -132,6 +135,12 @@ procedure TTrial.ClientStatus(msg: string);
   {$endif}
 end;
 
+{$ifdef DEBUG}
+procedure TTrial.ClockStatus(msg: string);
+begin
+  DebugLn(msg);
+end;
+{$endif}
   {
     FLimitedhold is controlled by a TTrial descendent.
   }
@@ -144,6 +153,9 @@ begin
     begin
       FClockThread.Interval := FLimitedHold;
       FClockThread.OnTimer := @ThreadClock;
+      {$ifdef DEBUG}
+        FClockThread.OnDebugStatus := @ClockStatus;
+      {$endif};
 
       SetLength(FClockList, Length(FClockList) + 1);
       FClockList[Length(FClockList) - 1] := @FClockThread.Start;
@@ -164,6 +176,11 @@ end;
 
 destructor TTrial.Destroy;
 begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'TTrial.Destroy');
+    DebugLn(mt_Debug + 'FNextTrial:' + FNextTrial);
+  {$endif}
+
   if Assigned(FClockThread) then
     begin
       FClockThread.Enabled := False;

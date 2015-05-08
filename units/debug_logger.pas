@@ -4,9 +4,11 @@ unit debug_logger;
 
 interface
 
-uses regdata;
+uses LCLProc, regdata;
 
 procedure DebugLn(msg : string);
+
+procedure DebuglnThreadLog(const Msg: string);
 
 var
   Logger : TRegData;
@@ -20,22 +22,22 @@ const
 
 implementation
 
-uses FileUtil, SysUtils;
+uses LCLIntf, FileUtil, SysUtils;
+
+var
+  FileInfo : TSearchRec;
 
 procedure DebugLn(msg: string);
 begin
-  if TextRec(Logger.DataFile).Mode = 55218 then
-    begin
-      WriteLn(Logger.DataFile, msg);
-      Logger.CloseFFile;
-    end
-  else
-    begin
-      Logger.AssignFFile;
-      Logger.AppendF;
-      WriteLn(Logger.DataFile, msg);
-      Logger.CloseFFile;
-    end;
+  DebuglnThreadLog(msg);
+end;
+
+procedure DebuglnThreadLog(const Msg: string);
+var
+  PID: PtrInt;
+begin
+  PID:=PtrInt(GetThreadID);
+  DbgOutThreadLog(IntToStr(GetTickCount) + ' : ' + IntToStr(PtrInt(PID)) + ' : ' + Msg + LineEnding);
 end;
 
 initialization
@@ -45,6 +47,25 @@ end
 
 finalization
 begin
+  if FindFirst('Log*',faAnyFile, FileInfo) = 0 then
+    begin
+      repeat
+        with FileInfo do
+          begin
+            if TextRec(Logger.DataFile).Mode <> 55218 then
+              begin
+                Logger.AssignFFile;
+                Logger.AppendF;
+              end;
+            WriteLn(Logger.DataFile, Name);
+            WriteLn(Logger.DataFile, ReadFileToString(Name));
+            DeleteFile(Name);
+          end;
+          WriteLn(Logger.DataFile, #10#10);
+      until FindNext(FileInfo) <> 0;
+      Logger.CloseFFile;
+    end;
+  FindClose(FileInfo);
   Logger.Free;
 end
 

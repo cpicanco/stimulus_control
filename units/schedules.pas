@@ -29,6 +29,9 @@ uses
   Classes, SysUtils
 
 , custom_timer
+{$ifdef DEBUG}
+, debug_logger
+{$endif}
 ;
 
 type
@@ -49,6 +52,10 @@ type
     procedure Response;
     procedure Pass;
     function GetStartMethod : TThreadMethod;
+  {$ifdef DEBUG}
+  strict protected
+    procedure DebugStatus(DebugMessage : string);
+  {$endif}
   public
     destructor Destroy; override;
     procedure AssignParameters; virtual; abstract;
@@ -177,6 +184,9 @@ begin
   inherited Create(AOwner);
   FClockThread := TClockThread.Create(True);
   FClockThread.OnTimer := @Clock;
+  {$ifdef DEBUG}
+    FClockThread.OnDebugStatus := @DebugStatus;
+  {$endif}
   FFlagClock := False;
 end;
 
@@ -254,6 +264,9 @@ begin
   inherited Create(AOwner);
   FClockThread := TClockThread.Create(True);
   FClockThread.OnTimer := @Clock;
+  {$ifdef DEBUG}
+    FClockThread.OnDebugStatus := @DebugStatus;
+  {$endif}
 end;
 
 { TSchDRH }
@@ -263,6 +276,9 @@ begin
   inherited Create (AOwner);
   FClockThread := TClockThread.Create(True);
   FClockThread.OnTimer := @Clock;
+  {$ifdef DEBUG}
+    FClockThread.OnDebugStatus := @DebugStatus;
+  {$endif}
 end;
 
 procedure TSchDRH.AssignParameters;
@@ -298,6 +314,9 @@ begin
   inherited Create(AOwner);
   FClockThread := TClockThread.Create(True);
   FClockThread.OnTimer := @Clock;
+  {$ifdef DEBUG}
+    FClockThread.OnDebugStatus := @DebugStatus;
+  {$endif}
   FFlagClock := False;
 end;
 
@@ -352,6 +371,13 @@ begin
   if Assigned(FClockThread) then Result := @FClockThread.Start
   else Result := @Self.Pass;
 end;
+
+{$ifdef DEBUG}
+procedure TAbsSch.DebugStatus(DebugMessage : string);
+begin
+  DebugLn(DebugMessage);
+end;
+{$endif}
 
 destructor TAbsSch.Destroy;
 begin
