@@ -25,20 +25,20 @@ unit trial_feature_positive;
 
 interface
 
-uses LCLIntf, LCLType, {LMessages,} Controls, Classes, SysUtils
+uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
-  //, counter
-  , dialogs
-  , config_session
-  //, countermanager
-  , trial_abstract
-  //, custom_timer
-  , constants
-  //, client
-  , draw_methods
-  , schedules_main
-  , response_key
-  ;
+    //, counter
+    , dialogs
+    , config_session
+    //, countermanager
+    , trial_abstract
+    //, custom_timer
+    , constants
+    //, client
+    , draw_methods
+    , schedules_main
+    , response_key
+    ;
 
 type
 

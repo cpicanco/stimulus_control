@@ -27,17 +27,16 @@ interface
 
 // this unit was not finished yet
 
-uses
-    Classes
-  , SysUtils
-  , Dialogs
+uses Classes, SysUtils
 
-  {$IFDEF Linux}
-  , Ports
-  {$ENDIF}
+    , Dialogs
 
-  , custom_timer
-  ;
+    {$IFDEF Linux}
+    , Ports
+    {$ENDIF}
+
+    , custom_timer
+    ;
 
 type
 
@@ -62,15 +61,15 @@ type
 
   end;
 
- {$IFDEF Linux}
- //program need to be executed under/have root privileges
- function ioperm(from: Cardinal; num: Cardinal; turn_on: Integer): Integer; cdecl; external 'libc';
- {$ENDIF}
+{$IFDEF Linux}
+  //program need to be executed under/have root privileges
+  function ioperm(from: Cardinal; num: Cardinal; turn_on: Integer): Integer; cdecl; external 'libc';
+{$ENDIF}
 
- {$IFDEF WINDOWS}
- function Inp32(EndPorta: integer): BYTE stdcall; external 'inpout32';
- procedure Out32(EndPorta: integer; Valor:BYTE); stdcall; external 'inpout32';
- {$ENDIF}
+{$IFDEF WINDOWS}
+  function Inp32(EndPorta: integer): BYTE stdcall; external 'inpout32';
+  procedure Out32(EndPorta: integer; Valor:BYTE); stdcall; external 'inpout32';
+{$ENDIF}
 
 var FPLP : TPLP;
 
@@ -88,9 +87,9 @@ begin
 // of the target machine before compile.
 
 {$IFDEF Linux}
-   if ioperm($378, 8, 1) = -1 then Showmessage('Error ioperm $378 on') else;
-   //if ioperm($278, 8, 1) = -1 then Showmessage('Error ioperm $278') else;
-   //if ioperm($3BC, 8, 1) = -1 then Showmessage('Error ioperm $3BC') else;
+  if ioperm($378, 8, 1) = -1 then Showmessage('Error ioperm $378 on') else;
+  //if ioperm($278, 8, 1) = -1 then Showmessage('Error ioperm $278') else;
+  //if ioperm($3BC, 8, 1) = -1 then Showmessage('Error ioperm $3BC') else;
 {$ENDIF}
 end;
 

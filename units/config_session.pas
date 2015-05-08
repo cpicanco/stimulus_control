@@ -1,6 +1,7 @@
 //
-// Stimulus Control App.
-// Copyright (C) 2014,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+// Validation Project (PCRF) - Stimulus Control App
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
 // cpicanco@ufpa.br
 //
 // This file is part of Validation Project (PCRF).
@@ -24,9 +25,9 @@ unit config_session;
 
 interface
 
-uses
-  Classes, ComCtrls,IniFiles, SysUtils,  Dialogs, Forms,
-  constants;
+uses Classes, ComCtrls, IniFiles, SysUtils,  Dialogs, Forms
+    , constants
+    ;
 
 type
 

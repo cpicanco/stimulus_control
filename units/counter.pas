@@ -21,7 +21,7 @@
 //
 unit counter;
 
-{$MODE Delphi}
+{$mode objfpc}{$H+}
 
 interface
 

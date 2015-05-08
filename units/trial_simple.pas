@@ -25,22 +25,20 @@ unit trial_simple;
 
 interface
 
-uses
+uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
-  LCLIntf, LCLType, Controls, Classes, SysUtils
+    // TTimer
+    , ExtCtrls
 
-  // TTimer
-  , ExtCtrls
-
-  , response_key
-  , trial_abstract
-  //, countermanager
-  //, config_session
-  , counter
-  , constants
-  , interface_rs232
-  , interface_plp
-  ;
+    , response_key
+    , trial_abstract
+    //, countermanager
+    //, config_session
+    , counter
+    , constants
+    , interface_rs232
+    , interface_plp
+    ;
 
 type
 

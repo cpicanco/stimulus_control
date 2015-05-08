@@ -25,25 +25,23 @@ unit trial_matching;
 
 interface
 
-uses
+uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
-  LCLIntf, LCLType, {LMessages,} Controls, Classes, SysUtils
+    // TTimer
+    , ExtCtrls
 
-  // TTimer
-  , ExtCtrls
+    //IntToBin
+    , strutils
 
-  //IntToBin
-  , strutils
-
-  , response_key
-  , trial_abstract
-  //, countermanager
-  //, config_session
-  , counter
-  , constants
-  , interface_rs232
-  , interface_plp
-  ;
+    , response_key
+    , trial_abstract
+    //, countermanager
+    //, config_session
+    , counter
+    , constants
+    , interface_rs232
+    , interface_plp
+    ;
 
 type
 

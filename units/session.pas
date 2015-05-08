@@ -212,7 +212,7 @@ begin
   FManager := nil;
   FCfgSes := nil;
 
-  // internal objects
+  //internal objects
   if Assigned(FRegData) then FreeAndNil(FRegData);
   if Assigned(FRegDataTicks) then FreeAndNil(FRegDataTicks);
   if Assigned(FBlc) then FreeAndNil(FBlc);
@@ -246,9 +246,7 @@ begin
     FRegDataTicks:= TRegData.Create(nil, FCfgSes.RootData + 'Ticks_000.txt');
 
   {
-    File writing operations are called from a different thread
-    It is a hack for a while until I find a proper synchronize
-    implementation
+    File writing operations are called from a different thread.
   }
   FTimestampsData := TRegData.Create(nil, ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps');
   UpdateTimestampsFileName(FTimestampsData.FileName);
@@ -287,7 +285,7 @@ begin
   IndTrial := FManager.CurrentTrial.Counter;
   if IndBlc < FCfgSes.NumBlc then
     begin
-      FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);     //bug
+      FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);
       FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, IndTrial, FTestMode)
     end
   else EndSess(Sender);

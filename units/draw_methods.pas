@@ -25,8 +25,7 @@ unit draw_methods; //helpers
 
 interface
 
-uses
-  Graphics, SysUtils, Classes, Controls;
+uses Graphics, SysUtils, Classes, Controls;
 
 type
 

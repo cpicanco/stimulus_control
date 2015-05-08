@@ -25,12 +25,9 @@ unit regdata;
 
 interface
 
-uses
-  //Dialogs,
-  SysUtils, Classes
-
-  , FileUtil
-  ;
+uses SysUtils, Classes, FileUtil
+    //, Dialogs
+    ;
 
 type
 
@@ -66,7 +63,7 @@ implementation
    }
 
 {$ifdef DEBUG}
-uses debug_logger, Dialogs;
+  uses debug_logger, Dialogs;
 {$endif}
 
 procedure TRegData.UpdateFileName(NewFileName : string);
@@ -125,7 +122,7 @@ begin
       Rewrite(FFile);
 
       {$ifdef DEBUG}
-      WriteLn(FFile, mt_Debug + 'Saving data to:' + FFileName )
+        WriteLn(FFile, mt_Debug + 'Saving data to:' + FFileName )
       {$endif}
    end;
 end;
@@ -163,7 +160,6 @@ begin
 end;
 
 procedure TRegData.CloseFFile;
-var IsOpened : Boolean;
 begin
   CloseFile(FFile);
 end;

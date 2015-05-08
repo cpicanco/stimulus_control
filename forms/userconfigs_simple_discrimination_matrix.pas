@@ -25,13 +25,15 @@ unit userconfigs_simple_discrimination_matrix;
 
 interface
 
-uses
-    Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-    {$IFDEF LCLGTK2}
-    gtk2, gdk2, glib2,
-    {$ENDIF}
-    StdCtrls, Spin, Grids, ActnList
-    , draw_methods;
+uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
+     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList
+
+     {$IFDEF LCLGTK2}
+     , gtk2, gdk2, glib2
+     {$ENDIF}
+
+     , draw_methods
+     ;
 
 type
 
@@ -230,7 +232,7 @@ var
   end;
 
   procedure GetCoordenates(var CoordenateString : string);
-  var pos42, i  : integer;
+  var pos42 : integer;
   begin
     // ASCII, Decimals
     // #32 (space)

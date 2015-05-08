@@ -73,7 +73,7 @@ type
     FIscorrection : Boolean;
     procedure ClientStatus(msg : string);
     {$ifdef DEBUG}
-       procedure ClockStatus(msg : string);
+      procedure ClockStatus(msg : string);
     {$endif}
     procedure StartTrial(Sender: TObject); virtual;
     procedure ThreadClock(Sender: TObject); virtual; abstract;
@@ -129,9 +129,9 @@ end;
 procedure TTrial.ClientStatus(msg: string);
  begin
   {$ifdef DEBUG}
-  DebugLn(msg);
+    DebugLn(msg);
   {$else}
-  TimestampLn(msg);
+    TimestampLn(msg);
   {$endif}
 end;
 
@@ -141,10 +141,10 @@ begin
   DebugLn(msg);
 end;
 {$endif}
-  {
-    FLimitedhold is controlled by a TTrial descendent.
-  }
 
+{
+  FLimitedhold is controlled by a TTrial descendent.
+}
 procedure TTrial.StartTrial(Sender: TObject);
 var
   i : integer;

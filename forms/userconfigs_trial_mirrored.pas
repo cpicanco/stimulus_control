@@ -25,20 +25,24 @@ unit userconfigs_trial_mirrored;
 
 interface
 
-uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  {$IFDEF LCLGTK2}
-  gtk2, gdk2, glib2,
-  {$ENDIF}
-  Spin, ValEdit, Grids, ExtCtrls, draw_methods, math
-  ;
+uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
+     Dialogs, StdCtrls, Spin, Grids, ExtCtrls
+
+     {$IFDEF LCLGTK2}
+     , gtk2, gdk2, glib2
+     {$ENDIF}
+     , draw_methods
+     , math
+     ;
 
 type
 
-  { TBresenhamLineForm }
+  { TTrialsPerNode }
+
   TTrialsPerNode = array of integer;
 
   { TCustomAxis }
+
   TCustomAxis = record
     Trials : integer;
     Angle : string;
@@ -49,10 +53,14 @@ type
     TrialsPerNode : TTrialsPerNode;
   end;
 
+  { TAxisList }
+
   TAxisList = record
     CanRead : Boolean;
     List : array of TCustomAxis;
   end;
+
+  { TBresenhamLineForm }
 
   TBresenhamLineForm = class(TForm)
     btnAddAxis: TButton;

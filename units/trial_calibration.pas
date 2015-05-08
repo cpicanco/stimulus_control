@@ -25,12 +25,11 @@ unit trial_calibration;
 
 interface
 
-uses
-  LCLIntf, Classes, SysUtils
-  , trial_abstract
-  , Graphics
-  , constants
-  ;
+uses LCLIntf, Classes, SysUtils
+    , trial_abstract
+    , Graphics
+    , constants
+    ;
 
 type
 
@@ -48,6 +47,9 @@ type
 
   { TCLB }
 
+  {
+    Calibration Trial
+  }
   TCLB = class(TTrial)
   private
     { private declarations }

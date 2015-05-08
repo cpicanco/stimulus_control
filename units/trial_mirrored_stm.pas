@@ -25,21 +25,15 @@ unit trial_mirrored_stm;
 
 interface
 
-uses
+uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
-  LCLIntf, LCLType, Controls, Classes, SysUtils
-
-  //, counter
-  //, countermanager
-  //, client
-
-  , config_session
-  , trial_abstract
-  , constants
-  , draw_methods
-  , schedules_main
-  , response_key
-  ;
+    , config_session
+    , trial_abstract
+    , constants
+    , draw_methods
+    , schedules_main
+    , response_key
+    ;
 
 type
 

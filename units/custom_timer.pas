@@ -27,10 +27,10 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
-   {$ifdef DEBUG}
-   , debug_logger
-   {$endif}
-   ;
+    {$ifdef DEBUG}
+    , debug_logger
+    {$endif}
+    ;
 
 type
 
@@ -114,7 +114,6 @@ procedure TClockThread.DebugStatus;
 begin
   if Assigned(FOnDebugStatus) then FOnDebugStatus(FDebugStatus);
 end;
-
 {$endif}
 
 procedure TClockThread.Clock;

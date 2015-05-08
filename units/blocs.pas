@@ -105,7 +105,9 @@ type
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
     procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
-    procedure DebugStatus(msg : string);
+    {$ifdef DEBUG}
+       procedure DebugStatus(msg : string);
+    {$endif}
     procedure PlayTrial;
     //procedure ShowCounterPlease (Kind : String);
     // events
@@ -590,12 +592,12 @@ begin
   FTimer.Start;
 end;
 
+{$ifdef DEBUG}
 procedure TBlc.DebugStatus(msg: string);
 begin
-{$ifdef DEBUG}
   DebugLn(msg);
-{$endif}
 end;
+{$endif}
 
 procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
 //var

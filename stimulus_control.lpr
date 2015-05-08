@@ -80,7 +80,6 @@ uses
   , draw_methods
   , timestamps_logger
 
-
   {$ifdef DEBUG}
   , debug_logger
   , SysUtils
@@ -97,17 +96,17 @@ resourcestring
 begin
 
   {$ifdef DEBUG}
-  DebugLn(mt_Information + 'Debug Logger initialized');
+    DebugLn(mt_Information + 'Debug Logger initialized');
     {$ifdef WINDOWS}
-    DebugLn(mt_Information + 'Inp32(0):' + IntToStr(Inp32(0)));
+      DebugLn(mt_Information + 'Inp32(0):' + IntToStr(Inp32(0)));
     {$endif}
   {$endif}
 
   Application.Title := ApplicationTitle;
   Application.Initialize;
   {$ifdef DEBUG}
-  DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
-  DebugLn(mt_Debug + 'Application ThreadID:' + IntToStr(ThreadID));
+    DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
+    DebugLn(mt_Debug + 'Application ThreadID:' + IntToStr(ThreadID));
   {$endif}
   Application.CreateForm(TUserConfig, UserConfig);
   Application.Run;

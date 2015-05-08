@@ -21,12 +21,12 @@
 //
 unit countermanager;
 
-{$MODE Delphi}
+{$mode objfpc}{$H+}
 
 interface
 
-uses
-    Classes, Dialogs, SysUtils, Counter;
+uses Classes, Dialogs, SysUtils, Counter;
+
 type
 
   TCounterManager = class (TComponent)
