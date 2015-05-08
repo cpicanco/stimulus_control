@@ -25,11 +25,10 @@ unit schedules_main;
 
 interface
 
-uses
-    Classes
-  , SysUtils
-  , schedules
-  ;
+uses Classes, SysUtils
+
+     , schedules
+     ;
 
 type
 
@@ -62,7 +61,8 @@ implementation
 procedure TSchMan.SetKind(Kind: String);
 var
   aSchedule,
-  Parameter1, Parameter2, Parameter3, Parameter4: String;
+  Parameter1, Parameter2 : String;
+  //Parameter3, Parameter4 : String;
 
   procedure NextSpaceDelimitedParamater;
   begin
@@ -86,11 +86,11 @@ begin
   NextSpaceDelimitedParamater;
   Parameter2 := Copy(Kind, 0, Pos(#32, Kind) - 1);
 
-  NextSpaceDelimitedParamater;
-  Parameter3 := Copy(Kind, 0, Pos(#32, Kind) - 1);
+  //NextSpaceDelimitedParamater;
+  //Parameter3 := Copy(Kind, 0, Pos(#32, Kind) - 1);
 
-  NextSpaceDelimitedParamater;
-  Parameter4 := Copy(Kind, 0, Pos(#32, Kind) - 1);
+  //NextSpaceDelimitedParamater;
+  //Parameter4 := Copy(Kind, 0, Pos(#32, Kind) - 1);
 
   if aSchedule = 'CRF' then
     begin

@@ -25,11 +25,11 @@ unit criatore;
 
 interface
 
-uses
-  LCLIntf, LCLType, {LMessages,} SysUtils, Classes, Graphics, Controls,
-  {StdCtrls,} ExtCtrls, {Math,} Forms, Dialogs,
+uses LCLIntf, LCLType, SysUtils, Classes, Graphics, Controls,
+     ExtCtrls, Forms, Dialogs
 
-  config_session;
+     , config_session
+     ;
 
 type
 

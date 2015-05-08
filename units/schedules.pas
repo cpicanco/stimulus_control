@@ -25,14 +25,13 @@ unit schedules;
 
 interface
 
-uses
-  Classes, SysUtils
+uses Classes, SysUtils
 
-, custom_timer
-{$ifdef DEBUG}
-, debug_logger
-{$endif}
-;
+    , custom_timer
+    {$ifdef DEBUG}
+    , debug_logger
+    {$endif}
+    ;
 
 type
 
@@ -142,8 +141,6 @@ type
     //FIntervalVariation : integer;
     //FTimeInterval : integer;
     FFlagClock : Boolean;
-    //procedure DestroyClock;
-    //procedure CreateClock;
   public
     constructor Create(AOwner : TComponent); override;
     procedure AssignParameters; override;

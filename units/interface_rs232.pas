@@ -27,16 +27,14 @@ interface
 
 // this unit was not implemented yet
 
-uses
-     Classes
-   , SysUtils
+uses Classes, SysUtils
 
-     {$IFDEF WINDOWS}
-   , Windows, Registry
-     {$ENDIF}
+    {$IFDEF WINDOWS}
+    , Windows, Registry
+    {$ENDIF}
 
-   , Synaser
-     ;
+    , Synaser
+    ;
 
 type
 

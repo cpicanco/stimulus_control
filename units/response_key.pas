@@ -22,17 +22,16 @@
 unit response_key;  // media_key may be a good name
 
 {$mode objfpc}{$H+}
-//{$MODE Delphi}
 
 interface
 
-uses Dialogs,
-     LCLIntf, LCLType, {LMessages,} SysUtils, Variants, Classes,
-     Graphics, Controls, Forms, ExtCtrls, FileUtil,
-     bass_player,
-     schedules_main,
-     counter
-     ;
+uses LCLIntf, LCLType, SysUtils, Variants, Classes,
+     Graphics, Controls, Forms, ExtCtrls, FileUtil
+
+    , bass_player
+    , schedules_main
+    , counter
+    ;
 
 type
 
@@ -346,8 +345,9 @@ var
 
   function Load_GIF(Audio: boolean) : boolean;
   begin
-    {
     Result := False;
+
+    {
     try
       FGifImage.Image.LoadFromFile (s2);
     except
@@ -379,8 +379,8 @@ var
 
   function Load_VID (Audio : boolean) : boolean;
   begin
-    {
     Result := False;
+    {
     try
       if EditMode then FMedia.settings.playCount := 1
       else if FLoopNumber = 0 then FMedia.settings.playCount := MaxInt

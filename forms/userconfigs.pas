@@ -25,23 +25,23 @@ unit userconfigs;
 
 interface
 
-uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls, types,
-  StdCtrls, ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons
+uses Classes, SysUtils, FileUtil, Forms, Controls,
+     Graphics, Dialogs, ExtCtrls, types, StdCtrls,
+     ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons
 
-{$ifdef DEBUG}
-, debug_logger
-{$endif}
-, draw_methods
-, bass_player
-, client
-, session
-, config_session
-, countermanager
-, escriba
-, regdata
-, constants
-;
+    , draw_methods
+    , bass_player
+    , client
+    , session
+    , config_session
+    , countermanager
+    , escriba
+    , regdata
+    , constants
+    {$ifdef DEBUG}
+    , debug_logger
+    {$endif}
+    ;
 
 type
 
@@ -361,7 +361,7 @@ end;
 }
 procedure TUserConfig.RandTrialOrder(BeginRow, EndRow : integer);
 var
-  i, NumTrials, RandLine: integer;
+  i, RandLine: integer;
   InCell : string;
   StrArray : array of string;
 
@@ -1111,7 +1111,7 @@ begin
   {
     Example:
 
-    4 axis {0, 45, 90, 135}
+    4 axis: 0, 45, 90, 135
     3 nodes per axis
     2 trials per node
     ______________________________

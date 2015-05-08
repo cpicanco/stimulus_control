@@ -25,17 +25,14 @@ unit client;
 
 interface
 
-uses
-   Classes
- , SysUtils
- , Process
+uses Classes, SysUtils, Process
 
- {$ifdef NoClient}
- //no zmqapi
- {$else}
- , zmqapi
- {$endif}
- ;
+  {$ifdef NoClient}
+  //no zmqapi
+  {$else}
+  , zmqapi
+  {$endif}
+  ;
 
 type
 
@@ -53,8 +50,8 @@ type
     {$ifdef NoClient}
       //no zmqapi
     {$else}
-    FContext : TZMQContext;
-    FSubscriber : TZMQSocket;
+      FContext : TZMQContext;
+      FSubscriber : TZMQSocket;
     {$endif}
     FMsg : string;
     FTrialIndex : string;
@@ -76,7 +73,7 @@ type
 implementation
 
 {$ifdef DEBUG}
-uses debug_logger;
+  uses debug_logger;
 {$endif}
 
 constructor TClientThread.Create(TrialIndex : integer; Code : string; CreateSuspended : boolean = True);
@@ -133,38 +130,39 @@ var
   data : string;
   message : UTF8String;
 begin
+  message := '';
   try
-    {$ifdef DEBUG}
-      FMsg := mt_Debug + 'Connecting to Server at: "' + FServerAddress + '"';
-      Synchronize( @Showstatus );
-    {$endif}
+  {$ifdef DEBUG}
+    FMsg := mt_Debug + 'Connecting to Server at: "' + FServerAddress + '"';
+    Synchronize( @Showstatus );
+  {$endif}
 
-    {$ifdef NoClient}
-    // do not create contexts
-    {$else}
+  {$ifdef NoClient}
+  // do not create contexts
+  {$else}
     FContext := TZMQContext.Create;
     FSubscriber := FContext.Socket( stSub );
     FSubscriber.connect( 'tcp://' + FServerAddress);
     FSubscriber.subscribe( '' );
-    {$endif}
+  {$endif}
 
     //message := '';
-      try
-        {$ifdef NoClient}
-        message := 'Pupil' + #10 + 'timestamp:' + 'NoClient is defined'+ #10;
-        {$else}
-        FSubscriber.recv( message );
-        {$endif}
-      except
-        on E : Exception do
-          begin
-            {$ifdef DEBUG}
-              FMsg := mt_Exception + 'Connection to server "' + FServerAddress + '" failed saying: ' + #10#10 + E.Message;
-              Synchronize( @Showstatus );
-            {$endif}
-            Exit; // Terminate;
-          end;
-      end;
+    try
+    {$ifdef NoClient}
+      message := 'Pupil' + #10 + 'timestamp:' + 'NoClient is defined'+ #10;
+    {$else}
+      FSubscriber.recv( message );
+    {$endif}
+    except
+      on E : Exception do
+        begin
+          {$ifdef DEBUG}
+            FMsg := mt_Exception + 'Connection to server "' + FServerAddress + '" failed saying: ' + #10#10 + E.Message;
+            Synchronize( @Showstatus );
+          {$endif}
+          Exit; // Terminate;
+        end;
+    end;
 
     {$ifdef DEBUG}
       FMsg := mt_Debug + 'Client receive:' + #10#10 +  message;
@@ -182,12 +180,12 @@ begin
     {$endif}
 
   finally
-    {$ifdef NoClient}
+  {$ifdef NoClient}
     message := '';
-    {$else}
+  {$else}
     FSubscriber.Free;
     FContext.Free;
-    {$endif}
+  {$endif}
 
   end;
 end;

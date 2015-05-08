@@ -54,11 +54,7 @@
             <Verbosity>
               <ShoLineNum Value="True"/>
             </Verbosity>
-            <CompilerMessages>
-              <MsgFileName Value=""/>
-            </CompilerMessages>
             <CustomOptions Value="-dUseCThreads"/>
-            <CompilerPath Value="$(CompPath)"/>
           </Other>
         </CompilerOptions>
       </Item2>
@@ -93,13 +89,9 @@
             <Verbosity>
               <ShoLineNum Value="True"/>
             </Verbosity>
-            <CompilerMessages>
-              <MsgFileName Value=""/>
-            </CompilerMessages>
             <CustomOptions Value="-dUseCThreads
 -dDEBUG
 -dNoClient"/>
-            <CompilerPath Value="$(CompPath)"/>
           </Other>
         </CompilerOptions>
       </Item3>
@@ -134,11 +126,7 @@
             <Verbosity>
               <ShoLineNum Value="True"/>
             </Verbosity>
-            <CompilerMessages>
-              <MsgFileName Value=""/>
-            </CompilerMessages>
             <CustomOptions Value="-dDEBUG"/>
-            <CompilerPath Value="$(CompPath)"/>
           </Other>
         </CompilerOptions>
       </Item4>
@@ -174,10 +162,6 @@
             <Verbosity>
               <ShoLineNum Value="True"/>
             </Verbosity>
-            <CompilerMessages>
-              <MsgFileName Value=""/>
-            </CompilerMessages>
-            <CompilerPath Value="$(CompPath)"/>
           </Other>
         </CompilerOptions>
       </Item5>
@@ -212,12 +196,8 @@
             <Verbosity>
               <ShoLineNum Value="True"/>
             </Verbosity>
-            <CompilerMessages>
-              <MsgFileName Value=""/>
-            </CompilerMessages>
             <CustomOptions Value="-dDEBUG
 -dNoclient"/>
-            <CompilerPath Value="$(CompPath)"/>
           </Other>
         </CompilerOptions>
       </Item6>
@@ -241,7 +221,6 @@
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="stimulus_control"/>
       </Unit0>
       <Unit1>
         <Filename Value="forms/background.pas"/>
@@ -272,7 +251,6 @@
       <Unit5>
         <Filename Value="units/simplegui.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="simplegui"/>
       </Unit5>
       <Unit6>
         <Filename Value="units/regdata.pas"/>
@@ -305,7 +283,6 @@
       <Unit11>
         <Filename Value="units/blocs.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="blocs"/>
       </Unit11>
       <Unit12>
         <Filename Value="units/countermanager.pas"/>
@@ -320,7 +297,6 @@
       <Unit14>
         <Filename Value="units/schedules_abstract.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="schedules_abstract"/>
       </Unit14>
       <Unit15>
         <Filename Value="units/schedules.pas"/>
@@ -401,7 +377,6 @@
       <Unit29>
         <Filename Value="backup/tool_ini.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="tool_ini"/>
       </Unit29>
       <Unit30>
         <Filename Value="units/interface_rs232.pas"/>
@@ -440,12 +415,8 @@
       <Verbosity>
         <ShoLineNum Value="True"/>
       </Verbosity>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
       <CustomOptions Value="-dUseCThreads
 -dDEBUG"/>
-      <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>

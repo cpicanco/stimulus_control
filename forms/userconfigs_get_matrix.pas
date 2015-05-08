@@ -25,13 +25,12 @@ unit userconfigs_get_matrix;
 
 interface
 
-uses
-  LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, Menus
+uses LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics,
+     Controls, Forms, Dialogs, StdCtrls, ExtCtrls, Menus
 
-  , criatore
-  , constants
-  ;
+     , criatore
+     , constants
+     ;
 
 type
 

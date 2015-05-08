@@ -25,9 +25,10 @@ unit cumulative_record;
 
 interface
 
-uses
-  Classes, SysUtils, Graphics, Controls
-, custom_timer;
+uses Classes, SysUtils, Graphics, Controls
+
+     , custom_timer
+     ;
 
 type
 

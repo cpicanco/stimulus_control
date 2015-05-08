@@ -1,11 +1,31 @@
+//
+// Validation Project (PCRF) - Stimulus Control App
+// Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+//
+// cpicanco@ufpa.br
+//
+// This file is part of Validation Project (PCRF).
+//
+// Validation Project (PCRF) is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Validation Project (PCRF) is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.
+//
 unit bass_player;
 
 {$mode objfpc}{$H+}
 
 interface
 
-uses
-  lcltype,Classes, SysUtils, Forms, BASS;
+uses LCLType, Classes, SysUtils, Forms, BASS;
 
 type
 
@@ -17,7 +37,7 @@ type
     public
       constructor Create (WindowHandle : HWND); overload;
       constructor Create; overload;
-      destructor Destroy; //override;
+      destructor Destroy; override;
       //procedure SetVolume; virtual; abstract;
       //procedure SetDevice; virtual; abstract;
   end;
@@ -40,8 +60,6 @@ type
 
 implementation
 
-
-
 { TBassAudioDevice }
 
   // on session start
@@ -49,37 +67,37 @@ constructor TBassAudioDevice.Create(WindowHandle: HWND);
 {$IFDEF MSWINDOWS}
 
 {$ELSE}
-var awindow : Pointer;
+  var awindow : Pointer;
 {$ENDIF}
 begin
   {$IFDEF MSWINDOWS}
-  BASS_Init(-1, 44100, 0, WindowHandle, nil);
+    BASS_Init(-1, 44100, 0, WindowHandle, nil);
   {$ELSE}
-  awindow := @WindowHandle;
-  BASS_Init(-1, 44100, 0, awindow, nil);
+    awindow := @WindowHandle;
+    BASS_Init(-1, 44100, 0, awindow, nil);
   {$ENDIF}
 end;
 
-  // on session start
+// on session start
 constructor TBassAudioDevice.Create;
 begin
   {$IFDEF MSWINDOWS}
+    // need testing
   {$ELSE}
-  BASS_Init(-1, 44100, 0, nil, nil);
+    BASS_Init(-1, 44100, 0, nil, nil);
   {$ENDIF}
 end;
 
-
-  // on before program closes
+// on before program closes
 destructor TBassAudioDevice.Destroy;
 begin
   BASS_Free;
-  //inherited Destroy;
+  inherited Destroy;
 end;
 
   { TBassChannel }
 
-  // on response_key create, if an audio extension was found
+// on response_key create, if an audio extension was found
 constructor TBassChannel.LoadFromFile(FileName: AnsiString);
 var
   aLength, aMax, aFlags: DWORD;
