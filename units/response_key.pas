@@ -28,6 +28,7 @@ interface
 uses LCLIntf, LCLType, SysUtils, Variants, Classes,
      Graphics, Controls, Forms, ExtCtrls, FileUtil
 
+    , Dialogs
     , bass_player
     , schedules_main
     , counter

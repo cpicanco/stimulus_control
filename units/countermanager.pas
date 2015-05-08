@@ -274,21 +274,21 @@ begin
     FTrialStmResponses.Clear;
   //////////////////
 
-    OnBeginBlc := BeginBlc;
-    OnBeginSess := BeginSess;
-    OnBeginTrial := BeginTrial;
-    OnBkGndResponse := BkGndResponse;
-    OnConsequence := Consequence;
-    OnCorrection := Correction;
-    OnEndBlc := EndBlc;
-    OnEndSess := EndSess;
-    OnEndTrial := EndTrial;
-    OnNxtTrial := CustomNxtTrial;
-    OnHit := Hit;
-    OnMiss := Miss;
-    OnStmResponse := StmResponse;
-    OnCsqCriterion := CsqCriterion;
-    OnNotCorrection := NotCorrection;
+    OnBeginBlc := @BeginBlc;
+    OnBeginSess := @BeginSess;
+    OnBeginTrial := @BeginTrial;
+    OnBkGndResponse := @BkGndResponse;
+    OnConsequence := @Consequence;
+    OnCorrection := @Correction;
+    OnEndBlc := @EndBlc;
+    OnEndSess := @EndSess;
+    OnEndTrial := @EndTrial;
+    OnNxtTrial := @CustomNxtTrial;
+    OnHit := @Hit;
+    OnMiss := @Miss;
+    OnStmResponse := @StmResponse;
+    OnCsqCriterion := @CsqCriterion;
+    OnNotCorrection := @NotCorrection;
 end;
 
 destructor TCounterManager.Destroy;
