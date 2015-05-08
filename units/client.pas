@@ -51,7 +51,7 @@ type
   private
     FServerAddress: string;
     {$ifdef NoClient}
-    //no zmqapi
+      //no zmqapi
     {$else}
     FContext : TZMQContext;
     FSubscriber : TZMQSocket;
@@ -98,10 +98,7 @@ end;
 procedure TClientThread.ShowStatus;
 // this method is executed by the mainthread and can therefore access all GUI elements.
 begin
-  if Assigned(FOnShowStatus) then
-  begin
-    FOnShowStatus(FMsg);
-  end;
+  if Assigned(FOnShowStatus) then FOnShowStatus(FMsg);
 end;
 
 function TClientThread.GetTimestampFromMessage(aMessage: Utf8String
