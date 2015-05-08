@@ -583,13 +583,18 @@ begin
 
   FTimer := TClockThread.Create(True);
   FTimer.OnTimer := @ClockThread;
+  {$ifdef DEBUG}
+    FTimer.OnDebugStatus := @DebugStatus;
+  {$endif}
   FTimer.Enabled := False;
   FTimer.Start;
 end;
 
 procedure TBlc.DebugStatus(msg: string);
 begin
-  //do nothing
+{$ifdef DEBUG}
+  DebugLn(msg);
+{$endif}
 end;
 
 procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
