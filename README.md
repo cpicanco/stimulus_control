@@ -11,7 +11,7 @@ The python scripts were meant to be interfaces to the Pupil Capture software. Pu
 
 For example, the script 'timestamps_by_trial.py' ilustrates how to read the data of the '*.timestamps' files (an output from the Stimulus Control App).
 
-Many thanks to Drausio Capobianco (first mean developer, now retired) for have allowed me to continue his work.
+Many thanks to Drausio Capobianco (first main developer, now retired) for have allowed me to continue his work.
 
 // português
 
