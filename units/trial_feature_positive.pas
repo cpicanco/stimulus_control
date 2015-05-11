@@ -206,7 +206,7 @@ begin
       begin
         if Key = 81 {q} then
           begin
-            Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
+            Data := Data + LineEnding + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + LineEnding;
             Result := 'NONE';
             IETConsequence := 'NONE';
             NextTrial := 'END';

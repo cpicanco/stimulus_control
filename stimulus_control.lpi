@@ -228,17 +228,14 @@
         <ComponentName Value="bkgnd"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="background"/>
       </Unit1>
       <Unit2>
         <Filename Value="units/client.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="client"/>
       </Unit2>
       <Unit3>
         <Filename Value="units/draw_methods.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="draw_methods"/>
       </Unit3>
       <Unit4>
         <Filename Value="forms/userconfigs.pas"/>
@@ -263,7 +260,6 @@
         <ComponentName Value="BresenhamLineForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="userconfigs_trial_mirrored"/>
       </Unit7>
       <Unit8>
         <Filename Value="units/constants.pas"/>
@@ -273,7 +269,6 @@
       <Unit9>
         <Filename Value="units/custom_timer.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="custom_timer"/>
       </Unit9>
       <Unit10>
         <Filename Value="units/session.pas"/>
@@ -283,16 +278,15 @@
       <Unit11>
         <Filename Value="units/blocs.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="blocs"/>
       </Unit11>
       <Unit12>
         <Filename Value="units/countermanager.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="countermanager"/>
       </Unit12>
       <Unit13>
         <Filename Value="units/counter.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="counter"/>
       </Unit13>
       <Unit14>
         <Filename Value="units/schedules_abstract.pas"/>
@@ -301,12 +295,10 @@
       <Unit15>
         <Filename Value="units/schedules.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="schedules"/>
       </Unit15>
       <Unit16>
         <Filename Value="units/response_key.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="response_key"/>
       </Unit16>
       <Unit17>
         <Filename Value="units/trial_feature_positive.pas"/>
@@ -334,7 +326,6 @@
         <ComponentName Value="MatrixForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="userconfigs_simple_discrimination_matrix"/>
       </Unit21>
       <Unit22>
         <Filename Value="forms/userconfigs_get_matrix.pas"/>
@@ -342,37 +333,30 @@
         <ComponentName Value="MatrixConfigForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="userconfigs_get_matrix"/>
       </Unit22>
       <Unit23>
         <Filename Value="units/criatore.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="criatore"/>
       </Unit23>
       <Unit24>
         <Filename Value="units/trial_abstract.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_abstract"/>
       </Unit24>
       <Unit25>
         <Filename Value="units/bass_player.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="bass_player"/>
       </Unit25>
       <Unit26>
         <Filename Value="units/debug_logger.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="debug_logger"/>
       </Unit26>
       <Unit27>
         <Filename Value="units/timestamps_logger.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="timestamps_logger"/>
       </Unit27>
       <Unit28>
         <Filename Value="units/trial_calibration.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_calibration"/>
       </Unit28>
       <Unit29>
         <Filename Value="backup/tool_ini.pas"/>

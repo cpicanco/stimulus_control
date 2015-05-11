@@ -75,7 +75,7 @@ begin
                'BkgndClk' + #9 +
                '-' + #9 +
                '-' + #9 +
-               '-' + #13#10 + #9 + #9;
+               '-' + LineEnding + #9 + #9;
 
   EndTrial(Self);
 end;
@@ -163,7 +163,7 @@ begin
                'MemoClk' + #9 +
                '-' + #9 +
                '-' + #9 +
-               '-' + #13#10 + #9 + #9;
+               '-' + LineEnding + #9 + #9;
 
   EndTrial(Self);
 end;
@@ -234,7 +234,7 @@ begin
                'TimeCsq' + #9 +
                '-' + #9 +
                '-' + #9 +
-               '-' + #13#10 + #9 + #9;
+               '-' + LineEnding + #9 + #9;
   FCanPassTrial := True;
   EndTrial(Self);
 end;

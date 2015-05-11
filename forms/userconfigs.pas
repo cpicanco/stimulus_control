@@ -690,7 +690,7 @@ begin
         end;
         // insert the content before the first trial
         s1 := NewFile.Text;
-        Insert(GetSection(0) + #13#10 + Content + #13#10, s1, Pos(GetSection(1), NewFile.Text));
+        Insert(GetSection(0) + LineEnding + Content + LineEnding, s1, Pos(GetSection(1), NewFile.Text));
         NewFile.Text := s1;
         // loop incrementing trial section numbers
         for i := 0 to NumTrials -1 do
@@ -1220,9 +1220,9 @@ var aDirectory, aDataName : string;
 begin
   //FileName := GetCurrentDir + PathDelim + leParticipant.Text + PathDelim + 'Dados_001.txt';
   //FData:= TRegData.Create(Self, Filename);
-  //FData.SaveData('Participante:' + #9 + leParticipant.Text + #13#10 +
-  //               'Sessão:' + #9 + IntToStr(FData.SessionNumber) + #13#10 +
-  //               'Data:' + #9 + DateTimeToStr(Date)+ #13#10 + #13#10);
+  //FData.SaveData('Participante:' + #9 + leParticipant.Text + LineEnding +
+  //               'Sessão:' + #9 + IntToStr(FData.SessionNumber) + LineEnding +
+  //               'Data:' + #9 + DateTimeToStr(Date)+ LineEnding + LineEnding);
   aDataName := 'Data_000.txt';
   aDirectory := GetCurrentDirUTF8 + PathDelim + leParticipant.Text;
   if ForceDirectoriesUTF8(aDirectory) then

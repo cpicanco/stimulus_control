@@ -137,10 +137,10 @@ end;
 
 procedure TSession.EndSess(Sender: TObject);
 begin
-  FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
+  FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + LineEnding);
 
   if DataTicks then
-    FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + #13#10);
+    FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + LineEnding);
 
   if Assigned(OnEndSess) then FOnEndSess(Sender);
 end;
@@ -222,9 +222,9 @@ end;
 procedure TSession.DoEndSess(Sender: TObject);
 begin
   if DataTicks then
-    FRegDataTicks.SaveData(#13#10 + 'Sessão Cancelada' + #13#10);
+    FRegDataTicks.SaveData(LineEnding + 'Sessão Cancelada' + LineEnding);
 
-  FRegData.SaveData(#13#10 + 'Sessão Cancelada' + #13#10);
+  FRegData.SaveData(LineEnding + 'Sessão Cancelada' + LineEnding);
   EndSess(Sender);
 end;
 
@@ -259,19 +259,19 @@ begin
     FBlc.RegDataTicks := FRegDataTicks;
   FBlc.BackGround:= FBackGround;
 
-  FRegData.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
-                    'Sessão:' + #9+ FSessName + #13#10 +
-                    'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
-                    'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
+  FRegData.SaveData('Sujeito:' + #9 + FSubjName + LineEnding +
+                    'Sessão:' + #9+ FSessName + LineEnding +
+                    'Data:' + #9 + DateTimeToStr(Date)+ LineEnding +
+                    'Hora de Início:' + #9 + TimeToStr(Time)+ LineEnding + LineEnding);
 
   FTimeStart := GetTickCount;
   FBlc.TimeStart := FTimeStart;
 
   if DataTicks then
-    FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + #13#10 +
-                    'Sessão:' + #9+ FSessName + #13#10 +
-                    'Data:' + #9 + DateTimeToStr(Date)+ #13#10 +
-                    'Hora de Início:' + #9 + TimeToStr(Time)+ #13#10 + #13#10);
+    FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + LineEnding +
+                    'Sessão:' + #9+ FSessName + LineEnding +
+                    'Data:' + #9 + DateTimeToStr(Date) + LineEnding +
+                    'Hora de Início:' + #9 + TimeToStr(Time)+ LineEnding + LineEnding);
 
   FManager.OnBeginSess(Self);
 
