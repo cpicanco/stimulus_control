@@ -156,10 +156,10 @@ uses debug_logger;
 
 procedure TBlc.EndBlc(Sender: TObject);
 begin
-  FRegData.SaveData(#13#10);
+  FRegData.SaveData(LineEnding);
 
   if Assigned(RegDataTicks) then
-    RegDataTicks.SaveData(#13#10);
+    RegDataTicks.SaveData(LineEnding);
 
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
 end;
@@ -341,7 +341,7 @@ begin
   //SetFocus;
 
 
-  //showmessage(s0 + #13#10 +s1 + #13#10 +s2 + #13#10 +s3 + #13#10);
+  //showmessage(s0 + LineEnding +s1 + LineEnding +s2 + LineEnding +s3 + LineEnding);
   if    (FTimerITI.Interval = 0)
     and (FTimerTO.Interval  = 0)
     and (FTimerCsq.Interval = 0) then
@@ -517,8 +517,11 @@ var CountTr, NumTr, NameTr: String;
 begin
   if FTrial.Header <> FLastHeader then
     begin
-      FData:= FData + #13#10 + FBlcHeader + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + #13#10;
-      FDataTicks:= FDataTicks + #13#10 + FBlcHeader + FTrial.HeaderTicks + #13#10;
+      FData:= FData + LineEnding
+              + FBlcHeader + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + LineEnding;
+
+      FDataTicks:= FDataTicks + LineEnding
+              + FBlcHeader + FTrial.HeaderTicks + LineEnding;
     end;
   FLastHeader:= FTrial.Header;
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
@@ -536,8 +539,8 @@ begin
           NameTr + #9 +
           #32#32#32#32#32#32 + 'NA' + #9 +
           FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart) + #9 +
-          FTrial.Data + #9 +
-          #13#10;
+          FTrial.Data +
+          LineEnding;
     end
   else
     begin
@@ -547,11 +550,11 @@ begin
           NameTr + #9 +
           FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
           FormatFloat('00000000;;00000000', FITIEND - FTimeStart) + #9 +
-          FTrial.Data + #9 +
-          #13#10;
+          FTrial.Data +
+          LineEnding;
     end;
 
-  FDataTicks:= FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  #13#10;
+  FDataTicks:= FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  LineEnding;
 
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'ITI:' + FormatFloat('00000000;;00000000', (FITIEND - FTimeStart) - (FITIBegin - FTimeStart)));

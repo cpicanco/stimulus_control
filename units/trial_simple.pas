@@ -434,7 +434,7 @@ begin
                FormatFloat('####,####',TickCount - Ft) + #9 +
                '-' + #9 +
                '-' + #9 +
-               IntToStr(X) + #9 + IntToStr(Y) + #13#10 + #9 + #9;
+               IntToStr(X) + #9 + IntToStr(Y) + LineEnding + #9 + #9;
       FDataBkGndI.Plus(1);
 
       CounterManager.OnBkgndResponse(FDataBkGndI);
@@ -534,7 +534,7 @@ begin
              'C' + IntToStr(TKey(Sender).Tag + 1) + #9 +
              ExtractFileName(TKey(Sender).FullPath) + #9 +
              IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left) + #9 +
-             IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + #13#10 + #9 + #9;
+             IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top) + LineEnding + #9 + #9;
 
        if FFirstResp = False then
         begin

@@ -118,7 +118,7 @@ begin
   ComX := GetCommPortNumber;
   if ComX = -1 then
     begin
-      {ShowMessage('Interface Serial-USB não encontrada ou não suportada.' + #13#10 +
+      {ShowMessage('Interface Serial-USB não encontrada ou não suportada.' + LineEnding +
                   'Verifique se a conexão e a instalação do dispositivo foram realizadas corretamente.');}
     end
   else

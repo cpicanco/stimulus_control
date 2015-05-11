@@ -146,7 +146,7 @@ begin
     begin
       Write(FFile, Data);
     end
-  else {$ifdef DEBUG}  WriteLn( FFile, mt_Warning + 'Filename is empty.' + '[' + Data + ']' + 'will not be saved.' + #13#10)  {$endif} ;
+  else {$ifdef DEBUG}  WriteLn( FFile, mt_Warning + 'Filename is empty.' + '[' + Data + ']' + 'will not be saved.' + LineEnding)  {$endif} ;
 end;
 
 procedure TRegData.AppendF;
