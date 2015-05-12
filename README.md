@@ -5,7 +5,7 @@ Validation Project (PCRF)
 
 This is a repository to stimulus control programs that I have contributed for.
 
-Validation Project (PCRF) is an ongoing project and includes a stimulus control program (Stimulus Control App) and some simple python scripts. The main program was writen in Object Free Pascal with the lazarus 1.2.6 IDE and was compiled on Ubuntu 13.10, Crunchbang 11, Windows 8.1 and Windows 10 and was thought to be cross-platform.
+Validation Project (PCRF) is an ongoing project and includes a stimulus control program (Stimulus Control App) and some simple python scripts. The main program was written in Object Free Pascal with the lazarus 1.2.6 IDE and was compiled on Ubuntu 13.10, Crunchbang 11, Windows 8.1 and Windows 10 and was thought to be cross-platform.
 
 The python scripts were meant to be interfaces to the Pupil Capture software. Pupil is an open source hardware and software platform to track eye movements (https://github.com/pupil-labs/pupil).
 

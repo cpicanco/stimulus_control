@@ -151,7 +151,9 @@ begin
     begin
       {$ifdef DEBUG}
         DebugLn(mt_Debug + 'Schedule:' + aSchedule + #32 +
-          Parameter1  + #32 + Parameter2  + #32 + Parameter3 + #32 + Parameter4  );
+          Parameter1  + #32 + Parameter2  + #32
+          //+ Parameter3 + #32 + Parameter4
+          );
       {$endif}
       FAbsSch.OnConsequence := @Consequence;
       FAbsSch.OnResponse := @Response;

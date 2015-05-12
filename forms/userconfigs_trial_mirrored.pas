@@ -668,9 +668,9 @@ begin
   //http://math.stackexchange.com/questions/143932/calculate-point-given-x-y-angle-and-distance
   //0 on the right, clock increment
   //if aAngle = 0 then
-  Distance :=  ((FCentralRect.Right - FCentralRect.Left)/ 2); // '-5' found by trial and error...
-  Result.X :=  Round((Distance * cos(DegtoRad(aAngle))) + x0.value);//Screen.Width div 2;
-  Result.Y :=  Round((Distance * sin(DegtoRad(aAngle))) + y0.value);//Screen.Height div 2;
+  Distance :=  ((FCentralRect.Right - FCentralRect.Left)/ 2);
+  Result.X :=  Round((Distance * cos(DegtoRad(aAngle))) + x0.value);
+  Result.Y :=  Round((Distance * sin(DegtoRad(aAngle))) + y0.value);
 end;
 
 function TBresenhamLineForm.GetCentralRect(aLeftBorderSpace, aTopBorderSpace,

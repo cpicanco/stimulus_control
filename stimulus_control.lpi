@@ -260,6 +260,7 @@
         <ComponentName Value="BresenhamLineForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="userconfigs_trial_mirrored"/>
       </Unit7>
       <Unit8>
         <Filename Value="units/constants.pas"/>
