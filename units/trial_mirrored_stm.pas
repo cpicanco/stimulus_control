@@ -120,6 +120,7 @@ end;
 
 procedure TMRD.Consequence(Sender: TObject);
 begin
+  CreateClientThread('C:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 
   TrialResult(Sender);
