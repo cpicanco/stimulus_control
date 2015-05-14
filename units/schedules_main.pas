@@ -38,6 +38,7 @@ type
   private
     FAbsSch: TAbsSch;
     FAbsSchLoaded: Boolean;
+    FKind: string;
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
     procedure Consequence(Sender: TObject);
@@ -46,7 +47,7 @@ type
   public
     procedure DoResponse;
     function StartMethod : TThreadMethod;
-    property Kind: String write SetKind;
+    property Kind: string read FKind write SetKind;
     property Loaded : Boolean read FAbsSchLoaded;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
@@ -159,6 +160,7 @@ begin
       FAbsSch.OnResponse := @Response;
       FAbsSch.AssignParameters;
       FAbsSch.Reset;
+      FKind := aSchedule;
     end;
 end;
 
