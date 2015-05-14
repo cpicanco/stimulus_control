@@ -78,7 +78,7 @@ uses
 
   // helpers
   , draw_methods
-  , timestamps_logger
+  , timestamps_logger, trial_dizzy_timers
 
   {$ifdef DEBUG}
   , debug_logger

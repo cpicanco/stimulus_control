@@ -43,6 +43,7 @@ uses Classes, Controls, LCLIntf, LCLType,
           , trial_feature_positive
           , trial_calibration
         , trial_matching
+        , trial_dizzy_timers
      ;
 
 type
@@ -671,12 +672,13 @@ begin
   if IndTrial < FBlc.NumTrials then
     begin
 
+      if FBlc.Trials[IndTrial].Kind = T_DZT then FTrial := TDZT.Create(Self);
       if FBlc.Trials[IndTrial].Kind = T_CLB then FTrial := TCLB.Create(Self);
       if FBlc.Trials[IndTrial].Kind = T_FPE then FTrial := TFPE.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MRD then FTrial:= TMRD.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MSG then FTrial:= TMSG.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MTS then FTrial:= TMTS.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_Simple then FTrial:= TSimpl.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MRD then FTrial := TMRD.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MSG then FTrial := TMSG.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MTS then FTrial := TMTS.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_Simple then FTrial := TSimpl.Create(Self);
 
       if Assigned(FTrial) then
         begin
