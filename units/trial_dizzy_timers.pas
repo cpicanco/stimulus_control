@@ -54,6 +54,7 @@ type
     Host : cardinal;
     Timer1 : TClockThread;
     Timer2 : TClockThread;
+    Version : string;
   end;
 
   { TDZT }
@@ -61,14 +62,15 @@ type
   // free operant style
   TDZT = Class(TTrial)
   private
+    FCycles : integer;
     FDizzyTimer : TDizzyTimer;
     FStimuli : array of TRect;
     FDataSupport : TDataSupport;
-    FVersion,
     FConsequence : string;
     FSchedule : TSchMan;
     FFirstResp : Boolean;
-    FCanResponse : Boolean;
+    FResponseEnabled : Boolean;
+    function GetCycles: integer;
   protected
     procedure Consequence(Sender: TObject);
     procedure EndTrial(Sender: TObject);
@@ -90,6 +92,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    property Cycles : integer read GetCycles;
 
   end;
 
@@ -106,12 +109,12 @@ begin
   inherited Create(AOwner);
   Header :=  'StmBegin' + #9 +
              '_Latency' + #9 +
-             '__StmEnd' + #9 +
              '___Cycle' + #9 +
              '__Timer2' + #9 +
              '_Version' + #9 +
              'RespFreq'
              ;
+  FCycles := 0;
   FDataSupport.Responses:= 0;
 end;
 
@@ -133,6 +136,11 @@ begin
   inherited Destroy;
 end;
 
+function TDZT.GetCycles: integer;
+begin
+  Result := FCycles;
+end;
+
 procedure TDZT.Consequence(Sender: TObject);
 var aConsequence : TKey;
 begin
@@ -151,7 +159,7 @@ end;
 
 procedure TDZT.TrialResult(Sender: TObject);
 begin
-  Result := T_HIT;
+  Result := T_NONE;
   IETConsequence := T_NONE;
 
   if not (FLimitedHold > 0) then EndTrial(Sender);
@@ -160,14 +168,28 @@ end;
 procedure TDZT.UpdateTimer1(Sender: TObject);
 begin
   FDataSupport.Cycle := GetTickCount;
+  Inc(FCycles);
 
   with FDizzyTimer do
     begin
       Main := Random(Max - Min) + Min + 1;
       Host := Random(((2 * Main) div 3) - (Main div 3)) + (Main div 3) + 1;
-      Timer1.Interval := Main * 1000;
-      Timer2.Interval := Host * 1000;
-      Timer2.Enabled := True;
+
+      if TClockThread(Sender) = Timer1 then
+        begin
+          Timer1.Interval := Main * 1000;
+          Timer2.Interval := Host * 1000;
+          Timer2.Enabled := True;
+          Color1 := not Color1;
+        end;
+
+      if TClockThread(Sender) = Timer2 then
+        begin
+          Timer2.Interval := Main * 1000;
+          Timer1.Interval := Host * 1000;
+          Timer1.Enabled := True;
+          Color2 := not Color2;
+        end;
     end;
 
   if FSchedule.Kind = T_CRF then
@@ -176,24 +198,32 @@ begin
     if FSchedule.Kind = T_EXT then
       FSchedule.Kind := T_CRF;
 
-  FDizzyTimer.Color1 := not FDizzyTimer.Color1;
   Invalidate;
 
-  WriteData(Sender);
+  // must pass Self here, see TBLC.WriteTrialData
+  WriteData(Self);
 end;
 
 procedure TDZT.UpdateTimer2(Sender: TObject);
 begin
+  TClockThread(Sender).Enabled := False;
   FDataSupport.Timer2 := GetTickCount;
 
-  FDizzyTimer.Timer2.Enabled := False;
-  FDizzyTimer.Color2 := not FDizzyTimer.Color2;
+  if TClockThread(Sender) = FDizzyTimer.Timer2 then
+    FDizzyTimer.Color2 := not FDizzyTimer.Color2;
+
+  if TClockThread(Sender) = FDizzyTimer.Timer1 then
+    FDizzyTimer.Color1 := not FDizzyTimer.Color1;
+
   Invalidate;
 end;
 
 procedure TDZT.ThreadClock(Sender: TObject);
 begin
+  FDataSupport.Cycle := GetTickCount;
+  FDataSupport.Timer2 := TimeStart;
   TrialResult(Sender);
+  WriteData(Self);
   EndTrial(Sender);
 end;
 
@@ -201,9 +231,9 @@ procedure TDZT.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   //inherited KeyDown (Key, Shift);
 
-  if (Key = 27 {ESC}) and (FCanResponse = True) then
+  if (Key = 27 {ESC}) and (FResponseEnabled = True) then
     begin
-      FCanResponse:= False;
+      FResponseEnabled:= False;
       Invalidate;
     end;
 
@@ -224,10 +254,10 @@ end;
 procedure TDZT.KeyUp(var Key: Word; Shift: TShiftState);
 var TickCount : cardinal;
 begin
-  //inherited KeyUp(Key, Shift);
+  inherited KeyUp(Key, Shift);
   TickCount := GetTickCount;
 
-  if FCanResponse then
+  if FResponseEnabled then
     begin
       if Key = 32 {space} then
         begin
@@ -244,7 +274,7 @@ begin
 
   if Key = 27 {ESC} then
     begin
-      FCanResponse := True;
+      FResponseEnabled := True;
       Invalidate;
     end;
 end;
@@ -257,7 +287,7 @@ const
   clYellow : integer = $FFFF00;
 begin
   inherited Paint;
-  if FCanResponse then
+  if FResponseEnabled then
     begin
 
       if FDizzyTimer.Color1 then
@@ -291,8 +321,7 @@ var
   end;
 
 begin
-  FCanResponse := False;
-  NextTrial := 'END';
+  FResponseEnabled := False;
   Randomize;
 
   // self descends from TCustomControl
@@ -302,6 +331,8 @@ begin
   else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
 
   // self descends from TTrial
+  Result := '';
+  NextTrial := CfgTrial.SList.Values[_NextTrial];
   RootMedia := CfgTrial.SList.Values[_RootMedia];
   FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
 
@@ -331,18 +362,35 @@ begin
       NextSpaceDelimitedParameter;
 
       Max := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+      NextSpaceDelimitedParameter;
+
+      Version := Copy(s1, 0, pos(#32, s1)-1);
+
       Main := Random(Max - Min) + Min + 1;
       Host := Random(((2 * Main) div 3) - (Main div 3)) + (Main div 3) + 1;
 
       Timer1 := TClockThread.Create(True);
-      Timer1.Interval := Main * 1000;
-      Timer1.OnTimer := @UpdateTimer1;
+      Timer2 := TClockThread.Create(True);
+
+      s1 := UpperCase(Version);
+      if (s1 = 'L') or (s1 = 'A') or (s1 = 'LEFT') then
+        begin
+          Timer1.Interval := Main * 1000;
+          Timer2.Interval := Host * 1000;
+          Timer1.OnTimer := @UpdateTimer1;
+          Timer2.OnTimer := @UpdateTimer2;
+        end
+      else if (s1 = 'R') or (s1 = 'B') or (s1 = 'RIGHT') then
+        begin
+          Timer1.Interval := Host * 1000;
+          Timer2.Interval := Main * 1000;
+          Timer1.OnTimer := @UpdateTimer2;
+          Timer2.OnTimer := @UpdateTimer1;
+        end;
+
       SetLength(FClockList, Length(FClockList) + 1);
       FClockList[Length(FClockList) -1] := @Timer1.Start;
 
-      Timer2 := TClockThread.Create(True);
-      Timer2.Interval := Host * 1000;
-      Timer2.OnTimer := @UpdateTimer2;
       SetLength(FClockList, Length(FClockList) + 1);
       FClockList[Length(FClockList) -1] := @Timer2.Start;
 
@@ -381,7 +429,6 @@ begin
 
         FStimuli[a1] := R;
     end;
-
   StartTrial(Self);
 end;
 
@@ -404,7 +451,7 @@ begin
       Timer2 := TimeStart;
     end;
 
-  FCanResponse := True;
+  FResponseEnabled := True;
   Invalidate;
   FDataSupport.StmBegin := GetTickCount;
 
@@ -413,44 +460,46 @@ end;
 
 
 procedure TDZT.WriteData(Sender: TObject);  //
-var Latency : string;
-    Timer2 : string;
+var
+    Latency, Timer2, Version : string;
 begin
   if not FFirstResp then
     Latency := FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart)
-  else Latency := #32#32#32#32#32#32#32 + 'NA';
+  else Latency := #32#32#32#32#32#32 + 'NA';
 
   if FDataSupport.Timer2 <> TimeStart then
     Timer2 :=  FormatFloat('00000000;;00000000',FDataSupport.Timer2 - TimeStart)
-  else Timer2 := #32#32#32#32#32#32#32 + 'NA';
+  else Timer2 := #32#32#32#32#32#32 + 'NA';
 
+  Version := FDizzyTimer.Version;
 
   {
 
   Header :=  'StmBegin' + #9 +
              '_Latency' + #9 +
-             '__StmEnd' + #9 +
              '_Version' + #9 +
              'RespFreq'
              ;
 
   }
-  Data :=  FormatFloat('00000000;;00000000',FDataSupport.StmBegin - TimeStart) + #9 +
+  Data :=  FormatFloat('00000000;;00000000', FDataSupport.StmBegin - TimeStart) + #9 +
            Latency + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.StmEnd - TimeStart) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.Cycle - TimeStart) + #9 +
+           FormatFloat('00000000;;00000000', FDataSupport.Cycle - TimeStart) + #9 +
            Timer2 + #9 +
-           FVersion + #9 +
+           Version + #9 +
            Format('%-*.*d', [4, 8, FDataSupport.Responses])
            + Data;
 
-  if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
+
+  if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
+
   Data := '';
+  FFirstResp := True;
 end;
 
 procedure TDZT.EndTrial(Sender: TObject);
 begin
-  FCanResponse := False;
+  FResponseEnabled := False;
   Hide;
 
   FDataSupport.StmEnd := GetTickCount;
