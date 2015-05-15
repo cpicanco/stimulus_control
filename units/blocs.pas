@@ -71,9 +71,10 @@ type
     FIsCorrection : Boolean;
 
     // Trial data
-    FData : string;
-    FTimeStart: cardinal;
-    FFirstTrialBegin: cardinal;
+    FLastData : string;
+    FLastITIData : string;
+    FTimeStart : cardinal;
+    FFirstTrialBegin : cardinal;
     FITIBegin : cardinal;
     FITIEnd : cardinal;
     FDataTicks : string;
@@ -244,13 +245,6 @@ var s0, s1, s2, s3, s4 : string;
     as4:= Copy(s0, 0, pos(#32, s0)-1);
   end;
 begin
-  FRegData.SaveData (FData);
-
-  if Assigned(RegDataTicks) then
-    RegDataTicks.SaveData(FDataTicks);
-
-  FData := '';
-  FDataTicks := '';
 
   s1 := '';
   s2 := '';
@@ -351,6 +345,7 @@ begin
        DebugLn(mt_Debug +  'Time Condition 1');
      {$endif}
      TrialTerminate(Sender);
+     FITIEnd := GetTickCount; // Here it will be near to zero;
      PlayTrial;
      Exit;
    end;
@@ -514,52 +509,84 @@ begin
 end;
 
 procedure TBlc.WriteTrialData(Sender: TObject);
-var CountTr, NumTr, NameTr: String;
+var
+  CountTr, NumTr, NameTr, ITIData, NewData, Report : string;
+  IsFirst : Boolean;
+const
+  EmptyBlock = #32#32#32#32#32#32#32#32;
+  DoNotApply = #32#32#32#32#32#32 + 'NA';
 begin
   if FTrial.Header <> FLastHeader then
     begin
-      FData:= FData + LineEnding
-              + FBlcHeader + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + LineEnding;
+      Report := LineEnding +
+                FBlcHeader +
+                'ITIBegin' + #9 + '__ITIEnd' + #9 +
+                FTrial.Header + LineEnding;
 
-      FDataTicks:= FDataTicks + LineEnding
-              + FBlcHeader + FTrial.HeaderTicks + LineEnding;
+      FDataTicks := LineEnding +
+                    FBlcHeader +
+                    FTrial.HeaderTicks + LineEnding;
     end;
-  FLastHeader:= FTrial.Header;
+  FLastHeader := FTrial.Header;
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
 
   CountTr := IntToStr(FCounterManager.Trials.Counter + 1);
   NumTr:= IntToStr(FCounterManager.CurrentTrial.Counter + 1);
-  if FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name = '' then NameTr:= '--------'
-  else NameTr:= FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name;
 
-  if (FCounterManager.CurrentTrial.Counter + 1) = 1 then
+  // Fill Empty Names
+  if FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name = '' then
+    NameTr := '--------'
+  else NameTr := FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name;
+
+  NewData := CountTr + #9 + NumTr + #9 + NameTr;
+
+  ITIData := FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
+            FormatFloat('00000000;;00000000', FITIEND - FTimeStart);
+
+  // Check where it is coming from
+  if Sender is TDZT then
     begin
-      FData:= FData +
-          CountTr + #9 +
-          NumTr + #9 +
-          NameTr + #9 +
-          #32#32#32#32#32#32 + 'NA' + #9 +
-          FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart) + #9 +
-          FTrial.Data +
-          LineEnding;
+      // Trial may not have changed, avoid repetition
+      if NewData = FLastData then
+        NewData := EmptyBlock + #9 + EmptyBlock + #9 +  EmptyBlock;
+
+      // no ITI
+      if FTrial.Result = '' then
+        ITIData :=  DoNotApply + #9 + DoNotApply
+      else
+        // Check if it is the fisrt trial
+        if (FCounterManager.Trials.Counter + 1) = 1 then
+          IsFirst := True
+        else IsFirst := False;
+
     end
   else
     begin
-      FData:= FData +
-          CountTr + #9 +
-          NumTr + #9 +
-          NameTr + #9 +
-          FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
-          FormatFloat('00000000;;00000000', FITIEND - FTimeStart) + #9 +
-          FTrial.Data +
-          LineEnding;
+
+      if (FCounterManager.Trials.Counter + 1) = 1 then
+        IsFirst := True
+      else IsFirst := False;
+
     end;
 
-  FDataTicks:= FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  LineEnding;
+  if IsFirst then
+    ITIData := DoNotApply + #9 + FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart);
+
+  // write data
+  Report := Report + NewData + #9 + ITIData + #9 + FTrial.Data + LineEnding;
+  FLastData := CountTr + #9 + NumTr + #9 + NameTr;
+  FLastITIData := ITIData;
+  FRegData.SaveData(Report);
 
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'ITI:' + FormatFloat('00000000;;00000000', (FITIEND - FTimeStart) - (FITIBegin - FTimeStart)));
   {$endif}
+
+  FDataTicks := FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  LineEnding;
+  if Assigned(RegDataTicks) then
+    RegDataTicks.SaveData(FDataTicks);
+
+  FDataTicks := '';
 end;
 
 procedure TBlc.BkGndResponse(Sender: TObject);
@@ -570,7 +597,6 @@ end;
 constructor TBlc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FData := '';
 
   with FTimerITI do begin
     Interval := 0;
@@ -668,7 +694,7 @@ begin
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
 
   IndTrial := FCounterManager.CurrentTrial.Counter;
-
+  if IndTrial = 0 then FFirstTrialBegin := GetTickCount;
   if IndTrial < FBlc.NumTrials then
     begin
 
@@ -699,7 +725,6 @@ begin
           FTrial.Play(FTestMode, FIsCorrection);
           FTrial.Visible := True;
           FTrial.SetFocus;
-          if IndTrial = 0 then FFirstTrialBegin := GetTickCount;
         end else EndBlc(Self);
 
       FIsCorrection := False;
