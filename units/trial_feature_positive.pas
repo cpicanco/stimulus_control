@@ -83,7 +83,7 @@ type
     FFlagCsq2Fired : Boolean;
     FUseMedia : Boolean;
     FShowStarter : Boolean;
-    FCanResponse : Boolean;
+    FResponseEnabled : Boolean;
   protected
     procedure BeginCorrection (Sender : TObject);
     procedure BeginStarter;
@@ -141,7 +141,7 @@ end;
 
 procedure TFPE.TrialResult(Sender: TObject);
 begin
-  if FCanResponse then
+  if FResponseEnabled then
     begin
       CreateClientThread('C:'+ FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
 
@@ -195,9 +195,9 @@ procedure TFPE.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   //inherited KeyDown (Key, Shift);
 
-  if (Key = 27 {ESC}) and (FCanResponse = True) then
+  if (Key = 27 {ESC}) and (FResponseEnabled = True) then
     begin
-      FCanResponse:= False;
+      FResponseEnabled:= False;
       Invalidate;
     end;
 
@@ -224,11 +224,11 @@ begin
   inherited KeyUp(Key, Shift);
   if Key = 27 {ESC} then
     begin
-      FCanResponse:= True;
+      FResponseEnabled:= True;
       Invalidate;
     end;
 
-  if FCanResponse then
+  if FResponseEnabled then
   begin
     if FShowStarter then
       begin
@@ -263,7 +263,7 @@ procedure TFPE.Paint;
 var i : integer;
 begin
   inherited Paint;
-  if FCanResponse then
+  if FResponseEnabled then
     begin
       if FShowStarter then
         begin
@@ -316,7 +316,7 @@ var
   end;
 
 begin
-  FCanResponse:= False;
+  FResponseEnabled:= False;
   NextTrial:= '-1';
   Randomize;
 
@@ -463,7 +463,7 @@ begin
 
   FFlagCsq2Fired := False;
   FFirstResp := True;
-  FCanResponse:= True;
+  FResponseEnabled:= True;
   FDataSupport.StmBegin := GetTickCount;
 
   inherited StartTrial(Sender);
@@ -472,7 +472,7 @@ end;
 procedure TFPE.BeginStarter;
 begin
   CreateClientThread('S:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
-  FCanResponse:= True;
+  FResponseEnabled:= True;
   Invalidate;
 end;
 
@@ -511,7 +511,7 @@ end;
 
 procedure TFPE.EndTrial(Sender: TObject);
 begin
-  FCanResponse := False;
+  FResponseEnabled := False;
   Hide;
   FDataSupport.StmEnd := GetTickCount;
 
