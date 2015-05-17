@@ -58,14 +58,14 @@ type
   TDataSupport = record
     Latency,
     StmBegin,
-    StmEnf : cardinal;
+    StmEnd : cardinal;
   end;
 
   { TSimpl }
 
   TSimpl = Class(TTrial)
   protected
-    FCanPassTrial : Boolean;
+    FConsequenceFired : Boolean;
     FDataBkGndI : TCounter;
     FDataBkGndS : string;
     FDataCMsg : string;
@@ -87,11 +87,9 @@ type
     procedure EndCorrection(Sender: TObject);
     procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
-    procedure LimitedHoldOnTimer(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
-    procedure SetTimerCsq;
     procedure TrialResult(Sender: TObject);
     // TTrial
     procedure ThreadClock(Sender: TObject); override;
@@ -117,18 +115,18 @@ begin
   Header :=  #9 +
              'Pos.Cmp.' + #9 +        //header do Relatório
              'Res.Cmp.' + #9 +
-             'Lat.Cmp.' + #9 + #9 +
-             'Dur.Cmp.' + #9 + #9 +
-             'Tmp.Cmp.' + #9 + #9 +
+             'Lat.Cmp.' + #9 +
+             'Dur.Cmp.' + #9 +
+             'Tmp.Cmp.' + #9 +
              'Disp.   ' + #9 +
              'UDsp.   ' + #9 +
              'Res.Frq.';
 
-  HeaderTicks := 'Tempo_ms' + #9 +
-                 'Cmp.Tipo' + #9 +
+  HeaderTicks := '____Time' + #9 +
+                 '____Type' + #9 +
                  'FileName' + #9 +
-                 'Left....' + #9 +
-                 'Top.....';
+                 '____Left' + #9 +
+                 '_____Top';
 
   FDataBkGndI := TCounter.Create;
 end;
@@ -142,7 +140,7 @@ end;
 procedure TSimpl.Dispenser(Csq: Byte; Usb: string);
 begin
   FPLP.OutPortOn (Csq);
-  //FRS232.Dispenser(Usb);
+  FRS232.Dispenser(Usb);
 end;
 
 procedure TSimpl.DispenserPlusCall;
@@ -191,7 +189,6 @@ begin
           Key := TKey.Create(Self);
           Key.Tag := a1;
           Key.Cursor := Self.Cursor;
-          Key.Visible := False;
           Key.OnConsequence := @Consequence;
           Key.OnResponse := @Response;
 
@@ -207,7 +204,7 @@ begin
             end;
           Key.Parent := Self;
 
-          s1 := CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd];
+          s1 := CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd] + #32;
           R.Top := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
           NextSpaceDelimitedParameter;
 
@@ -270,17 +267,17 @@ begin
   if FResponseEnabled then
     begin
       FResponseEnabled:= False;
-      FDataSuport.StmEnd := GetTickCount;
+      FDataSupport.StmEnd := GetTickCount;
 
       if (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) or
          (FVetSupportC[TKey(Sender).Tag].Res = T_MISS)  then
         begin
-          if FVetSupportC[TKey(Sender).Tag].Res = T_HIT then Result := 'HIT';
+          if FVetSupportC[TKey(Sender).Tag].Res = T_HIT then Result := T_HIT;
 
-          if FVetSupportC[TKey(Sender).Tag].Res = T_MISS then Result := 'MISS';
+          if FVetSupportC[TKey(Sender).Tag].Res = T_MISS then Result := T_MISS;
 
         end
-      else Result := 'NONE';
+      else Result := T_NONE;
 
       //FDataCsq:= FVetSupportC[TKey(Sender).Tag].Csq;
       //FDataUsb := FVetSupportC[TKey(Sender).Tag].Usb;
@@ -352,14 +349,14 @@ begin
   FFirstResp := False;
   FResponseEnabled := True;
 
-  FDataSuport.StmBegin := GetTickCount;
+  FDataSupport.StmBegin := GetTickCount;
   inherited StartTrial(Sender);
 end;
 
 
 procedure TSimpl.WriteData(Sender: TObject);  //Dados do Relatório
 var
-    Lat_Cmp,
+    Latency,
     Dur_CmpResponse,
     Dur_Cmp,
     Res_Cmp,
@@ -393,26 +390,18 @@ begin
   if FDataCMsg = '' then FDataCMsg:= '--------';
   Res_Cmp:= LeftStr(FDataCMsg+#32#32#32#32#32#32#32#32, 8);
 
-
-  if FDataSuport.Latency = 0 then
-    begin
-      Lat_Cmp:= '0' + #9 + 'ms';
-      Dur_CmpResponse := '0' + #9 + 'ms';
-    end
-  else
-    begin
-      Lat_Cmp:= FormatFloat('00000000;;00000000',FDataSuport.Latency - TimeStart) + #9 + 'ms';
-      Dur_CmpResponse := FormatFloat('00000000;;00000000',FDataSuport.StmEnd - TimeStart) + #9 + 'ms';
-    end;
-
-  Dur_Cmp := FormatFloat('00000000;;00000000',FDataSuport.StmEnd - FDataSuport.StmBegin) + #9 + 'ms';
+  if not FFirstResp then
+    Latency := FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart)
+  else Latency := #32#32#32#32#32#32 + 'NA';
+  Dur_CmpResponse := FormatFloat('00000000;;00000000',FDataSupport.StmEnd - TimeStart);
+  Dur_Cmp := FormatFloat('00000000;;00000000',FDataSupport.StmEnd - FDataSupport.StmBegin);
 
   //Disp:= RightStr(IntToBin(FDataCsq, 9)+#0, 8);
   //uDisp := IntToStr(FDataUsb);
 
   Data := PosComps  + #9 +
           Res_Cmp   + #9 +
-          Lat_Cmp  + #9 +  //#9
+          Latency  + #9 +  //#9
           Dur_CmpResponse + #9 +
           Dur_Cmp + #9 +
           Disp      + #9 +
@@ -430,10 +419,13 @@ end;
 
 procedure TSimpl.EndTrial(Sender: TObject);
 begin
-  if FDataSuport.Latency = 0 then FDataSuport.Latency:= GetTickCount;
+  FResponseEnabled := False;
+  Hide;
+
+  FDataSupport.StmEnd := GetTickCount;
   WriteData(Sender);
-  if FCanPassTrial then
-    if Assigned(OnEndTrial) then OnEndTrial(sender);
+
+  if Assigned(OnEndTrial) then OnEndTrial(sender);
 end;
 
 procedure TSimpl.Hit(Sender: TObject);
@@ -444,46 +436,66 @@ end;
 procedure TSimpl.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   inherited KeyDown (Key, Shift);
+
   if Key = 27 {ESC} then FResponseEnabled:= False;
 
   if (ssCtrl in Shift) and (Key = 13) {Enter} then
     begin
-      FDataCMsg:= 'Cancel';
-      if FCanPassTrial then FTimerCsq.Enabled:= True else
-        begin
-          FDataSuport.StmBegin := GetTickCount;
-          FResponseEnabled:= True;
-          EndTrial(Self);
-        end;
+      FResponseEnabled := False;
+      FDataCMsg := 'Cancel';
+      Result := T_NONE;
+      IETConsequence := T_NONE;
+      NextTrial := '0';
+      None(Self);
+      WriteData(Self);
+      EndTrial(Self);
     end;
+
+  if ssCtrl in Shift then
+     begin
+       if (ssCtrl in Shift) and (Key = 81) {q} then
+         begin
+           FResponseEnabled:= False;
+           FDataCMsg := 'Cancel';
+           Data := Data + LineEnding + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + LineEnding;
+           Result := T_NONE;
+           IETConsequence := T_NONE;
+           NextTrial := 'END';
+           None(Self);
+           WriteData(Self);
+           EndTrial(Self);
+         end;
+     end;
+end;
+
+procedure TSimpl.KeyUp(var Key: Word; Shift: TShiftState);
+begin
+  inherited Keyup(Key, Shift);
+
+  if Key = 27 then FResponseEnabled:= True;
+
   if (Key = 107) {+} then
     begin
-      FDataCMsg:= FKPlus.Msg;
-      FDataCsq:= FKPlus.Csq;
+      FDataCMsg := FKPlus.Msg;
+      FDataCsq := FKPlus.Csq;
       //FDataUsb := FKPlus.Usb;
-      Result:= FKPlus.Res;
-      IETConsequence:= FKPlus.IET;
+      Result := FKPlus.Res;
+      IETConsequence := FKPlus.IET;
       TimeOut := FKPlus.TO_;
       Dispenser(FKPlus.Csq, FKPlus.Usb);
     end;
 
   if (Key = 109) {-} then
     begin
-      FDataCMsg:= FKMinus.Msg;
-      FDataCsq:= FKMinus.Csq;
+      FDataCMsg := FKMinus.Msg;
+      FDataCsq := FKMinus.Csq;
       //FDataUsb := FKMinus.Usb;
-      Result:= FKMinus.Res;
-      TimeOut:= FKMinus.TO_;
-      IETConsequence:= FKMinus.IET;
+      Result := FKMinus.Res;
+      TimeOut := FKMinus.TO_;
+      IETConsequence := FKMinus.IET;
 
       Dispenser(FKMinus.Csq, FKMinus.Usb);
     end;
-
-end;
-
-procedure TSimpl.KeyUp(var Key: Word; Shift: TShiftState);
-begin
-  if Key = 27 then FResponseEnabled:= True;
 end;
 
 procedure TSimpl.Miss(Sender: TObject);
@@ -498,7 +510,7 @@ begin
   inherited MouseDown(Button,Shift, X, Y);
 
   DataTicks := DataTicks +
-               FormatFloat('####,####',TickCount - FDataSuport.StmBegin) + #9 +
+               FormatFloat('00000000;;00000000',TickCount - FDataSupport.StmBegin) + #9 +
                '-' + #9 +
                '-' + #9 +
                IntToStr(X) + #9 + IntToStr(Y) + LineEnding;
@@ -524,7 +536,7 @@ begin
   //Dispenser(FDataCsq, FDataUsb);
   CounterManager.OnConsequence(Sender);
   if Assigned(OnConsequence) then OnConsequence(Sender);
-  if not (FLimitedHold > 0) then TrialResult(Sender);
+  if not (FLimitedHold > 0) then TrialResult(Sender)
   else
     if FConsequenceFired = False then FConsequenceFired := True;
 end;
@@ -537,7 +549,7 @@ begin
   TickCount := GetTickCount;
   if FResponseEnabled then
     begin
-      aTime := FormatFloat('####,####', TickCount - TimeStart);
+      aTime := FormatFloat('00000000;;00000000', TickCount - TimeStart);
       aCode := 'C' + IntToStr(TKey(Sender).Tag + 1);
       aStimulus := ExtractFileName(TKey(Sender).FullPath);
       aLeft := IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left);
@@ -547,7 +559,7 @@ begin
 
       if FFirstResp = False then
       begin
-        FDataSuport.Latency := TickCount;
+        FDataSupport.Latency := TickCount;
         FFirstResp := True;
       end;
 
