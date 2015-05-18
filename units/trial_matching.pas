@@ -39,7 +39,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     //, config_session
     , counter
     , constants
-    , interface_rs232
+    //, interface_rs232
     , interface_plp
     ;
 
@@ -129,7 +129,7 @@ constructor TMTS.Create(AOwner: TComponent);
 begin
   Inherited Create(AOwner);
 
-  FHeader1:= #9 + 'Pos.Mod.' + #9 +
+  FHeader1:= 'Pos.Mod.' + #9 +
              'Res.Mod.' + #9 +
              'Lat.Mod.' + #9 + #9 +
              'Dur.Mod.' + #9 + #9 +
@@ -182,8 +182,8 @@ end;
 
 procedure TMTS.Dispenser(Csq: Byte; Usb: string);
 begin
-  //FRS232.Dispenser(Usb);
-  FPLP.OutPortOn (Csq);
+  //RS232.Dispenser(Usb);
+  PLP.OutPortOn (Csq);
 end;
 
 procedure TMTS.DispenserPlusCall;
@@ -245,7 +245,7 @@ begin
     Key.FullPath:= sName;
     //Key.FileName:= CfgTrial.SList.Values['RootMedia'] + CfgTrial.SList.Values['SStm'];
 
-    Key.SchMan.Kind:= CfgTrial.SList.Values[_Samp + _cSch];
+    Key.Schedule.Kind:= CfgTrial.SList.Values[_Samp + _cSch];
 
     Msg:= CfgTrial.SList.Values[_Samp + _cMsg];
   end;
@@ -261,7 +261,6 @@ begin
       Key.Cursor:= Self.Cursor;
       Key.Parent:= Self;
       Key.OnConsequence:= @Consequence;
-      Key.OnConsequence2:= @Consequence2;
       Key.OnResponse:= @Response;
 
       s1:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cBnd];
@@ -286,7 +285,7 @@ begin
 
       //Key.FileName:= CfgTrial.SList.Values['RootMedia'] + CfgTrial.SList.Values['C'+IntToStr(a1+1)+'Stm'];
 
-      Key.SchMan.Kind:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cSch];
+      Key.Schedule.Kind:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cSch];
       Csq:= StrToIntDef(CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cCsq], 0);
       Usb := CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cUsb];//FRS232.GetUsbCsqFromValue ();
       TO_ := StrToIntDef(CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cTO], 0);
@@ -357,7 +356,7 @@ begin
               FFirstResp := True;
             end else;
         end;
-      TKey(Sender).IncCounterResponse;
+      TKey(Sender).IncResponseCount;
       if Assigned (CounterManager.OnStmResponse)then CounterManager.OnStmResponse (Sender);
       if Assigned(OnStmResponse) then OnStmResponse(Sender);
     end;
@@ -723,8 +722,8 @@ end;
 procedure TMTS.Consequence2(Sender: TObject);
 begin
   if FFlagCsq2Fired = False then FFlagCsq2Fired := True;
-  FPLP.OutPortOn (FKPlus.Csq);
-  //FRS232.Dispenser(FKPlus.Usb);
+  PLP.OutPortOn (FKPlus.Csq);
+  //RS232.Dispenser(FKPlus.Usb);
 end;
 
 end.

@@ -130,10 +130,10 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
-    property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
     property RegData: TRegData read FRegData write FRegData;
+    property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property ServerAddress : string read FServerAddress write FServerAddress;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
     property TimeStart : cardinal read FTimeStart write FTimeStart;
@@ -156,48 +156,192 @@ implementation
 uses debug_logger;
 {$endif}
 
-procedure TBlc.EndBlc(Sender: TObject);
+constructor TBlc.Create(AOwner: TComponent);
 begin
-  FRegData.SaveData(LineEnding);
+  inherited Create(AOwner);
 
+  with FTimerITI do begin
+    Interval := 0;
+    Enabled := False;
+  end;
+
+  with FTimerTO do begin
+    Interval := 0;
+    Enabled := False;
+  end;
+
+  with FTimerCsq do begin
+    Interval := 0;
+    Enabled := False;
+  end;
+
+  FTimer := TClockThread.Create(True);
+  FTimer.OnTimer := @ClockThread;
+  {$ifdef DEBUG}
+    FTimer.OnDebugStatus := @DebugStatus;
+  {$endif}
+  FTimer.Enabled := False;
+  FTimer.Start;
+end;
+
+destructor TBlc.Destroy;
+begin
+  FTimer.Enabled := False;
+  FTimer.Terminate;
+  inherited Destroy;
+end;
+
+procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
+begin
+  FBlc:= CfgBlc;
+  FCounterManager := Manager;
+
+  FTestMode:= TestMode;
+
+  FLastHeader:= '';
+
+  FCounterManager.CurrentTrial.Counter := IndTent;
+  FIsCorrection := False;
+
+  FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
+  FRegData.SaveData(FBlc.Name);
+
+  PlayTrial
+end;
+
+procedure TBlc.PlayTrial;
+var IndTrial : integer;
+begin
+  if Assigned(FTrial) then
+    begin
+      FreeAndNil(FTrial);
+    end;
+
+  if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
+
+  IndTrial := FCounterManager.CurrentTrial.Counter;
+  if IndTrial = 0 then FFirstTrialBegin := GetTickCount;
+  if IndTrial < FBlc.NumTrials then
+    begin
+
+      if FBlc.Trials[IndTrial].Kind = T_DZT then FTrial := TDZT.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_CLB then FTrial := TCLB.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_FPE then FTrial := TFPE.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MRD then FTrial := TMRD.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MSG then FTrial := TMSG.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_MTS then FTrial := TMTS.Create(Self);
+      if FBlc.Trials[IndTrial].Kind = T_Simple then FTrial := TSimpl.Create(Self);
+
+      if Assigned(FTrial) then
+        begin
+          FTrial.CounterManager := FCounterManager;
+          FTrial.ServerAddress := FServerAddress;
+          FTrial.TimeStart := FTimeStart;
+          FTrial.Parent := FBackGround;
+          FTrial.Align := AlClient;
+          FTrial.OnEndTrial := @EndTrial;
+          FTrial.OnWriteTrialData := @WriteTrialData;
+          FTrial.OnStmResponse := @StmResponse;
+          FTrial.OnBkGndResponse := @BkGndResponse;
+          FTrial.OnHit := @Hit;
+          FTrial.OnMiss := @Miss;
+          FTrial.OnNone := @None;
+          FTrial.CfgTrial := FBlc.Trials[IndTrial];
+          FTrial.Visible := False;
+          FTrial.Play(FTestMode, FIsCorrection);
+          FTrial.Visible := True;
+          FTrial.SetFocus;
+        end else EndBlc(Self);
+
+      FIsCorrection := False;
+    end
+      else
+        begin
+          if Assigned(FTrial) then FreeAndNil(FTrial);
+          EndBlc(Self);
+        end;
+
+end;
+
+procedure TBlc.WriteTrialData(Sender: TObject);
+var
+  CountTr, NumTr, NameTr, ITIData, NewData, Report : string;
+  IsFirst : Boolean;
+const
+  EmptyBlock = #32#32#32#32#32#32#32#32;
+  DoNotApply = #32#32#32#32#32#32 + 'NA';
+begin
+  if FTrial.Header <> FLastHeader then
+    begin
+      Report := LineEnding +
+                FBlcHeader +
+                'ITIBegin' + #9 + '__ITIEnd' + #9 +
+                FTrial.Header + LineEnding;
+
+      FDataTicks := LineEnding +
+                    FBlcHeader +
+                    FTrial.HeaderTicks + LineEnding;
+    end;
+  FLastHeader := FTrial.Header;
+  //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
+
+  CountTr := IntToStr(FCounterManager.Trials.Counter + 1);
+  NumTr:= IntToStr(FCounterManager.CurrentTrial.Counter + 1);
+
+  // Fill Empty Names
+  if FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name = '' then
+    NameTr := '--------'
+  else NameTr := FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name;
+
+  NewData := CountTr + #9 + NumTr + #9 + NameTr;
+
+  ITIData := FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
+            FormatFloat('00000000;;00000000', FITIEND - FTimeStart);
+
+  // Check where it is coming from
+  if Sender is TDZT then
+    begin
+      // Trial may not have changed, avoid repetition
+      if NewData = FLastData then
+        NewData := EmptyBlock + #9 + EmptyBlock + #9 +  EmptyBlock;
+
+      // no ITI
+      if FTrial.Result = '' then
+        ITIData :=  DoNotApply + #9 + DoNotApply
+      else
+        // Check if it is the fisrt trial
+        if (FCounterManager.Trials.Counter + 1) = 1 then
+          IsFirst := True
+        else IsFirst := False;
+
+    end
+  else
+    begin
+
+      if (FCounterManager.Trials.Counter + 1) = 1 then
+        IsFirst := True
+      else IsFirst := False;
+
+    end;
+
+  if IsFirst then
+    ITIData := DoNotApply + #9 + FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart);
+
+  // write data
+  Report := Report + NewData + #9 + ITIData + #9 + FTrial.Data + LineEnding;
+  FLastData := CountTr + #9 + NumTr + #9 + NameTr;
+  FLastITIData := ITIData;
+  FRegData.SaveData(Report);
+
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'ITI:' + FormatFloat('00000000;;00000000', (FITIEND - FTimeStart) - (FITIBegin - FTimeStart)));
+  {$endif}
+
+  FDataTicks := FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  LineEnding;
   if Assigned(RegDataTicks) then
-    RegDataTicks.SaveData(LineEnding);
+    RegDataTicks.SaveData(FDataTicks);
 
-  if Assigned(OnEndBlc) then FOnEndBlc(Sender);
-end;
-
-
-procedure TBlc.Hit(Sender: TObject);
-begin
-  FCounterManager.OnHit(Sender);
-  if FBlc.CrtKCsqHit > 0 then
-    if FBlc.CrtKCsqHit = FCounterManager.BlcCsqHits.Counter then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
-      begin
-        FCounterManager.OnCsqCriterion(Sender);
-        FTrial.DispenserPlusCall;
-      end;
-  if Assigned(OnHit) then FOnHit(Sender);
-end;
-
-procedure TBlc.IETConsequence(Sender: TObject);
-begin
-  //
-end;
-
-procedure TBlc.IETResponse(Sender: TObject);
-begin
-  BkGndResponse(Sender);
-end;
-
-procedure TBlc.Miss(Sender: TObject);
-begin
-  FCounterManager.OnMiss(Sender);
-  if Assigned(OnMiss) then FOnMiss(Sender);
-end;
-
-procedure TBlc.None(Sender: TObject);
-begin
-
+  FDataTicks := '';
 end;
 
 procedure TBlc.EndTrial(Sender: TObject);
@@ -503,123 +647,14 @@ begin
     end;
 end;
 
-procedure TBlc.TrialTerminate(Sender: TObject);
+procedure TBlc.EndBlc(Sender: TObject);
 begin
-  if Assigned(OnEndTrial) then FOnEndTrial(Sender);
-end;
+  FRegData.SaveData(LineEnding);
 
-procedure TBlc.WriteTrialData(Sender: TObject);
-var
-  CountTr, NumTr, NameTr, ITIData, NewData, Report : string;
-  IsFirst : Boolean;
-const
-  EmptyBlock = #32#32#32#32#32#32#32#32;
-  DoNotApply = #32#32#32#32#32#32 + 'NA';
-begin
-  if FTrial.Header <> FLastHeader then
-    begin
-      Report := LineEnding +
-                FBlcHeader +
-                'ITIBegin' + #9 + '__ITIEnd' + #9 +
-                FTrial.Header + LineEnding;
-
-      FDataTicks := LineEnding +
-                    FBlcHeader +
-                    FTrial.HeaderTicks + LineEnding;
-    end;
-  FLastHeader := FTrial.Header;
-  //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
-
-  CountTr := IntToStr(FCounterManager.Trials.Counter + 1);
-  NumTr:= IntToStr(FCounterManager.CurrentTrial.Counter + 1);
-
-  // Fill Empty Names
-  if FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name = '' then
-    NameTr := '--------'
-  else NameTr := FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name;
-
-  NewData := CountTr + #9 + NumTr + #9 + NameTr;
-
-  ITIData := FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
-            FormatFloat('00000000;;00000000', FITIEND - FTimeStart);
-
-  // Check where it is coming from
-  if Sender is TDZT then
-    begin
-      // Trial may not have changed, avoid repetition
-      if NewData = FLastData then
-        NewData := EmptyBlock + #9 + EmptyBlock + #9 +  EmptyBlock;
-
-      // no ITI
-      if FTrial.Result = '' then
-        ITIData :=  DoNotApply + #9 + DoNotApply
-      else
-        // Check if it is the fisrt trial
-        if (FCounterManager.Trials.Counter + 1) = 1 then
-          IsFirst := True
-        else IsFirst := False;
-
-    end
-  else
-    begin
-
-      if (FCounterManager.Trials.Counter + 1) = 1 then
-        IsFirst := True
-      else IsFirst := False;
-
-    end;
-
-  if IsFirst then
-    ITIData := DoNotApply + #9 + FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart);
-
-  // write data
-  Report := Report + NewData + #9 + ITIData + #9 + FTrial.Data + LineEnding;
-  FLastData := CountTr + #9 + NumTr + #9 + NameTr;
-  FLastITIData := ITIData;
-  FRegData.SaveData(Report);
-
-  {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'ITI:' + FormatFloat('00000000;;00000000', (FITIEND - FTimeStart) - (FITIBegin - FTimeStart)));
-  {$endif}
-
-  FDataTicks := FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  LineEnding;
   if Assigned(RegDataTicks) then
-    RegDataTicks.SaveData(FDataTicks);
+    RegDataTicks.SaveData(LineEnding);
 
-  FDataTicks := '';
-end;
-
-procedure TBlc.BkGndResponse(Sender: TObject);
-begin
-  if Assigned(OnBkGndResponse) then FOnBkGndResponse (Sender);
-end;
-
-constructor TBlc.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-
-  with FTimerITI do begin
-    Interval := 0;
-    Enabled := False;
-  end;
-
-  with FTimerTO do begin
-    Interval := 0;
-    Enabled := False;
-  end;
-
-  with FTimerCsq do begin
-    Interval := 0;
-    Enabled := False;
-  end;
-
-  FTimer := TClockThread.Create(True);
-  FTimer.OnTimer := @ClockThread;
-  {$ifdef DEBUG}
-    FTimer.OnDebugStatus := @DebugStatus;
-  {$endif}
-  FTimer.Enabled := False;
-  FTimer.Start;
+  if Assigned(OnEndBlc) then FOnEndBlc(Sender);
 end;
 
 {$ifdef DEBUG}
@@ -633,7 +668,6 @@ procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
 //var
 //  MediaPath : string;
 begin
-
   //BlockInput(true);
   FIETMedia := TKey.Create(FBackGround);
   FIETMedia.Cursor:= FBackGround.Cursor;
@@ -658,84 +692,6 @@ begin
   if Assigned(OnConsequence) then FOnConsequence(FIETMedia);
 end;
 
-destructor TBlc.Destroy;
-begin
-  FTimer.Enabled := False;
-  FTimer.Terminate;
-  inherited Destroy;
-end;
-
-procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
-begin
-  FBlc:= CfgBlc;
-  FCounterManager := Manager;
-
-  FTestMode:= TestMode;
-
-  FLastHeader:= '';
-
-  FCounterManager.CurrentTrial.Counter := IndTent;
-  FIsCorrection := False;
-
-  FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
-  FRegData.SaveData(FBlc.Name);
-
-  PlayTrial
-end;
-
-procedure TBlc.PlayTrial;
-var IndTrial : integer;
-begin
-  if Assigned(FTrial) then
-    begin
-      FreeAndNil(FTrial);
-    end;
-
-  if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
-
-  IndTrial := FCounterManager.CurrentTrial.Counter;
-  if IndTrial = 0 then FFirstTrialBegin := GetTickCount;
-  if IndTrial < FBlc.NumTrials then
-    begin
-
-      if FBlc.Trials[IndTrial].Kind = T_DZT then FTrial := TDZT.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_CLB then FTrial := TCLB.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_FPE then FTrial := TFPE.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MRD then FTrial := TMRD.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MSG then FTrial := TMSG.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MTS then FTrial := TMTS.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_Simple then FTrial := TSimpl.Create(Self);
-
-      if Assigned(FTrial) then
-        begin
-          FTrial.CounterManager := FCounterManager;
-          FTrial.ServerAddress := FServerAddress;
-          FTrial.TimeStart := FTimeStart;
-          FTrial.Parent := FBackGround;
-          FTrial.Align := AlClient;
-          FTrial.OnEndTrial := @EndTrial;
-          FTrial.OnWriteTrialData := @WriteTrialData;
-          FTrial.OnStmResponse := @StmResponse;
-          FTrial.OnBkGndResponse := @BkGndResponse;
-          FTrial.OnHit := @Hit;
-          FTrial.OnMiss := @Miss;
-          FTrial.OnNone := @None;
-          FTrial.CfgTrial := FBlc.Trials[IndTrial];
-          FTrial.Visible := False;
-          FTrial.Play(FTestMode, FIsCorrection);
-          FTrial.Visible := True;
-          FTrial.SetFocus;
-        end else EndBlc(Self);
-
-      FIsCorrection := False;
-    end
-      else
-        begin
-          if Assigned(FTrial) then FreeAndNil(FTrial);
-          EndBlc(Self);
-        end;
-
-end;
 
   {
 procedure TBlc.ShowCounterPlease(Kind: String);
@@ -760,9 +716,52 @@ begin
   end;
 end;   }
 
+procedure TBlc.Hit(Sender: TObject);
+begin
+  FCounterManager.OnHit(Sender);
+  if FBlc.CrtKCsqHit > 0 then
+    if FBlc.CrtKCsqHit = FCounterManager.BlcCsqHits.Counter then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
+      begin
+        FCounterManager.OnCsqCriterion(Sender);
+        FTrial.DispenserPlusCall;
+      end;
+  if Assigned(OnHit) then FOnHit(Sender);
+end;
+
+procedure TBlc.IETResponse(Sender: TObject);
+begin
+  BkGndResponse(Sender);
+end;
+
+procedure TBlc.Miss(Sender: TObject);
+begin
+  FCounterManager.OnMiss(Sender);
+  if Assigned(OnMiss) then FOnMiss(Sender);
+end;
+
+procedure TBlc.IETConsequence(Sender: TObject);
+begin
+  //
+end;
+
+procedure TBlc.None(Sender: TObject);
+begin
+  //
+end;
+
+procedure TBlc.BkGndResponse(Sender: TObject);
+begin
+  if Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
+end;
+
 procedure TBlc.StmResponse(Sender: TObject);
 begin
   if Assigned(OnStmResponse) then FOnStmResponse (Sender);
+end;
+
+procedure TBlc.TrialTerminate(Sender: TObject);
+begin
+  if Assigned(OnEndTrial) then FOnEndTrial(Sender);
 end;
 
 

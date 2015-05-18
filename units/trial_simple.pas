@@ -468,7 +468,7 @@ begin
     begin
       FDataSupport.CompMsg := FKPlus.Msg;
       FDataSupport.PLPCode := FKPlus.Csq;
-      //FDataSupport.RS232Code := FKPlus.Usb;
+      FDataSupport.RS232Code := FKPlus.Usb;
       Result := FKPlus.Res;
       IETConsequence := FKPlus.IET;
       TimeOut := FKPlus.TO_;
@@ -479,7 +479,7 @@ begin
     begin
       FDataSupport.CompMsg := FKMinus.Msg;
       FDataSupport.PLPCode := FKMinus.Csq;
-      //FDataSupport.RS232Code := FKMinus.Usb;
+      FDataSupport.RS232Code := FKMinus.Usb;
       Result := FKMinus.Res;
       TimeOut := FKMinus.TO_;
       IETConsequence := FKMinus.IET;
@@ -527,8 +527,8 @@ end;
 
 procedure TSimpl.Consequence(Sender: TObject);
 begin
-  { The Dispenser requires working interfaces. They were not tested. }
-  //Dispenser(FDataSupport.PLPCode, FDataSupport.RS232Code);
+  { The Dispenser requires working interfaces. They were not tested in the cross platform scope. }
+  Dispenser(FDataSupport.PLPCode, FDataSupport.RS232Code);
   CounterManager.OnConsequence(Sender);
   if Assigned(OnConsequence) then OnConsequence(Sender);
   if not (FLimitedHold > 0) then TrialResult(Sender)

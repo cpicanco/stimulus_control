@@ -31,7 +31,6 @@ uses LCLIntf, LCLType, SysUtils, Variants, Classes,
     , Dialogs
     , bass_player
     , schedules_main
-    , counter
     ;
 
 type
@@ -52,9 +51,8 @@ type
     FAudioChannel : TBassChannel;
     FKeyPress: TNotifyEvent;
     FSchMan: TSchMan;
-    FCounterResponse : TCounter;
+    FResponseCount : integer;
     FOnConsequence: TNotifyEvent;
-    FOnConsequence2: TNotifyEvent;
     FOnResponse: TNotifyEvent;
     FOnEndMedia: TNotifyEvent;
     FBitMap: TBitMap;
@@ -69,7 +67,6 @@ type
     FLRespPnt: TResponsePoint;
     procedure SetFileName(Path: string);
     procedure Consequence (Sender: TObject);
-    procedure Consequence2 (Sender: TObject);
     procedure Response (Sender: TObject);
     //procedure CMMouseEnter(var msg: TMessage); message CM_MOUSEENTER;
     //procedure CMMouseLeave(var msg: TMessage); message CM_MOUSELEAVE;
@@ -85,7 +82,7 @@ type
     procedure Play;
     procedure Stop;
     procedure FullScreen;
-    procedure IncCounterResponse;
+    procedure IncResponseCount;
     property Caption;
     property Color : TColor read FColor write FColor;
     property Edge : TColor read FEdge write FEdge;
@@ -103,10 +100,9 @@ type
     property OnMouseLeave;
     property OnKeyPress: TNotifyEvent read FKeyPress write FKeyPress;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
-    property OnConsequence2: TNotifyEvent read FOnConsequence2 write FOnConsequence2;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
     property OnEndMedia: TNotifyEvent read FOnEndMedia write FOnEndMedia;
-    property SchMan: TSchMan read FSchMan;
+    property Schedule: TSchMan read FSchMan;
     //property Touch;
   end;
 
@@ -123,15 +119,12 @@ begin
   Color:= clRed;
   Edge:= clInactiveCaption;
 
-  FCounterResponse := TCounter.Create;
-  FSchMan:= TSchMan.Create(self);
+  FSchMan := TSchMan.Create(self);
   with FSchMan do
     begin
-      OnConsequence2 := @Consequence2;
       OnConsequence:= @Consequence;
       OnResponse:= @Response;
     end;
-
 end;
 
 destructor TKey.Destroy;
@@ -145,7 +138,6 @@ begin
   if Assigned(FBitMap) then FBitMap.Free;
   //if Assigned(FGifImage) then FreeAndNil (FGifImage);
 
-  if Assigned(FCounterResponse) then FCounterResponse.Free;
   inherited Destroy;
 end;
 
@@ -166,9 +158,9 @@ begin
   Invalidate;
 end;
 
-procedure TKey.IncCounterResponse;
+procedure TKey.IncResponseCount;
 begin
-  FCounterResponse.Plus(1);
+  Inc(FResponseCount);
 end;
 
 procedure TKey.Paint;
@@ -232,7 +224,7 @@ begin
     end;}
 end;
 
-procedure TKey.SetFileName(Path: string);                 //REVISAR
+procedure TKey.SetFileName(Path: string);                 //Review required
 var
     s1, s2 : String;
 
@@ -538,22 +530,17 @@ end;
 //******
 procedure TKey.Consequence(Sender: TObject);
 begin
-  If Assigned(OnConsequence) then FOnConsequence (Self);   //Necessariamente Self
-end;
-
-procedure TKey.Consequence2(Sender: TObject);
-begin
-  if Assigned(OnConsequence2) then FOnConsequence2 (Self);    //Necessariamente Self, sender is irrelevant at this point
+  If Assigned(OnConsequence) then FOnConsequence(Self);   //Necessariamente Self
 end;
 
 procedure TKey.Response(Sender: TObject);
 begin
-  If Assigned(OnResponse) then FOnResponse (Self);   //Necessariamente  SELF
+  If Assigned(OnResponse) then FOnResponse(Self);   //Necessariamente  SELF
 end;
 
 function TKey.ResponseCount: integer;
 begin
-  Result := FCounterResponse.Counter;
+  Result := FResponseCount;
 end;
 
 end.
