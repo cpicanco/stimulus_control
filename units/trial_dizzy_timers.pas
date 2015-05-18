@@ -37,21 +37,20 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
 type
 
   TDataSupport = record
+    Cycle : cardinal;
     Latency : cardinal;
     Responses : integer;
     StmBegin : cardinal;
-    StmEnd : cardinal;
-    Cycle : cardinal;
     Timer2 : cardinal;
   end;
 
   TDizzyTimer = record
     Color1 : Boolean;
     Color2 : Boolean;
-    Min : cardinal;
-    Max : cardinal;
-    Main : cardinal;
     Host : cardinal;
+    Main : cardinal;
+    Max : cardinal;
+    Min : cardinal;
     Timer1 : TClockThread;
     Timer2 : TClockThread;
     Version : string;
@@ -62,14 +61,14 @@ type
   // free operant style
   TDZT = Class(TTrial)
   private
-    FCycles : integer;
-    FDizzyTimer : TDizzyTimer;
-    FStimuli : array of TRect;
-    FDataSupport : TDataSupport;
     FConsequence : string;
-    FSchedule : TSchMan;
+    FCycles : integer;
+    FDataSupport : TDataSupport;
+    FDizzyTimer : TDizzyTimer;
     FFirstResp : Boolean;
     FResponseEnabled : Boolean;
+    FSchedule : TSchMan;
+    FStimuli : array of TRect;
     function GetCycles: integer;
   protected
     procedure Consequence(Sender: TObject);
@@ -78,13 +77,14 @@ type
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
+    procedure TrialResult(Sender: TObject);
+    procedure UpdateTimer1(Sender: TObject);
+    procedure UpdateTimer2(Sender: TObject);
+    // TTrial
     procedure StartTrial(Sender: TObject); override;
     procedure ThreadClock(Sender: TObject); override;
-    procedure TrialResult(Sender : TObject);
-    procedure UpdateTimer1(Sender : TObject);
-    procedure UpdateTimer2(Sender : TObject);
     procedure WriteData(Sender: TObject); override;
-    //TCustomControl
+    // TCustomControl
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Paint; override;
@@ -219,8 +219,10 @@ begin
 end;
 
 procedure TDZT.ThreadClock(Sender: TObject);
+var TickCount : cardinal;
 begin
-  FDataSupport.Cycle := GetTickCount;
+  TickCount := GetTickCount;
+  FDataSupport.Cycle := TickCount;
   FDataSupport.Timer2 := TimeStart;
   TrialResult(Sender);
   WriteData(Self);
@@ -447,7 +449,6 @@ begin
     begin
       Cycle := TimeStart;
       Latency := TimeStart;
-      StmEnd := TimeStart;
       Timer2 := TimeStart;
     end;
 
@@ -477,6 +478,8 @@ begin
 
   Header :=  'StmBegin' + #9 +
              '_Latency' + #9 +
+             '___Cycle' + #9 +
+             '__Timer2' + #9 +
              '_Version' + #9 +
              'RespFreq'
              ;
@@ -501,8 +504,6 @@ procedure TDZT.EndTrial(Sender: TObject);
 begin
   FResponseEnabled := False;
   Hide;
-
-  FDataSupport.StmEnd := GetTickCount;
 
   if Result = T_HIT then Hit(Sender);
   if Result = T_MISS then  Miss(Sender);

@@ -71,7 +71,7 @@ type
   procedure Out32(EndPorta: integer; Valor:BYTE); stdcall; external 'inpout32';
 {$ENDIF}
 
-var FPLP : TPLP;
+var PLP : TPLP;
 
 implementation
 

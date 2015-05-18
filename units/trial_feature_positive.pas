@@ -80,26 +80,27 @@ type
     FCurrTrial: TCurrentTrial;
     FSchedule : TSchMan;
     FFirstResp : Boolean;
-    FFlagCsq2Fired : Boolean;
+    FConsequenceFired : Boolean;
     FUseMedia : Boolean;
     FShowStarter : Boolean;
     FResponseEnabled : Boolean;
   protected
-    procedure BeginCorrection (Sender : TObject);
+    procedure BeginCorrection(Sender: TObject);
     procedure BeginStarter;
     procedure Consequence(Sender: TObject);
-    procedure EndCorrection (Sender : TObject);
+    procedure EndCorrection (Sender: TObject);
     procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
     procedure SetTimerCsq;
+    procedure TrialResult(Sender: TObject);
+    // TTrial
     procedure StartTrial(Sender: TObject); override;
     procedure ThreadClock(Sender: TObject); override;
-    procedure TrialResult(Sender: TObject);
     procedure WriteData(Sender: TObject); override;
-    //TCustomControl
+    // TCustomControl
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure KeyPress(var Key: Char); override;
@@ -147,7 +148,7 @@ begin
 
       //FDataSupport.StmDuration := GetTickCount;
 
-      if FFlagCsq2Fired then
+      if FConsequenceFired then
         begin
           if FCurrTrial.response = 'Positiva' then  Result := T_HIT else Result := T_MISS;
           IETConsequence := FDataSupport.CSQHIT;
@@ -170,7 +171,7 @@ var
   aConsequence : TKey;
 
 begin
-    if FFlagCsq2Fired = False then FFlagCsq2Fired := True;
+    if FConsequenceFired = False then FConsequenceFired := True;
     aConsequence := TKey.Create(Self);
     aConsequence.Cursor:= Self.Cursor;
     aConsequence.Parent:= Self;
@@ -310,7 +311,7 @@ var
         //Color := StrToIntDef(sColor, $0000FF {clRed} );
         //HowManyLoops:= StrToIntDef(sLoop, 0);
         //FullPath:= sName;
-        SchMan.Kind:= CfgTrial.SList.Values[_Schedule];
+        Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
         //Visible := False;
       end;
   end;
@@ -461,7 +462,7 @@ begin
     end;
   }
 
-  FFlagCsq2Fired := False;
+  FConsequenceFired := False;
   FFirstResp := True;
   FResponseEnabled:= True;
   FDataSupport.StmBegin := GetTickCount;

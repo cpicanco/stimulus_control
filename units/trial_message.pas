@@ -50,14 +50,14 @@ type
     FResponseEnabled : Boolean;
     FMemo : TMemo;
     FMemoPrompt : TLabel;
-    procedure EndTrial(Sender: TObject);
-    procedure ThreadClock(Sender: TObject); override;
-    //procedure MemoEnter(Sender: TObject);
-    procedure MemoClick(Sender: TObject);
-    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     //procedure Click; override;
-    procedure WriteData(Sender: TObject); override;
+    //procedure MemoEnter(Sender: TObject);
+    procedure EndTrial(Sender: TObject);
+    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
+    procedure MemoClick(Sender: TObject);
     procedure StartTrial(Sender: TObject); override;
+    procedure ThreadClock(Sender: TObject); override;
+    procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
@@ -113,7 +113,7 @@ procedure TMSG.KeyUp(var Key: Word; Shift: TShiftState);
 begin
   inherited KeyUp(Key, Shift);
   if not (FLimitedHold > 0) then
-    if (scCtrl in Shift) and (Key = 32) then EndTrial(Self);
+    if (ssCtrl in Shift) and (Key = 32) then EndTrial(Self);
 end;
 
 procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);

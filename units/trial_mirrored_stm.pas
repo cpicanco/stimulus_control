@@ -238,11 +238,11 @@ var
     with aKey do
       begin
         BoundsRect := R;
-        Color := StrToIntDef(sColor, $0000FF {clRed} );
-        HowManyLoops:= StrToIntDef(sLoop, 0);
-        FullPath:= sName;
-        SchMan.Kind:= CfgTrial.SList.Values[_Schedule];
-        //Visible := False;
+        Color := StrToIntDef(sColor, $0000FF); // clRed
+        HowManyLoops := StrToIntDef(sLoop, 0);
+        FullPath := sName;
+        Schedule.Kind := CfgTrial.SList.Values[_Schedule];
+        // Visible := False;
       end;
   end;
 
@@ -458,7 +458,7 @@ begin
     end;
 
   if FUseMedia then
-    if Sender is TKey then TKey(Sender).IncCounterResponse;
+    if Sender is TKey then TKey(Sender).IncResponseCount;
 
   //Invalidate;
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);

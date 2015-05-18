@@ -225,6 +225,16 @@ end;
 
 { TSchRT }
 
+constructor TSchRT.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FClockThread := TClockThread.Create(True);
+  FClockThread.OnTimer := @Clock;
+  {$ifdef DEBUG}
+    FClockThread.OnDebugStatus := @DebugStatus;
+  {$endif}
+end;
+
 procedure TSchRT.AssignParameters;
 begin
   FTimeInterval := FParameter1;
@@ -254,16 +264,6 @@ begin
   else FInterval := NewInterval;
 
   FClockThread.Interval := FInterval;
-end;
-
-constructor TSchRT.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FClockThread := TClockThread.Create(True);
-  FClockThread.OnTimer := @Clock;
-  {$ifdef DEBUG}
-    FClockThread.OnDebugStatus := @DebugStatus;
-  {$endif}
 end;
 
 { TSchDRH }

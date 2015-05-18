@@ -48,11 +48,11 @@ type
     public
       constructor Create; reintroduce;
       destructor Destroy; override;
-      procedure Dispenser (Data : String);
+      procedure Dispenser(Data : String);
       //function GetUsbCsqFromValue (Value : String) : ShortInt;  deprecated
   end;
 
-var FRS232 : TRS232;
+var RS232 : TRS232;
 
 implementation
 
