@@ -78,6 +78,7 @@ begin
   FMemo := TMemo.Create(Self);
   with FMemo do begin
     Alignment := taCenter;
+    AutoSize := True;
     BorderStyle := bsNone;
     Font.Name := 'TimesNewRoman';
     Parent := Self;
