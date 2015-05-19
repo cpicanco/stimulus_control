@@ -236,7 +236,6 @@
       <Unit3>
         <Filename Value="units/draw_methods.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="draw_methods"/>
       </Unit3>
       <Unit4>
         <Filename Value="forms/userconfigs.pas"/>
@@ -244,7 +243,6 @@
         <ComponentName Value="UserConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="userconfigs"/>
       </Unit4>
       <Unit5>
         <Filename Value="units/simplegui.pas"/>
@@ -253,7 +251,6 @@
       <Unit6>
         <Filename Value="units/regdata.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="regdata"/>
       </Unit6>
       <Unit7>
         <Filename Value="forms/userconfigs_trial_mirrored.pas"/>
@@ -261,7 +258,6 @@
         <ComponentName Value="BresenhamLineForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="userconfigs_trial_mirrored"/>
       </Unit7>
       <Unit8>
         <Filename Value="units/constants.pas"/>
@@ -276,7 +272,6 @@
       <Unit10>
         <Filename Value="units/session.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="session"/>
       </Unit10>
       <Unit11>
         <Filename Value="units/blocs.pas"/>
@@ -286,6 +281,7 @@
       <Unit12>
         <Filename Value="units/countermanager.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="countermanager"/>
       </Unit12>
       <Unit13>
         <Filename Value="units/counter.pas"/>
