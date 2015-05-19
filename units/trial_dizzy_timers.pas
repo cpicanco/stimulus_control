@@ -456,7 +456,7 @@ begin
   FResponseEnabled := True;
   Invalidate;
   FDataSupport.StmBegin := GetTickCount;
-
+  CreateClientThread('S:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
   inherited StartTrial(Sender);
 end;
 
@@ -505,7 +505,7 @@ procedure TDZT.EndTrial(Sender: TObject);
 begin
   FResponseEnabled := False;
   Hide;
-
+  CreateClientThread('E:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
   if Result = T_HIT then Hit(Sender);
   if Result = T_MISS then  Miss(Sender);
   if Result = T_NONE then  None(Sender);
