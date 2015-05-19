@@ -54,6 +54,7 @@ type
     Timer1 : TClockThread;
     Timer2 : TClockThread;
     Version : string;
+    Schedule : string;
   end;
 
   { TDZT }
@@ -192,11 +193,10 @@ begin
         end;
     end;
 
-  if FSchedule.Kind = T_CRF then
-    FSchedule.Kind := T_EXT
+  if FSchedule.Kind = T_EXT then
+    FSchedule.Kind := FDizzyTimer.Schedule
   else
-    if FSchedule.Kind = T_EXT then
-      FSchedule.Kind := T_CRF;
+    FSchedule.Kind := T_EXT;
 
   Invalidate;
 
@@ -339,12 +339,13 @@ begin
   FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
 
   // self
+  FDizzyTimer.Schedule := CfgTrial.SList.Values[_Schedule];
   FSchedule := TSchMan.Create(self);
   with FSchedule do
     begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
-      Kind := CfgTrial.SList.Values[_Schedule];
+      Kind := FDizzyTimer.Schedule;
       if Loaded then
         begin
           SetLength(FClockList, Length(FClockList) + 1);
