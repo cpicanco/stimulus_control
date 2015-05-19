@@ -20,18 +20,17 @@ def ranking(values, tolerance = 10):
                     aRanking[OldIndex] = rank
     return aRanking
 
-def xyRanking(stims):
+def ranking2d(values2d, tolerancex = 10, tolerancey = 10):
     """
     stims: 2d array 
     """
-    x = [xy[0] for xy in stims]
-    y = [xy[1] for xy in stims]
+    x = [xy[0] for xy in values2d]
+    y = [xy[1] for xy in values2d]
 
-    x = ranking(np.array(x))
-    y = ranking(np.array(y))
+    x = ranking(np.array(x), tolerancex)
+    y = ranking(np.array(y), tolerancey)
 
-    xy = [[x[i], y[i]] for i in range(len(stims))]
-    return xy
+    return [(x[i], y[i]) for i in range(len(values2d))]
 
 if __name__ == '__main__':
 
@@ -48,8 +47,10 @@ if __name__ == '__main__':
     print "\nOriginal stimuli:"
     print stimList
 
+    aRanking = ranking2d(stimList)
+    
     print "\nTheir ordinal coordinates:"
-    print xyRanking(stimList)
+    print aRanking
 
     print "\nTheir codes:"
-    print [str(xy[0]) + "-" + str(xy[1]) for xy in xyRanking(stimList)]
+    print [str(xy[0]) + "-" + str(xy[1]) for xy in aRanking]
