@@ -236,32 +236,18 @@ end;
 
 procedure TDZT.KeyDown(var Key: Word; Shift: TShiftState);
 begin
-  //inherited KeyDown (Key, Shift);
-
+  //inherited KeyDown(Key, Shift);
   if (Key = 27 {ESC}) and (FResponseEnabled = True) then
     begin
       FResponseEnabled:= False;
       Invalidate;
     end;
-
-  if ssCtrl in Shift then
-     begin
-       if Key = 81 {q} then
-         begin
-           Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
-           Result := 'NONE';
-           IETConsequence := 'NONE';
-           NextTrial := 'END';
-           None(Self);
-           EndTrial(Self);
-         end;
-     end;
 end;
 
 procedure TDZT.KeyUp(var Key: Word; Shift: TShiftState);
 var TickCount : cardinal;
 begin
-  inherited KeyUp(Key, Shift);
+  //inherited KeyUp(Key, Shift);
   TickCount := GetTickCount;
 
   if FResponseEnabled then
@@ -284,6 +270,19 @@ begin
       FResponseEnabled := True;
       Invalidate;
     end;
+
+  if ssCtrl in Shift then
+     begin
+       if Key = 81 {q} then
+         begin
+           Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
+           Result := 'NONE';
+           IETConsequence := 'NONE';
+           NextTrial := 'END';
+           None(Self);
+           EndTrial(Self);
+         end;
+     end;
 end;
 
 procedure TDZT.Paint;
@@ -521,6 +520,7 @@ procedure TDZT.EndTrial(Sender: TObject);
 begin
   FResponseEnabled := False;
   Hide;
+
   CreateClientThread('E:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
   if Result = T_HIT then Hit(Sender);
   if Result = T_MISS then  Miss(Sender);
