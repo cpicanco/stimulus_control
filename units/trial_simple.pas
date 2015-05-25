@@ -31,7 +31,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     , trial_abstract
     //, countermanager
     //, config_session
-    , counter
+    //, counter
     , constants
     , interface_rs232
     , interface_plp
