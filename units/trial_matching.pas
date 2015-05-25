@@ -108,14 +108,17 @@ type
     procedure ShowKeyC;
     procedure TimerCsqTimer(Sender: TObject);
     procedure TimerDelayTimer(Sender: TObject);
-    // TCustomControl
   protected
+    // TTrial
+    procedure StartTrial(Sender: TObject); override;
+    procedure WriteData(Sender: TObject); override;
+    procedure ThreadClock(Sender: TObject); override;
+    // TCustomControl
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure KeyPress(var Key: Char); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
-    procedure StartTrial(Sender: TObject); override;
-    procedure WriteData(Sender: TObject); override;
+
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -479,6 +482,11 @@ begin
 
   CounterManager.OnConsequence(Sender);
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
+end;
+
+procedure TMTS.ThreadClock(Sender: TObject);
+begin
+  // Limited hold was not implemented yet
 end;
 
 procedure TMTS.EndCorrection(Sender: TObject);

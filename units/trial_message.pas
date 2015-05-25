@@ -61,6 +61,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure DispenserPlusCall; override;
   end;
 
 resourcestring
@@ -71,7 +72,7 @@ implementation
 
 constructor TMSG.Create(AOwner: TComponent);
 begin
-  Inherited Create(AOwner);
+  inherited Create(AOwner);
 
   Header := 'Message' + #9 + '___Start' + #9 + 'Duration';
 
@@ -107,14 +108,26 @@ end;
 
 procedure TMSG.MemoClick(Sender: TObject);
 begin
-  if not (FLimitedHold > 0) then EndTrial(Sender);
+  if FResponseEnabled then
+    if not (FLimitedHold > 0) then
+      begin
+        FDataSupport.TrialEnd := GetTickCount;
+        WriteData(Self);
+        EndTrial(Sender);
+      end;
 end;
 
 procedure TMSG.KeyUp(var Key: Word; Shift: TShiftState);
 begin
-  inherited KeyUp(Key, Shift);
-  if not (FLimitedHold > 0) then
-    if (ssCtrl in Shift) and (Key = 32) then EndTrial(Self);
+  //inherited KeyUp(Key, Shift);
+  if FResponseEnabled then
+    if not (FLimitedHold > 0) then
+      if (ssCtrl in Shift) and (Key = 32) then
+        begin
+          FDataSupport.TrialEnd := GetTickCount;
+          WriteData(Self);
+          EndTrial(Self);
+        end;
 end;
 
 procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);
@@ -160,6 +173,11 @@ begin
   StartTrial(Self);
 end;
 
+procedure TMSG.DispenserPlusCall;
+begin
+  // dispensers were not implemented yet
+end;
+
 procedure TMSG.StartTrial(Sender: TObject);
 begin
   FResponseEnabled := True;
@@ -182,9 +200,7 @@ procedure TMSG.EndTrial(Sender: TObject);
 begin
   FResponseEnabled := False;
   Hide;
-  FDataSupport.TrialEnd := GetTickCount;
 
-  WriteData(Sender);
   //if Result = T_NONE then None(Sender);
 
   if Assigned(OnEndTrial) then OnEndTrial(Sender);
@@ -192,7 +208,12 @@ end;
 
 procedure TMSG.ThreadClock(Sender: TObject);
 begin
-  EndTrial(Sender);
+  if FResponseEnabled then
+    begin
+      FDataSupport.TrialEnd := GetTickCount;
+      WriteData(Sender);
+      EndTrial(Sender);
+    end;
 end;
 
 end.
