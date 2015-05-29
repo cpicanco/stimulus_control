@@ -236,7 +236,6 @@
       <Unit3>
         <Filename Value="units/draw_methods.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="draw_methods"/>
       </Unit3>
       <Unit4>
         <Filename Value="forms/userconfigs.pas"/>
@@ -244,7 +243,6 @@
         <ComponentName Value="UserConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="userconfigs"/>
       </Unit4>
       <Unit5>
         <Filename Value="units/simplegui.pas"/>
@@ -253,7 +251,6 @@
       <Unit6>
         <Filename Value="units/regdata.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="regdata"/>
       </Unit6>
       <Unit7>
         <Filename Value="forms/userconfigs_trial_mirrored.pas"/>
@@ -261,22 +258,18 @@
         <ComponentName Value="BresenhamLineForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="userconfigs_trial_mirrored"/>
       </Unit7>
       <Unit8>
         <Filename Value="units/constants.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="constants"/>
       </Unit8>
       <Unit9>
         <Filename Value="units/custom_timer.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="custom_timer"/>
       </Unit9>
       <Unit10>
         <Filename Value="units/session.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="session"/>
       </Unit10>
       <Unit11>
         <Filename Value="units/blocs.pas"/>
@@ -298,7 +291,6 @@
       <Unit15>
         <Filename Value="units/schedules.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="schedules"/>
       </Unit15>
       <Unit16>
         <Filename Value="units/response_key.pas"/>
@@ -323,7 +315,6 @@
       <Unit20>
         <Filename Value="units/trial_simple.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_simple"/>
       </Unit20>
       <Unit21>
         <Filename Value="forms/userconfigs_simple_discrimination_matrix.pas"/>
@@ -355,7 +346,6 @@
       <Unit26>
         <Filename Value="units/debug_logger.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="debug_logger"/>
       </Unit26>
       <Unit27>
         <Filename Value="units/timestamps_logger.pas"/>
@@ -372,7 +362,6 @@
       <Unit30>
         <Filename Value="units/interface_rs232.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="interface_rs232"/>
       </Unit30>
       <Unit31>
         <Filename Value="units/trial_dizzy_timers.pas"/>
