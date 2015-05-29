@@ -5,8 +5,7 @@ object bkgnd: Tbkgnd
   Width = 320
   Caption = 'Fundo'
   Color = clWhite
-  DragKind = dkDock
+  DefaultMonitor = dmDesktop
   OnCreate = FormCreate
-  Position = poScreenCenter
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.4.0.4'
 end
