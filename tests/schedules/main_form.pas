@@ -54,6 +54,7 @@ type
     PanelCumulativeRecord: TPanel;
     PanelOperandum: TPanel;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure ListBoxSchedulesClick(Sender: TObject);
     procedure PanelOperandumMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -65,7 +66,7 @@ type
     FTimeScheduleBegin,
     FTimeLatency,
     FTimeConsequence : cardinal;
-
+    FThreadMethod : TThreadMethod;
     FClock : TClockThread;
     FSchedule : TSchMan;
     FCumulativeRecord : TCummulativeRecord;
@@ -90,10 +91,14 @@ implementation
 
 procedure TFormSchedules.ListBoxSchedulesClick(Sender: TObject);
 begin
-  FSchedule.Kind := ListBoxSchedules.Items.Strings[ListBoxSchedules.ItemIndex];
-  FSchedule.Start;
+  with FSchedule do
+    begin
+      Kind := ListBoxSchedules.Items.Strings[ListBoxSchedules.ItemIndex];
+      if Loaded then
+      FThreadMethod := StartMethod;
+      TThreadMethod(FThreadMethod);
+    end;
   ResetTimer;
-
   FCumulativeRecord.Reset;
 end;
 
@@ -140,6 +145,14 @@ begin
   FClock.Start;
 end;
 
+procedure TFormSchedules.FormDestroy(Sender: TObject);
+begin
+  FClock.FreeOnTerminate := False;
+  FClock.Enabled := False;
+  FClock.Terminate;
+  FClock.Free;
+end;
+
 procedure TFormSchedules.Response(Sender: TObject);
 begin
   FCumulativeRecord.DecNY(1);
@@ -147,8 +160,8 @@ end;
 
 procedure TFormSchedules.Consequence(Sender: TObject);
 begin
-  FCumulativeRecord.DrawEvent(True);
   FTimeConsequence := GetTickCount;
+  FCumulativeRecord.DrawEvent(True);
   PanelEnd.Caption := IntToStr(FTimeConsequence - FTimeScheduleBegin);
 end;
 

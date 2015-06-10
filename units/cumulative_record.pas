@@ -43,7 +43,8 @@ type
     FNY : integer;
     procedure OnTimer(Sender : TObject);
   public
-    constructor Create(AOwner : TWinControl);
+    constructor Create(AOwner : TWinControl); reintroduce;
+    destructor Destroy; override;
     procedure Reset;
     procedure Paint; override;
     procedure IncNX(n : integer);
@@ -75,6 +76,16 @@ begin
 
   FClock.Start;
 end;
+
+destructor TCummulativeRecord.Destroy;
+begin
+  FClock.FreeOnTerminate := False;
+  FClock.Enabled := False;
+  FClock.Terminate;
+  FClock.Free;
+  inherited Destroy;
+end;
+
 
 procedure TCummulativeRecord.Reset;
 begin

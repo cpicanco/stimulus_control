@@ -243,6 +243,7 @@
         <ComponentName Value="UserConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="userconfigs"/>
       </Unit4>
       <Unit5>
         <Filename Value="units/simplegui.pas"/>
@@ -270,6 +271,7 @@
       <Unit10>
         <Filename Value="units/session.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="session"/>
       </Unit10>
       <Unit11>
         <Filename Value="units/blocs.pas"/>
@@ -315,6 +317,7 @@
       <Unit20>
         <Filename Value="units/trial_simple.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_simple"/>
       </Unit20>
       <Unit21>
         <Filename Value="forms/userconfigs_simple_discrimination_matrix.pas"/>
@@ -354,6 +357,7 @@
       <Unit28>
         <Filename Value="units/trial_calibration.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_calibration"/>
       </Unit28>
       <Unit29>
         <Filename Value="backup/tool_ini.pas"/>
