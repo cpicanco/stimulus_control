@@ -104,7 +104,6 @@ type
     procedure cbUseGridChange(Sender: TObject);
     procedure EditingCDone(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -349,21 +348,6 @@ begin
   FMirroredLine := GetMirroredLine(FLine);
 end;
 
-procedure TBresenhamLineForm.FormCreate(Sender: TObject);
-var i : integer;
-begin
-  x0.value := Screen.Width div 2;
-  y0.value := Screen.Height div 2;
-  RefreshLine;
-
-  SetLength(FTrialsPerNode, Length(FLine));
-  for i := Low(FTrialsPerNode) to High(FTrialsPerNode) do
-  FTrialsPerNode[i] := seTrials.Value;
-
-  FCentralRect := Rect(0, 0, Screen.Width, Screen.Height);
-  Canvas.Brush.Style:= bsClear;
-end;
-
 procedure TBresenhamLineForm.FormKeyPress(Sender: TObject; var Key: char);
 begin
   if key in [#32] then
@@ -374,8 +358,26 @@ begin
 end;
 
 procedure TBresenhamLineForm.FormActivate(Sender: TObject);
+var
+  aWidth, aHeight,
+  i : integer;
+
 begin
   SetFullScreen(True);
+
+  aWidth := Screen.MonitorFromWindow(Handle).Width;
+  aHeight := Screen.MonitorFromWindow(Handle).Height;
+
+  x0.value := aWidth div 2;
+  y0.value := aHeight div 2;
+  RefreshLine;
+
+  SetLength(FTrialsPerNode, Length(FLine));
+  for i := Low(FTrialsPerNode) to High(FTrialsPerNode) do
+  FTrialsPerNode[i] := seTrials.Value;
+
+  FCentralRect := Rect(0, 0, aWidth, aHeight);
+  Canvas.Brush.Style:= bsClear;
 end;
 
 procedure TBresenhamLineForm.btnMinimizeClick(Sender: TObject);
@@ -417,11 +419,18 @@ begin
 end;
 
 procedure TBresenhamLineForm.cbChooseGridChange(Sender: TObject);
-var i: integer; aDegree : Float;
+var
+  aWidth, aHeight,
+  i: integer;
+
+  aDegree : Float;
 begin
+  aWidth := Screen.MonitorFromWindow(Handle).Width;
+  aHeight := Screen.MonitorFromWindow(Handle).Height;
+
   i := (seSize.value div 2) + seBorder.Value;
   case cbChooseGrid.ItemIndex of
-    0 : FCentralRect := Rect(0, 0, Screen.Width, Screen.Height);
+    0 : FCentralRect := Rect(0, 0, aWidth, aHeight);
     1 : FCentralRect := GetCentralRect(0, 0, 0, 0);
     2 : FCentralRect := GetCentralRect(i, i, i, i);
   end;
@@ -623,8 +632,8 @@ function TBresenhamLineForm.GetMirroredLine(aLine: TPoints): TPoints;
 var i, HalfScreenWidth, HalfScreenHeight, Distance : integer;
 begin
   SetLength(Result, Length(aLine));
-  HalfScreenWidth := Round(Screen.Width/2);
-  HalfScreenHeight := Round(Screen.Height/2);
+  HalfScreenWidth := Round(Screen.MonitorFromWindow(Handle).Width/2);
+  HalfScreenHeight := Round(Screen.MonitorFromWindow(Handle).Height/2);
 
   if cbCentralized.Checked then
     begin
@@ -675,35 +684,40 @@ end;
 
 function TBresenhamLineForm.GetCentralRect(aLeftBorderSpace, aTopBorderSpace,
   aRightBorderSpace, aBottomBorderSpace: integer): TRect;
-  var side : integer;
+  var
+    aWidth, aHeight,
+    side : integer;
 begin
-    if Screen.Height > Screen.Width then
-      begin
-        side := Screen.Width;
-        Result := Rect( (0 + aLeftBorderSpace),
-                        (0  + (Screen.Height div 2) - (side div 2) +  aTopBorderSpace),
-                        (side - aRightBorderSpace),
-                        (side + (Screen.Height div 2) - (side div 2) +  - aBottomBorderSpace)
-                      );
-      end
-    else if Screen.Height < Screen.Width then
-      begin
-        side := Screen.Height;
-        Result := Rect( (0 + (Screen.Width div 2) - (side div 2) + aLeftBorderSpace),
-                        (0 + aTopBorderSpace),
-                        (side + (Screen.Width div 2) - (side div 2) - aRightBorderSpace),
-                        (side - aBottomBorderSpace)
-                      );
-      end
-    else if Screen.Height = Screen.Width then
-      begin
-        side := Screen.Height;
-        Result := Rect( (0 + aLeftBorderSpace),
-                        (0 + aTopBorderSpace),
-                        (side - aRightBorderSpace),
-                        (side - aBottomBorderSpace)
-                      );
-      end;
+  aWidth := Screen.MonitorFromWindow(Handle).Width;
+  aHeight := Screen.MonitorFromWindow(Handle).Height;
+
+  if aHeight > aWidth then
+    begin
+      side := aWidth;
+      Result := Rect( (0 + aLeftBorderSpace),
+                      (0  + (aHeight div 2) - (side div 2) +  aTopBorderSpace),
+                      (side - aRightBorderSpace),
+                      (side + (aHeight div 2) - (side div 2) +  - aBottomBorderSpace)
+                    );
+    end
+  else if aHeight < aWidth then
+    begin
+      side := aHeight;
+      Result := Rect( (0 + (aWidth div 2) - (side div 2) + aLeftBorderSpace),
+                      (0 + aTopBorderSpace),
+                      (side + (aWidth div 2) - (side div 2) - aRightBorderSpace),
+                      (side - aBottomBorderSpace)
+                    );
+    end
+  else if aHeight = aWidth then
+    begin
+      side := aHeight;
+      Result := Rect( (0 + aLeftBorderSpace),
+                      (0 + aTopBorderSpace),
+                      (side - aRightBorderSpace),
+                      (side - aBottomBorderSpace)
+                    );
+    end;
 end;
 
 
