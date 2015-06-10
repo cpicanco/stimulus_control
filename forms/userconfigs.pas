@@ -1126,6 +1126,9 @@ begin
   begin
     aRow := 1;
     BresenhamLineForm := TBresenhamLineForm.Create(Application);
+    if chkPlayOnSecondMonitor.Checked then
+       BresenhamLineForm.Left := Screen.Width + 1;
+
     if BresenhamLineForm.ShowModal = mrOk then
       begin
         for aRepeat := 0 to BresenhamLineForm.seRepeat.Value -1 do
@@ -1165,6 +1168,10 @@ begin
       aRow := 1;
       aCol := 0;
       MatrixForm := TMatrixForm.Create(Application);
+      if chkPlayOnSecondMonitor.Checked then
+          MatrixForm.Left := Screen.Width + 1;
+
+
       if MatrixForm.ShowModal = mrOk then
           begin
             for aTrial := Low(MatrixForm.Trials) to High(MatrixForm.Trials) do AddMatrixTrialToGrid;
@@ -1232,12 +1239,10 @@ begin
     begin
       if not Assigned(bkgnd) then
         bkgnd := Tbkgnd.Create(Application);
-      with bkgnd do
-        begin
-          if chkPlayOnSecondMonitor.Checked then Left := Screen.Width + 1;
-          Show;
-          SetFullScreen(True);
-        end;
+        bkgnd.Show;
+        bkgnd.SetFullScreen(True);
+        if chkPlayOnSecondMonitor.Checked then
+           bkgnd.Left := Screen.Width + 1;
 
       FConfigs := TCfgSes.Create(nil);
       FConfigs.LoadFromFile(OpenDialog1.Filename, False);
