@@ -29,7 +29,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls
 
-, LCLIntf
+, LCLIntf, LCLType
 
 , custom_timer
 , schedules_main
@@ -41,6 +41,7 @@ type
   { TFormSchedules }
 
   TFormSchedules = class(TForm)
+    chkSaveBeforeReset: TCheckBox;
     lblClock: TLabel;
     lblLatency: TLabel;
     lblScheduleEnd: TLabel;
@@ -53,6 +54,7 @@ type
     PanelEnd: TPanel;
     PanelCumulativeRecord: TPanel;
     PanelOperandum: TPanel;
+    procedure chkSaveBeforeResetChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ListBoxSchedulesClick(Sender: TObject);
@@ -74,6 +76,7 @@ type
     procedure Response(Sender : TObject);
     procedure Consequence(Sender : TObject);
     procedure ResetTimer;
+    procedure BeforeReset(Sender : TObject);
 
     { private declarations }
   public
@@ -139,10 +142,16 @@ begin
   ResetTimer;
 
   FCumulativeRecord := TCummulativeRecord.Create(PanelCumulativeRecord);
+  FCumulativeRecord.OnBeforeReset := @BeforeReset;
 
   FClock := TClockThread.Create(True);
   FClock.OnTimer := @ClockOnTimer;
   FClock.Start;
+end;
+
+procedure TFormSchedules.chkSaveBeforeResetChange(Sender: TObject);
+begin
+  FCumulativeRecord.ResetEventEnabled := chkSaveBeforeReset.Checked;
 end;
 
 procedure TFormSchedules.FormDestroy(Sender: TObject);
@@ -177,6 +186,49 @@ begin
   PanelDelta.Caption := IntToStr(FTimeDeltaR);
   PanelLatency.Caption := IntToStr(FTimeLatency - FTimeScheduleBegin);
   PanelEnd.Caption := IntToStr(FTimeConsequence - FTimeScheduleBegin);
+end;
+
+procedure TFormSchedules.BeforeReset(Sender: TObject);
+var
+  Bitmap : TBitmap;
+  aFilename : string;
+  i : integer;
+  DestRect, OrigRect : TRect;
+begin
+  i := 1;
+  aFilename := ExtractFilePath(Application.ExeName);
+  aFilename := aFilename + 'cummulative_record_' + Format('%.3d', [i]) + '.bmp';
+  while FileExistsUTF8(aFilename) do
+   begin
+     Inc(i);
+     aFilename := 'cummulative_record_' + Format('%.3d', [i]) + '.bmp';
+   end;
+
+  DestRect := Rect(0,0,PanelCumulativeRecord.Width, PanelCumulativeRecord.Height);
+  OrigRect := Rect(PanelCumulativeRecord.Left,
+                   PanelCumulativeRecord.Top,
+                   PanelCumulativeRecord.Left + PanelCumulativeRecord.Width,
+                   PanelCumulativeRecord.Top + PanelCumulativeRecord.Height);
+
+  Bitmap := TBitmap.Create;
+  with Bitmap do
+    try
+      Width := 1;
+      Height := 1;
+
+      // Load from form window
+      LoadFromDevice(Self.Canvas.Handle);
+
+      // Copy only the Panel image
+      Canvas.CopyRect(DestRect, Canvas, OrigRect);
+      Width := PanelCumulativeRecord.Width;
+      Height := PanelCumulativeRecord.Height;
+
+      // Save
+      SaveToFile(aFileName);
+    finally
+      Free;
+    end;
 end;
 
 end.
