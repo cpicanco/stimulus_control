@@ -3,6 +3,7 @@ object FormSchedules: TFormSchedules
   Height = 292
   Top = 191
   Width = 556
+  ActiveControl = ListBoxSchedules
   Caption = 'Schedules of Reinforcement'
   ClientHeight = 292
   ClientWidth = 556
@@ -27,21 +28,22 @@ object FormSchedules: TFormSchedules
       'DRH 5 3000'
     )
     ItemHeight = 21
+    ItemIndex = 0
     OnClick = ListBoxSchedulesClick
     ScrollWidth = 89
     TabOrder = 0
   end
   object PanelCumulativeRecord: TPanel
     Left = 114
-    Height = 237
-    Top = 5
+    Height = 209
+    Top = 33
     Width = 437
     Align = alClient
     BorderSpacing.Left = 114
-    BorderSpacing.Top = 5
+    BorderSpacing.Top = 33
     BorderSpacing.Right = 5
     BorderSpacing.Bottom = 50
-    BevelOuter = bvLowered
+    BevelOuter = bvNone
     Color = clTeal
     ParentColor = False
     TabOrder = 1
@@ -118,18 +120,18 @@ object FormSchedules: TFormSchedules
     Left = 337
     Height = 15
     Top = 246
-    Width = 23
+    Width = 79
     Anchors = [akLeft, akBottom]
-    Caption = 'End'
+    Caption = 'Consequence'
     ParentColor = False
   end
   object lblResponseDelta: TLabel
     Left = 448
     Height = 15
     Top = 246
-    Width = 30
+    Width = 92
     Anchors = [akLeft, akBottom]
-    Caption = 'Delta'
+    Caption = 'Response Delta'
     ParentColor = False
   end
   object PanelDelta: TPanel
@@ -140,5 +142,14 @@ object FormSchedules: TFormSchedules
     Anchors = [akLeft, akBottom]
     Caption = '0'
     TabOrder = 6
+  end
+  object chkSaveBeforeReset: TCheckBox
+    Left = 112
+    Height = 21
+    Top = 8
+    Width = 224
+    Caption = 'Save Cummulative Record on disk'
+    OnChange = chkSaveBeforeResetChange
+    TabOrder = 7
   end
 end
