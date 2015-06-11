@@ -37,19 +37,25 @@ type
   TCummulativeRecord = class(TCustomControl)
   private
     FClock : TClockThread;
+    FOnBeforeReset: TNotifyEvent;
     FOX : integer;
     FOY : integer;
     FNX : integer;
     FNY : integer;
+    FResetEventEnabled: Boolean;
     procedure OnTimer(Sender : TObject);
+    procedure SetOnBeforeReset(AValue: TNotifyEvent);
+    procedure SetResetEventEnabled(AValue: Boolean);
   public
     constructor Create(AOwner : TWinControl); reintroduce;
     destructor Destroy; override;
-    procedure Reset;
+    procedure Reset(EventTrigger : Boolean = False);
     procedure Paint; override;
     procedure IncNX(n : integer);
     procedure DecNY(n : integer);
     procedure DrawEvent(OnLeftTop : Boolean);
+    property OnBeforeReset : TNotifyEvent read FOnBeforeReset write SetOnBeforeReset;
+    property ResetEventEnabled : Boolean read FResetEventEnabled write SetResetEventEnabled;
   end;
 
 implementation
@@ -59,17 +65,18 @@ implementation
 constructor TCummulativeRecord.Create(AOwner: TWinControl);
 begin
   inherited Create(AOwner);
+  FResetEventEnabled := False;
   FClock := TClockThread.Create(True);
   FClock.OnTimer := @OnTimer;
   FClock.Interval := 125;
 
   Parent:= AOwner;
   Align := alClient;
-  Color := clTeal;
-  Canvas.Pen.Color := RGBToColor(255,128,255);
+  Color := clWhite;
+  Canvas.Pen.Color := clWhite;
   Canvas.Pen.Style := psDot;
   Canvas.Pen.Width := 1;
-  Canvas.Pen.Mode := pmCopy;
+  Canvas.Pen.Mode := pmXor;
 
   Reset;
   BringToFront;
@@ -87,8 +94,11 @@ begin
 end;
 
 
-procedure TCummulativeRecord.Reset;
+procedure TCummulativeRecord.Reset(EventTrigger : Boolean = False);
 begin
+  if EventTrigger then
+    if Assigned(OnBeforeReset) then OnBeforeReset(Self);
+
   FOX := 2;
   FOY := Height - 10;
   Canvas.MoveTo(FOX, FOY);
@@ -122,7 +132,7 @@ begin
     begin
       FNX := 2;
       Canvas.MoveTo(FNX, FNY);
-      Reset;
+      Reset(FResetEventEnabled);
     end;
 
   if FNY < 2 then
@@ -133,6 +143,17 @@ begin
   Paint;
 end;
 
+procedure TCummulativeRecord.SetOnBeforeReset(AValue: TNotifyEvent);
+begin
+  if FOnBeforeReset=AValue then Exit;
+  FOnBeforeReset := AValue;
+end;
+
+procedure TCummulativeRecord.SetResetEventEnabled(AValue: Boolean);
+begin
+  if FResetEventEnabled=AValue then Exit;
+  FResetEventEnabled := AValue;
+end;
 
 procedure TCummulativeRecord.DrawEvent(OnLeftTop : Boolean);
 begin
