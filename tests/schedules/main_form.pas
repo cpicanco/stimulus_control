@@ -29,7 +29,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls
 
-, LCLIntf, LCLType
+, LCLIntf, LCLType, Menus
 
 , custom_timer
 , schedules_main
@@ -48,6 +48,8 @@ type
     LabelSchedules: TLabel;
     lblResponseDelta: TLabel;
     ListBoxSchedules: TListBox;
+    MainMenu1: TMainMenu;
+    miAbout: TMenuItem;
     PanelClock: TPanel;
     PanelDelta: TPanel;
     PanelLatency: TPanel;
@@ -58,6 +60,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ListBoxSchedulesClick(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
     procedure PanelOperandumMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
   private
@@ -103,6 +106,56 @@ begin
     end;
   ResetTimer;
   FCumulativeRecord.Reset;
+end;
+
+procedure TFormSchedules.miAboutClick(Sender: TObject);
+var
+  FormAbout : TForm;
+  LabelCredits : TMemo;
+begin
+  FormAbout := TForm.Create(nil);
+
+  LabelCredits := TMemo.Create(FormAbout);
+  with LabelCredits do
+    begin
+      Align := alClient;
+      AutoSize := True;
+      Text :=
+        'Validation Project (PCRF) - Stimulus Control App' + LineEnding +
+        'Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.' + LineEnding +
+        LineEnding +
+        'This software is part of Validation Project (PCRF).' + LineEnding +
+        'You can see on GitHub:' + LineEnding +
+        '<http://github.com/cpicanco/validation_project>' + LineEnding +
+        LineEnding +
+        'Validation Project (PCRF) is free software: you can redistribute it and/or modify' + LineEnding +
+        'it under the terms of the GNU General Public License as published by' + LineEnding +
+        'the Free Software Foundation, either version 3 of the License, or' + LineEnding +
+        '(at your option) any later version.' + LineEnding +
+        LineEnding +
+        'Validation Project (PCRF) is distributed in the hope that it will be useful,' + LineEnding +
+        'but WITHOUT ANY WARRANTY; without even the implied warranty of' + LineEnding +
+        'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the' + LineEnding +
+        'GNU General Public License for more details.' + LineEnding +
+        LineEnding +
+        'You should have received a copy of the GNU General Public License' + LineEnding +
+        'along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.';
+      Parent := FormAbout;
+    end;
+
+  with FormAbout do
+    try
+      Width := 600;
+      Height := 320;
+      Position := poMainFormCenter;
+
+      if ShowModal = mrClose then
+        begin
+         // do nothing
+        end;
+    finally
+      Free;
+    end;
 end;
 
 procedure TFormSchedules.PanelOperandumMouseDown(Sender: TObject;
