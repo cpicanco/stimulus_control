@@ -1,12 +1,13 @@
 object FormSchedules: TFormSchedules
   Left = 321
-  Height = 292
+  Height = 331
   Top = 191
-  Width = 556
+  Width = 560
   ActiveControl = ListBoxSchedules
   Caption = 'Schedules of Reinforcement'
-  ClientHeight = 292
-  ClientWidth = 556
+  ClientHeight = 312
+  ClientWidth = 560
+  Menu = MainMenu1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '1.4.0.4'
@@ -35,9 +36,9 @@ object FormSchedules: TFormSchedules
   end
   object PanelCumulativeRecord: TPanel
     Left = 114
-    Height = 209
+    Height = 229
     Top = 33
-    Width = 437
+    Width = 441
     Align = alClient
     BorderSpacing.Left = 114
     BorderSpacing.Top = 33
@@ -74,7 +75,7 @@ object FormSchedules: TFormSchedules
   object PanelClock: TPanel
     Left = 114
     Height = 21
-    Top = 264
+    Top = 284
     Width = 100
     Anchors = [akLeft, akBottom]
     Caption = '0'
@@ -83,7 +84,7 @@ object FormSchedules: TFormSchedules
   object PanelLatency: TPanel
     Left = 225
     Height = 21
-    Top = 264
+    Top = 284
     Width = 100
     Anchors = [akLeft, akBottom]
     Caption = '0'
@@ -92,7 +93,7 @@ object FormSchedules: TFormSchedules
   object PanelEnd: TPanel
     Left = 337
     Height = 21
-    Top = 264
+    Top = 284
     Width = 100
     Anchors = [akLeft, akBottom]
     Caption = '0'
@@ -101,7 +102,7 @@ object FormSchedules: TFormSchedules
   object lblClock: TLabel
     Left = 114
     Height = 15
-    Top = 246
+    Top = 266
     Width = 33
     Anchors = [akLeft, akBottom]
     Caption = 'Clock'
@@ -110,7 +111,7 @@ object FormSchedules: TFormSchedules
   object lblLatency: TLabel
     Left = 225
     Height = 15
-    Top = 246
+    Top = 266
     Width = 46
     Anchors = [akLeft, akBottom]
     Caption = 'Latency'
@@ -119,7 +120,7 @@ object FormSchedules: TFormSchedules
   object lblScheduleEnd: TLabel
     Left = 337
     Height = 15
-    Top = 246
+    Top = 266
     Width = 79
     Anchors = [akLeft, akBottom]
     Caption = 'Consequence'
@@ -128,7 +129,7 @@ object FormSchedules: TFormSchedules
   object lblResponseDelta: TLabel
     Left = 448
     Height = 15
-    Top = 246
+    Top = 266
     Width = 92
     Anchors = [akLeft, akBottom]
     Caption = 'Response Delta'
@@ -137,7 +138,7 @@ object FormSchedules: TFormSchedules
   object PanelDelta: TPanel
     Left = 448
     Height = 21
-    Top = 264
+    Top = 284
     Width = 100
     Anchors = [akLeft, akBottom]
     Caption = '0'
@@ -151,5 +152,13 @@ object FormSchedules: TFormSchedules
     Caption = 'Save Cummulative Record on disk'
     OnChange = chkSaveBeforeResetChange
     TabOrder = 7
+  end
+  object MainMenu1: TMainMenu
+    left = 32
+    top = 216
+    object miAbout: TMenuItem
+      Caption = 'About'
+      OnClick = miAboutClick
+    end
   end
 end
