@@ -57,7 +57,7 @@ type
     FCurrTrial : FDataSupport;
   protected
     procedure None(Sender: TObject);
-    //procedure ThreadClock(Sender: TObject); override;
+    procedure ThreadClock(Sender: TObject); override;
     procedure StartTrial(Sender: TObject); override;
     procedure EndTrial(Sender: TObject);
     procedure WriteData(Sender: TObject); override;
@@ -69,6 +69,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure DispenserPlusCall; override;
   end;
 
 
@@ -81,6 +82,11 @@ procedure TCLB.None(Sender: TObject);
 begin
   { This trial type does not implement an OnNone event }
   if Assigned(OnNone) then OnNone(Sender);
+end;
+
+procedure TCLB.ThreadClock(Sender: TObject);
+begin
+  // do nothing; Limited hold was not impleted in this trial type
 end;
 
 procedure TCLB.StartTrial(Sender: TObject);
@@ -214,6 +220,11 @@ begin
       FCurrTrial.Dots[i].Size := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
     end;
   StartTrial(Self);
+end;
+
+procedure TCLB.DispenserPlusCall;
+begin
+  // dispensers were not implemented yet
 end;
 
 end.

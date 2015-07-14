@@ -36,7 +36,6 @@
       <Unit0>
         <Filename Value="schedules_test.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="schedules_test"/>
       </Unit0>
       <Unit1>
         <Filename Value="main_form.pas"/>
@@ -49,7 +48,6 @@
       <Unit2>
         <Filename Value="cumulative_record.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="cumulative_record"/>
       </Unit2>
     </Units>
   </ProjectOptions>
@@ -76,11 +74,7 @@
       </Options>
     </Linking>
     <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
       <CustomOptions Value="-dUseCThreads"/>
-      <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>
