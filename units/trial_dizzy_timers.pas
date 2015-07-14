@@ -94,6 +94,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure DispenserPlusCall; override;
     property Cycles : integer read GetCycles;
 
   end;
@@ -441,6 +442,11 @@ begin
         FStimuli[a1] := R;
     end;
   StartTrial(Self);
+end;
+
+procedure TDZT.DispenserPlusCall;
+begin
+  // dispensers were not implemented yet
 end;
 
 procedure TDZT.StartTrial(Sender: TObject);

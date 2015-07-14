@@ -79,6 +79,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure DispenserPlusCall; override;
 
   end;
 
@@ -335,6 +336,11 @@ begin
   {$endif}
 
   if FShowStarter then BeginStarter else StartTrial(Self);
+end;
+
+procedure TMRD.DispenserPlusCall;
+begin
+  // dispensers were not implemented yet
 end;
 
 procedure TMRD.StartTrial(Sender: TObject);

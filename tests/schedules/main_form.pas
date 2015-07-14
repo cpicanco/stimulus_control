@@ -29,7 +29,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls
 
-, LCLIntf
+, LCLIntf, LCLType, Menus
 
 , custom_timer
 , schedules_main
@@ -41,20 +41,26 @@ type
   { TFormSchedules }
 
   TFormSchedules = class(TForm)
+    chkSaveBeforeReset: TCheckBox;
     lblClock: TLabel;
     lblLatency: TLabel;
     lblScheduleEnd: TLabel;
     LabelSchedules: TLabel;
     lblResponseDelta: TLabel;
     ListBoxSchedules: TListBox;
+    MainMenu1: TMainMenu;
+    miAbout: TMenuItem;
     PanelClock: TPanel;
     PanelDelta: TPanel;
     PanelLatency: TPanel;
     PanelEnd: TPanel;
     PanelCumulativeRecord: TPanel;
     PanelOperandum: TPanel;
+    procedure chkSaveBeforeResetChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure ListBoxSchedulesClick(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
     procedure PanelOperandumMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
   private
@@ -65,7 +71,7 @@ type
     FTimeScheduleBegin,
     FTimeLatency,
     FTimeConsequence : cardinal;
-
+    FThreadMethod : TThreadMethod;
     FClock : TClockThread;
     FSchedule : TSchMan;
     FCumulativeRecord : TCummulativeRecord;
@@ -73,6 +79,7 @@ type
     procedure Response(Sender : TObject);
     procedure Consequence(Sender : TObject);
     procedure ResetTimer;
+    procedure BeforeReset(Sender : TObject);
 
     { private declarations }
   public
@@ -90,11 +97,65 @@ implementation
 
 procedure TFormSchedules.ListBoxSchedulesClick(Sender: TObject);
 begin
-  FSchedule.Kind := ListBoxSchedules.Items.Strings[ListBoxSchedules.ItemIndex];
-  FSchedule.Start;
+  with FSchedule do
+    begin
+      Kind := ListBoxSchedules.Items.Strings[ListBoxSchedules.ItemIndex];
+      if Loaded then
+      FThreadMethod := StartMethod;
+      TThreadMethod(FThreadMethod);
+    end;
   ResetTimer;
-
   FCumulativeRecord.Reset;
+end;
+
+procedure TFormSchedules.miAboutClick(Sender: TObject);
+var
+  FormAbout : TForm;
+  LabelCredits : TMemo;
+begin
+  FormAbout := TForm.Create(nil);
+
+  LabelCredits := TMemo.Create(FormAbout);
+  with LabelCredits do
+    begin
+      Align := alClient;
+      AutoSize := True;
+      Text :=
+        'Validation Project (PCRF) - Stimulus Control App' + LineEnding +
+        'Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.' + LineEnding +
+        LineEnding +
+        'This software is part of Validation Project (PCRF).' + LineEnding +
+        'You can see on GitHub:' + LineEnding +
+        '<http://github.com/cpicanco/validation_project>' + LineEnding +
+        LineEnding +
+        'Validation Project (PCRF) is free software: you can redistribute it and/or modify' + LineEnding +
+        'it under the terms of the GNU General Public License as published by' + LineEnding +
+        'the Free Software Foundation, either version 3 of the License, or' + LineEnding +
+        '(at your option) any later version.' + LineEnding +
+        LineEnding +
+        'Validation Project (PCRF) is distributed in the hope that it will be useful,' + LineEnding +
+        'but WITHOUT ANY WARRANTY; without even the implied warranty of' + LineEnding +
+        'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the' + LineEnding +
+        'GNU General Public License for more details.' + LineEnding +
+        LineEnding +
+        'You should have received a copy of the GNU General Public License' + LineEnding +
+        'along with Validation Project (PCRF).  If not, see <http://www.gnu.org/licenses/>.';
+      Parent := FormAbout;
+    end;
+
+  with FormAbout do
+    try
+      Width := 600;
+      Height := 320;
+      Position := poMainFormCenter;
+
+      if ShowModal = mrClose then
+        begin
+         // do nothing
+        end;
+    finally
+      Free;
+    end;
 end;
 
 procedure TFormSchedules.PanelOperandumMouseDown(Sender: TObject;
@@ -134,10 +195,24 @@ begin
   ResetTimer;
 
   FCumulativeRecord := TCummulativeRecord.Create(PanelCumulativeRecord);
+  FCumulativeRecord.OnBeforeReset := @BeforeReset;
 
   FClock := TClockThread.Create(True);
   FClock.OnTimer := @ClockOnTimer;
   FClock.Start;
+end;
+
+procedure TFormSchedules.chkSaveBeforeResetChange(Sender: TObject);
+begin
+  FCumulativeRecord.ResetEventEnabled := chkSaveBeforeReset.Checked;
+end;
+
+procedure TFormSchedules.FormDestroy(Sender: TObject);
+begin
+  FClock.FreeOnTerminate := False;
+  FClock.Enabled := False;
+  FClock.Terminate;
+  FClock.Free;
 end;
 
 procedure TFormSchedules.Response(Sender: TObject);
@@ -147,8 +222,8 @@ end;
 
 procedure TFormSchedules.Consequence(Sender: TObject);
 begin
-  FCumulativeRecord.DrawEvent(True);
   FTimeConsequence := GetTickCount;
+  FCumulativeRecord.DrawEvent(True);
   PanelEnd.Caption := IntToStr(FTimeConsequence - FTimeScheduleBegin);
 end;
 
@@ -164,6 +239,49 @@ begin
   PanelDelta.Caption := IntToStr(FTimeDeltaR);
   PanelLatency.Caption := IntToStr(FTimeLatency - FTimeScheduleBegin);
   PanelEnd.Caption := IntToStr(FTimeConsequence - FTimeScheduleBegin);
+end;
+
+procedure TFormSchedules.BeforeReset(Sender: TObject);
+var
+  Bitmap : TBitmap;
+  aFilename : string;
+  i : integer;
+  DestRect, OrigRect : TRect;
+begin
+  i := 1;
+  aFilename := ExtractFilePath(Application.ExeName);
+  aFilename := aFilename + 'cummulative_record_' + Format('%.3d', [i]) + '.bmp';
+  while FileExistsUTF8(aFilename) do
+   begin
+     Inc(i);
+     aFilename := 'cummulative_record_' + Format('%.3d', [i]) + '.bmp';
+   end;
+
+  DestRect := Rect(0,0,PanelCumulativeRecord.Width, PanelCumulativeRecord.Height);
+  OrigRect := Rect(PanelCumulativeRecord.Left,
+                   PanelCumulativeRecord.Top,
+                   PanelCumulativeRecord.Left + PanelCumulativeRecord.Width,
+                   PanelCumulativeRecord.Top + PanelCumulativeRecord.Height);
+
+  Bitmap := TBitmap.Create;
+  with Bitmap do
+    try
+      Width := 1;
+      Height := 1;
+
+      // Load from form window
+      LoadFromDevice(Self.Canvas.Handle);
+
+      // Copy only the Panel image
+      Canvas.CopyRect(DestRect, Canvas, OrigRect);
+      Width := PanelCumulativeRecord.Width;
+      Height := PanelCumulativeRecord.Height;
+
+      // Save
+      SaveToFile(aFileName);
+    finally
+      Free;
+    end;
 end;
 
 end.
