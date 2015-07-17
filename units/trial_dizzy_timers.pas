@@ -170,8 +170,10 @@ begin
 end;
 
 procedure TDZT.UpdateTimer1(Sender: TObject);
+var TickCount : cardinal;
 begin
-  FDataSupport.Cycle := GetTickCount;
+  TickCount := GetTickCount;
+  FDataSupport.Cycle := TickCount;
   Inc(FCycles);
 
   with FDizzyTimer do
@@ -200,9 +202,15 @@ begin
   else
     if FDizzyTimer.Mode = 'B' then
       if FSchedule.Kind = T_EXT then
-        FSchedule.Kind := FDizzyTimer.Schedule
+        begin
+           FSchedule.Kind := FDizzyTimer.Schedule
+           CreateClientThread('1:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+        end
       else
-        FSchedule.Kind := T_EXT;
+        begin
+          FSchedule.Kind := T_EXT;
+          CreateClientThread('2:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+        end;
 
   Invalidate;
 
@@ -211,15 +219,23 @@ begin
 end;
 
 procedure TDZT.UpdateTimer2(Sender: TObject);
+var TickCount : cardinal;
 begin
   TClockThread(Sender).Enabled := False;
-  FDataSupport.Timer2 := GetTickCount;
+  TickCount := GetTickCount;
+  FDataSupport.Timer2 := TickCount;
 
   if TClockThread(Sender) = FDizzyTimer.Timer2 then
-    FDizzyTimer.Color2 := not FDizzyTimer.Color2;
+    begin
+      FDizzyTimer.Color2 := not FDizzyTimer.Color2;
+      CreateClientThread('3:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+    end;
 
   if TClockThread(Sender) = FDizzyTimer.Timer1 then
-    FDizzyTimer.Color1 := not FDizzyTimer.Color1;
+    begin
+      FDizzyTimer.Color1 := not FDizzyTimer.Color1;
+      CreateClientThread('4:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+    end;
 
   Invalidate;
 end;
