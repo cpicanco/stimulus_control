@@ -217,7 +217,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="32">
+    <Units Count="33">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -271,7 +271,6 @@
       <Unit10>
         <Filename Value="units/session.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="session"/>
       </Unit10>
       <Unit11>
         <Filename Value="units/blocs.pas"/>
@@ -297,22 +296,18 @@
       <Unit16>
         <Filename Value="units/response_key.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="response_key"/>
       </Unit16>
       <Unit17>
         <Filename Value="units/trial_feature_positive.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_feature_positive"/>
       </Unit17>
       <Unit18>
         <Filename Value="units/trial_message.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_message"/>
       </Unit18>
       <Unit19>
         <Filename Value="units/trial_matching.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_matching"/>
       </Unit19>
       <Unit20>
         <Filename Value="units/trial_simple.pas"/>
@@ -340,7 +335,6 @@
       <Unit24>
         <Filename Value="units/trial_abstract.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_abstract"/>
       </Unit24>
       <Unit25>
         <Filename Value="units/bass_player.pas"/>
@@ -357,7 +351,6 @@
       <Unit28>
         <Filename Value="units/trial_calibration.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_calibration"/>
       </Unit28>
       <Unit29>
         <Filename Value="backup/tool_ini.pas"/>
@@ -372,6 +365,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="trial_dizzy_timers"/>
       </Unit31>
+      <Unit32>
+        <Filename Value="units/git_vertioning.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="git_vertioning"/>
+      </Unit32>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

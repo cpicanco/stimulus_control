@@ -63,12 +63,13 @@ uses
   , trial_simple
   , trial_matching
   , trial_message
+
   , trial_mirrored_stm
-  
   , trial_feature_positive
   , trial_calibration
-  , blocs
+  , trial_dizzy_timers
 
+  , blocs
   , session
   , config_session
 
@@ -78,7 +79,8 @@ uses
 
   // helpers
   , draw_methods
-  , timestamps_logger, trial_dizzy_timers
+  , timestamps_logger
+  , git_vertioning
 
   {$ifdef DEBUG}
   , debug_logger
@@ -102,7 +104,7 @@ begin
     {$endif}
   {$endif}
 
-  Application.Title := ApplicationTitle;
+  Application.Title := ApplicationTitle + CurrentVersion(GetCommitTag());
   Application.Initialize;
   {$ifdef DEBUG}
     DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
