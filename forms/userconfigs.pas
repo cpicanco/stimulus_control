@@ -38,6 +38,7 @@ uses Classes, SysUtils, FileUtil, Forms, Controls,
     , escriba
     , regdata
     , constants
+    , git_vertioning
     {$ifdef DEBUG}
     , debug_logger
     {$endif}
@@ -70,12 +71,15 @@ type
     edtContent: TEdit;
     gbRepetitions: TGroupBox;
     gbTrialGroup: TGroupBox;
+    Image1: TImage;
     leServerAddress: TLabeledEdit;
     lblITI: TLabel;
     leParticipant: TLabeledEdit;
     leFillValue: TLabeledEdit;
     leSessionName: TLabeledEdit;
     Memo1: TMemo;
+    MemoAppInfo: TMemo;
+    PanelHeader: TPanel;
     piTrialGroup: TMenuItem;
     piFillEven: TMenuItem;
     piFillOdd: TMenuItem;
@@ -93,7 +97,10 @@ type
     SaveDialog1: TSaveDialog;
     seCount: TSpinEdit;
     seITI: TSpinEdit;
+    stAppTitle: TStaticText;
+    stVersion: TStaticText;
     StringGrid1: TStringGrid;
+    tbVersion: TTabSheet;
     tbTools: TTabSheet;
     tbSave: TTabSheet;
     tbGeneral: TTabSheet;
@@ -1192,8 +1199,14 @@ begin
   Randomize;
   FLastFocusedCol := -1;
   StringGrid1.ColCount := 9;
-  Caption := Application.Title + ' - ' + 'cpicanco@ufpa.br';
-
+  Caption := Application.Title;
+  stAppTitle.Caption := Application.Title;
+  stVersion.Caption := CurrentVersion(GetCommitTag());
+  MemoAppInfo.Lines.Append('Stimulus Control App.');
+  MemoAppInfo.Lines.Append('Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.');
+  MemoAppInfo.Lines.Append('');
+  MemoAppInfo.Lines.Append('Last Commit: ' + LastCommitShortCode(GetCommitTag()));
+  MemoAppInfo.Lines.Append('Contact: cpicanco@ufpa.br');
   with StringGrid1 do
     begin
       Cells[0, 0] := rsTrials;
@@ -1221,6 +1234,7 @@ procedure TUserConfig.FormDestroy(Sender: TObject);
 begin
   //FPosArray.Free;
 end;
+
 
 procedure TUserConfig.btnRunClick(Sender: TObject);
 var aDirectory, aDataName : string;

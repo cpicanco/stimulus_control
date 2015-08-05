@@ -104,7 +104,7 @@ begin
     {$endif}
   {$endif}
 
-  Application.Title := ApplicationTitle + CurrentVersion(GetCommitTag());
+  Application.Title := ApplicationTitle;
   Application.Initialize;
   {$ifdef DEBUG}
     DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
