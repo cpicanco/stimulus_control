@@ -4,7 +4,7 @@ object UserConfig: TUserConfig
   Top = 112
   Width = 407
   HorzScrollBar.Page = 401
-  VertScrollBar.Page = 485
+  VertScrollBar.Page = 271
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
   Caption = 'Configurar'
@@ -1620,7 +1620,7 @@ object UserConfig: TUserConfig
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   ParentBiDiMode = False
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.4.0.4'
   object btnRun: TButton
     Left = 8
     Height = 25
@@ -2052,6 +2052,7 @@ object UserConfig: TUserConfig
     Height = 21
     Top = 464
     Width = 107
+    Anchors = [akLeft, akBottom]
     Caption = 'Registrar ticks'
     TabOrder = 3
   end

@@ -203,7 +203,7 @@ begin
     if FDizzyTimer.Mode = 'B' then
       if FSchedule.Kind = T_EXT then
         begin
-           FSchedule.Kind := FDizzyTimer.Schedule
+           FSchedule.Kind := FDizzyTimer.Schedule;
            CreateClientThread('1:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
         end
       else
