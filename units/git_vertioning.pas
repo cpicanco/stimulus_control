@@ -35,7 +35,9 @@ uses
 
 function ReadProcessOutput(Output : TInputPipeStream) : TStringList;
 function GetCommitTag(UseTagsOption : Boolean = True) : TStringList;
+
 function CurrentVersion(CommitTag : TStringList) : string;
+function LastCommitShortCode(CommitTag : TStringList) : string;
 
 implementation
 
@@ -120,7 +122,24 @@ begin
         Delimiter := '-';
         DelimitedText := CommitTag[0];
       end;
-    Result := #32 + VersionLines[0] + 'c' + VersionLines[1];
+    Result := #32 + VersionLines[0] + #32 + 'c' + VersionLines[1];
+  finally
+    VersionLines.Free;
+  end;
+end;
+
+function LastCommitShortCode(CommitTag: TStringList): string;
+var VersionLines : TStringList;
+begin
+  VersionLines := TStringList.Create;
+  try
+    with VersionLines do
+      begin
+        StrictDelimiter := True;
+        Delimiter := '-';
+        DelimitedText := CommitTag[0];
+      end;
+    Result := VersionLines[2];
   finally
     VersionLines.Free;
   end;

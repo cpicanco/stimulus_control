@@ -275,7 +275,6 @@
       <Unit11>
         <Filename Value="units/blocs.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="blocs"/>
       </Unit11>
       <Unit12>
         <Filename Value="units/countermanager.pas"/>
@@ -312,7 +311,6 @@
       <Unit20>
         <Filename Value="units/trial_simple.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_simple"/>
       </Unit20>
       <Unit21>
         <Filename Value="forms/userconfigs_simple_discrimination_matrix.pas"/>
@@ -363,7 +361,6 @@
       <Unit31>
         <Filename Value="units/trial_dizzy_timers.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_dizzy_timers"/>
       </Unit31>
       <Unit32>
         <Filename Value="units/git_vertioning.pas"/>
