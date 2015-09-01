@@ -1,9 +1,11 @@
 object Form1: TForm1
-  Left = 476
-  Height = 240
-  Top = 181
-  Width = 320
+  Left = 208
+  Height = 404
+  Top = 124
+  Width = 879
   Caption = 'Form1'
+  OnActivate = FormActivate
   OnKeyDown = FormKeyDown
+  OnPaint = FormPaint
   LCLVersion = '1.4.0.4'
 end
