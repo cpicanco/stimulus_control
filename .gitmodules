@@ -1,0 +1,9 @@
+[submodule "pupil"]
+	path = pupil
+	url = https://github.com/pupil-labs/pupil
+[submodule "pyv4l2"]
+	path = pyv4l2
+	url = https://github.com/pupil-labs/pyv4l2.git
+[submodule "pyglui"]
+	path = pyglui
+	url = https://github.com/pupil-labs/pyglui
