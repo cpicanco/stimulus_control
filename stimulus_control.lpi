@@ -228,10 +228,12 @@
         <ComponentName Value="bkgnd"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="background"/>
       </Unit1>
       <Unit2>
         <Filename Value="units/client.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="client"/>
       </Unit2>
       <Unit3>
         <Filename Value="units/draw_methods.pas"/>
@@ -259,6 +261,7 @@
         <ComponentName Value="BresenhamLineForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="userconfigs_trial_mirrored"/>
       </Unit7>
       <Unit8>
         <Filename Value="units/constants.pas"/>
@@ -318,6 +321,7 @@
         <ComponentName Value="MatrixForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="userconfigs_simple_discrimination_matrix"/>
       </Unit21>
       <Unit22>
         <Filename Value="forms/userconfigs_get_matrix.pas"/>
@@ -333,6 +337,7 @@
       <Unit24>
         <Filename Value="units/trial_abstract.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_abstract"/>
       </Unit24>
       <Unit25>
         <Filename Value="units/bass_player.pas"/>
@@ -361,11 +366,11 @@
       <Unit31>
         <Filename Value="units/trial_dizzy_timers.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_dizzy_timers"/>
       </Unit31>
       <Unit32>
         <Filename Value="units/git_vertioning.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="git_vertioning"/>
       </Unit32>
     </Units>
   </ProjectOptions>

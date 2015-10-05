@@ -52,3 +52,6 @@ tests/fancy_timer/lib/*
 tests/schedules/schedules_test
 tests/schedules/schedules_test.ico
 tests/schedules/lib/*
+tests/timing/timing
+tests/timing/timing.ico
+tests/timing/lib/*
