@@ -1,0 +1,52 @@
+object Form1: TForm1
+  Left = 401
+  Height = 416
+  Top = 200
+  Width = 438
+  Caption = 'Form1'
+  ClientHeight = 416
+  ClientWidth = 438
+  OnActivate = FormActivate
+  LCLVersion = '1.4.0.4'
+  object ListBox1: TListBox
+    Left = 0
+    Height = 416
+    Top = 0
+    Width = 163
+    Align = alLeft
+    ItemHeight = 0
+    ScrollWidth = 161
+    TabOrder = 0
+    TopIndex = -1
+  end
+  object ListBox2: TListBox
+    Left = 272
+    Height = 416
+    Top = 0
+    Width = 166
+    Align = alRight
+    Anchors = [akTop, akBottom]
+    ItemHeight = 0
+    ScrollWidth = 164
+    TabOrder = 1
+    TopIndex = -1
+  end
+  object Button1: TButton
+    Left = 176
+    Height = 25
+    Top = 8
+    Width = 75
+    Caption = 'Monotonic'
+    OnClick = Button1Click
+    TabOrder = 2
+  end
+  object Button2: TButton
+    Left = 176
+    Height = 25
+    Top = 40
+    Width = 75
+    Caption = 'Mono Raw'
+    OnClick = Button2Click
+    TabOrder = 3
+  end
+end
