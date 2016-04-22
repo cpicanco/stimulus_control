@@ -68,45 +68,30 @@ end;
 
 procedure Tbkgnd.SetFullScreen(TurnOn: Boolean);
 begin
+
   if TurnOn then
     begin
-      // To full screen
-      FOriginalWindowState := WindowState;
-      FOriginalBounds := BoundsRect;
-
-      BorderStyle := bsNone;
-      FScreenBounds := Screen.MonitorFromWindow(Handle).BoundsRect;
-    with FScreenBounds do
-      SetBounds(Left, Top, Right - Left, Bottom - Top);
-      {$IFDEF WINDOWS}
-        Application.TaskBarBehavior := tbDefault;
+      //fullscreen true
+      {$IFDEF MSWINDOWS}
+      // to do
       {$ENDIF}
 
-      {$IFDEF LCLGTK2}
-      gdk_window_fullscreen(PGtkWidget(Self.Handle)^.window);
+      {$IFDEF LINUX}
+      WindowState := wsFullScreen;
       {$ENDIF}
     end
   else
     begin
+      //fullscreen false
       {$IFDEF MSWINDOWS}
-      BorderStyle := bsSizeable;
+      // to do
       {$ENDIF}
-
-      if FOriginalWindowState = wsMaximized then
-        WindowState := wsMaximized
-      else
-        with FOriginalBounds do
-          SetBounds(Left, Top, Right - Left, Bottom - Top);
 
       {$IFDEF LINUX}
-      BorderStyle := bsSizeable;
-      {$ENDIF}
-
-      {$IFDEF LCLGTK2}
-      gdk_window_unfullscreen(PGtkWidget(Self.Handle)^.window);
+      WindowState := wsNormal;
       {$ENDIF}
     end;
-  FFullScreen := TurnOn;
+    FFullScreen := TurnOn;
 end;
 
 end.

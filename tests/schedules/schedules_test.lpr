@@ -28,7 +28,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms,
+  Forms, tachartlazaruspkg,
 
   main_form,
   cumulative_record

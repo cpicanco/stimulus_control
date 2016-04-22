@@ -1201,7 +1201,6 @@ begin
   StringGrid1.ColCount := 9;
   Caption := Application.Title;
   stAppTitle.Caption := Application.Title;
-  stVersion.Caption := CurrentVersion(GetCommitTag());
   MemoAppInfo.Lines.Append('Stimulus Control App.');
   MemoAppInfo.Lines.Append('Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.');
   MemoAppInfo.Lines.Append('');

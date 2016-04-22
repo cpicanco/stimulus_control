@@ -1,7 +1,7 @@
 object FormSchedules: TFormSchedules
-  Left = 321
+  Left = 538
   Height = 331
-  Top = 191
+  Top = 119
   Width = 560
   ActiveControl = ListBoxSchedules
   Caption = 'Schedules of Reinforcement'
@@ -156,6 +156,10 @@ object FormSchedules: TFormSchedules
   object MainMenu1: TMainMenu
     left = 32
     top = 216
+    object miAlgorithmTest: TMenuItem
+      Caption = 'Algorith Test'
+      OnClick = miAlgorithmTestClick
+    end
     object miAbout: TMenuItem
       Caption = 'About'
       OnClick = miAboutClick

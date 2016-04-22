@@ -1,14 +1,14 @@
 object UserConfig: TUserConfig
-  Left = 359
-  Height = 469
-  Top = 116
+  Left = 455
+  Height = 478
+  Top = 158
   Width = 400
   HorzScrollBar.Page = 308
   VertScrollBar.Page = 102
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
   Caption = 'Configurar'
-  ClientHeight = 469
+  ClientHeight = 478
   ClientWidth = 400
   Constraints.MinHeight = 400
   Constraints.MinWidth = 400
@@ -1620,11 +1620,11 @@ object UserConfig: TUserConfig
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   ParentBiDiMode = False
-  LCLVersion = '1.4.0.4'
+  LCLVersion = '1.6.0.4'
   object btnRun: TButton
     Left = 8
     Height = 25
-    Top = 437
+    Top = 446
     Width = 64
     Anchors = [akLeft, akBottom]
     Caption = 'Rodar'
@@ -1648,7 +1648,7 @@ object UserConfig: TUserConfig
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 431
+    Height = 440
     Top = 0
     Width = 400
     ActivePage = tbTools
@@ -1728,7 +1728,7 @@ object UserConfig: TUserConfig
       object btnNextGeneral: TButton
         Left = 6
         Height = 25
-        Top = 390
+        Top = 399
         Width = 390
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Avançar'
@@ -1774,7 +1774,7 @@ object UserConfig: TUserConfig
       object btnNextStimuli: TButton
         Left = 6
         Height = 24
-        Top = 391
+        Top = 400
         Width = 389
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Avançar'
@@ -1788,9 +1788,9 @@ object UserConfig: TUserConfig
       ClientWidth = 396
       object StringGrid1: TStringGrid
         Left = 0
-        Height = 272
+        Height = 257
         Top = 110
-        Width = 401
+        Width = 394
         Align = alClient
         BorderSpacing.Top = 110
         BorderSpacing.Bottom = 40
@@ -1844,10 +1844,12 @@ object UserConfig: TUserConfig
         TabOrder = 2
       end
       object btnNextTrials: TButton
-        Left = 6
-        Height = 25
-        Top = 390
-        Width = 389
+        AnchorSideTop.Control = StringGrid1
+        AnchorSideTop.Side = asrBottom
+        Left = 5
+        Height = 26
+        Top = 381
+        Width = 387
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Avançar'
         OnClick = btnNextTrialsClick
@@ -1857,13 +1859,13 @@ object UserConfig: TUserConfig
         Left = 251
         Height = 51
         Top = 8
-        Width = 144
+        Width = 142
         Caption = 'Mostrar Repetições'
         ClientHeight = 32
         ClientWidth = 140
         TabOrder = 4
         object seCount: TSpinEdit
-          Left = 80
+          Left = 78
           Height = 25
           Top = 2
           Width = 50
@@ -1951,7 +1953,7 @@ object UserConfig: TUserConfig
       object btnSave: TButton
         Left = 8
         Height = 25
-        Top = 392
+        Top = 381
         Width = 384
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Salvar'
@@ -1960,9 +1962,9 @@ object UserConfig: TUserConfig
       end
       object Memo1: TMemo
         Left = 0
-        Height = 382
+        Height = 367
         Top = 0
-        Width = 401
+        Width = 394
         Align = alClient
         BorderSpacing.Bottom = 40
         TabOrder = 1
