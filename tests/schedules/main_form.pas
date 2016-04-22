@@ -26,10 +26,10 @@ unit main_form;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
+  StdCtrls, ExtCtrls
 
-, LCLIntf, LCLType, Menus
+, LCLIntf, LCLType, TAGraph, TASeries, TATypes, Menus
 
 , custom_timer
 , schedules_main
@@ -49,6 +49,7 @@ type
     lblResponseDelta: TLabel;
     ListBoxSchedules: TListBox;
     MainMenu1: TMainMenu;
+    miAlgorithmTest: TMenuItem;
     miAbout: TMenuItem;
     PanelClock: TPanel;
     PanelDelta: TPanel;
@@ -61,6 +62,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure ListBoxSchedulesClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
+    procedure miAlgorithmTestClick(Sender: TObject);
     procedure PanelOperandumMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
   private
@@ -145,6 +147,94 @@ begin
 
   with FormAbout do
     try
+      Width := 600;
+      Height := 320;
+      Position := poMainFormCenter;
+
+      if ShowModal = mrClose then
+        begin
+         // do nothing
+        end;
+    finally
+      Free;
+    end;
+end;
+
+procedure TFormSchedules.miAlgorithmTestClick(Sender: TObject);
+var
+  //hMin, hMax, hInterval,
+  i, x, y : integer;
+  FormChart : TForm;
+  aPlot : TChart;
+  aSerie : TLineSeries;
+  //Histogram : array of integer;
+  MeanResponse, Variation : integer;
+begin
+  // histogram
+
+  //hInterval := 5;
+  //
+  //SetLength(Histogram, hInterval);
+  //for i := Low(Histogram) to High(Histogram) do Histogram[i] := 0;
+  //
+  //for x := 0 to 1000 do
+  //  begin
+  //    y := MeanResponse - Variation + Random((2 * Variation) + 1);
+  //    if y = 0 then y := MeanResponse;
+  //    for i := Low(Histogram) to High(Histogram) do
+  //      begin
+  //        hMax := hInterval * (i + 1);
+  //        hMin := hMax - hInterval;
+  //        if (y >= hMin) and (y <= hMax) then Inc(Histogram[i]);
+  //      end
+  //  end;
+  //
+  //for x := Low(Histogram) to High(Histogram) do aSerie.AddXY(x, Histogram[i]);
+
+  FormChart := TForm.Create(nil);
+  aPlot := TChart.Create(FormChart);
+  aSerie := TLineSeries.Create(aPlot);
+
+  with aSerie do
+    begin
+      LineType := ltNone;
+      ShowPoints := True;
+      Pointer.HorizSize := 3;
+      Pointer.VertSize := 3;
+      Pointer.Style := psCircle;
+    end;
+
+  MeanResponse := 100;
+  Variation := 100;
+
+  for x := 0 to 500 do
+    begin
+      y := MeanResponse - Variation + Random((2 * Variation) + 1);
+      if y = 0 then y := MeanResponse;
+      aSerie.AddXY(x, y);
+    end;
+
+  with aPlot do
+    begin
+      Align := alClient;
+      AutoSize := True;
+      AxisList.Axes[0].Range.UseMin := True;
+      AxisList.Axes[0].Grid.Visible := False;
+      AxisList.Axes[0].Title.Visible := True;
+      AxisList.Axes[0].Title.Caption := 'Responses';
+
+      AxisList.Axes[1].Range.UseMin := True;
+      AxisList.Axes[1].Grid.Visible := False;
+      AxisList.Axes[1].Title.Visible := True;
+      AxisList.Axes[1].Title.Caption := 'Random Samples';
+
+      AddSeries(aSerie);
+      Parent := FormChart;
+    end;
+
+  with FormChart do
+    try
+      Caption := 'Returned Values over Random Sampling';
       Width := 600;
       Height := 320;
       Position := poMainFormCenter;

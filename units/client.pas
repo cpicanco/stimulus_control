@@ -151,6 +151,7 @@ begin
     {$ifdef NoClient}
       message := 'Pupil' + #10 + 'timestamp:' + 'NoClient is defined'+ #10;
     {$else}
+      FSubscriber.setRcvTimeout(1000);
       FSubscriber.recv( message );
     {$endif}
     except
@@ -160,7 +161,7 @@ begin
             FMsg := mt_Exception + 'Connection to server "' + FServerAddress + '" failed saying: ' + #10#10 + E.Message;
             Synchronize( @Showstatus );
           {$endif}
-          Exit; // Terminate;
+          //Exit; // The file "../nptl/sysdeps/unix/sysv/linux/raise.c" was not found.
         end;
     end;
 

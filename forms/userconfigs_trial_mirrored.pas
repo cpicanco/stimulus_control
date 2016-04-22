@@ -28,9 +28,6 @@ interface
 uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
      Dialogs, StdCtrls, Spin, Grids, ExtCtrls
 
-     {$IFDEF LCLGTK2}
-     , gtk2, gdk2, glib2
-     {$ENDIF}
      , draw_methods
      , math
      ;
@@ -145,7 +142,7 @@ procedure btnAddAxisClick(Sender: TObject);
     function GetPointFromAngle (aAngle : float) : TPoint;//standard or user defined distances?
     function GetCentralRect (aLeftBorderSpace, aTopBorderSpace, aRightBorderSpace, aBottomBorderSpace: integer) : TRect;
   public
-    procedure SetFullScreen(TurnOn: Boolean);
+    procedure ToggleFullScreen;
     property Axis : TAxisList read FAxis;
   end;
 
@@ -363,7 +360,7 @@ var
   i : integer;
 
 begin
-  SetFullScreen(True);
+  ToggleFullScreen;
 
   aWidth := Screen.MonitorFromWindow(Handle).Width;
   aHeight := Screen.MonitorFromWindow(Handle).Height;
@@ -721,48 +718,33 @@ begin
 end;
 
 
-procedure TBresenhamLineForm.SetFullScreen(TurnOn: Boolean);
+procedure TBresenhamLineForm.ToggleFullScreen;
 begin
-  if TurnOn then
-    begin
-      //fullscreen true
-      FOriginalWindowState := WindowState;
-      FOriginalBounds := BoundsRect;
+  { TODO 1 -oRafael -cdev : Update fullscreen behavior }
+  //BorderStyle := bsNone;
+  WindowState := wsFullScreen;
+  BoundsRect := Screen.MonitorFromWindow(Handle).BoundsRect;
 
-      BorderStyle := bsNone;
-      FScreenBounds := Screen.MonitorFromWindow(Handle).BoundsRect;
-    with FScreenBounds do
-      SetBounds(Left, Top, Right - Left, Bottom - Top);
-      {$IFDEF WINDOWS}
-        Application.TaskBarBehavior := tbDefault;
-      {$ENDIF}
-
-      {$IFDEF LCLGTK2}
-      gdk_window_fullscreen(PGtkWidget(Self.Handle)^.window);
-      {$ENDIF}
-    end
-  else
-    begin
-      //fullscreen false
-      {$IFDEF MSWINDOWS}
-      BorderStyle := bsSizeable;
-      {$ENDIF}
-
-      if FOriginalWindowState = wsMaximized then
-        WindowState := wsMaximized
-      else
-        with FOriginalBounds do
-          SetBounds(Left, Top, Right - Left, Bottom - Top);
-
-      {$IFDEF LINUX}
-      BorderStyle := bsSizeable;
-      {$ENDIF}
-
-      {$IFDEF LCLGTK2}
-      gdk_window_unfullscreen(PGtkWidget(Self.Handle)^.window);
-      {$ENDIF}
-    end;
-  FFullScreen := TurnOn;
+  //if BorderStyle <> bsNone then begin
+  //  // To full screen
+  //  FOriginalWindowState := WindowState;
+  //  FOriginalBounds := BoundsRect;
+  //
+  //  BorderStyle := bsNone;
+  //  BoundsRect := Screen.MonitorFromWindow(Handle).BoundsRect;
+  //end else begin
+  //  // From full screen
+  //  {$IFDEF MSWINDOWS}
+  //  FBorderStyle := bsSizeable;
+  //  {$ENDIF}
+  //  if FOriginalWindowState = wsMaximized then
+  //    WindowState := wsMaximized
+  //  else
+  //    BoundsRect := FOriginalBounds;
+  //  {$IFDEF LINUX}
+  //  BorderStyle := bsSizeable;
+  //  {$ENDIF}
+  //end;
 end;
 
 end.

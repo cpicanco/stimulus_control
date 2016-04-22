@@ -394,6 +394,7 @@ begin
       Mode := Copy(s1, 0, pos(#32, s1)-1);
       Mode := UpperCase(Mode);
 
+      // return a number greater than min and lower or equal to max
       Main := Random(Max - Min) + Min + 1;
       Host := Random(((2 * Main) div 3) - (Main div 3)) + (Main div 3) + 1;
 
