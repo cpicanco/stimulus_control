@@ -1,0 +1,83 @@
+object Form1: TForm1
+  Left = 577
+  Height = 272
+  Top = 169
+  Width = 348
+  BorderStyle = bsDialog
+  Caption = 'timestamp comparison'
+  ClientHeight = 272
+  ClientWidth = 348
+  Constraints.MinHeight = 197
+  Constraints.MinWidth = 343
+  Position = poDesktopCenter
+  LCLVersion = '1.6.0.4'
+  object btnRequestTimestamp: TButton
+    Left = 2
+    Height = 26
+    Top = 142
+    Width = 227
+    Caption = 'request timestamp'
+    OnClick = btnRequestTimestampClick
+    TabOrder = 0
+  end
+  object btnGetTimestamp: TButton
+    Left = 2
+    Height = 26
+    Top = 115
+    Width = 227
+    Caption = 'get timestamp'
+    OnClick = btnGetTimestampClick
+    TabOrder = 1
+  end
+  object ltbTimestamps: TListBox
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 236
+    Height = 272
+    Top = 0
+    Width = 112
+    Anchors = [akTop, akRight, akBottom]
+    ItemHeight = 0
+    ScrollWidth = 110
+    TabOrder = 2
+    TopIndex = -1
+  end
+  object lblDescription: TLabel
+    Left = 2
+    Height = 105
+    Top = 1
+    Width = 227
+    Caption = 'Limitations:'#10'1) Pupil Remote is deprecated;'#10'2) This program and Pupil Remote'#10'must be running at the same machine; '#10'3) This program will generate insane'#10'timestamps if Pupil Sync is running'#10'(with multiple nodes).'
+    ParentColor = False
+  end
+  object btnRequestRawTimestamp: TButton
+    Left = 2
+    Height = 26
+    Top = 170
+    Width = 227
+    Caption = 'request raw timestamp'
+    OnClick = btnRequestTimestampClick
+    TabOrder = 3
+  end
+  object btnRequestStartRecording: TButton
+    Left = 2
+    Height = 26
+    Top = 196
+    Width = 227
+    Caption = 'request start recording'
+    OnClick = btnRequestTimestampClick
+    TabOrder = 4
+  end
+  object btnRequestStopRecording: TButton
+    Left = 2
+    Height = 26
+    Top = 224
+    Width = 227
+    Caption = 'request stop recording'
+    OnClick = btnRequestTimestampClick
+    TabOrder = 5
+  end
+end
