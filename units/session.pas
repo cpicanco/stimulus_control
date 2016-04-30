@@ -34,6 +34,8 @@ uses Classes, Controls, SysUtils, LCLIntf
      , regdata
      , blocs
      , timestamps_logger
+     , timestamp
+     , client
      ;
 
 type
@@ -52,6 +54,19 @@ type
     FCrtReached : Boolean;
     FDataTicks: Boolean;
     FManager : TCounterManager;
+    FClientThread : TClientThread;
+
+    FRegData: TRegData;
+    FRegDataTicks: TRegData;
+    FTimestampsData : TRegData;
+    FServerAddress: string;
+    FSessName: string;
+    FShowCounter : Boolean;
+    FSubjName: string;
+    FTestMode: Boolean;
+    FTimeStart : Extended;
+
+    // events
     FOnBkGndResponse: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
     FOnEndBlc: TNotifyEvent;
@@ -60,15 +75,7 @@ type
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
-    FRegData: TRegData;
-    FRegDataTicks: TRegData;
-    FTimestampsData : TRegData;
-    FServerAddress: string;
-    FSessName: String;
-    FShowCounter : Boolean;
-    FSubjName: String;
-    FTestMode: Boolean;
-    FTimeStart : cardinal;
+
     procedure BkGndResponse(Sender: TObject);
     procedure BlcEndBlc(Sender: TObject);
     procedure Consequence(Sender: TObject);
@@ -137,6 +144,8 @@ end;
 
 procedure TSession.EndSess(Sender: TObject);
 begin
+  FClientThread.SendRequest('pupil_stop_recording',-1,'r');
+  //Sleep(1000);
   FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + LineEnding);
 
   if DataTicks then
@@ -213,10 +222,11 @@ begin
   FCfgSes := nil;
 
   //internal objects
+  FClientThread.Terminate;
   if Assigned(FRegData) then FreeAndNil(FRegData);
   if Assigned(FRegDataTicks) then FreeAndNil(FRegDataTicks);
   if Assigned(FBlc) then FreeAndNil(FBlc);
-  inherited Destroy;
+  inherited;
 end;
 
 procedure TSession.DoEndSess(Sender: TObject);
@@ -242,9 +252,6 @@ begin
 
   FRegData := TRegData.Create(nil, FCfgSes.RootData + FileData);
 
-  if DataTicks then
-    FRegDataTicks:= TRegData.Create(nil, FCfgSes.RootData + 'Ticks_000.txt');
-
   {
     File writing operations are called from a different thread.
   }
@@ -254,9 +261,6 @@ begin
 
   FBlc.ShowCounter := ShowCounter;
   FBlc.RegData:= FRegData;
-  FBlc.ServerAddress:= FServerAddress;
-  if DataTicks then
-    FBlc.RegDataTicks := FRegDataTicks;
   FBlc.BackGround:= FBackGround;
 
   FRegData.SaveData('Sujeito:' + #9 + FSubjName + LineEnding +
@@ -264,15 +268,23 @@ begin
                     'Data:' + #9 + DateTimeToStr(Date)+ LineEnding +
                     'Hora de Início:' + #9 + TimeToStr(Time)+ LineEnding + LineEnding);
 
-  FTimeStart := GetTickCount;
-  FBlc.TimeStart := FTimeStart;
-
   if DataTicks then
-    FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + LineEnding +
+    begin
+      FRegDataTicks:= TRegData.Create(nil, FCfgSes.RootData + 'Ticks_000.txt');
+      FBlc.RegDataTicks := FRegDataTicks;
+      FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + LineEnding +
                     'Sessão:' + #9+ FSessName + LineEnding +
                     'Data:' + #9 + DateTimeToStr(Date) + LineEnding +
                     'Hora de Início:' + #9 + TimeToStr(Time)+ LineEnding + LineEnding);
 
+    end;
+
+  FClientThread := TClientThread.Create(FServerAddress);
+  FBlc.SetClientThread(FClientThread);
+  FClientThread.Start;
+  FClientThread.SendRequest('pupil_start_recording',-1,'R');
+  FTimeStart := GetCustomTick;
+  FBlc.TimeStart := FTimeStart;
   FManager.OnBeginSess(Self);
 
   PlayBlc(Self);

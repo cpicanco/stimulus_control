@@ -33,16 +33,17 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     , draw_methods
     , schedules_main
     , response_key
+    , timestamp
     ;
 
 type
 
   { TMRD }
   TDataSupport = record
-    Latency : cardinal;
     Responses : integer;
-    StmBegin : cardinal;
-    StmEnd : cardinal;
+    Latency,
+    StmBegin,
+    StmEnd : Extended;
   end;
 
   TMRD = Class(TTrial)
@@ -121,7 +122,7 @@ end;
 
 procedure TMRD.Consequence(Sender: TObject);
 begin
-  CreateClientThread('C:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+  SendRequest('C:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 
   TrialResult(Sender);
@@ -169,9 +170,9 @@ begin
 end;
 
 procedure TMRD.KeyUp(var Key: Word; Shift: TShiftState);
-var TickCount : cardinal;
+var TickCount : Extended;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetCustomTick;
   inherited KeyUp(Key, Shift);
   if Key = 27 {ESC} then
     begin
@@ -187,13 +188,13 @@ begin
             begin
               //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
               FDataSupport.Latency := TickCount;
-              CreateClientThread('*R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+              SendRequest('*R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
               FShowStarter := False;
               Invalidate;
               StartTrial(Self);
             end;
         end
-      else CreateClientThread('R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+      else SendRequest('R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
     end;
 end;
 
@@ -367,14 +368,14 @@ begin
 
   FCanResponse := True;
   Invalidate;
-  FDataSupport.StmBegin := GetTickCount;
+  FDataSupport.StmBegin := GetCustomTick;
 
   inherited StartTrial(Sender);
 end;
 
 procedure TMRD.BeginStarter;
 begin
-  CreateClientThread('S:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+  SendRequest('S:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
   FCanResponse:= True;
   Invalidate;
 end;
@@ -423,7 +424,7 @@ begin
   FCanResponse := False;
   Hide;
 
-  FDataSupport.StmEnd := GetTickCount;
+  FDataSupport.StmEnd := GetTickCount64;
   FCircles.Result := Result;
 
   if Result = T_HIT then Hit(Sender);
@@ -452,9 +453,9 @@ begin
 end;
 
 procedure TMRD.Response(Sender: TObject);
-var TickCount : cardinal;
+var TickCount : Extended;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetCustomTick;
   Inc(FDataSupport.Responses);
 
   if FFirstResp then

@@ -56,7 +56,7 @@ type
     BackgroundResponseCount : integer;
     Latency,
     StmBegin,
-    StmEnd : cardinal;
+    StmEnd : Extended;
     BkGndMsg,
     CompMsg,
     Rs232Code : string;
@@ -258,7 +258,7 @@ end;
 procedure TSimpl.TrialResult(Sender: TObject);
 var TickCount : cardinal;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetTickCount64;
   if FResponseEnabled then
     begin
       Hide;
@@ -347,7 +347,7 @@ begin
   FFirstResp := False;
   FResponseEnabled := True;
 
-  FDataSupport.StmBegin := GetTickCount;
+  FDataSupport.StmBegin := GetTickCount64;
   inherited StartTrial(Sender);
 end;
 
@@ -498,7 +498,7 @@ var
     TickCount : cardinal;
     aTime, aCode, aStimulus, aLeft, aTop : string;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetTickCount64;
   inherited MouseDown(Button,Shift, X, Y);
 
   aTime := FormatFloat('00000000;;00000000', TickCount - TimeStart);
@@ -541,7 +541,7 @@ var
     TickCount : cardinal;
     aTime, aCode, aStimulus, aLeft, aTop : string;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetTickCount64;
   if FResponseEnabled then
     begin
       aTime := FormatFloat('00000000;;00000000', TickCount - TimeStart);

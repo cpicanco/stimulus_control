@@ -80,7 +80,7 @@ implementation
 constructor TClockThread.Create(CreateSuspended: Boolean);
 begin
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'TClockThread.Create at:' + TimeToStr(Time) + TimeSeparator + IntToStr(GetTickCount));
+    DebugLn(mt_Debug + 'TClockThread.Create at:' + TimeToStr(Time) + ':' + IntToStr(GetTickCount64));
   {$endif}
   FreeOnTerminate := True;
   FInterval := 1000;

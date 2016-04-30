@@ -32,16 +32,17 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     , schedules_main
     , response_key
     , custom_timer
+    , timestamp
     ;
 
 type
 
   TDataSupport = record
-    Cycle : cardinal;
-    Latency : cardinal;
     Responses : integer;
-    StmBegin : cardinal;
-    Timer2 : cardinal;
+    Cycle,
+    Latency,
+    StmBegin,
+    Timer2 : Extended;
   end;
 
   TDizzyTimer = record
@@ -157,7 +158,7 @@ begin
   aConsequence.FullPath := RootMedia + FConsequence;
   aConsequence.Play;
 
-  CreateClientThread('C:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+  SendRequest('C:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
 
@@ -170,9 +171,9 @@ begin
 end;
 
 procedure TDZT.UpdateTimer1(Sender: TObject);
-var TickCount : cardinal;
+var TickCount : Extended;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetCustomTick;
   FDataSupport.Cycle := TickCount;
   Inc(FCycles);
 
@@ -203,13 +204,11 @@ begin
     if FDizzyTimer.Mode = 'B' then
       if FSchedule.Kind = T_EXT then
         begin
-           FSchedule.Kind := FDizzyTimer.Schedule;
-           CreateClientThread('1:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+          FSchedule.Kind := FDizzyTimer.Schedule;
         end
       else
         begin
           FSchedule.Kind := T_EXT;
-          CreateClientThread('2:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
         end;
 
   Invalidate;
@@ -219,31 +218,41 @@ begin
 end;
 
 procedure TDZT.UpdateTimer2(Sender: TObject);
-var TickCount : cardinal;
+var
+    TickCount : Extended;
+    ACode : string;
 begin
   TClockThread(Sender).Enabled := False;
-  TickCount := GetTickCount;
-  FDataSupport.Timer2 := TickCount;
-
-  if TClockThread(Sender) = FDizzyTimer.Timer2 then
-    begin
-      FDizzyTimer.Color2 := not FDizzyTimer.Color2;
-      CreateClientThread('3:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
-    end;
 
   if TClockThread(Sender) = FDizzyTimer.Timer1 then
     begin
       FDizzyTimer.Color1 := not FDizzyTimer.Color1;
-      CreateClientThread('4:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+      if FDizzyTimer.Color1 then
+        ACode := '1a'
+      else
+        ACode := '1b';
     end;
+
+  if TClockThread(Sender) = FDizzyTimer.Timer2 then
+    begin
+      FDizzyTimer.Color2 := not FDizzyTimer.Color2;
+      if FDizzyTimer.Color2 then
+        ACode := '2a'
+      else
+        ACode := '2b';
+    end;
+
+  TickCount := GetCustomTick;
+  FDataSupport.Timer2 := TickCount;
+  SendRequest(ACode + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
 
   Invalidate;
 end;
 
 procedure TDZT.ThreadClock(Sender: TObject);
-var TickCount : cardinal;
+var TickCount : Extended;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetCustomTick;
   FDataSupport.Cycle := TickCount;
   FDataSupport.Timer2 := TimeStart;
   TrialResult(Sender);
@@ -262,10 +271,10 @@ begin
 end;
 
 procedure TDZT.KeyUp(var Key: Word; Shift: TShiftState);
-var TickCount : cardinal;
+var TickCount : Extended;
 begin
   //inherited KeyUp(Key, Shift);
-  TickCount := GetTickCount;
+  TickCount := GetCustomTick;
 
   if FResponseEnabled then
     begin
@@ -274,11 +283,11 @@ begin
           FSchedule.DoResponse;
           if FFirstResp then
             begin
-              CreateClientThread('*R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+              SendRequest('*R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
               FFirstResp := False;
               FDataSupport.Latency := TickCount;
             end
-          else CreateClientThread('R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+          else SendRequest('R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
         end;
     end;
 
@@ -307,7 +316,7 @@ const
   clRed : integer = $FF0000;
   clGreen : integer = $00FF00;
   clBlue : integer = $0000FF;
-  clYellow : integer = $FFFF00;
+  clCiano : integer = $FFFF00;
 begin
   inherited Paint;
   if FResponseEnabled then
@@ -322,7 +331,7 @@ begin
 
       if FDizzyTimer.Color2 then
         Canvas.Pen.Color := clGreen
-      else Canvas.Pen.Color := clYellow;
+      else Canvas.Pen.Color := clCiano;
 
       Canvas.Brush.Color := Canvas.Pen.Color;
       Canvas.Ellipse(FStimuli[1]);
@@ -468,7 +477,7 @@ end;
 
 procedure TDZT.StartTrial(Sender: TObject);
 var
-  TickCount : cardinal;
+  TickCount : Extended;
 
   procedure KeyStart(var aKey : TKey);
   begin
@@ -478,7 +487,7 @@ var
 
 begin
   FFirstResp := True;
-  TickCount := GetTickCount;
+  TickCount := GetCustomTick;
 
   with FDataSupport do
     begin
@@ -490,7 +499,7 @@ begin
   FResponseEnabled := True;
   Invalidate;
   FDataSupport.StmBegin := TickCount;
-  CreateClientThread('S:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+  SendRequest('S:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
   inherited StartTrial(Sender);
 end;
 
@@ -500,11 +509,11 @@ var
     Latency, Timer2, Version, Mode : string;
 begin
   if not FFirstResp then
-    Latency := FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart)
+    Latency := FloatToStrF(FDataSupport.Latency - TimeStart,ffFixed,0,9)
   else Latency := #32#32#32#32#32#32 + 'NA';
 
   if FDataSupport.Timer2 <> TimeStart then
-    Timer2 :=  FormatFloat('00000000;;00000000',FDataSupport.Timer2 - TimeStart)
+    Timer2 :=  FloatToStrF(FDataSupport.Timer2 - TimeStart,ffFixed,0,9)
   else Timer2 := #32#32#32#32#32#32 + 'NA';
 
   Version := FDizzyTimer.Version;
@@ -523,9 +532,9 @@ begin
              ;
 
   }
-  Data :=  FormatFloat('00000000;;00000000', FDataSupport.StmBegin - TimeStart) + #9 +
+  Data :=  FloatToStrF(FDataSupport.StmBegin - TimeStart,ffFixed,0,9) + #9 +
            Latency + #9 +
-           FormatFloat('00000000;;00000000', FDataSupport.Cycle - TimeStart) + #9 +
+           FloatToStrF(FDataSupport.Cycle - TimeStart, ffFixed,0,0) + #9 +
            Timer2 + #9 +
            Version + #9 +
            Mode + #9 +
@@ -544,7 +553,7 @@ begin
   FResponseEnabled := False;
   Hide;
 
-  CreateClientThread('E:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+  SendRequest('E:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
   if Result = T_HIT then Hit(Sender);
   if Result = T_MISS then  Miss(Sender);
   if Result = T_NONE then  None(Sender);

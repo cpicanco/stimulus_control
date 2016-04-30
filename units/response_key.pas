@@ -26,7 +26,7 @@ unit response_key;  // media_key may be a good name
 interface
 
 uses LCLIntf, LCLType, SysUtils, Variants, Classes,
-     Graphics, Controls, Forms, ExtCtrls, FileUtil
+     Graphics, Controls, Forms, ExtCtrls, LazFileUtils
 
     , Dialogs
     , bass_player
@@ -190,7 +190,7 @@ procedure TKey.Paint;
         end;
     end;
 begin
-  if FileExistsUTF8(Self.FullPath) { *Converted from FileExists*  } then
+  if FileExists(Self.FullPath) { *Converted from FileExists*  } then
     begin
       if (FKind.stmImage = stmPicture) then PaintFBitMap;
       if (FKind.stmImage = stmAnimation) then ;//FGifImage.Visible := True;
@@ -448,21 +448,21 @@ begin
           // we will load the image here
           s1:= Path;
           Delete(s1, pos(Copy(Path,Length(Path)- 3,4),s1), 4);
-          if FileExistsUTF8(s1 + '.BMP') { *Converted from FileExists*  } then
+          if FileExists(s1 + '.BMP') { *Converted from FileExists*  } then
             begin
               Create_IMG;
               s2:= s1 + '.BMP';
               Load_BMP(True)
             end;
 
-          if FileExistsUTF8(s1 + '.JPG') { *Converted from FileExists*  } then
+          if FileExists(s1 + '.JPG') { *Converted from FileExists*  } then
             begin
               Create_IMG;
               s2:= s1 + '.JPG';
               Load_JPG(True)
             end;
 
-          if FileExistsUTF8(s1 + '.GIF') { *Converted from FileExists*  } then
+          if FileExists(s1 + '.GIF') { *Converted from FileExists*  } then
             begin
               Create_GIF;
               s2:= s1 + '.GIF';

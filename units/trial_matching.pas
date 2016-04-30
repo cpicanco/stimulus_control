@@ -325,7 +325,7 @@ end;
 procedure TMTS.Response(Sender: TObject);
 var TickCount : cardinal;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetTickCount64;
   //ShowMessage(Sender.ClassName);
   if FFlagResp then
     begin
@@ -582,7 +582,7 @@ end;
 procedure TMTS.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var TickCount : cardinal;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetTickCount64;
   inherited MouseDown(Button, Shift, X, Y);
   DataTicks := DataTicks +
              FormatFloat('####,####', TickCount - Ft) + #9 +
@@ -616,7 +616,7 @@ begin
     end;
   FFirstResp := False;
   FFlagResp := True;
-  Ft2 := GetTickCount;
+  Ft2 := GetTickCount64;
   //FTimerClock.Enabled := True;
 end;
 
@@ -636,13 +636,13 @@ begin
   Ft2 := 0;
   FLatCmp:= 0;
   FDurCmp := 0;
-  Ft := GetTickCount;
+  Ft := GetTickCount64;
   //FTimerClock.Enabled:= True;
 end;
 
 procedure TMTS.SConsequence(Sender: TObject);
 begin
-  FDurMod := GetTickCount;
+  FDurMod := GetTickCount64;
 
   FSupportS.Key.Stop;
   FSupportS.Key.Enabled:= False;
@@ -665,7 +665,7 @@ procedure TMTS.Consequence(Sender: TObject);
 begin
   If FFlagResp then begin
     FFlagResp := False;
-    FDurCmp := GetTickCount;
+    FDurCmp := GetTickCount64;
     //Self.Enabled := False;
 
     if (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) or
@@ -721,7 +721,7 @@ begin
     if FCanPassTrial then FTimerCsq.Enabled:= True else
       begin
         EndTrial(Sender);
-        Ft := GetTickCount;
+        Ft := GetTickCount64;
         FFlagResp:= True;
       end;
   end;

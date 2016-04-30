@@ -25,7 +25,7 @@ unit userconfigs;
 
 interface
 
-uses Classes, SysUtils, FileUtil, Forms, Controls,
+uses Classes, SysUtils, LazFileUtils, Forms, Controls,
      Graphics, Dialogs, ExtCtrls, types, StdCtrls,
      ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons
 
@@ -437,7 +437,7 @@ procedure TUserConfig.DebugStatus(Message: String);
 begin
   ShowMessage(Message);
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'zmq Client said:' + Message);
+    DebugLn(mt_Debug + 'response:' + Message);
   {$endif}
 end;
 
@@ -631,7 +631,7 @@ var
   end;
 
 begin
-  if FileExistsUTF8(edtTarget.Text) and FileExistsUTF8(edtContent.Text) then
+  if FileExists(edtTarget.Text) and FileExists(edtContent.Text) then
     begin
 
       // initialize  string lists
@@ -732,28 +732,30 @@ begin
 
   if not Assigned(FData) then
     begin
-      Filename := GetCurrentDirUTF8 + '/Test_000.timestamps';
+      Filename := GetCurrentDir + '/Test_000.timestamps';
       FData := TRegData.Create(Self, Filename);
-      Sleep(2000);
+      Sleep(1000);
     end;
 
-  Client := TClientThread.Create( -1, 'The Client is Working');
+  Client := TClientThread.Create(leServerAddress.Text);
   Client.OnShowStatus := @DebugStatus;
-  Client.ServerAddress := leServerAddress.Text;
 
   {$ifdef DEBUG}
   try
-  {$endif}
     Client.Start;
-  {$ifdef DEBUG}
+    Client.SendRequest('-1:teste', 0, 'R');
   except
     on E:exception do
       begin
         DebugLn(mt_Exception + E.Message );
       end;
   end;
+  {$else}
+    Client.Start;
+    Client.SendRequest('-1:teste', 0, 'R');
   {$endif}
   Sleep (1000);
+  Client.Terminate;
 end;
 
 procedure TUserConfig.btnExportStimulusClick(Sender: TObject);

@@ -41,7 +41,7 @@ procedure UpdateTimestampsFileName(NewFilename : string);
 
 implementation
 
-uses FileUtil, SysUtils;
+uses SysUtils;
 
 var
   Timestamps : TRegData;

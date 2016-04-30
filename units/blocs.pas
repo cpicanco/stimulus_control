@@ -36,6 +36,8 @@ uses Classes, Controls, LCLIntf, LCLType,
      , countermanager
      , custom_timer
      , trial_abstract
+     , timestamp
+     , client
 
         , trial_message
         , trial_simple
@@ -71,13 +73,14 @@ type
     FIsCorrection : Boolean;
 
     // Trial data
-    FLastData : string;
+    FDataTicks,
+    FLastData,
     FLastITIData : string;
-    FTimeStart : cardinal;
-    FFirstTrialBegin : cardinal;
-    FITIBegin : cardinal;
-    FITIEnd : cardinal;
-    FDataTicks : string;
+    FFirstTrialBegin,
+    FITIBegin,
+    FITIEnd,
+    FTimeStart : Extended;
+
 
     // Clock System
     FTimer : TClockThread;
@@ -86,6 +89,7 @@ type
     FTimerTO : TFakeTimer;
 
     // main objects/components
+    FClientThread: TClientThread;
     FBackGround: TWinControl;
     FBlc: TCfgBlc;
     FTrial: TTrial;
@@ -129,6 +133,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure SetClientThread(AClientThread:TClientThread);
     procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
@@ -136,7 +141,7 @@ type
     property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property ServerAddress : string read FServerAddress write FServerAddress;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
-    property TimeStart : cardinal read FTimeStart write FTimeStart;
+    property TimeStart : Extended read FTimeStart write FTimeStart;
   public
     property OnBeginCorrection: TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
@@ -191,6 +196,11 @@ begin
   inherited Destroy;
 end;
 
+procedure TBlc.SetClientThread(AClientThread: TClientThread);
+begin
+  FClientThread := AClientThread;
+end;
+
 procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
 begin
   FBlc:= CfgBlc;
@@ -220,7 +230,7 @@ begin
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
 
   IndTrial := FCounterManager.CurrentTrial.Counter;
-  if IndTrial = 0 then FFirstTrialBegin := GetTickCount;
+  if IndTrial = 0 then FFirstTrialBegin := GetCustomTick;
   if IndTrial < FBlc.NumTrials then
     begin
 
@@ -235,7 +245,6 @@ begin
       if Assigned(FTrial) then
         begin
           FTrial.CounterManager := FCounterManager;
-          FTrial.ServerAddress := FServerAddress;
           FTrial.TimeStart := FTimeStart;
           FTrial.Parent := FBackGround;
           FTrial.Align := AlClient;
@@ -247,6 +256,8 @@ begin
           FTrial.OnMiss := @Miss;
           FTrial.OnNone := @None;
           FTrial.CfgTrial := FBlc.Trials[IndTrial];
+          FTrial.SetClientThread(FClientThread);
+          // dependencies above
           FTrial.Visible := False;
           FTrial.Play(FTestMode, FIsCorrection);
           FTrial.Visible := True;
@@ -295,8 +306,8 @@ begin
 
   NewData := CountTr + #9 + NumTr + #9 + NameTr;
 
-  ITIData := FormatFloat('00000000;;00000000', FITIBegin - FTimeStart) + #9 +
-            FormatFloat('00000000;;00000000', FITIEND - FTimeStart);
+  ITIData := FloatToStrF(FITIBegin - FTimeStart, ffFixed,0,9) + #9 +
+            FloatToStrF(FITIEND - FTimeStart, ffFixed,0,9);
 
   // Check where it is coming from
   if Sender is TDZT then
@@ -325,7 +336,7 @@ begin
     end;
 
   if IsFirst then
-    ITIData := DoNotApply + #9 + FormatFloat('00000000;;00000000', FFirstTrialBegin - FTimeStart);
+    ITIData := DoNotApply + #9 + FloatToStrF(FFirstTrialBegin - FTimeStart,ffFixed,0,9);
 
   // write data
   Report := Report + NewData + #9 + ITIData + #9 + FTrial.Data + LineEnding;
@@ -334,7 +345,7 @@ begin
   FRegData.SaveData(Report);
 
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'ITI:' + FormatFloat('00000000;;00000000', (FITIEND - FTimeStart) - (FITIBegin - FTimeStart)));
+    DebugLn(mt_Debug + 'ITI:' + FloatToStrF((FITIEND - FTimeStart) - (FITIBegin - FTimeStart),ffFixed,0,9));
   {$endif}
 
   FDataTicks := FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  LineEnding;
@@ -463,7 +474,7 @@ begin
       FTimerTO.Interval:= FTrial.TimeOut;
       FTimerCsq.Interval:= csqDuration;
 
-      FITIBegin := GetTickCount;
+      FITIBegin := GetCustomTick;
     end;
 
   if FTrial.TimeOut > 0 then
@@ -489,7 +500,7 @@ begin
        DebugLn(mt_Debug +  'Time Condition 1');
      {$endif}
      TrialTerminate(Sender);
-     FITIEnd := GetTickCount; // Here it will be near to zero;
+     FITIEnd := GetCustomTick; // Here it will be near to zero;
      PlayTrial;
      Exit;
    end;
@@ -593,7 +604,7 @@ begin
         end
       else
         begin
-          FITIEnd := GetTickCount;
+          FITIEnd := GetCustomTick;
           FTimer.Enabled := False;
           TrialTerminate(Sender);
           PlayTrial;
@@ -619,7 +630,7 @@ begin
         end
       else
         begin
-          FITIEnd := GetTickCount;
+          FITIEnd := GetCustomTick;
           FTimer.Enabled := False;
           TrialTerminate(Sender);
           PlayTrial;
@@ -640,7 +651,7 @@ begin
           FCounterLabel.Free;
         end;
 
-      FITIEnd := GetTickCount;
+      FITIEnd := GetCustomTick;
       FTimer.Enabled := False;
       TrialTerminate(Sender);
       PlayTrial;
