@@ -42,6 +42,7 @@ type
   private
     FCfgTrial: TCfgTrial;
     FClientThread : TClientThread;
+    FClockThread : TClockThread;
     FCounterManager : TCounterManager;
     FData: string;
     FDataTicks: string;
@@ -54,7 +55,7 @@ type
     FRootMedia: string;
     FServerAddress: string;
     FTimeOut: Integer;
-    FTimeStart: cardinal;
+    FTimeStart: Extended;
     // events
     FOnBeginCorrection: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
@@ -66,7 +67,6 @@ type
     FOnNone: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
     FOnWriteTrialData: TNotifyEvent;
-    FClockThread : TClockThread;
   strict protected
     FClockList : array of TThreadMethod;
     FLimitedHold : integer;
@@ -83,9 +83,10 @@ type
     destructor Destroy; override;
     procedure DispenserPlusCall; virtual; abstract;
     procedure Play(TestMode: Boolean; Correction : Boolean); virtual; abstract;
-    procedure CreateClientThread(Code : string);
-    property CounterManager : TCounterManager read FCounterManager write FCounterManager;
+    procedure SendRequest(ACode : string);
+    procedure SetClientThread(AClientThread:TClientThread);
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
+    property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property Data: string read FData write FData;
     property DataTicks: string read FDataTicks write FDataTicks;
     property FileName : string read FFilename write FFilename;
@@ -93,11 +94,6 @@ type
     property HeaderTicks: string read FHeaderTicks write FHeaderTicks;
     property IETConsequence : string read FIETConsequence write FIETConsequence;
     property NextTrial: string read FNextTrial write FNextTrial;
-    property Result: string read FResult write FResult;
-    property RootMedia : string read FRootMedia write FRootMedia;
-    property ServerAddress : string read FServerAddress write FServerAddress;
-    property TimeOut : Integer read FTimeOut write FTimeOut;
-    property TimeStart : cardinal read FTimeStart write FTimeStart;
     property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse: TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
@@ -108,6 +104,12 @@ type
     property OnNone: TNotifyEvent read FOnNone write FOnNone;
     property OnStmResponse: TNotifyEvent read FOnStmResponse write FOnStmResponse;
     property OnWriteTrialData: TNotifyEvent read FOnWriteTrialData write FOnWriteTrialData;
+    property Result: string read FResult write FResult;
+    property RootMedia : string read FRootMedia write FRootMedia;
+    property ServerAddress : string read FServerAddress write FServerAddress;
+    property TimeOut : Integer read FTimeOut write FTimeOut;
+    property TimeStart : Extended read FTimeStart write FTimeStart;
+
   end;
 
 implementation
@@ -118,12 +120,15 @@ uses debug_logger;
 
 { TTrial }
 
-procedure TTrial.CreateClientThread(Code: string);
+procedure TTrial.SendRequest(ACode: string);
 begin
-  FClientThread := TClientThread.Create( FCfgTrial.Id, Code);
+  FClientThread.SendRequest(ACode,FCfgTrial.Id);
+end;
+
+procedure TTrial.SetClientThread(AClientThread: TClientThread);
+begin
+  FClientThread := AClientThread;
   FClientThread.OnShowStatus := @ClientStatus;
-  FClientThread.ServerAddress := FServerAddress;
-  FClientThread.Start;
 end;
 
 procedure TTrial.ClientStatus(msg: string);

@@ -111,7 +111,7 @@ begin
   if FResponseEnabled then
     if not (FLimitedHold > 0) then
       begin
-        FDataSupport.TrialEnd := GetTickCount;
+        FDataSupport.TrialEnd := GetTickCount64;
         WriteData(Self);
         EndTrial(Sender);
       end;
@@ -124,7 +124,7 @@ begin
     if not (FLimitedHold > 0) then
       if (ssCtrl in Shift) and (Key = 32) then
         begin
-          FDataSupport.TrialEnd := GetTickCount;
+          FDataSupport.TrialEnd := GetTickCount64;
           WriteData(Self);
           EndTrial(Self);
         end;
@@ -182,7 +182,7 @@ procedure TMSG.StartTrial(Sender: TObject);
 begin
   FResponseEnabled := True;
   Invalidate;
-  FDataSupport.TrialBegin := GetTickCount;
+  FDataSupport.TrialBegin := GetTickCount64;
   inherited StartTrial(Sender);
 end;
 
@@ -210,7 +210,7 @@ procedure TMSG.ThreadClock(Sender: TObject);
 begin
   if FResponseEnabled then
     begin
-      FDataSupport.TrialEnd := GetTickCount;
+      FDataSupport.TrialEnd := GetTickCount64;
       WriteData(Sender);
       EndTrial(Sender);
     end;

@@ -1,10 +1,10 @@
 object UserConfig: TUserConfig
-  Left = 455
+  Left = 448
   Height = 478
-  Top = 158
+  Top = 160
   Width = 400
-  HorzScrollBar.Page = 308
-  VertScrollBar.Page = 102
+  HorzScrollBar.Page = 289
+  VertScrollBar.Page = 276
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
   Caption = 'Configurar'
@@ -1620,6 +1620,7 @@ object UserConfig: TUserConfig
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   ParentBiDiMode = False
+  Position = poDesktopCenter
   LCLVersion = '1.6.0.4'
   object btnRun: TButton
     Left = 8
@@ -1632,10 +1633,10 @@ object UserConfig: TUserConfig
     TabOrder = 0
   end
   object chkPlayOnSecondMonitor: TCheckBox
-    Left = 72
-    Height = 24
-    Top = 437
-    Width = 112
+    Left = 74
+    Height = 21
+    Top = 448
+    Width = 95
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
     TabOrder = 1
@@ -1651,15 +1652,15 @@ object UserConfig: TUserConfig
     Height = 440
     Top = 0
     Width = 400
-    ActivePage = tbTools
+    ActivePage = tbGeneral
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 4
+    TabIndex = 0
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
-      ClientHeight = 400
-      ClientWidth = 396
+      ClientHeight = 407
+      ClientWidth = 394
       object leParticipant: TLabeledEdit
         Left = 6
         Height = 25
@@ -1726,9 +1727,9 @@ object UserConfig: TUserConfig
         Text = 'Sessão1'
       end
       object btnNextGeneral: TButton
-        Left = 6
+        Left = 5
         Height = 25
-        Top = 399
+        Top = 376
         Width = 390
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Avançar'
@@ -1752,7 +1753,7 @@ object UserConfig: TUserConfig
         EditLabel.Caption = 'Servidor (Pupil timestamps)'
         EditLabel.ParentColor = False
         TabOrder = 4
-        Text = '10.42.0.1:5020'
+        Text = 'localhost:5020'
       end
       object btnClientTest: TButton
         AnchorSideLeft.Control = leServerAddress
@@ -1769,12 +1770,12 @@ object UserConfig: TUserConfig
     end
     object tbStimuli: TTabSheet
       Caption = 'Estímulos'
-      ClientHeight = 400
-      ClientWidth = 396
+      ClientHeight = 407
+      ClientWidth = 394
       object btnNextStimuli: TButton
         Left = 6
         Height = 24
-        Top = 400
+        Top = 384
         Width = 389
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Avançar'
@@ -1784,8 +1785,8 @@ object UserConfig: TUserConfig
     end
     object tbTrials: TTabSheet
       Caption = 'Tentativas'
-      ClientHeight = 400
-      ClientWidth = 396
+      ClientHeight = 407
+      ClientWidth = 394
       object StringGrid1: TStringGrid
         Left = 0
         Height = 257
@@ -1861,8 +1862,8 @@ object UserConfig: TUserConfig
         Top = 8
         Width = 142
         Caption = 'Mostrar Repetições'
-        ClientHeight = 32
-        ClientWidth = 140
+        ClientHeight = 34
+        ClientWidth = 138
         TabOrder = 4
         object seCount: TSpinEdit
           Left = 78
@@ -1923,7 +1924,7 @@ object UserConfig: TUserConfig
         Top = 8
         Width = 144
         Caption = 'Grupo de Tentativas'
-        ClientHeight = 32
+        ClientHeight = 34
         ClientWidth = 140
         TabOrder = 7
         object cbDrawTrialGroup: TCheckBox
@@ -1948,8 +1949,8 @@ object UserConfig: TUserConfig
     end
     object tbSave: TTabSheet
       Caption = 'Salvar'
-      ClientHeight = 400
-      ClientWidth = 396
+      ClientHeight = 407
+      ClientWidth = 394
       object btnSave: TButton
         Left = 8
         Height = 25
@@ -1972,16 +1973,16 @@ object UserConfig: TUserConfig
     end
     object tbTools: TTabSheet
       Caption = 'Ferramentas'
-      ClientHeight = 400
-      ClientWidth = 396
+      ClientHeight = 407
+      ClientWidth = 394
       object btnTargetFile: TButton
         AnchorSideLeft.Control = tbTools
         AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 25
-        Top = 272
-        Width = 391
+        Top = 255
+        Width = 389
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Right = 5
         Caption = 'Arquivo alvo'
@@ -1993,9 +1994,9 @@ object UserConfig: TUserConfig
         AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 27
-        Top = 248
-        Width = 396
+        Height = 25
+        Top = 231
+        Width = 394
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 1
         Text = 'alvo'
@@ -2006,8 +2007,8 @@ object UserConfig: TUserConfig
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 25
-        Top = 344
-        Width = 396
+        Top = 327
+        Width = 394
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Novas configurações'
         OnClick = btnClick
@@ -2018,9 +2019,9 @@ object UserConfig: TUserConfig
         AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 27
-        Top = 320
-        Width = 396
+        Height = 25
+        Top = 303
+        Width = 394
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 3
         Text = 'conteúdo'
@@ -2031,8 +2032,8 @@ object UserConfig: TUserConfig
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 33
-        Top = 381
-        Width = 396
+        Top = 371
+        Width = 394
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Aplicar novas configurações ao arquivo alvo'
         OnClick = btnApplyClick
@@ -2050,8 +2051,8 @@ object UserConfig: TUserConfig
     end
     object tbVersion: TTabSheet
       Caption = 'Sobre o programa'
-      ClientHeight = 400
-      ClientWidth = 396
+      ClientHeight = 407
+      ClientWidth = 394
       object Image1: TImage
         Left = 263
         Height = 128
@@ -3721,10 +3722,10 @@ object UserConfig: TUserConfig
     end
   end
   object cbDataTicks: TCheckBox
-    Left = 180
-    Height = 24
-    Top = 437
-    Width = 123
+    Left = 182
+    Height = 21
+    Top = 448
+    Width = 107
     Anchors = [akLeft, akBottom]
     Caption = 'Registrar ticks'
     TabOrder = 3

@@ -25,7 +25,7 @@ unit regdata;
 
 interface
 
-uses SysUtils, Classes, FileUtil
+uses SysUtils, Classes, LazFileUtils
     //, Dialogs
     ;
 

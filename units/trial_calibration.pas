@@ -33,6 +33,8 @@ uses LCLIntf, Classes, SysUtils
 
 type
 
+  { TODO -oRafael -ccalibration : Implement self driven calibration. }
+
   TDot = record
     X : integer;
     Y : integer;
@@ -94,13 +96,13 @@ begin
   { This trial type does not requires a timer }
   //inherited StartTrial(Sender);
   FShowDots := True;
-  FCurrTrial.StmBegin := GetTickCount;
+  FCurrTrial.StmBegin := GetTickCount64;
 end;
 
 procedure TCLB.EndTrial(Sender: TObject);
 begin
   Hide;
-  FCurrTrial.StmEnd := GetTickCount;
+  FCurrTrial.StmEnd := GetTickCount64;
   WriteData(Sender);
 
   if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);

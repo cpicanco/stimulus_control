@@ -43,7 +43,7 @@ const
 
 implementation
 
-uses LCLIntf, FileUtil, SysUtils;
+uses LCLIntf, FileUtil, LazFileUtils, SysUtils;
 
 var
   FileInfo : TSearchRec;
@@ -58,12 +58,12 @@ var
   PID: PtrInt;
 begin
   PID:=PtrInt(GetThreadID);
-  DbgOutThreadLog(IntToStr(GetTickCount) + ' : ' + IntToStr(PtrInt(PID)) + ' : ' + Msg + LineEnding);
+  DbgOutThreadLog(IntToStr(GetTickCount64) + ' : ' + IntToStr(PtrInt(PID)) + ' : ' + Msg + LineEnding);
 end;
 
 initialization
 begin
-  Logger := TRegData.Create(nil, GetCurrentDirUTF8 + PathDelim + '_Log_001.txt');
+  Logger := TRegData.Create(nil, GetCurrentDir + PathDelim + '_Log_001.txt');
 end
 
 finalization

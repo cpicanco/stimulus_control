@@ -38,6 +38,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     , draw_methods
     , schedules_main
     , response_key
+    , timestamp
     ;
 
 type
@@ -45,11 +46,11 @@ type
   { TMRD }
 
   TDataSupport = record
-    StarterLatency : cardinal;
-    Latency : cardinal;
     Responses : integer;
-    StmBegin : cardinal;
-    StmEnd : cardinal;
+    StarterLatency,
+    Latency,
+    StmBegin,
+    StmEnd : Extended;
 
     {
       CSQHIT occurs at the trial ending, after the trial is destroyed, see units/blocs.pas IETconsequence,
@@ -145,9 +146,9 @@ procedure TFPE.TrialResult(Sender: TObject);
 begin
   if FResponseEnabled then
     begin
-      CreateClientThread('C:'+ FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+      SendRequest('C:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
 
-      //FDataSupport.StmDuration := GetTickCount;
+      //FDataSupport.StmDuration := GetCustomTick;
 
       if FConsequenceFired then
         begin
@@ -220,9 +221,9 @@ end;
 
 
 procedure TFPE.KeyUp(var Key: Word; Shift: TShiftState);
-var TickCount : cardinal;
+var TickCount : Extended;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetCustomTick;
   inherited KeyUp(Key, Shift);
   if Key = 27 {ESC} then
     begin
@@ -238,7 +239,7 @@ begin
           begin
             //if FUseMedia then ... not implemented yet
             FDataSupport.StarterLatency := TickCount;
-            CreateClientThread('*R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+            SendRequest('*R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
             FShowStarter := False;
             Invalidate;
             StartTrial(Self);
@@ -247,7 +248,7 @@ begin
     else
       begin
         //if FUseMedia then ... not implemented yet
-        CreateClientThread('R:' + FormatFloat('00000000;;00000000', TickCount - TimeStart));
+        SendRequest('R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
         FSchedule.DoResponse;
       end;
   end;
@@ -471,14 +472,14 @@ begin
   FConsequenceFired := False;
   FFirstResp := True;
   FResponseEnabled:= True;
-  FDataSupport.StmBegin := GetTickCount;
+  FDataSupport.StmBegin := GetCustomTick;
 
   inherited StartTrial(Sender);
 end;
 
 procedure TFPE.BeginStarter;
 begin
-  CreateClientThread('S:' + FormatFloat('00000000;;00000000', GetTickCount - TimeStart));
+  SendRequest('S:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
   FResponseEnabled:= True;
   Invalidate;
 end;
@@ -520,7 +521,7 @@ procedure TFPE.EndTrial(Sender: TObject);
 begin
   FResponseEnabled := False;
   Hide;
-  FDataSupport.StmEnd := GetTickCount;
+  FDataSupport.StmEnd := GetTickCount64;
 
   FCurrTrial.Result := Result;
 
@@ -553,9 +554,9 @@ begin
 end;
 
 procedure TFPE.Response(Sender: TObject);
-var TickCount : cardinal;
+var TickCount : Extended;
 begin
-  TickCount := GetTickCount;
+  TickCount := GetCustomTick;
   Inc(FDataSupport.Responses);
   if FFirstResp then
     begin

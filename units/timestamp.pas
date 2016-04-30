@@ -27,18 +27,31 @@ unit timestamp;
 
 {$mode objfpc}{$H+}
 
-{$asmmode intel}
-
 interface
 
 uses
-  Linux, UnixType, SysUtils;
+  { TODO -oRafael -cCrossplatform : Implement clock_gettime() alternative for windows. }
+  Linux, UnixType,
+  SysUtils;
 
-function GetTimeStampRaw: timespec;
-function GetTimeStampMono: timespec;
-function GetResolution: string;
+function GetCustomTick : Extended;
+function GetTimeStampRaw : timespec;
+function GetTimeStampMono : timespec;
+function GetResolution : string;
 
 implementation
+
+function GetCustomTick: Extended;
+var
+  tp: timespec;
+  a, b : Extended;
+begin
+  clock_gettime(CLOCK_MONOTONIC, @tp);
+  a := tp.tv_sec;
+  b := tp.tv_nsec * 1e-9;
+  Result := a+b;
+  //FloatToStrF(Result, ffFixed, 0, 9);
+end;
 
 function GetTimeStampRaw: timespec;
 var
