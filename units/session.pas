@@ -280,11 +280,12 @@ begin
     end;
 
   FClientThread := TClientThread.Create(FServerAddress);
-  FBlc.SetClientThread(FClientThread);
   FClientThread.Start;
   FClientThread.SendRequest('pupil_start_recording',-1,'R');
+
   FTimeStart := GetCustomTick;
   FBlc.TimeStart := FTimeStart;
+  FBlc.SetClientThread(FClientThread);
   FManager.OnBeginSess(Self);
 
   PlayBlc(Self);

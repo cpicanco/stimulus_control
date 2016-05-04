@@ -42,18 +42,15 @@ type
 
   TClientThread = class(TThread)
   private
-    FServerAddress,
     FMsg,
     FTrialIndex,
     FRequest,
     FCode : string;
     FContext : TZMQContext;
     FRequester : TZMQSocket;
+    FCriticalSection : TRTLCriticalSection;
     FRTLEvent: PRTLEvent;
-
     FOnShowStatus: TShowStatusEvent;
-
-    procedure SetServerAddress(AValue: string);
     procedure ShowStatus;
   protected
     procedure Execute; override;
@@ -62,7 +59,7 @@ type
     destructor Destroy; override;
     procedure SendRequest(ACode : string; ATrialIndex : integer; ARequest : string = 'T');
     property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
-    property ServerAddress : string read FServerAddress write SetServerAddress;
+
 
   end;
 
@@ -76,14 +73,12 @@ constructor TClientThread.Create(AHost: string; CreateSuspended: Boolean);
 begin
   FreeOnTerminate := True;
 
-  FTrialIndex := '-';
-  FCode := '-:-';
-  FRequest := '-';
+  InitCriticalSection(FCriticalSection);
   FRTLEvent := RTLEventCreate;
-  FServerAddress := AHost;
+
   FContext := TZMQContext.Create;
   FRequester := FContext.Socket( stReq );
-  FRequester.connect( 'tcp://' + FServerAddress );
+  FRequester.connect( 'tcp://' + AHost );
   inherited Create(CreateSuspended);
 end;
 
@@ -92,16 +87,21 @@ begin
   FRequester.Free;
   FContext.Free;
   RTLEventDestroy(FRTLEvent);
-
+  DoneCriticalsection(FCriticalSection);
   inherited Destroy;
 end;
 
 procedure TClientThread.SendRequest(ACode: string; ATrialIndex: integer;
   ARequest: string);
 begin
-  FRequest := ARequest;
-  FCode := ACode;
-  FTrialIndex := IntToStr(ATrialIndex);
+  EnterCriticalSection(FCriticalSection);
+  try
+    FRequest := ARequest;
+    FCode := ACode;
+    FTrialIndex := IntToStr(ATrialIndex);
+  finally
+    LeaveCriticalSection(FCriticalSection);
+  end;
   RTLeventSetEvent(FRTLEvent);
 end;
 
@@ -112,26 +112,30 @@ begin
   if Assigned(FOnShowStatus) then FOnShowStatus(FMsg);
 end;
 
-procedure TClientThread.SetServerAddress(AValue: string);
-begin
-  if FServerAddress = AValue then Exit;
-  if Length(AValue) > 0 then FServerAddress := AValue;
-end;
-
 
 procedure TClientThread.Execute;
 var
+  ARequest,ACode,ATrialIndex : string;
   AMessage : UTF8String;
-begin
+ begin
   while not Terminated do
     begin
       AMessage := '';
       RTLeventWaitFor(FRTLEvent);
-      FRequester.send( FRequest );
+      EnterCriticalSection(FCriticalSection);
+      try
+        ARequest := FRequest;
+        ACode := FCode;
+        ATrialIndex := FTrialIndex;
+      finally
+        LeaveCriticalSection(FCriticalSection);
+      end;
+
+      FRequester.send( ARequest );
       FRequester.recv( AMessage );
 
       // ('trial', 'timestamp', 'event')
-      FMsg := #40#39 + FTrialIndex + #39#44#32#39 + AMessage + #39#44#32#39 + FCode + #39#41;
+      FMsg := #40#39 + ATrialIndex + #39#44#32#39 + AMessage + #39#44#32#39 + ACode + #39#41;
       Synchronize( @Showstatus );
 
       {$ifdef DEBUG}

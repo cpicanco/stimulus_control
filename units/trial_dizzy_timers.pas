@@ -157,8 +157,8 @@ begin
   aConsequence.HowManyLoops := 0;
   aConsequence.FullPath := RootMedia + FConsequence;
   aConsequence.Play;
-
   SendRequest('C:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
+  Sleep(10);
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
 
@@ -172,6 +172,7 @@ end;
 
 procedure TDZT.UpdateTimer1(Sender: TObject);
 var TickCount : Extended;
+    ACode : string;
 begin
   TickCount := GetCustomTick;
   FDataSupport.Cycle := TickCount;
@@ -188,6 +189,10 @@ begin
           Timer2.Interval := Host * 1000;
           Timer2.Enabled := True;
           Color1 := not Color1;
+          if Color1 then
+            ACode := '1a:'
+          else
+            ACode := '1b:';
         end;
 
       if TClockThread(Sender) = Timer2 then
@@ -196,6 +201,10 @@ begin
           Timer1.Interval := Host * 1000;
           Timer1.Enabled := True;
           Color2 := not Color2;
+          if Color2 then
+            ACode := '2a:'
+          else
+            ACode := '2b:';
         end;
     end;
 
@@ -210,11 +219,12 @@ begin
         begin
           FSchedule.Kind := T_EXT;
         end;
-
+  SendRequest(ACode + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
   Invalidate;
 
   // must pass Self here, see TBLC.WriteTrialData
   WriteData(Self);
+  FFirstResp := True;
 end;
 
 procedure TDZT.UpdateTimer2(Sender: TObject);
@@ -228,18 +238,18 @@ begin
     begin
       FDizzyTimer.Color1 := not FDizzyTimer.Color1;
       if FDizzyTimer.Color1 then
-        ACode := '1a'
+        ACode := '1a:'
       else
-        ACode := '1b';
+        ACode := '1b:';
     end;
 
   if TClockThread(Sender) = FDizzyTimer.Timer2 then
     begin
       FDizzyTimer.Color2 := not FDizzyTimer.Color2;
       if FDizzyTimer.Color2 then
-        ACode := '2a'
+        ACode := '2a:'
       else
-        ACode := '2b';
+        ACode := '2b:';
     end;
 
   TickCount := GetCustomTick;
@@ -247,6 +257,7 @@ begin
   SendRequest(ACode + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
 
   Invalidate;
+  FFirstResp := True;
 end;
 
 procedure TDZT.ThreadClock(Sender: TObject);
@@ -545,7 +556,6 @@ begin
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
 
   Data := '';
-  FFirstResp := True;
 end;
 
 procedure TDZT.EndTrial(Sender: TObject);

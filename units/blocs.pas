@@ -118,6 +118,7 @@ type
     //procedure ShowCounterPlease (Kind : String);
     // events
     procedure BkGndResponse(Sender: TObject);
+    procedure ClickTrial(Sender: TObject);
     procedure ClockThread(Sender: TObject);
     procedure EndBlc(Sender: TObject);
     procedure EndTrial(Sender: TObject);
@@ -216,7 +217,7 @@ begin
   FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
   FRegData.SaveData(FBlc.Name);
 
-  PlayTrial
+  PlayTrial;
 end;
 
 procedure TBlc.PlayTrial;
@@ -248,6 +249,7 @@ begin
           FTrial.TimeStart := FTimeStart;
           FTrial.Parent := FBackGround;
           FTrial.Align := AlClient;
+          FTrial.OnClick := @ClickTrial;
           FTrial.OnEndTrial := @EndTrial;
           FTrial.OnWriteTrialData := @WriteTrialData;
           FTrial.OnStmResponse := @StmResponse;
@@ -763,6 +765,11 @@ end;
 procedure TBlc.BkGndResponse(Sender: TObject);
 begin
   if Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
+end;
+
+procedure TBlc.ClickTrial(Sender: TObject);
+begin
+  // do nothing
 end;
 
 procedure TBlc.StmResponse(Sender: TObject);
