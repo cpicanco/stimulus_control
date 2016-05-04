@@ -28,9 +28,6 @@ interface
 uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
      Dialogs, ExtCtrls, LCLType, LCLIntf
 
-     {$IFDEF LCLGTK2}
-     , gtk2, gdk2, glib2
-     {$ENDIF}
      ;
 
 type

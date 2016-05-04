@@ -21,7 +21,7 @@
 //
 unit trial_message;
 
-{$MODE Delphi}
+{$mode objfpc}{$H+}
 
 interface
 
@@ -30,16 +30,17 @@ uses  LCLIntf, LCLType, Controls,
 
      , trial_abstract
      , constants
+     , timestamp
      //, countermanager
      ;
 
 type
 
   TDataSupport = record
-    //Latency : cardinal;
-    //Responses : integer;
-    TrialBegin : cardinal;
-    TrialEnd : cardinal;
+    //Latency,
+    //Responses,
+    TrialBegin,
+    TrialEnd : Extended;
   end;
 
   { TMSG }
@@ -82,14 +83,14 @@ begin
     AutoSize := True;
     BorderStyle := bsNone;
     Font.Name := 'TimesNewRoman';
-    Parent := Self;
     ReadOnly := True;
     Cursor := -1;
     //Text := #0;
     //Font.Color := clWhite;
     //Color := clBlack;
     //OnEnter := MemoEnter;
-    OnClick := MemoClick;
+    OnClick := @MemoClick;
+    Parent := Self;
   end;
 
   FMemoPrompt := TLabel.Create(Self);
@@ -97,8 +98,8 @@ begin
     Caption := MessageMemoPrompt1;
     Font.Name := 'TimesNewRoman';
     Font.Size := 14;
+    OnClick := @MemoClick;
     Parent := Self;
-    OnClick := MemoClick;
   end;
 
   Result := T_NONE;
@@ -111,7 +112,7 @@ begin
   if FResponseEnabled then
     if not (FLimitedHold > 0) then
       begin
-        FDataSupport.TrialEnd := GetTickCount64;
+        FDataSupport.TrialEnd := GetCustomTick;
         WriteData(Self);
         EndTrial(Sender);
       end;
@@ -122,21 +123,24 @@ begin
   //inherited KeyUp(Key, Shift);
   if FResponseEnabled then
     if not (FLimitedHold > 0) then
-      if (ssCtrl in Shift) and (Key = 32) then
+      if (not (ssCtrl in Shift)) and (Key = 32) then
         begin
-          FDataSupport.TrialEnd := GetTickCount64;
+          FDataSupport.TrialEnd := GetCustomTick;
           WriteData(Self);
           EndTrial(Self);
         end;
 end;
 
 procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);
-var H : Integer;
+var
+  AHeight,
+  AFontColor : Integer;
 begin
   //FIscorrection := Correction; //Messages with corrections were not implemented yet
 
   // TCustomControl
   Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], $FFFFFF);
+  AFontColor :=  StrToIntDef(CfgTrial.SList.Values[_MsgFontColor], $000000);
 
   if TestMode then Cursor := 0
   else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
@@ -152,13 +156,13 @@ begin
       Text := CfgTrial.SList.Values[_Msg];
       Width := StrToIntDef(CfgTrial.SList.Values[_MsgWidth], 640);
       Font.Size := StrToIntDef(CfgTrial.SList.Values[_MsgFontSize], 22);
-      Font.Color := StrToIntDef(CfgTrial.SList.Values[_MsgFontColor], $000000);
+      Font.Color := AFontColor;
       Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], Self.Color);
 
-      H := (Lines.Count + 2) * Font.Height * -1;
-      SetBounds((Self.Width - Width) div 2, (Self.Height - H) div 2, Width, H);
+      AHeight := (Lines.Count + 2) * Font.Height * -1;
+      SetBounds((Self.Width - Width) div 2, (Self.Height - AHeight) div 2, Width, AHeight);
 
-      Parent := Self;
+      //Parent := Self;
     end;
 
   // Self TLabel
@@ -167,7 +171,7 @@ begin
     if Visible then
       begin
         SetBounds((Self.Width - Width) div 2, (Self.Height - Height) - 20, Width, Height);
-        Font.Color:= FMemo.Font.Color;
+        Font.Color:= AFontColor;
       end;
 
   StartTrial(Self);
@@ -180,9 +184,9 @@ end;
 
 procedure TMSG.StartTrial(Sender: TObject);
 begin
+  //Invalidate;
   FResponseEnabled := True;
-  Invalidate;
-  FDataSupport.TrialBegin := GetTickCount64;
+  FDataSupport.TrialBegin := GetCustomTick;
   inherited StartTrial(Sender);
 end;
 
@@ -192,14 +196,14 @@ begin
   aStart := FormatFloat('00000000;;00000000', FDataSupport.TrialBegin - TimeStart);;
   aDuration := FormatFloat('00000000;;00000000', FDataSupport.TrialEnd - TimeStart);
 
-  Data := FMemo.Lines.Text + #9 + aStart + #9 + aDuration + Data;
+  Data := 'FMemo.Lines.Text' + #9 + aStart + #9 + aDuration + Data;
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
 end;
 
 procedure TMSG.EndTrial(Sender: TObject);
 begin
   FResponseEnabled := False;
-  Hide;
+
 
   //if Result = T_NONE then None(Sender);
 
@@ -210,7 +214,7 @@ procedure TMSG.ThreadClock(Sender: TObject);
 begin
   if FResponseEnabled then
     begin
-      FDataSupport.TrialEnd := GetTickCount64;
+      FDataSupport.TrialEnd := GetCustomTick;
       WriteData(Sender);
       EndTrial(Sender);
     end;

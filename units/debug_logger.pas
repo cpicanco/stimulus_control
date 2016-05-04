@@ -43,7 +43,7 @@ const
 
 implementation
 
-uses LCLIntf, FileUtil, LazFileUtils, SysUtils;
+uses LCLIntf, FileUtil, LazFileUtils, SysUtils, timestamp;
 
 var
   FileInfo : TSearchRec;
@@ -58,7 +58,7 @@ var
   PID: PtrInt;
 begin
   PID:=PtrInt(GetThreadID);
-  DbgOutThreadLog(IntToStr(GetTickCount64) + ' : ' + IntToStr(PtrInt(PID)) + ' : ' + Msg + LineEnding);
+  DbgOutThreadLog(FloatToStrF(GetCustomTick, ffFixed,0,9) + ' : ' + IntToStr(PtrInt(PID)) + ' : ' + Msg + LineEnding);
 end;
 
 initialization
