@@ -158,7 +158,9 @@ begin
   aConsequence.FullPath := RootMedia + FConsequence;
   aConsequence.Play;
   SendRequest('C:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
-  Sleep(10);
+
+  { TODO 1 -oRafael -cenhencement : Test if queueing client requests. }
+  Sleep(10); // prevent data loss
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
 

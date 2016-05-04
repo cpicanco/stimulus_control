@@ -78,6 +78,7 @@ type
     procedure StartTrial(Sender: TObject); virtual;
     procedure ThreadClock(Sender: TObject); virtual; abstract;
     procedure WriteData(Sender: TObject); virtual; abstract;
+    //property Onclick;
   public
     constructor Create (AOwner : TComponent); override;
     destructor Destroy; override;

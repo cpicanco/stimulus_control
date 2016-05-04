@@ -3,9 +3,11 @@ object bkgnd: Tbkgnd
   Height = 240
   Top = 230
   Width = 320
+  BorderStyle = bsNone
   Caption = 'Fundo'
   Color = clWhite
   DefaultMonitor = dmDesktop
   OnCreate = FormCreate
-  LCLVersion = '1.4.0.4'
+  LCLVersion = '1.6.0.4'
+  WindowState = wsFullScreen
 end

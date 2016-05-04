@@ -490,7 +490,7 @@ begin
   if Assigned(FConfigs) then FreeAndNil(FConfigs);
   if Assigned(FManager) then FreeAndNil(FManager);
   //if Assigned(FAudioDevice) then FreeAndNil(FAudioDevice);
-  bkgnd.SetFullScreen(False);
+  //bkgnd.SetFullScreen(False);
   bkgnd.Hide;
   //if Assigned(bkgnd) then FreeAndNil(bkgnd);
   ShowMessage(rsEndSession)
@@ -1255,7 +1255,7 @@ begin
       if not Assigned(bkgnd) then
         bkgnd := Tbkgnd.Create(Application);
         bkgnd.Show;
-        bkgnd.SetFullScreen(True);
+        //bkgnd.SetFullScreen(True);
         if chkPlayOnSecondMonitor.Checked then
            bkgnd.Left := Screen.Width + 1;
 
