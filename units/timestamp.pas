@@ -38,8 +38,12 @@ function GetCustomTick : Extended;
 function GetTimeStampRaw : timespec;
 function GetTimeStampMono : timespec;
 function GetResolution : string;
+function GetTimeStampF : string; overload;
+function GetTimeStampF (ATimeStart:Extended): string; overload;
 
 implementation
+
+
 
 function GetCustomTick: Extended;
 var
@@ -69,6 +73,16 @@ begin
   Result := tp;
 end;
 
+function GetTimeStampF: string;
+begin
+  Result:=FloatToStrF(GetCustomTick,ffFixed,0,9)
+end;
+
+function GetTimeStampF(ATimeStart: Extended): string;
+begin
+  Result:=FloatToStrF(GetCustomTick-ATimeStart,ffFixed,0,9)
+end;
+
 function GetResolution: string;
 var
   tp: timespec;
@@ -76,7 +90,6 @@ begin
   clock_getres(CLOCK_MONOTONIC, @tp);
   Result := IntToStr(tp.tv_sec) + '.' + FloatToStr(tp.tv_nsec * 1e-9);
 end;
-
 
 end.
 

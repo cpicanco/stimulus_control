@@ -175,6 +175,7 @@ const
   T_END = 'END';
 
   { Trial Kinds }
+
   T_DZT = 'DZT';
   T_CLB = 'CLB';
   T_FPE = 'FPE';
