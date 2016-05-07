@@ -124,6 +124,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
+
     procedure piClick(Sender: TObject);
     procedure piFillEvenClick(Sender: TObject);
     procedure StringGrid1Click(Sender: TObject);
@@ -196,6 +197,7 @@ begin
   if OpenPictureDialog1.Execute then
     TImage(Sender).Picture.LoadFromFile(OpenPictureDialog1.FileName);
 end;
+
 
 procedure TUserConfig.piClick(Sender: TObject);
 begin

@@ -114,6 +114,10 @@ type
 
 implementation
 
+{$ifdef DEBUG}
+  uses debug_logger;
+{$endif}
+
 procedure TSession.BkGndResponse(Sender: TObject);
 begin
   if Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
@@ -285,6 +289,9 @@ begin
 
   FTimeStart := GetCustomTick;
   FBlc.TimeStart := FTimeStart;
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'TimeStart:' + GetTimeStampF);
+  {$endif}
   FBlc.SetClientThread(FClientThread);
   FManager.OnBeginSess(Self);
 

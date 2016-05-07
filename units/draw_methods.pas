@@ -69,34 +69,35 @@ begin
   Result := False;
   npoints := Length(APolygon);
   if (npoints < 3) then Exit;
+
   xold := APolygon[npoints-1].X;
   yold := APolygon[npoints-1].Y;
   for i := 0 to npoints - 1 do
-  begin
-    xnew := APolygon[i].X;
-    ynew := APolygon[i].Y;
-    if (xnew > xold) then
     begin
-      x1:=xold;
-      x2:=xnew;
-      y1:=yold;
-      y2:=ynew;
-    end
-    else
-    begin
-      x1:=xnew;
-      x2:=xold;
-      y1:=ynew;
-      y2:=yold;
+      xnew := APolygon[i].X;
+      ynew := APolygon[i].Y;
+      if (xnew > xold) then
+        begin
+          x1:=xold;
+          x2:=xnew;
+          y1:=yold;
+          y2:=ynew;
+        end
+      else
+        begin
+          x1:=xnew;
+          x2:=xold;
+          y1:=ynew;
+          y2:=yold;
+        end;
+
+      // edge "open" at left end
+      if (((xnew < AX) = (AX <= xold)) and ((AY-y1)*(x2-x1) < (y2-y1)*(AX-x1))) then
+        inside := not inside;
+
+      xold:=xnew;
+      yold:=ynew;
     end;
-    if (((xnew < AX) = (AX <= xold))         // edge "open" at left end
-      and ((AY-y1)*(x2-x1) < (y2-y1)*(AX-x1))) then
-    begin
-      inside := not inside;
-    end;
-    xold:=xnew;
-    yold:=ynew;
-  end;
   Result := inside <> 0;
 end;
 
@@ -158,33 +159,33 @@ begin
 end;
 
 procedure CenteredMarker(Canvas: TCanvas; Width, Height, size: integer);
-  var center : TPoint;
+var center : TPoint;
 begin
-      center.X := Round(Width / 2);
-      center.Y := Round(Height / 2);
+  center.X := Round(Width / 2);
+  center.Y := Round(Height / 2);
 
-      with Canvas do
+  with Canvas do
+    begin
+      Brush.Color := clBlack;
+      Pen.Mode := pmCopy;
+      Pen.Color := clBlack;
+      Pen.Width := 2;
+      with center do
         begin
-          Brush.Color := clBlack;
-          Pen.Mode := pmCopy;
-          Pen.Color := clBlack;
-          Pen.Width := 2;
-          with center do
-            begin
-              Line(X - X, Y, X + X, Y);
-              Line(X, Y - Y, X, Y + Y);
-            end;
-
-          Brush.Color := clGreen;
-          Brush.Style:= bsClear;
-          Pen.Mode := pmCopy;
-          Pen.Style:= psSolid;
-          Pen.Color := clGreen;
-          Pen.Width := 2;
-          with center do
-            Ellipse(X - size, Y - size, X + size, Y + size);
-
+          Line(X - X, Y, X + X, Y);
+          Line(X, Y - Y, X, Y + Y);
         end;
+
+      Brush.Color := clGreen;
+      Brush.Style:= bsClear;
+      Pen.Mode := pmCopy;
+      Pen.Style:= psSolid;
+      Pen.Color := clGreen;
+      Pen.Width := 2;
+      with center do
+        Ellipse(X - size, Y - size, X + size, Y + size);
+
+    end;
 end;
 
 procedure DrawCircle(Canvas: TCanvas; left, top, size: integer; gap: Boolean;
@@ -193,43 +194,44 @@ var
   fix : integer;
   inner_arc : TArc;
 begin
-      with Canvas do
+  with Canvas do
+    begin
+      Brush.Style := bsSolid;
+      Pen.Style := psSolid;
+      Pen.Mode := pmXor;
+
+      Brush.Color := clWhite;
+      Pen.Color := clBlack;
+      Pen.Width := 1;
+      Ellipse(left,top, left + size, top + size);
+
+      Brush.Color := clBlack;
+      Brush.Style := bsClear;
+      Pen.Color := clWhite;
+      Pen.Mode := pmxor;
+      Pen.Width := 1;
+
+      fix := (size div 2) div 2;
+      with inner_arc do
         begin
-          Brush.Style := bsSolid;
-          Pen.Style := psSolid;
-          Pen.Mode := pmXor;
+          p1.X := left + (size div 2) - fix;
+          p1.Y := top + (size div 2) - fix;
+          p2.X := left + size - fix;
+          p2.Y := top + size - fix;
+          Ellipse(p1.X, p1.Y, p2.X, p2.Y);
+        end;
 
-          Brush.Color := clWhite;
+      // draw gap on inner circle circumference
+      if gap then
+        begin
           Pen.Color := clBlack;
-          Pen.Width := 1;
-          Ellipse(left,top, left + size, top + size);
-
-          Brush.Color := clBlack;
-          Brush.Style := bsClear;
-          Pen.Color := clWhite;
-          Pen.Mode := pmxor;
-          Pen.Width := 1;
-
-          fix := (size div 2) div 2;
+          Pen.Mode := pmCopy;
+          Pen.Width := 5;
           with inner_arc do
-            begin
-              p1.X := left + (size div 2) - fix;
-              p1.Y := top + (size div 2) - fix;
-              p2.X := left + size - fix;
-              p2.Y := top + size - fix;
-              Ellipse(p1.X, p1.Y, p2.X, p2.Y);
-            end;
-
-          if {is to draw an arc} gap {on inner circle circumference} then
-            begin
-              Pen.Color := clBlack;
-              Pen.Mode := pmCopy;
-              Pen.Width := 5;
-              with inner_arc do
-                //Arc(p1.X + 1, p1.Y + 1, p2.X - 1, p2.Y - 1, 16 * gap_degree, 16 * gap_length);
-                Arc(p1.X , p1.Y , p2.X , p2.Y , 16 * gap_degree, 16 * gap_length);
-            end;
-      end;
+            //Arc(p1.X + 1, p1.Y + 1, p2.X - 1, p2.Y - 1, 16 * gap_degree, 16 * gap_length);
+            Arc(p1.X , p1.Y , p2.X , p2.Y , 16 * gap_degree, 16 * gap_length);
+        end;
+    end;
 end;
 
 procedure DrawCenteredCircle (Canvas : TCanvas; Width, Height, Size : integer);
@@ -240,11 +242,11 @@ begin
 
   with Canvas do
     begin
-      Brush.Color := clGreen;
+      Brush.Color := clBlack;
       Brush.Style:= bsClear;
       Pen.Mode := pmCopy;
       Pen.Style:= psSolid;
-      Pen.Color := clGreen;
+      Pen.Color := clBlack;
       Pen.Width := 2;
       with center do
         Ellipse(X - size, Y - size, X + size, Y + size);
@@ -256,7 +258,7 @@ end;
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 var plusX : integer;
 begin
-  with canvas do
+  with Canvas do
     begin
       Brush.Color := clWhite;
       Brush.Style:= bsSolid;
@@ -267,11 +269,8 @@ begin
       with center do
         begin
           Ellipse(X - size, Y - size, X + size, Y + size);
-
           Line(X - (size * 8), Y, X - (size *5), Y);
-
           Line(X + (size * 9), Y, X + (size *5), Y);
-
           plusX := Round((((X + (size * 9)) - (X + (size *5)))/2) + (X + (size *5)));
           Line(plusX, Y - (size * 2), plusX, Y + (size * 2));
           //Line(X, Y - size, X, Y + size);
