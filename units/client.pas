@@ -40,15 +40,22 @@ type
 
   { TClientThread }
 
+  //FCriticalSection : TRTLCriticalSection;
+  //EnterCriticalSection(FCriticalSection);
+  //try
+  // do stuff
+  //finally
+  //  LeaveCriticalSection(FCriticalSection);
+  //end;
   TClientThread = class(TThread)
   private
     FMsg,
     FTrialIndex,
     FRequest,
-    FCode : string;
+    FCode : UTF8string;
     FContext : TZMQContext;
     FRequester : TZMQSocket;
-    FCriticalSection : TRTLCriticalSection;
+
     FRTLEvent: PRTLEvent;
     FOnShowStatus: TShowStatusEvent;
     procedure ShowStatus;
@@ -57,7 +64,7 @@ type
   public
     constructor Create(AHost : string; CreateSuspended: Boolean = True);
     destructor Destroy; override;
-    procedure SendRequest(ACode : string; ATrialIndex : integer; ARequest : string = 'T');
+    procedure SendRequest(ACode : UTF8string; ATrialIndex : integer; ARequest : UTF8string = 'T');
     property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
 
 
@@ -73,7 +80,7 @@ constructor TClientThread.Create(AHost: string; CreateSuspended: Boolean);
 begin
   FreeOnTerminate := True;
 
-  InitCriticalSection(FCriticalSection);
+  //InitCriticalSection(FCriticalSection);
   FRTLEvent := RTLEventCreate;
 
   FContext := TZMQContext.Create;
@@ -87,21 +94,17 @@ begin
   FRequester.Free;
   FContext.Free;
   RTLEventDestroy(FRTLEvent);
-  DoneCriticalsection(FCriticalSection);
+  //DoneCriticalsection(FCriticalSection);
   inherited Destroy;
 end;
 
-procedure TClientThread.SendRequest(ACode: string; ATrialIndex: integer;
-  ARequest: string);
+procedure TClientThread.SendRequest(ACode: UTF8string; ATrialIndex: integer;
+  ARequest: UTF8string);
 begin
-  EnterCriticalSection(FCriticalSection);
-  try
-    FRequest := ARequest;
-    FCode := ACode;
-    FTrialIndex := IntToStr(ATrialIndex);
-  finally
-    LeaveCriticalSection(FCriticalSection);
-  end;
+  FRequest := ARequest;
+  FCode := ACode;
+  FTrialIndex := IntToStr(ATrialIndex);
+
   RTLeventSetEvent(FRTLEvent);
 end;
 
@@ -115,21 +118,18 @@ end;
 
 procedure TClientThread.Execute;
 var
-  ARequest,ACode,ATrialIndex : string;
+  ARequest,ACode,ATrialIndex,
   AMessage : UTF8String;
- begin
+begin
   while not Terminated do
     begin
       AMessage := '';
       RTLeventWaitFor(FRTLEvent);
-      EnterCriticalSection(FCriticalSection);
-      try
-        ARequest := FRequest;
-        ACode := FCode;
-        ATrialIndex := FTrialIndex;
-      finally
-        LeaveCriticalSection(FCriticalSection);
-      end;
+
+      // make a local copy to synchronize shared variables
+      ARequest := FRequest;
+      ACode := FCode;
+      ATrialIndex := FTrialIndex;
 
       FRequester.send( ARequest );
       FRequester.recv( AMessage );
