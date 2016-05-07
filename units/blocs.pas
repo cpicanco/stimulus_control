@@ -235,19 +235,22 @@ begin
   if IndTrial < FBlc.NumTrials then
     begin
 
-      if FBlc.Trials[IndTrial].Kind = T_DZT then FTrial := TDZT.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_CLB then FTrial := TCLB.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_FPE then FTrial := TFPE.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MRD then FTrial := TMRD.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MSG then FTrial := TMSG.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_MTS then FTrial := TMTS.Create(Self);
-      if FBlc.Trials[IndTrial].Kind = T_Simple then FTrial := TSimpl.Create(Self);
+      case FBlc.Trials[IndTrial].Kind of
+        T_DZT : FTrial := TDZT.Create(Self);
+        T_CLB : FTrial := TCLB.Create(Self);
+        T_FPE : FTrial := TFPE.Create(Self);
+        T_MRD : FTrial := TMRD.Create(Self);
+        T_MSG : FTrial := TMSG.Create(Self);
+        T_MTS : FTrial := TMTS.Create(Self);
+        T_Simple : FTrial := TSimpl.Create(Self);
+      end;
 
       if Assigned(FTrial) then
         begin
           FTrial.CounterManager := FCounterManager;
           FTrial.TimeStart := FTimeStart;
           FTrial.Parent := FBackGround;
+          FTrial.DoubleBuffered := True;
           FTrial.Align := AlClient;
           FTrial.OnClick := @ClickTrial;
           FTrial.OnEndTrial := @EndTrial;
