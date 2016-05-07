@@ -83,7 +83,7 @@ begin
     DebugLn(mt_Debug + 'TClockThread.Create at:' + TimeToStr(Time) + ':' + IntToStr(GetTickCount64));
   {$endif}
   FreeOnTerminate := True;
-  FInterval := 1000;
+  FInterval := 0;
   FEnabled := True;
   FMustReset := False;
   FRTLEvent := RTLEventCreate;
@@ -159,6 +159,7 @@ begin
 end;
 
 procedure TClockThread.Execute;
+var LInterval : longint;
 begin
   {$ifdef DEBUG}
     FDebugStatus := mt_Debug + 'TClockThread.Execute:Start ' +  IntToStr(ThreadID);
@@ -168,7 +169,12 @@ begin
   while not Terminated do
     if Enabled then
       begin
-        RTLeventWaitFor(FRTLEvent, Interval);
+        LInterval := Interval;
+        if LInterval = 0 then
+          RTLeventWaitFor(FRTLEvent)
+        else
+          RTLeventWaitFor(FRTLEvent, LInterval);
+
         Synchronize(@Clock);
       end
     else

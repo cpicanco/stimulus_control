@@ -76,6 +76,7 @@ type
       procedure ClockStatus(msg : string);
     {$endif}
     procedure StartTrial(Sender: TObject); virtual;
+    procedure EndTrial(Sender: TObject); virtual;
     procedure ThreadClock(Sender: TObject); virtual; abstract;
     procedure WriteData(Sender: TObject); virtual; abstract;
     //property Onclick;
@@ -95,6 +96,12 @@ type
     property HeaderTicks: string read FHeaderTicks write FHeaderTicks;
     property IETConsequence : string read FIETConsequence write FIETConsequence;
     property NextTrial: string read FNextTrial write FNextTrial;
+    property Result: string read FResult write FResult;
+    property RootMedia : string read FRootMedia write FRootMedia;
+    property ServerAddress : string read FServerAddress write FServerAddress;
+    property TimeOut : Integer read FTimeOut write FTimeOut;
+    property TimeStart : Extended read FTimeStart write FTimeStart;
+  public
     property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse: TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
@@ -105,11 +112,6 @@ type
     property OnNone: TNotifyEvent read FOnNone write FOnNone;
     property OnStmResponse: TNotifyEvent read FOnStmResponse write FOnStmResponse;
     property OnWriteTrialData: TNotifyEvent read FOnWriteTrialData write FOnWriteTrialData;
-    property Result: string read FResult write FResult;
-    property RootMedia : string read FRootMedia write FRootMedia;
-    property ServerAddress : string read FServerAddress write FServerAddress;
-    property TimeOut : Integer read FTimeOut write FTimeOut;
-    property TimeStart : Extended read FTimeStart write FTimeStart;
 
   end;
 
@@ -155,17 +157,14 @@ procedure TTrial.StartTrial(Sender: TObject);
 var
   i : integer;
 begin
-  if FLimitedHold > 0 then
-    begin
-      FClockThread.Interval := FLimitedHold;
-      FClockThread.OnTimer := @ThreadClock;
-      {$ifdef DEBUG}
-        FClockThread.OnDebugStatus := @ClockStatus;
-      {$endif};
+  FClockThread.Interval := FLimitedHold;
+  FClockThread.OnTimer := @ThreadClock;
+  {$ifdef DEBUG}
+    FClockThread.OnDebugStatus := @ClockStatus;
+  {$endif};
 
-      SetLength(FClockList, Length(FClockList) + 1);
-      FClockList[Length(FClockList) - 1] := @FClockThread.Start;
-    end;
+  SetLength(FClockList, Length(FClockList) + 1);
+  FClockList[Length(FClockList) - 1] := @FClockThread.Start;
 
   // TClockThread.Start
   if Length(FClockList) > 0 then
@@ -175,9 +174,16 @@ begin
   SetLength(FClockList, 0);
 end;
 
+procedure TTrial.EndTrial(Sender: TObject);
+begin
+  if Assigned(FClockThread) then
+    RTLeventSetEvent(FClockThread.RTLEvent);
+end;
+
 constructor TTrial.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FLimitedHold := 0;
   FClockThread := TClockThread.Create(True);
 end;
 
@@ -192,6 +198,7 @@ begin
     begin
       FClockThread.Enabled := False;
       FClockThread.Terminate;
+      FClockThread := nil;
     end;
   inherited Destroy;
 end;
