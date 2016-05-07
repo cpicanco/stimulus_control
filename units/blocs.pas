@@ -118,7 +118,6 @@ type
     //procedure ShowCounterPlease (Kind : String);
     // events
     procedure BkGndResponse(Sender: TObject);
-    procedure ClickTrial(Sender: TObject);
     procedure ClockThread(Sender: TObject);
     procedure EndBlc(Sender: TObject);
     procedure EndTrial(Sender: TObject);
@@ -225,10 +224,12 @@ var IndTrial : integer;
 begin
   if Assigned(FTrial) then
     begin
-      FreeAndNil(FTrial);
+      FTrial.Free;
+      FTrial := nil;
     end;
 
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
+
 
   IndTrial := FCounterManager.CurrentTrial.Counter;
   if IndTrial = 0 then FFirstTrialBegin := GetCustomTick;
@@ -236,23 +237,21 @@ begin
     begin
 
       case FBlc.Trials[IndTrial].Kind of
-        T_DZT : FTrial := TDZT.Create(Self);
-        T_CLB : FTrial := TCLB.Create(Self);
-        T_FPE : FTrial := TFPE.Create(Self);
-        T_MRD : FTrial := TMRD.Create(Self);
-        T_MSG : FTrial := TMSG.Create(Self);
-        T_MTS : FTrial := TMTS.Create(Self);
-        T_Simple : FTrial := TSimpl.Create(Self);
+        T_DZT : FTrial := TDZT.Create(FBackGround);
+        T_CLB : FTrial := TCLB.Create(FBackGround);
+        T_FPE : FTrial := TFPE.Create(FBackGround);
+        T_MRD : FTrial := TMRD.Create(FBackGround);
+        T_MSG : FTrial := TMSG.Create(FBackGround);
+        T_MTS : FTrial := TMTS.Create(FBackGround);
+        T_Simple : FTrial := TSimpl.Create(FBackGround);
       end;
 
       if Assigned(FTrial) then
         begin
           FTrial.CounterManager := FCounterManager;
           FTrial.TimeStart := FTimeStart;
-          FTrial.Parent := FBackGround;
           FTrial.DoubleBuffered := True;
           FTrial.Align := AlClient;
-          FTrial.OnClick := @ClickTrial;
           FTrial.OnEndTrial := @EndTrial;
           FTrial.OnWriteTrialData := @WriteTrialData;
           FTrial.OnStmResponse := @StmResponse;
@@ -262,20 +261,27 @@ begin
           FTrial.OnNone := @None;
           FTrial.CfgTrial := FBlc.Trials[IndTrial];
           FTrial.SetClientThread(FClientThread);
+          FTrial.Parent := FBackGround;
           // dependencies above
           FTrial.Visible := False;
           FTrial.Play(FTestMode, FIsCorrection);
           FTrial.Visible := True;
           FTrial.SetFocus;
-        end else EndBlc(Self);
+        end else
+          EndBlc(Self);
 
       FIsCorrection := False;
-    end
-      else
-        begin
-          if Assigned(FTrial) then FreeAndNil(FTrial);
-          EndBlc(Self);
-        end;
+    end else
+      begin
+        if Assigned(FTrial) then
+          begin
+            //PostMessage(FTrial.Handle, CM_RELEASE,0,0);
+            //FBackGround.DestroyComponents;
+            FTrial.Free;
+            FTrial := nil;
+          end;
+        EndBlc(Self);
+      end;
 
 end;
 
@@ -770,10 +776,6 @@ begin
   if Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
 end;
 
-procedure TBlc.ClickTrial(Sender: TObject);
-begin
-  // do nothing
-end;
 
 procedure TBlc.StmResponse(Sender: TObject);
 begin

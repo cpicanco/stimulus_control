@@ -52,7 +52,7 @@ type
     FMessage,
     FMessagePrompt : TLabel;
     //procedure Click; override;
-    procedure EndTrial(Sender: TObject);
+    procedure EndTrial(Sender: TObject); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure MessageMouseUp(Sender: TObject;Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
     procedure StartTrial(Sender: TObject); override;
@@ -107,25 +107,18 @@ procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   if FResponseEnabled then
-    if not (FLimitedHold > 0) then
-      begin
-        FDataSupport.TrialEnd := GetCustomTick;
-        WriteData(Self);
-        EndTrial(Self);
-      end;
+    if FLimitedHold = 0 then
+      EndTrial(Self);
+
 end;
 
 procedure TMSG.KeyUp(var Key: Word; Shift: TShiftState);
 begin
   //inherited KeyUp(Key, Shift);
   if FResponseEnabled then
-    if not (FLimitedHold > 0) then
+    if FLimitedHold = 0 then
       if (not (ssCtrl in Shift)) and (Key = 32) then
-        begin
-          FDataSupport.TrialEnd := GetCustomTick;
-          WriteData(Self);
           EndTrial(Self);
-        end;
 end;
 
 procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);
@@ -183,30 +176,29 @@ end;
 procedure TMSG.WriteData(Sender: TObject);
 var aStart, aDuration : string;
 begin
-  aStart := FormatFloat('00000000;;00000000', FDataSupport.TrialBegin - TimeStart);;
-  aDuration := FormatFloat('00000000;;00000000', FDataSupport.TrialEnd - TimeStart);
+  aStart := FloatToStrF(FDataSupport.TrialBegin - TimeStart, ffFixed, 0, 9);
+  aDuration := FloatToStrF(FDataSupport.TrialEnd - TimeStart, ffFixed, 0, 9);
 
-  Data := 'FMemo.Lines.Text' + #9 + aStart + #9 + aDuration + Data;
+  Data := FMessage.Caption + #9 + aStart + #9 + aDuration + Data;
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
 end;
 
 procedure TMSG.EndTrial(Sender: TObject);
 begin
-  FResponseEnabled := False;
-
-
-  //if Result = T_NONE then None(Sender);
-
-  if Assigned(OnEndTrial) then OnEndTrial(Sender);
+  Hide;
+  FDataSupport.TrialEnd := GetCustomTick;
+  WriteData(Self);
+  inherited EndTrial(Sender);
 end;
 
 procedure TMSG.ThreadClock(Sender: TObject);
 begin
   if FResponseEnabled then
     begin
-      FDataSupport.TrialEnd := GetCustomTick;
-      WriteData(Sender);
-      EndTrial(Sender);
+      Hide;
+      WriteData(Self);
+      FResponseEnabled := False;
+      if Assigned(OnEndTrial) then OnEndTrial(Sender);
     end;
 end;
 
