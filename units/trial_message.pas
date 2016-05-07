@@ -26,7 +26,7 @@ unit trial_message;
 interface
 
 uses  LCLIntf, LCLType, Controls,
-      Classes, SysUtils, StdCtrls
+      Classes, SysUtils, StdCtrls, Graphics
 
      , trial_abstract
      , constants
@@ -49,13 +49,12 @@ type
   protected
     FDataSupport : TDataSupport;
     FResponseEnabled : Boolean;
-    FMemo : TMemo;
-    FMemoPrompt : TLabel;
+    FMessage,
+    FMessagePrompt : TLabel;
     //procedure Click; override;
-    //procedure MemoEnter(Sender: TObject);
     procedure EndTrial(Sender: TObject);
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
-    procedure MemoClick(Sender: TObject);
+    procedure MessageMouseUp(Sender: TObject;Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
     procedure StartTrial(Sender: TObject); override;
     procedure ThreadClock(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
@@ -67,7 +66,7 @@ type
 
 resourcestring
 
-  MessageMemoPrompt1 = 'Pressione  o botão  para avançar.';
+  MessagePrompt1 = 'Pressione  o botão  para avançar.';
 
 implementation
 
@@ -77,28 +76,25 @@ begin
 
   Header := 'Message' + #9 + '___Start' + #9 + 'Duration';
 
-  FMemo := TMemo.Create(Self);
-  with FMemo do begin
-    Alignment := taCenter;
-    AutoSize := True;
-    BorderStyle := bsNone;
-    Font.Name := 'TimesNewRoman';
-    ReadOnly := True;
+  FMessage := TLabel.Create(Self);
+  with FMessage do begin
     Cursor := -1;
-    //Text := #0;
-    //Font.Color := clWhite;
-    //Color := clBlack;
-    //OnEnter := MemoEnter;
-    OnClick := @MemoClick;
+    Alignment := taCenter;
+    Anchors := [akLeft,akRight];
+    //Layout := tlCenter;
+    WordWrap := True;
+    Font.Name := 'TimesNewRoman';
+    OnMouseUp := @MessageMouseUp;
     Parent := Self;
   end;
 
-  FMemoPrompt := TLabel.Create(Self);
-  with FMemoPrompt do begin
-    Caption := MessageMemoPrompt1;
+  FMessagePrompt := TLabel.Create(Self);
+  with FMessagePrompt do begin
+    Cursor := -1;
+    Caption := MessagePrompt1;
     Font.Name := 'TimesNewRoman';
     Font.Size := 14;
-    OnClick := @MemoClick;
+    OnMouseUp := @MessageMouseUp;
     Parent := Self;
   end;
 
@@ -107,14 +103,15 @@ begin
   Result := T_NONE;
 end;
 
-procedure TMSG.MemoClick(Sender: TObject);
+procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 begin
   if FResponseEnabled then
     if not (FLimitedHold > 0) then
       begin
         FDataSupport.TrialEnd := GetCustomTick;
         WriteData(Self);
-        EndTrial(Sender);
+        EndTrial(Self);
       end;
 end;
 
@@ -133,14 +130,13 @@ end;
 
 procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);
 var
-  AHeight,
-  AFontColor : Integer;
+  LFontColor : Integer;
 begin
   //FIscorrection := Correction; //Messages with corrections were not implemented yet
 
   // TCustomControl
   Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], $FFFFFF);
-  AFontColor :=  StrToIntDef(CfgTrial.SList.Values[_MsgFontColor], $000000);
+  LFontColor :=  StrToIntDef(CfgTrial.SList.Values[_MsgFontColor], $000000);
 
   if TestMode then Cursor := 0
   else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
@@ -149,29 +145,23 @@ begin
   NextTrial := CfgTrial.SList.Values[_NextTrial];
   FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
 
-  // Self TMemo
-  with FMemo do
+  with FMessage do
     begin
       Cursor := Self.Cursor;
-      Text := CfgTrial.SList.Values[_Msg];
+      Caption := CfgTrial.SList.Values[_Msg];
       Width := StrToIntDef(CfgTrial.SList.Values[_MsgWidth], 640);
       Font.Size := StrToIntDef(CfgTrial.SList.Values[_MsgFontSize], 22);
-      Font.Color := AFontColor;
+      Font.Color := LFontColor;
       Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], Self.Color);
-
-      AHeight := (Lines.Count + 2) * Font.Height * -1;
-      SetBounds((Self.Width - Width) div 2, (Self.Height - AHeight) div 2, Width, AHeight);
-
-      //Parent := Self;
+      SetBounds((Self.Width - Width) div 2, (Self.Height - Height) div 2, Width, Height);
     end;
 
-  // Self TLabel
-  FMemoPrompt.Visible := StrToBoolDef(CfgTrial.SList.Values[_Prompt], False);
-  with FMemoPrompt do
+  FMessagePrompt.Visible := StrToBoolDef(CfgTrial.SList.Values[_Prompt], False);
+  with FMessagePrompt do
     if Visible then
       begin
+        Font.Color:= LFontColor;
         SetBounds((Self.Width - Width) div 2, (Self.Height - Height) - 20, Width, Height);
-        Font.Color:= AFontColor;
       end;
 
   StartTrial(Self);
