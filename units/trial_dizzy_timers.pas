@@ -73,6 +73,7 @@ type
     FSchedule : TSchMan;
     FStimuli : array of TRect;
     function GetCycles: integer;
+    function RandomInRange(AFrom, ATo : integer):integer;
   protected
     procedure Consequence(Sender: TObject);
     procedure EndTrial(Sender: TObject);
@@ -146,6 +147,11 @@ begin
   Result := FCycles;
 end;
 
+function TDZT.RandomInRange(AFrom, ATo: integer): integer;
+begin
+  Result := Random(ATo - AFrom + 1) + AFrom;
+end;
+
 procedure TDZT.Consequence(Sender: TObject);
 var aConsequence : TKey;
 begin
@@ -157,10 +163,10 @@ begin
   aConsequence.HowManyLoops := 0;
   aConsequence.FullPath := RootMedia + FConsequence;
   aConsequence.Play;
-  SendRequest('C:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
+  SendRequest('C:' + GetTimestampF);
 
-  { TODO 1 -oRafael -cenhencement : Test if queueing client requests. }
-  Sleep(10); // prevent data loss
+  { TODO 1 -oRafael -cenhencement : Find a better way to prevent data loss. }
+  Sleep(10); // hack to prevent data loss
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
 
@@ -182,8 +188,8 @@ begin
 
   with FDizzyTimer do
     begin
-      Main := Random(Max - Min) + Min + 1;
-      Host := Random(((2 * Main) div 3) - (Main div 3)) + (Main div 3) + 1;
+      Main := RandomInRange(Min, Max);
+      Host := RandomInRange(Main div 3,(2 * Main) div 3);
 
       if TClockThread(Sender) = Timer1 then
         begin
@@ -221,7 +227,7 @@ begin
         begin
           FSchedule.Kind := T_EXT;
         end;
-  SendRequest(ACode + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
+  SendRequest(ACode + GetTimeStampF);
   Invalidate;
 
   // must pass Self here, see TBLC.WriteTrialData
@@ -256,7 +262,7 @@ begin
 
   TickCount := GetCustomTick;
   FDataSupport.Timer2 := TickCount;
-  SendRequest(ACode + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
+  SendRequest(ACode + GetTimeStampF);
 
   Invalidate;
   FFirstResp := True;
@@ -296,11 +302,11 @@ begin
           FSchedule.DoResponse;
           if FFirstResp then
             begin
-              SendRequest('*R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
+              SendRequest('*R:' + GetTimeStampF);
               FFirstResp := False;
               FDataSupport.Latency := TickCount;
             end
-          else SendRequest('R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
+          else SendRequest('R:' + GetTimeStampF);
         end;
     end;
 
@@ -416,9 +422,8 @@ begin
       Mode := Copy(s1, 0, pos(#32, s1)-1);
       Mode := UpperCase(Mode);
 
-      // return a number greater than min and lower or equal to max
-      Main := Random(Max - Min) + Min + 1;
-      Host := Random(((2 * Main) div 3) - (Main div 3)) + (Main div 3) + 1;
+      Main := RandomInRange(Min, Max);
+      Host := RandomInRange(Main div 3,(2 * Main) div 3); // 1/3 and 2/3  of main
 
       Timer1 := TClockThread.Create(True);
       Timer2 := TClockThread.Create(True);
@@ -512,7 +517,7 @@ begin
   FResponseEnabled := True;
   Invalidate;
   FDataSupport.StmBegin := TickCount;
-  SendRequest('S:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
+  SendRequest('S:' + GetTimeStampF);
   inherited StartTrial(Sender);
 end;
 
@@ -565,7 +570,7 @@ begin
   FResponseEnabled := False;
   Hide;
 
-  SendRequest('E:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
+  SendRequest('E:' + GetTimeStampF);
   if Result = T_HIT then Hit(Sender);
   if Result = T_MISS then  Miss(Sender);
   if Result = T_NONE then  None(Sender);
