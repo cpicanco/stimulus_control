@@ -214,6 +214,7 @@ const
 
 resourcestring
   ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
+  ExceptionConfigurationNotAllowed = 'A configuração não é permitida.';
 
 implementation
 
