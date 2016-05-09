@@ -57,6 +57,7 @@ type
     FTimeOut: Integer;
     FTimeStart: Extended;
     // events
+    FOnBeforeEndTrial: TNotifyEvent;
     FOnBeginCorrection: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
@@ -67,6 +68,7 @@ type
     FOnNone: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
     FOnWriteTrialData: TNotifyEvent;
+    procedure EndTrialThread(Sender: TObject);
   strict protected
     FClockList : array of TThreadMethod;
     FLimitedHold : integer;
@@ -75,15 +77,15 @@ type
     {$ifdef DEBUG}
       procedure ClockStatus(msg : string);
     {$endif}
+    procedure EndTrial(Sender: TObject);
     procedure StartTrial(Sender: TObject); virtual;
-    procedure EndTrial(Sender: TObject); virtual;
-    procedure ThreadClock(Sender: TObject); virtual; abstract;
     procedure WriteData(Sender: TObject); virtual; abstract;
+    procedure BeforeEndTrial(Sender: TObject); virtual; abstract;
     //property Onclick;
   public
     constructor Create (AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure DispenserPlusCall; virtual; abstract;
+//    procedure DispenserPlusCall; virtual; abstract;
     procedure Play(TestMode: Boolean; Correction : Boolean); virtual; abstract;
     procedure SendRequest(ACode : string);
     procedure SetClientThread(AClientThread:TClientThread);
@@ -102,6 +104,7 @@ type
     property TimeOut : Integer read FTimeOut write FTimeOut;
     property TimeStart : Extended read FTimeStart write FTimeStart;
   public
+    property OnBeforeEndTrial: TNotifyEvent read FOnBeforeEndTrial write FOnBeforeEndTrial;
     property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse: TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
@@ -125,7 +128,15 @@ uses debug_logger;
 
 procedure TTrial.SendRequest(ACode: string);
 begin
-  FClientThread.SendRequest(ACode,FCfgTrial.Id);
+  if Assigned(FClientThread) then
+    FClientThread.SendRequest(ACode,FCfgTrial.Id)
+  else
+  {$ifdef DEBUG}
+    DebugLn('TTrial.SendRequest:' + ACode + ' has failed');
+  {$else}
+    TimestampLn('TTrial.SendRequest:' + ACode + ' has failed');
+  {$endif}
+
 end;
 
 procedure TTrial.SetClientThread(AClientThread: TClientThread);
@@ -151,14 +162,14 @@ end;
 {$endif}
 
 {
-  FLimitedhold is controlled by a TTrial descendent.
+  FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
 }
 procedure TTrial.StartTrial(Sender: TObject);
 var
   i : integer;
 begin
   FClockThread.Interval := FLimitedHold;
-  FClockThread.OnTimer := @ThreadClock;
+  FClockThread.OnTimer := @EndTrialThread;
   {$ifdef DEBUG}
     FClockThread.OnDebugStatus := @ClockStatus;
   {$endif};
@@ -176,26 +187,43 @@ end;
 
 procedure TTrial.EndTrial(Sender: TObject);
 begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'TTrial.EndTrial1');
+  {$endif}
   if Assigned(FClockThread) then
     RTLeventSetEvent(FClockThread.RTLEvent);
+end;
+
+procedure TTrial.EndTrialThread(Sender: TObject);
+begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'TTrial.EndTrial2');
+  {$endif}
+  Hide;
+  if Assigned(OnBeforeEndTrial) then OnBeforeEndTrial(Sender);
+  if Assigned(OnEndTrial) then OnEndTrial(Sender);
 end;
 
 constructor TTrial.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  OnBeforeEndTrial := nil;
+  OnEndTrial := nil;
+
   FLimitedHold := 0;
+  FClientThread := nil;
   FClockThread := TClockThread.Create(True);
 end;
 
 destructor TTrial.Destroy;
 begin
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'TTrial.Destroy');
-    DebugLn(mt_Debug + 'FNextTrial:' + FNextTrial);
+    DebugLn(mt_Debug + 'TTrial.Destroy:FNextTrial:' + FNextTrial);
   {$endif}
 
   if Assigned(FClockThread) then
     begin
+      FClockThread.OnTimer := nil;
       FClockThread.Enabled := False;
       FClockThread.Terminate;
       FClockThread := nil;

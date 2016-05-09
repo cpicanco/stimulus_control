@@ -119,7 +119,7 @@ end;
 procedure TClockThread.Clock;
 begin
   {$ifdef DEBUG}
-    FDebugStatus := mt_Debug + 'TClockThread.Execute:SyncHead ' + IntToStr(ThreadID);
+    FDebugStatus := mt_Debug + 'TClockThread.Execute:Clock ' + IntToStr(ThreadID);
     DebugStatus;
   {$endif}
 
@@ -130,17 +130,12 @@ begin
       Exit;
     end;
   if Assigned(FOnTimer) then FOnTimer(Self);
-
-  {$ifdef DEBUG}
-    FDebugStatus := mt_Debug + 'TClockThread.Execute:Fired ' + IntToStr(ThreadID);
-    DebugStatus;
-  {$endif}
 end;
 
 procedure TClockThread.SetEnabled(AValue: Boolean);
 begin
   {$ifdef DEBUG}
-    FDebugStatus := mt_Debug + 'TClockThread.SetEnabled:' + BoolToStr(AValue, 'True', 'False') + #32 + IntToStr(ThreadID);
+     FDebugStatus := mt_Debug + 'TClockThread.SetEnabled:' + BoolToStr(AValue, 'True', 'False') + #32 + IntToStr(ThreadID);
     DebugStatus;
   {$endif}
   if FEnabled = AValue then Exit;
@@ -160,6 +155,7 @@ end;
 
 procedure TClockThread.Execute;
 var LInterval : longint;
+    LEnabled : boolean;
 begin
   {$ifdef DEBUG}
     FDebugStatus := mt_Debug + 'TClockThread.Execute:Start ' +  IntToStr(ThreadID);
@@ -167,24 +163,27 @@ begin
   {$endif}
 
   while not Terminated do
-    if Enabled then
-      begin
-        LInterval := Interval;
-        if LInterval = 0 then
-          RTLeventWaitFor(FRTLEvent)
-        else
-          RTLeventWaitFor(FRTLEvent, LInterval);
+    begin
+      LEnabled := Enabled;
+      if LEnabled then
+        begin
+          LInterval := Interval;
+          if LInterval = 0 then
+            RTLeventWaitFor(FRTLEvent)
+          else
+            RTLeventWaitFor(FRTLEvent, LInterval);
 
-        Synchronize(@Clock);
-      end
-    else
-      begin
-        RTLeventWaitFor(FRTLEvent);
-        {$ifdef DEBUG}
-          FDebugStatus := mt_Debug + 'TClockThread.Execute:Wait ' + IntToStr(ThreadID);
-          Synchronize(@DebugStatus);
-        {$endif}
-      end;
+          Synchronize(@Clock);
+        end
+      else
+        begin
+          RTLeventWaitFor(FRTLEvent);
+          {$ifdef DEBUG}
+            FDebugStatus := mt_Debug + 'TClockThread.Execute:Wait ' + IntToStr(ThreadID);
+            Synchronize(@DebugStatus);
+          {$endif}
+        end;
+    end;
 
   {$ifdef DEBUG}
     FDebugStatus := mt_Debug + 'TClockThread.Execute:Terminated ' + IntToStr(ThreadID);
