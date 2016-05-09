@@ -247,7 +247,7 @@ begin
       Pen.Mode := pmCopy;
       Pen.Style:= psSolid;
       Pen.Color := clBlack;
-      Pen.Width := 2;
+      Pen.Width := 5;
       with center do
         Ellipse(X - size, Y - size, X + size, Y + size);
 
