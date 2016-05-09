@@ -74,9 +74,7 @@ type
     FStimuli : array of TRect;
     function GetCycles: integer;
     function RandomInRange(AFrom, ATo : integer):integer;
-  protected
     procedure Consequence(Sender: TObject);
-    procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
@@ -84,19 +82,18 @@ type
     procedure TrialResult(Sender: TObject);
     procedure UpdateTimer1(Sender: TObject);
     procedure UpdateTimer2(Sender: TObject);
-    // TTrial
+  private { TCustomControl }
+    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+  protected { TTrial }
+    procedure BeforeEndTrial(Sender: TObject); override;
     procedure StartTrial(Sender: TObject); override;
-    procedure ThreadClock(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
-    // TCustomControl
-    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
-    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
-    procedure DispenserPlusCall; override;
     property Cycles : integer read GetCycles;
 
   end;
@@ -112,6 +109,10 @@ uses
 constructor TDZT.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  OnKeyDown := @TrialKeyDown;
+  OnKeyUp := @TrialKeyUp;
+  OnBeforeEndTrial := @BeforeEndTrial;
+
   Header :=  'StmBegin' + #9 +
              '_Latency' + #9 +
              '___Cycle' + #9 +
@@ -152,6 +153,52 @@ begin
   Result := Random(ATo - AFrom + 1) + AFrom;
 end;
 
+procedure TDZT.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key = 27 {ESC}) and (FResponseEnabled = True) then
+    begin
+      FResponseEnabled:= False;
+      Invalidate;
+    end;
+end;
+
+procedure TDZT.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+var TickCount : Extended;
+begin
+  TickCount := GetCustomTick;
+
+  if FResponseEnabled then
+    begin
+      if Key = 32 {space} then
+        begin
+          FSchedule.DoResponse;
+          if FFirstResp then
+            begin
+              SendRequest('*R:' + GetTimeStampF);
+              FFirstResp := False;
+              FDataSupport.Latency := TickCount;
+            end
+          else SendRequest('R:' + GetTimeStampF);
+        end;
+    end;
+
+  if Key = 27 {ESC} then
+    begin
+      FResponseEnabled := True;
+      Invalidate;
+    end;
+
+  if (ssCtrl in Shift) and (Key = 81 {q}) then
+    begin
+      Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
+      Result := 'NONE';
+      IETConsequence := 'NONE';
+      NextTrial := 'END';
+      None(Self);
+      EndTrial(Self);
+    end;
+end;
+
 procedure TDZT.Consequence(Sender: TObject);
 var aConsequence : TKey;
 begin
@@ -174,8 +221,9 @@ procedure TDZT.TrialResult(Sender: TObject);
 begin
   Result := T_NONE;
   IETConsequence := T_NONE;
-
-  if not (FLimitedHold > 0) then EndTrial(Sender);
+  if Result = T_HIT then Hit(Sender);
+  if Result = T_MISS then  Miss(Sender);
+  if Result = T_NONE then  None(Sender);
 end;
 
 procedure TDZT.UpdateTimer1(Sender: TObject);
@@ -268,67 +316,6 @@ begin
   FFirstResp := True;
 end;
 
-procedure TDZT.ThreadClock(Sender: TObject);
-var TickCount : Extended;
-begin
-  TickCount := GetCustomTick;
-  FDataSupport.Cycle := TickCount;
-  FDataSupport.Timer2 := TimeStart;
-  TrialResult(Sender);
-  WriteData(Self);
-  EndTrial(Sender);
-end;
-
-procedure TDZT.KeyDown(var Key: Word; Shift: TShiftState);
-begin
-  //inherited KeyDown(Key, Shift);
-  if (Key = 27 {ESC}) and (FResponseEnabled = True) then
-    begin
-      FResponseEnabled:= False;
-      Invalidate;
-    end;
-end;
-
-procedure TDZT.KeyUp(var Key: Word; Shift: TShiftState);
-var TickCount : Extended;
-begin
-  //inherited KeyUp(Key, Shift);
-  TickCount := GetCustomTick;
-
-  if FResponseEnabled then
-    begin
-      if Key = 32 {space} then
-        begin
-          FSchedule.DoResponse;
-          if FFirstResp then
-            begin
-              SendRequest('*R:' + GetTimeStampF);
-              FFirstResp := False;
-              FDataSupport.Latency := TickCount;
-            end
-          else SendRequest('R:' + GetTimeStampF);
-        end;
-    end;
-
-  if Key = 27 {ESC} then
-    begin
-      FResponseEnabled := True;
-      Invalidate;
-    end;
-
-  if ssCtrl in Shift then
-     begin
-       if Key = 81 {q} then
-         begin
-           Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
-           Result := 'NONE';
-           IETConsequence := 'NONE';
-           NextTrial := 'END';
-           None(Self);
-           EndTrial(Self);
-         end;
-     end;
-end;
 
 procedure TDZT.Paint;
 const
@@ -488,10 +475,6 @@ begin
   StartTrial(Self);
 end;
 
-procedure TDZT.DispenserPlusCall;
-begin
-  // dispensers were not implemented yet
-end;
 
 procedure TDZT.StartTrial(Sender: TObject);
 var
@@ -519,6 +502,18 @@ begin
   FDataSupport.StmBegin := TickCount;
   SendRequest('S:' + GetTimeStampF);
   inherited StartTrial(Sender);
+end;
+
+procedure TDZT.BeforeEndTrial(Sender: TObject);
+begin
+  FResponseEnabled := False;
+
+  FDataSupport.Cycle := GetCustomTick;
+  FDataSupport.Timer2 := TimeStart;
+  TrialResult(Sender);
+  WriteData(Self);
+
+  SendRequest('E:' + GetTimeStampF);
 end;
 
 
@@ -563,19 +558,6 @@ begin
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
 
   Data := '';
-end;
-
-procedure TDZT.EndTrial(Sender: TObject);
-begin
-  FResponseEnabled := False;
-  Hide;
-
-  SendRequest('E:' + GetTimeStampF);
-  if Result = T_HIT then Hit(Sender);
-  if Result = T_MISS then  Miss(Sender);
-  if Result = T_NONE then  None(Sender);
-
-  if Assigned(OnEndTrial) then OnEndTrial(Sender);
 end;
 
 procedure TDZT.Hit(Sender: TObject);

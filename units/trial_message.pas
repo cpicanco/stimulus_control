@@ -30,7 +30,6 @@ uses  LCLIntf, LCLType, Controls,
 
      , trial_abstract
      , constants
-     , timestamp
      //, countermanager
      ;
 
@@ -46,22 +45,21 @@ type
   { TMSG }
 
   TMSG = class(TTrial)
-  protected
+  private
     FDataSupport : TDataSupport;
     FResponseEnabled : Boolean;
-    FMessage,
-    FMessagePrompt : TLabel;
-    //procedure Click; override;
-    procedure EndTrial(Sender: TObject); override;
-    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
+    FMessagePrompt,
+    FMessage : TLabel;
     procedure MessageMouseUp(Sender: TObject;Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
+    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+  protected
+    procedure BeforeEndTrial(Sender: TObject); override;
     procedure StartTrial(Sender: TObject); override;
-    procedure ThreadClock(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
+    //procedure ThreadClock(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
-    procedure DispenserPlusCall; override;
   end;
 
 resourcestring
@@ -70,11 +68,18 @@ resourcestring
 
 implementation
 
+uses
+  timestamp
+  {$ifdef DEBUG}
+  , debug_logger
+  {$endif}
+  ;
+
 constructor TMSG.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-
-  Header := 'Message' + #9 + '___Start' + #9 + 'Duration';
+  OnKeyUp := @TrialKeyUp;
+  OnBeforeEndTrial := @BeforeEndTrial;
 
   FMessage := TLabel.Create(Self);
   with FMessage do begin
@@ -98,6 +103,7 @@ begin
     Parent := Self;
   end;
 
+  Header := '___Start' + #9 + 'Duration' + #9 + 'Message';
   Result := T_NONE;
   IETConsequence := T_NONE;
   Result := T_NONE;
@@ -108,17 +114,29 @@ procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;
 begin
   if FResponseEnabled then
     if FLimitedHold = 0 then
-      EndTrial(Self);
-
+      EndTrial(Sender);
 end;
 
-procedure TMSG.KeyUp(var Key: Word; Shift: TShiftState);
+procedure TMSG.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  //inherited KeyUp(Key, Shift);
   if FResponseEnabled then
     if FLimitedHold = 0 then
       if (not (ssCtrl in Shift)) and (Key = 32) then
-          EndTrial(Self);
+          EndTrial(Sender);
+
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug +  'TMSG.KeyUp:'+ GetTimeStampF);
+  {$endif}
+end;
+
+procedure TMSG.BeforeEndTrial(Sender: TObject);
+begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + 'TMSG.BeforeEndTrial:'+ TObject(Sender).ClassName);
+  {$endif}
+  FDataSupport.TrialEnd := GetCustomTick;
+  FResponseEnabled := False;
+  WriteData(Self);
 end;
 
 procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);
@@ -160,18 +178,13 @@ begin
   StartTrial(Self);
 end;
 
-procedure TMSG.DispenserPlusCall;
-begin
-  // dispensers were not implemented yet
-end;
-
 procedure TMSG.StartTrial(Sender: TObject);
 begin
-  //Invalidate;
   FResponseEnabled := True;
   FDataSupport.TrialBegin := GetCustomTick;
   inherited StartTrial(Sender);
 end;
+
 
 procedure TMSG.WriteData(Sender: TObject);
 var aStart, aDuration : string;
@@ -179,27 +192,8 @@ begin
   aStart := FloatToStrF(FDataSupport.TrialBegin - TimeStart, ffFixed, 0, 9);
   aDuration := FloatToStrF(FDataSupport.TrialEnd - TimeStart, ffFixed, 0, 9);
 
-  Data := FMessage.Caption + #9 + aStart + #9 + aDuration + Data;
+  Data := aStart + #9 + aDuration + #9 + FMessage.Caption + Data;
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
-end;
-
-procedure TMSG.EndTrial(Sender: TObject);
-begin
-  Hide;
-  FDataSupport.TrialEnd := GetCustomTick;
-  WriteData(Self);
-  inherited EndTrial(Sender);
-end;
-
-procedure TMSG.ThreadClock(Sender: TObject);
-begin
-  if FResponseEnabled then
-    begin
-      Hide;
-      WriteData(Self);
-      FResponseEnabled := False;
-      if Assigned(OnEndTrial) then OnEndTrial(Sender);
-    end;
 end;
 
 end.
