@@ -138,7 +138,7 @@ end;
 
 procedure TFPE.TrialResult(Sender: TObject);
 begin
-  SendRequest('C:' + GetTimeStampF);
+  SendRequest('C' + #9 + GetTimeStampF);
 
   //FDataSupport.StmDuration := GetCustomTick;
 
@@ -229,7 +229,7 @@ begin
         begin
           //if FUseMedia then ... not implemented yet
           FDataSupport.StarterLatency := TickCount;
-          SendRequest('*R:' + GetTimeStampF);
+          SendRequest('*R' + #9 + GetTimeStampF);
           FShowStarter := False;
           Invalidate;
           StartTrial(Self);
@@ -237,7 +237,7 @@ begin
       else
         begin
           //if FUseMedia then ... not implemented yet
-          SendRequest('R:' + GetTimeStampF);
+          SendRequest('R' + #9 + GetTimeStampF);
           FSchedule.DoResponse;
         end;
   end;
@@ -457,7 +457,7 @@ end;
 
 procedure TFPE.BeginStarter;
 begin
-  SendRequest('S:' + GetTimeStampF);
+  SendRequest('S' + #9 + GetTimeStampF);
   FResponseEnabled:= True;
   Invalidate;
 end;

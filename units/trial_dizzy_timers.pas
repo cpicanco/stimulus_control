@@ -174,11 +174,11 @@ begin
           FSchedule.DoResponse;
           if FFirstResp then
             begin
-              SendRequest('*R:' + GetTimeStampF);
+              SendRequest('*R' + #9 + GetTimeStampF);
               FFirstResp := False;
               FDataSupport.Latency := TickCount;
             end
-          else SendRequest('R:' + GetTimeStampF);
+          else SendRequest('R' + #9 + GetTimeStampF);
         end;
     end;
 
@@ -203,14 +203,14 @@ procedure TDZT.Consequence(Sender: TObject);
 var aConsequence : TKey;
 begin
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'C:' + RootMedia + FConsequence);
+    DebugLn(mt_Debug + 'C' + #9 +  RootMedia + FConsequence);
   {$endif}
   aConsequence := TKey.Create(Self);
   aConsequence.Parent:= Self;
   aConsequence.HowManyLoops := 0;
   aConsequence.FullPath := RootMedia + FConsequence;
   aConsequence.Play;
-  SendRequest('C:' + GetTimestampF);
+  SendRequest('C' + #9 + GetTimestampF);
 
   { TODO 1 -oRafael -cenhencement : Find a better way to prevent data loss. }
   Sleep(10); // hack to prevent data loss
@@ -246,9 +246,9 @@ begin
           Timer2.Enabled := True;
           Color1 := not Color1;
           if Color1 then
-            ACode := '1a:'
+            ACode := '1a'
           else
-            ACode := '1b:';
+            ACode := '1b';
         end;
 
       if TClockThread(Sender) = Timer2 then
@@ -258,9 +258,9 @@ begin
           Timer1.Enabled := True;
           Color2 := not Color2;
           if Color2 then
-            ACode := '2a:'
+            ACode := '2a'
           else
-            ACode := '2b:';
+            ACode := '2b';
         end;
     end;
 
@@ -275,7 +275,7 @@ begin
         begin
           FSchedule.Kind := T_EXT;
         end;
-  SendRequest(ACode + GetTimeStampF);
+  SendRequest(ACode + #9 +  GetTimeStampF);
   Invalidate;
 
   // must pass Self here, see TBLC.WriteTrialData
@@ -294,23 +294,23 @@ begin
     begin
       FDizzyTimer.Color1 := not FDizzyTimer.Color1;
       if FDizzyTimer.Color1 then
-        ACode := '1a:'
+        ACode := '1a'
       else
-        ACode := '1b:';
+        ACode := '1b';
     end;
 
   if TClockThread(Sender) = FDizzyTimer.Timer2 then
     begin
       FDizzyTimer.Color2 := not FDizzyTimer.Color2;
       if FDizzyTimer.Color2 then
-        ACode := '2a:'
+        ACode := '2a'
       else
-        ACode := '2b:';
+        ACode := '2b';
     end;
 
   TickCount := GetCustomTick;
   FDataSupport.Timer2 := TickCount;
-  SendRequest(ACode + GetTimeStampF);
+  SendRequest(ACode + #9 + GetTimeStampF);
 
   Invalidate;
   FFirstResp := True;
@@ -500,7 +500,7 @@ begin
   FResponseEnabled := True;
   Invalidate;
   FDataSupport.StmBegin := TickCount;
-  SendRequest('S:' + GetTimeStampF);
+  SendRequest('S' + #9 + GetTimeStampF);
   inherited StartTrial(Sender);
 end;
 
@@ -513,7 +513,7 @@ begin
   TrialResult(Sender);
   WriteData(Self);
 
-  SendRequest('E:' + GetTimeStampF);
+  SendRequest('E' + #9 + GetTimeStampF);
 end;
 
 

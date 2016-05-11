@@ -33,7 +33,6 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     , draw_methods
     , schedules_main
     , response_key
-    , timestamp
     ;
 
 type
@@ -57,43 +56,45 @@ type
     FUseMedia : Boolean;
     FShowStarter : Boolean;
     FCanResponse : Boolean;
-  protected
     procedure BeginCorrection (Sender : TObject);
     procedure BeginStarter;
     procedure Consequence(Sender: TObject);
     procedure EndCorrection (Sender : TObject);
-    procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
-    procedure SetTimerCsq;
-    procedure StartTrial(Sender: TObject); override;
-    procedure ThreadClock(Sender: TObject); override;
     procedure TrialResult(Sender : TObject);
+  protected
+    procedure BeforeEndTrial(Sender: TObject); override;
+    procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
-    //TCustomControl
-    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
-    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
-    procedure KeyPress(var Key: Char); override;
+    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
-    procedure DispenserPlusCall; override;
+    //procedure DispenserPlusCall; override;
 
   end;
 
 implementation
 
-{$ifdef DEBUG}
 uses
-  debug_logger
-, dialogs;
+  timestamp
+{$ifdef DEBUG}
+  , debug_logger
+  , dialogs
 {$endif}
+  ;
 
 constructor TMRD.Create(AOwner: TComponent);
 begin
+  OnBeforeEndTrial := @BeforeEndTrial;
+  OnKeyDown := @TrialKeyDown;
+  OnKeyUp := @TrialKeyUp;
+
   inherited Create(AOwner);
   Header :=  'StmBegin' + #9 +
              '_Latency' + #9 +
@@ -109,20 +110,9 @@ begin
   FDataSupport.Responses:= 0;
 end;
 
-
-procedure TMRD.BeginCorrection(Sender: TObject);
-begin
-  if Assigned(OnBeginCorrection) then OnBeginCorrection (Sender);
-end;
-
-procedure TMRD.EndCorrection(Sender: TObject);
-begin
-  if Assigned(OnEndCorrection) then OnEndCorrection (Sender);
-end;
-
 procedure TMRD.Consequence(Sender: TObject);
 begin
-  SendRequest('C:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
+  SendRequest('C' + #9 + GetTimeStampF);
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 
   TrialResult(Sender);
@@ -136,19 +126,12 @@ begin
   if FCircles.NextTrial = T_CRT then NextTrial := T_CRT
   else NextTrial := FCircles.NextTrial;
 
-  if not (FLimitedHold > 0) then EndTrial(Sender);
+  if FLimitedHold = 0 then EndTrial(Sender);
 end;
 
-procedure TMRD.ThreadClock(Sender: TObject);
-begin
-  TrialResult(Sender);
-  EndTrial(Sender);
-end;
 
-procedure TMRD.KeyDown(var Key: Word; Shift: TShiftState);
+procedure TMRD.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  //inherited KeyDown (Key, Shift);
-
   if (Key = 27 {ESC}) and (FCanResponse = True) then
     begin
       FCanResponse:= False;
@@ -169,11 +152,11 @@ begin
      end;
 end;
 
-procedure TMRD.KeyUp(var Key: Word; Shift: TShiftState);
+procedure TMRD.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 var TickCount : Extended;
 begin
   TickCount := GetCustomTick;
-  inherited KeyUp(Key, Shift);
+
   if Key = 27 {ESC} then
     begin
       FCanResponse:= True;
@@ -188,22 +171,16 @@ begin
             begin
               //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
               FDataSupport.Latency := TickCount;
-              SendRequest('*R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
+              SendRequest('*R' + #9 + GetTimeStampF);
               FShowStarter := False;
               Invalidate;
               StartTrial(Self);
             end;
         end
-      else SendRequest('R:' + FloatToStrF(TickCount - TimeStart,ffFixed,0,9));
+      else SendRequest('R' + #9 + GetTimeStampF);
     end;
 end;
 
-procedure TMRD.KeyPress(var Key: Char);
-begin
-  inherited KeyPress(Key);
-  // do nothing
-
-end;
 
 procedure TMRD.Paint;
 var i : integer;
@@ -339,10 +316,10 @@ begin
   if FShowStarter then BeginStarter else StartTrial(Self);
 end;
 
-procedure TMRD.DispenserPlusCall;
-begin
-  // dispensers were not implemented yet
-end;
+//procedure TMRD.DispenserPlusCall;
+//begin
+//  // dispensers were not implemented yet
+//end;
 
 procedure TMRD.StartTrial(Sender: TObject);
 
@@ -375,7 +352,7 @@ end;
 
 procedure TMRD.BeginStarter;
 begin
-  SendRequest('S:' + FloatToStrF(GetCustomTick - TimeStart,ffFixed,0,9));
+  SendRequest('S' + #9 + GetTimeStampF);
   FCanResponse:= True;
   Invalidate;
 end;
@@ -397,9 +374,9 @@ begin
              ;
   }
   Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.StmBegin - TimeStart) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart) + #9 +
-           FormatFloat('00000000;;00000000',FDataSupport.StmEnd - TimeStart) + #9 +
+           FloatToStrF(FDataSupport.StmBegin - TimeStart,ffFixed,0,9) + #9 +
+           FloatToStrF(FDataSupport.Latency - TimeStart,ffFixed,0,9) + #9 +
+           FloatToStrF(FDataSupport.StmEnd - TimeStart,ffFixed,0,9) + #9 +
            #32#32#32#32#32 + FormatFloat('000;;00', FCircles.angle) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[0].o.X]) + #9 +
            Format('%-*.*d', [4,8,FCircles.C[0].o.Y]) + #9 +
@@ -414,16 +391,9 @@ begin
            + Data;
 end;
 
-procedure TMRD.SetTimerCsq;
-begin
-
-end;
-
-procedure TMRD.EndTrial(Sender: TObject);
+procedure TMRD.BeforeEndTrial(Sender: TObject);
 begin
   FCanResponse := False;
-  Hide;
-
   FDataSupport.StmEnd := GetTickCount64;
   FCircles.Result := Result;
 
@@ -434,23 +404,8 @@ begin
   WriteData(Sender);
 
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
-  if Assigned(OnEndTrial) then OnEndTrial(Sender);
 end;
 
-procedure TMRD.Hit(Sender: TObject);
-begin
-  if Assigned(OnHit) then OnHit(Sender);
-end;
-
-procedure TMRD.Miss(Sender: TObject);
-begin
-  if Assigned(OnMiss) then OnMiss (Sender);
-end;
-
-procedure TMRD.None(Sender: TObject);
-begin
-  if Assigned(OnNone) then OnNone (Sender);
-end;
 
 procedure TMRD.Response(Sender: TObject);
 var TickCount : Extended;
@@ -470,6 +425,31 @@ begin
   //Invalidate;
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
+end;
+
+procedure TMRD.Hit(Sender: TObject);
+begin
+  if Assigned(OnHit) then OnHit(Sender);
+end;
+
+procedure TMRD.Miss(Sender: TObject);
+begin
+  if Assigned(OnMiss) then OnMiss (Sender);
+end;
+
+procedure TMRD.None(Sender: TObject);
+begin
+  if Assigned(OnNone) then OnNone (Sender);
+end;
+
+procedure TMRD.BeginCorrection(Sender: TObject);
+begin
+  if Assigned(OnBeginCorrection) then OnBeginCorrection (Sender);
+end;
+
+procedure TMRD.EndCorrection(Sender: TObject);
+begin
+  if Assigned(OnEndCorrection) then OnEndCorrection (Sender);
 end;
 
 end.
