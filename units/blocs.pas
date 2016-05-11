@@ -280,7 +280,6 @@ begin
           end;
         EndBlc(Self);
       end;
-
 end;
 
 procedure TBlc.WriteTrialData(Sender: TObject);
