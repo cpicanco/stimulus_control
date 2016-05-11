@@ -66,14 +66,16 @@ type
     FLoopNumber: Integer;
     FLRespPnt: TResponsePoint;
     procedure SetFileName(Path: string);
-    procedure Consequence (Sender: TObject);
-    procedure Response (Sender: TObject);
+    procedure Consequence(Sender: TObject);
+    procedure Response(Sender: TObject);
+    procedure MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
     //procedure CMMouseEnter(var msg: TMessage); message CM_MOUSEENTER;
     //procedure CMMouseLeave(var msg: TMessage); message CM_MOUSELEAVE;
   protected
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); overload; override;
-    procedure MouseDown(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);reintroduce; overload;
-    procedure MouseDown(Sender : TObject; Button: Smallint; ShiftState: Smallint; X: Integer; Y: Integer); reintroduce; overload;
+    //procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    //procedure MouseDown(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);reintroduce; overload;
+    //procedure MouseDown(Sender : TObject; Button: Smallint; ShiftState: Smallint; X: Integer; Y: Integer); reintroduce; overload;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -118,6 +120,7 @@ begin
   FLRespPnt[1] := 0;
   Color:= clRed;
   Edge:= clInactiveCaption;
+  OnMouseDown := @MouseDown;
 
   FSchMan := TSchMan.Create(self);
   with FSchMan do
@@ -185,8 +188,8 @@ procedure TKey.Paint;
     begin
       with Canvas do
         begin
-          Draw(0,0, FBitMap);
-          //StretchDraw(Rect(0, 0, Width, Height), FBitMap);
+          //Draw(0,0, FBitMap);
+          StretchDraw(Rect(0, 0, Width, Height), FBitMap);
         end;
     end;
 begin
@@ -313,7 +316,7 @@ var
     Result := False;
     try
       FBitMap.LoadFromFile(s2);
-      SetKind (Audio, stmPicture);
+      SetKind(Audio, stmPicture);
     except
       on Exception do Exit;
     end;
@@ -329,7 +332,7 @@ var
       jpg.LoadFromFile(s2);
       FBitMap.Assign(jpg);
       jpg.Free;
-      SetKind (Audio, stmPicture);
+      SetKind(Audio, stmPicture);
     except
       on Exception do Exit;
     end;
@@ -475,51 +478,52 @@ begin
   Invalidate;
 end;
 
-procedure TKey.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TKey.MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 begin
-  inherited MouseDown(Button, Shift, X, Y);
+  //inherited MouseDown(Button, Shift, X, Y);
   FLRespPnt[0] := X;
   FLRespPnt[1] := Y;
   FSchMan.DoResponse;
 end;
 
-procedure TKey.MouseDown(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
-  inherited MouseDown(Button, Shift, X, Y);
-  FLRespPnt[0] := X;
-  FLRespPnt[1] := Y;
-  FSchMan.DoResponse;
-end;
-
-procedure TKey.MouseDown(Sender : TObject; Button: Smallint; ShiftState: Smallint; X: Integer; Y: Integer);
-var Shift : TShiftState;
-    aButton : TMouseButton;
-begin
-  case ShiftState of
-    0: Shift := [ssShift];
-    1: Shift := [ssAlt];
-    2: Shift := [ssCtrl];
-    3: Shift := [ssLeft];
-    4: Shift := [ssRight];
-    5: Shift := [ssMiddle];
-    6: Shift := [ssDouble];
-    //7: Shift := [ssTouch];
-    //8: Shift := [ssPen];
-    //9: Shift := [ssCommand];
-      else Shift := [];
-  end;
-  case Button of
-    0: aButton := mbLeft;
-    1: aButton := mbRight;
-    2: aButton := mbMiddle;
-    else aButton := mbLeft;
-  end;
-
-  inherited MouseDown(aButton, Shift, X, Y);
-  FLRespPnt[0] := X;
-  FLRespPnt[1] := Y;
-  FSchMan.DoResponse;
-end;
+//procedure TKey.MouseDown(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+//begin
+//  inherited MouseDown(Button, Shift, X, Y);
+//  FLRespPnt[0] := X;
+//  FLRespPnt[1] := Y;
+//  FSchMan.DoResponse;
+//end;
+//
+//procedure TKey.MouseDown(Sender : TObject; Button: Smallint; ShiftState: Smallint; X: Integer; Y: Integer);
+//var Shift : TShiftState;
+//    aButton : TMouseButton;
+//begin
+//  case ShiftState of
+//    0: Shift := [ssShift];
+//    1: Shift := [ssAlt];
+//    2: Shift := [ssCtrl];
+//    3: Shift := [ssLeft];
+//    4: Shift := [ssRight];
+//    5: Shift := [ssMiddle];
+//    6: Shift := [ssDouble];
+//    //7: Shift := [ssTouch];
+//    //8: Shift := [ssPen];
+//    //9: Shift := [ssCommand];
+//      else Shift := [];
+//  end;
+//  case Button of
+//    0: aButton := mbLeft;
+//    1: aButton := mbRight;
+//    2: aButton := mbMiddle;
+//    else aButton := mbLeft;
+//  end;
+//
+//  inherited MouseDown(aButton, Shift, X, Y);
+//  FLRespPnt[0] := X;
+//  FLRespPnt[1] := Y;
+//  FSchMan.DoResponse;
+//end;
 //******
 //**  **
 //******
@@ -530,12 +534,12 @@ end;
 //******
 procedure TKey.Consequence(Sender: TObject);
 begin
-  If Assigned(OnConsequence) then FOnConsequence(Self);   //Necessariamente Self
+  if Assigned(OnConsequence) then FOnConsequence(Self);   //Necessariamente Self
 end;
 
 procedure TKey.Response(Sender: TObject);
 begin
-  If Assigned(OnResponse) then FOnResponse(Self);   //Necessariamente  SELF
+  if Assigned(OnResponse) then FOnResponse(Self);   //Necessariamente  SELF
 end;
 
 function TKey.ResponseCount: integer;
