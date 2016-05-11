@@ -1,0 +1,275 @@
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	1000
+NumTrials=	96 1
+
+[Blc 1 - T1]
+
+Name=	135.00 1
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	135.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	507 407 110
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	663 251 110
+C2Stm=	
+C2Gap=	1
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T2]
+
+Name=	90.00 2
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	90.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	585 439 110
+C1Stm=	
+C1Gap=	1
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	585 219 110
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T3]
+
+Name=	0.00 3
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	0.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	695 329 110
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	475 329 110
+C2Stm=	
+C2Gap=	1
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T4]
+
+Name=	0.00 4
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	0.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	695 329 110
+C1Stm=	
+C1Gap=	1
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	475 329 110
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T5]
+
+Name=	0.00 5
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	0.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	640 329 110
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	530 329 110
+C2Stm=	
+C2Gap=	1
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T6]
+
+Name=	45.00 6
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	45.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	663 407 110
+C1Stm=	
+C1Gap=	1
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	507 251 110
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T7]
+
+Name=	45.00 7
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	45.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	624 368 110
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	546 290 110
+C2Stm=	
+C2Gap=	1
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T8]
+
+Name=	45.00 8
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	45.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	663 407 110
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	507 251 110
+C2Stm=	
+C2Gap=	1
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T9]
+
+Name=	90.00 9
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	90.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	585 439 110
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	585 219 110
+C2Stm=	
+C2Gap=	1
+C2GapDegree=	0
+C2GapLength=	360
+
+[Blc 1 - T10]
+
+Name=	0.00 10
+Kind=	MRD
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	2
+UseMedia=	0
+Starter=	1
+Angle=	0.00
+Schedule=	FT 2000
+NextTrial=	0
+
+C1Bnd=	751 329 110
+C1Stm=	
+C1Gap=	1
+C1GapDegree=	0
+C1GapLength=	360
+
+C2Bnd=	419 329 110
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	0
+C2GapLength=	360

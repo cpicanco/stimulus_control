@@ -1,0 +1,715 @@
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	1000
+NumTrials=	10 1
+
+[Blc 1 - T1]
+
+Name=	Positiva 1
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Positiva
+TIET=	NONE,MISS,HIT,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	1
+C1GapDegree=	235
+C1GapLength=	1
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T2]
+
+Name=	Negativa 2
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Negativa
+TIET=	NONE,HIT,MISS,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T3]
+
+Name=	Positiva 3
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Positiva
+TIET=	NONE,MISS,HIT,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	1
+C2GapDegree=	144
+C2GapLength=	1
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T4]
+
+Name=	Negativa 4
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Negativa
+TIET=	NONE,HIT,MISS,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T5]
+
+Name=	Positiva 5
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Positiva
+TIET=	NONE,MISS,HIT,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	1
+C3GapDegree=	212
+C3GapLength=	1
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T6]
+
+Name=	Negativa 6
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Negativa
+TIET=	NONE,HIT,MISS,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T7]
+
+Name=	Positiva 7
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Positiva
+TIET=	NONE,MISS,HIT,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	1
+C4GapDegree=	260
+C4GapLength=	1
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T8]
+
+Name=	Negativa 8
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Negativa
+TIET=	NONE,HIT,MISS,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T9]
+
+Name=	Positiva 9
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Positiva
+TIET=	NONE,MISS,HIT,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	1
+C5GapDegree=	218
+C5GapLength=	1
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T10]
+
+Name=	Negativa 10
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	0
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Negativa
+TIET=	NONE,HIT,MISS,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
