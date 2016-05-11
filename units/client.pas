@@ -40,13 +40,6 @@ type
 
   { TClientThread }
 
-  //FCriticalSection : TRTLCriticalSection;
-  //EnterCriticalSection(FCriticalSection);
-  //try
-  // do stuff
-  //finally
-  //  LeaveCriticalSection(FCriticalSection);
-  //end;
   TClientThread = class(TThread)
   private
     FMsg,
@@ -66,8 +59,6 @@ type
     destructor Destroy; override;
     procedure SendRequest(ACode : UTF8string; ATrialIndex : integer; ARequest : UTF8string = 'T');
     property OnShowStatus: TShowStatusEvent read FOnShowStatus write FOnShowStatus;
-
-
   end;
 
 implementation
@@ -80,7 +71,6 @@ constructor TClientThread.Create(AHost: string; CreateSuspended: Boolean);
 begin
   FreeOnTerminate := True;
 
-  //InitCriticalSection(FCriticalSection);
   FRTLEvent := RTLEventCreate;
 
   FContext := TZMQContext.Create;
@@ -94,7 +84,6 @@ begin
   FRequester.Free;
   FContext.Free;
   RTLEventDestroy(FRTLEvent);
-  //DoneCriticalsection(FCriticalSection);
   inherited Destroy;
 end;
 
@@ -134,8 +123,8 @@ begin
       FRequester.send( ARequest );
       FRequester.recv( AMessage );
 
-      // ('trial', 'timestamp', 'event')
-      FMsg := #40#39 + ATrialIndex + #39#44#32#39 + AMessage + #39#44#32#39 + ACode + #39#41;
+      // trial timestamp event
+      FMsg := ATrialIndex + #9 + AMessage + #9 + ACode;
       Synchronize( @Showstatus );
 
       {$ifdef DEBUG}
@@ -145,24 +134,5 @@ begin
 
     end;
 end;
-
-//function TClientThread.GetTimestampFromMessage(aMessage: Utf8String
-//  ): Utf8String;
-//
-//  var aKey, aHeader : Utf8String;
-//begin
-//  if Pos('timestamp', aMessage) <> 0 then
-//  begin
-//	  aHeader := 'Pupil';
-//	  aKey := 'timestamp:';
-//	  Delete(  aMessage, Pos(aHeader, aMessage), Length(aHeader)  );
-//	  Delete(  aMessage, Pos(aKey, aMessage), Length(aKey)  );
-//
-//	  while Pos(#10, aMessage) <> 0 do
-//		  Delete(  aMessage, Pos(#10, aMessage), Length(#10)  );
-//  end;
-//	Result := aMessage;
-//
-//end;
 
 end.
