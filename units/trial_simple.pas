@@ -33,8 +33,8 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     //, config_session
     //, counter
     , constants
-    , interface_rs232
-    , interface_plp
+    //, interface_rs232
+    //, interface_plp
     ;
 
 type
@@ -67,45 +67,49 @@ type
 
   TSimpl = Class(TTrial)
   protected
-    FConsequenceFired : Boolean;
     FDataSupport : TDataSupport;
-    FFirstResp : Boolean;
     FKMinus : TSupportKey;
     FKPlus : TSupportKey;
-    FNumComp : Integer;
     FResponseEnabled : Boolean;
+    FConsequenceFired : Boolean;
+    FFirstResp : Boolean;
+    FNumComp : Integer;
     FTrialInterval : Integer;
     FVetSupportC : array of TSupportKey;
     procedure BeginCorrection (Sender: TObject);
     procedure Consequence(Sender: TObject);
     procedure Dispenser(Csq: Byte; Usb: string);
     procedure EndCorrection(Sender: TObject);
-    procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
     procedure TrialResult(Sender: TObject);
     // TTrial
-    procedure ThreadClock(Sender: TObject); override;
+    procedure BeforeEndTrial(Sender: TObject); override;
     procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
     // TCustomControl
-    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
-    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialKeyUp(Sender: TObject;var Key: Word; Shift: TShiftState);
+    procedure TrialMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
-    procedure DispenserPlusCall; override;
+    //procedure DispenserPlusCall; override;
   end;
 
 implementation
 
+uses timestamp;
+
 constructor TSimpl.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  OnBeforeEndTrial := @BeforeEndTrial;
+  OnKeyDown := @TrialKeyDown;
+  OnKeyUp := @TrialKeyUp;
+  OnMouseDown := @TrialMouseDown;
 
   Header :=  'Pos.Cmp.' + #9 +        //header do Relatório
              'Res.Cmp.' + #9 +
@@ -124,22 +128,17 @@ begin
 
 end;
 
-destructor TSimpl.Destroy;
-begin
-
-  inherited Destroy;
-end;
 
 procedure TSimpl.Dispenser(Csq: Byte; Usb: string);
 begin
-  PLP.OutPortOn (Csq);
-  RS232.Dispenser(Usb);
+  //PLP.OutPortOn (Csq);
+  //RS232.Dispenser(Usb);
 end;
 
-procedure TSimpl.DispenserPlusCall;
-begin
-  Dispenser(FKPlus.Csq, FKPlus.Usb);
-end;
+//procedure TSimpl.DispenserPlusCall;
+//begin
+//  Dispenser(FKPlus.Csq, FKPlus.Usb);
+//end;
 
 procedure TSimpl.Play(TestMode: Boolean; Correction : Boolean);
 var
@@ -157,10 +156,10 @@ begin
   Randomize;
 
   // TCustomControl
-  Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], 0);
+  Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], Parent.Color);
 
   if TestMode then Cursor := 0
-  else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
+  else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], Parent.Cursor);
 
   // TTrial
   RootMedia := CfgTrial.SList.Values[_RootMedia];
@@ -204,7 +203,7 @@ begin
           R.Left := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
           NextSpaceDelimitedParameter;
 
-          R.Bottom := StrToIntDef(s1, 0);
+          R.Bottom := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
           NextSpaceDelimitedParameter;
 
           R.Right := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
@@ -256,72 +255,81 @@ begin
 end;
 
 procedure TSimpl.TrialResult(Sender: TObject);
-var TickCount : cardinal;
+var
+    TickCount : Extended;
+    I : integer;
+
 begin
-  TickCount := GetTickCount64;
-  if FResponseEnabled then
+  TickCount := GetCustomTick;
+
+  FDataSupport.StmEnd := TickCount;
+  FResponseEnabled:= False;
+
+  if Sender is TKey then
     begin
-      Hide;
-      FDataSupport.StmEnd := TickCount;
-      FResponseEnabled:= False;
+      I := TKey(Sender).Tag;
+      //FDataSupport.PLPCode:= FVetSupportC[I].Csq;
+      //FDataSupport.RS232Code := FVetSupportC[I].Usb;
+      TimeOut := FVetSupportC[I].TO_;
+      IETConsequence := FVetSupportC[I].IET;
 
-
-      if (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) or
-         (FVetSupportC[TKey(Sender).Tag].Res = T_MISS)  then
+      if (FVetSupportC[I].Res = T_HIT) or (FVetSupportC[I].Res = T_MISS)  then
         begin
-          if FVetSupportC[TKey(Sender).Tag].Res = T_HIT then Result := T_HIT;
-
-          if FVetSupportC[TKey(Sender).Tag].Res = T_MISS then Result := T_MISS;
-
+          if FVetSupportC[I].Res = T_HIT then Result := T_HIT;
+          if FVetSupportC[I].Res = T_MISS then Result := T_MISS;
         end
-      else Result := T_NONE;
+      else
+        Result := T_NONE;
 
-      //FDataSupport.PLPCode:= FVetSupportC[TKey(Sender).Tag].Csq;
-      //FDataSupport.RS232Code := FVetSupportC[TKey(Sender).Tag].Usb;
-      TimeOut := FVetSupportC[TKey(Sender).Tag].TO_;
-      IETConsequence := FVetSupportC[TKey(Sender).Tag].IET;
-      if FVetSupportC[TKey(Sender).Tag].Nxt = T_CRT then NextTrial := T_CRT
-      else NextTrial := FVetSupportC[TKey(Sender).Tag].Nxt;
+      if FVetSupportC[I].Nxt = T_CRT then
+        NextTrial := T_CRT
+      else
+        NextTrial := FVetSupportC[I].Nxt;
 
-      if FVetSupportC[TKey(Sender).Tag].Msg = 'GONOGO' then
+      if FVetSupportC[I].Msg = 'GONOGO' then
         begin       //GONOGO serve apenas para a diferenciação entre Go e NoGo nos esquemas RRRT
-           if FConsequenceFired then FDataSupport.CompMsg := 'GO'
-           else  FDataSupport.CompMsg := 'NOGO';
+          if FConsequenceFired then
+            FDataSupport.CompMsg := 'GO'
+          else
+            FDataSupport.CompMsg := 'NOGO';
 
-           if (FConsequenceFired = False) and (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) then
-             begin
-               Result := 'MISS';
-             end;
-           if (FConsequenceFired = False) and (FVetSupportC[TKey(Sender).Tag].Res = T_MISS) then
-             begin
-               FDataSupport.PLPCode := 0;
-               FDataSupport.RS232Code := '0';
-               TimeOut := 0;
-               Result := T_HIT;
-             end;
+          if (FConsequenceFired = False) and (FVetSupportC[I].Res = T_HIT) then
+            Result := 'MISS';
 
-           if FConsequenceFired and (FVetSupportC[TKey(Sender).Tag].Res = T_HIT) then TimeOut := 0;
-           if FConsequenceFired and (FVetSupportC[TKey(Sender).Tag].Res = T_MISS) then
-             begin
-               FDataSupport.PLPCode := 0;
-               FDataSupport.RS232Code := '0';
-             end;
+          if (FConsequenceFired = False) and (FVetSupportC[I].Res = T_MISS) then
+           begin
+             FDataSupport.PLPCode := 0;
+             FDataSupport.RS232Code := '0';
+             TimeOut := 0;
+             Result := T_HIT;
+           end;
+
+          if FConsequenceFired and (FVetSupportC[I].Res = T_HIT) then
+            TimeOut := 0;
+
+          if FConsequenceFired and (FVetSupportC[I].Res = T_MISS) then
+           begin
+             FDataSupport.PLPCode := 0;
+             FDataSupport.RS232Code := '0';
+           end;
         end
-      else FDataSupport.CompMsg:= FVetSupportC[TKey(Sender).Tag].Msg;
-
-      if Result = T_HIT then  Hit(Sender);
-      if Result = T_MISS then  Miss(Sender);
-      if Result = T_NONE then  None(Sender);
-
-      if not (FLimitedHold > 0) then EndTrial(Sender);
+      else
+        FDataSupport.CompMsg:= FVetSupportC[I].Msg;
     end;
+
+  if Result = T_HIT then
+    Hit(Sender);
+
+  if Result = T_MISS then
+    Miss(Sender);
+
+  if Result = T_NONE then
+    None(Sender);
 end;
 
-procedure TSimpl.ThreadClock(Sender: TObject);
+procedure TSimpl.BeforeEndTrial(Sender: TObject);
 begin
-  TrialResult(Sender);
   WriteData(Sender);
-  EndTrial(Sender);
 end;
 
 procedure TSimpl.StartTrial(Sender: TObject);
@@ -347,12 +355,12 @@ begin
   FFirstResp := False;
   FResponseEnabled := True;
 
-  FDataSupport.StmBegin := GetTickCount64;
+  FDataSupport.StmBegin := GetCustomTick;
   inherited StartTrial(Sender);
 end;
 
 
-procedure TSimpl.WriteData(Sender: TObject);  //Dados do Relatório
+procedure TSimpl.WriteData(Sender: TObject);
 var
     Latency,
     Dur_CmpResponse,
@@ -389,10 +397,10 @@ begin
   Res_Cmp:= LeftStr(FDataSupport.CompMsg+#32#32#32#32#32#32#32#32, 8);
 
   if not FFirstResp then
-    Latency := FormatFloat('00000000;;00000000',FDataSupport.Latency - TimeStart)
+    Latency := FloatToStrF(FDataSupport.Latency - TimeStart,ffFixed,0,9)
   else Latency := #32#32#32#32#32#32 + 'NA';
-  Dur_CmpResponse := FormatFloat('00000000;;00000000',FDataSupport.StmEnd - TimeStart);
-  Dur_Cmp := FormatFloat('00000000;;00000000',FDataSupport.StmEnd - FDataSupport.StmBegin);
+  Dur_CmpResponse := FloatToStrF(FDataSupport.StmEnd - TimeStart,ffFixed,0,9);
+  Dur_Cmp := FloatToStrF(FDataSupport.StmEnd - FDataSupport.StmBegin,ffFixed,0,9);
 
   //Disp:= RightStr(IntToBin(FDataSupport.PLPCode, 9)+#0, 8);
   //uDisp := IntToStr(FDataSupport.RS232Code);
@@ -410,26 +418,9 @@ begin
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
 end;
 
-procedure TSimpl.EndCorrection(Sender: TObject);
+procedure TSimpl.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
+  );
 begin
-  if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
-end;
-
-procedure TSimpl.EndTrial(Sender: TObject);
-begin
-  FResponseEnabled := False;
-
-  if Assigned(OnEndTrial) then OnEndTrial(sender);
-end;
-
-procedure TSimpl.Hit(Sender: TObject);
-begin
-  if Assigned(OnHit) then OnHit(Sender);
-end;
-
-procedure TSimpl.KeyDown(var Key: Word; Shift: TShiftState);
-begin
-  inherited KeyDown (Key, Shift);
 
   if Key = 27 {ESC} then FResponseEnabled:= False;
 
@@ -440,7 +431,6 @@ begin
       Result := T_NONE;
       IETConsequence := T_NONE;
       NextTrial := '0';
-      WriteData(Self);
       EndTrial(Self);
     end;
 
@@ -451,18 +441,16 @@ begin
      Result := T_NONE;
      IETConsequence := T_NONE;
      NextTrial := 'END';
-     WriteData(Self);
-     Data := Data + LineEnding + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + LineEnding;
+     Data := Data + LineEnding + '(Sessão cancelada)' + LineEnding;
      EndTrial(Self);
     end;
 
 end;
 
-procedure TSimpl.KeyUp(var Key: Word; Shift: TShiftState);
+procedure TSimpl.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  inherited Keyup(Key, Shift);
 
-  if Key = 27 then FResponseEnabled:= True;
+  if Key = 27 {esc} then FResponseEnabled:= True;
 
   if (Key = 107) {+} then
     begin
@@ -488,20 +476,16 @@ begin
     end;
 end;
 
-procedure TSimpl.Miss(Sender: TObject);
-begin
-  if Assigned(OnMiss) then OnMiss (Sender);
-end;
 
-procedure TSimpl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TSimpl.TrialMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 var
-    TickCount : cardinal;
+    TickCount : Extended;
     aTime, aCode, aStimulus, aLeft, aTop : string;
 begin
-  TickCount := GetTickCount64;
-  inherited MouseDown(Button,Shift, X, Y);
+  TickCount := GetCustomTick;
 
-  aTime := FormatFloat('00000000;;00000000', TickCount - TimeStart);
+  aTime := FloatToStrF(TickCount - TimeStart, ffFixed, 0, 9);
   aCode := 'BK';
   aStimulus := '-';
   aLeft := IntToStr(X);
@@ -515,6 +499,65 @@ begin
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;
 
+procedure TSimpl.Consequence(Sender: TObject);
+begin
+  { The Dispenser requires working interfaces. They were not tested in the cross platform scope. }
+  Dispenser(FDataSupport.PLPCode, FDataSupport.RS232Code);
+  CounterManager.OnConsequence(Sender);
+  if Assigned(OnConsequence) then OnConsequence(Sender);
+  if FLimitedHold = 0 then
+    begin
+      // we need TKey as sender, not TThread
+      TrialResult(Sender);
+      EndTrial(Sender)
+    end
+  else
+    if FConsequenceFired = False then
+      FConsequenceFired := True;
+end;
+
+procedure TSimpl.Response(Sender: TObject);
+var
+    TickCount : Extended;
+    aTime, aCode, aStimulus, aLeft, aTop : string;
+begin
+  TickCount := GetCustomTick;
+  if FResponseEnabled then
+    begin
+      aTime := FloatToStrF(TickCount - TimeStart, ffFixed, 0, 9);
+
+      if Sender is TKey then
+        begin
+          TKey(Sender).IncResponseCount;
+          aCode := 'C' + IntToStr(TKey(Sender).Tag + 1);
+          aStimulus := ExtractFileName(TKey(Sender).FullPath);
+          aLeft := IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left);
+          aTop := IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top);
+          DataTicks := DataTicks +
+            aTime + #9 + aCode + #9 + aStimulus + #9 + aLeft + #9 + aTop + LineEnding;
+        end;
+
+      if FFirstResp = False then
+        begin
+          FDataSupport.Latency := TickCount;
+          FFirstResp := True;
+        end;
+
+      if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
+      if Assigned(OnStmResponse) then OnStmResponse (Self);
+    end;
+end;
+
+procedure TSimpl.EndCorrection(Sender: TObject);
+begin
+  if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
+end;
+
+procedure TSimpl.Hit(Sender: TObject);
+begin
+  if Assigned(OnHit) then OnHit(Sender);
+end;
+
 procedure TSimpl.None(Sender: TObject);
 begin
   if Assigned(OnNone) then OnMiss (Sender);
@@ -525,43 +568,9 @@ begin
   if Assigned (OnBeginCorrection) then OnBeginCorrection (Sender);
 end;
 
-procedure TSimpl.Consequence(Sender: TObject);
+procedure TSimpl.Miss(Sender: TObject);
 begin
-  { The Dispenser requires working interfaces. They were not tested in the cross platform scope. }
-  Dispenser(FDataSupport.PLPCode, FDataSupport.RS232Code);
-  CounterManager.OnConsequence(Sender);
-  if Assigned(OnConsequence) then OnConsequence(Sender);
-  if not (FLimitedHold > 0) then TrialResult(Sender)
-  else
-    if FConsequenceFired = False then FConsequenceFired := True;
-end;
-
-procedure TSimpl.Response(Sender: TObject);
-var
-    TickCount : cardinal;
-    aTime, aCode, aStimulus, aLeft, aTop : string;
-begin
-  TickCount := GetTickCount64;
-  if FResponseEnabled then
-    begin
-      aTime := FormatFloat('00000000;;00000000', TickCount - TimeStart);
-      aCode := 'C' + IntToStr(TKey(Sender).Tag + 1);
-      aStimulus := ExtractFileName(TKey(Sender).FullPath);
-      aLeft := IntToStr(TKey(Sender).LastResponsePoint[0] + TKey(Sender).Left);
-      aTop := IntToStr(TKey(Sender).LastResponsePoint[1] + TKey(Sender).Top);
-      DataTicks := DataTicks +
-        aTime + #9 + aCode + #9 + aStimulus + #9 + aLeft + #9 + aTop + LineEnding;
-
-      if FFirstResp = False then
-      begin
-        FDataSupport.Latency := TickCount;
-        FFirstResp := True;
-      end;
-
-      TKey(Sender).IncResponseCount;
-      if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
-      if Assigned(OnStmResponse) then OnStmResponse (Self);
-    end;
+  if Assigned(OnMiss) then OnMiss (Sender);
 end;
 
 end.
