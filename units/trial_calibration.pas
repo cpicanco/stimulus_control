@@ -59,9 +59,8 @@ type
     FCurrTrial : FDataSupport;
   protected
     procedure None(Sender: TObject);
-    procedure ThreadClock(Sender: TObject); override;
+    procedure ThreadClock(Sender: TObject); //override;
     procedure StartTrial(Sender: TObject); override;
-    procedure EndTrial(Sender: TObject);
     procedure WriteData(Sender: TObject); override;
 
     { TCustomControl overrides }
@@ -71,7 +70,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
-    procedure DispenserPlusCall; override;
+    //procedure DispenserPlusCall; override;
   end;
 
 
@@ -88,25 +87,19 @@ end;
 
 procedure TCLB.ThreadClock(Sender: TObject);
 begin
-  // do nothing; Limited hold was not impleted in this trial type
-end;
-
-procedure TCLB.StartTrial(Sender: TObject);
-begin
-  { This trial type does not requires a timer }
-  //inherited StartTrial(Sender);
-  FShowDots := True;
-  FCurrTrial.StmBegin := GetTickCount64;
-end;
-
-procedure TCLB.EndTrial(Sender: TObject);
-begin
   Hide;
   FCurrTrial.StmEnd := GetTickCount64;
   WriteData(Sender);
 
   if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
   if Assigned(OnEndTrial) then OnEndTrial(Sender);
+end;
+
+procedure TCLB.StartTrial(Sender: TObject);
+begin
+  FShowDots := True;
+  FCurrTrial.StmBegin := GetTickCount64;
+  inherited StartTrial(Sender);
 end;
 
 procedure TCLB.WriteData(Sender: TObject);
@@ -224,10 +217,10 @@ begin
   StartTrial(Self);
 end;
 
-procedure TCLB.DispenserPlusCall;
-begin
-  // dispensers were not implemented yet
-end;
+//procedure TCLB.DispenserPlusCall;
+//begin
+//  // dispensers were not implemented yet
+//end;
 
 end.
 

@@ -46,7 +46,6 @@
         <ComponentName Value="FormSchedules"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="main_form"/>
       </Unit1>
       <Unit2>
         <Filename Value="cumulative_record.pas"/>
@@ -65,12 +64,22 @@
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>
+      <SmartLinkUnit Value="True"/>
       <Optimizations>
-        <OptimizationLevel Value="0"/>
+        <OptimizationLevel Value="3"/>
       </Optimizations>
+      <SmallerCode Value="True"/>
     </CodeGeneration>
     <Linking>
+      <Debugging>
+        <GenerateDebugInfo Value="False"/>
+        <UseLineInfoUnit Value="False"/>
+        <StripSymbols Value="True"/>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
+      <LinkSmart Value="True"/>
       <Options>
+        <PassLinkerOptions Value="True"/>
         <Win32>
           <GraphicApplication Value="True"/>
         </Win32>
@@ -78,6 +87,9 @@
     </Linking>
     <Other>
       <CustomOptions Value="-dUseCThreads"/>
+      <OtherDefines Count="1">
+        <Define0 Value="UseCThreads"/>
+      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>
