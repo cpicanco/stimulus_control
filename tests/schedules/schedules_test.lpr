@@ -25,13 +25,13 @@ program schedules_test;
 
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
-  cthreads,
+  cthreads
   {$ENDIF}{$ENDIF}
-  Interfaces, // this includes the LCL widgetset
-  Forms, tachartlazaruspkg,
-
-  main_form,
-  cumulative_record
+  , Interfaces // this includes the LCL widgetset
+  , Forms
+  , main_form
+  //, tachartlazaruspkg
+  //, cumulative_record
   { you can add units after this };
 
 {$R *.res}

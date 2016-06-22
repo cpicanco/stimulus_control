@@ -112,7 +112,7 @@ type
     // TTrial
     procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
-    procedure ThreadClock(Sender: TObject); override;
+    procedure ThreadClock(Sender: TObject); //override;
     // TCustomControl
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
@@ -123,7 +123,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
-    procedure DispenserPlusCall; override;
+    //procedure DispenserPlusCall; override;
   end;
 
 implementation
@@ -189,10 +189,10 @@ begin
   PLP.OutPortOn (Csq);
 end;
 
-procedure TMTS.DispenserPlusCall;
-begin
-  Dispenser(FKPlus.Csq, FKPlus.Usb);
-end;
+//procedure TMTS.DispenserPlusCall;
+//begin
+//  Dispenser(FKPlus.Csq, FKPlus.Usb);
+//end;
 
 procedure TMTS.Play(TestMode: Boolean; Correction : Boolean);
 var s1, sName, sLoop, sColor: String; R: TRect; a1: Integer;
