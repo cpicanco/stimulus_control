@@ -44,7 +44,6 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <StripSymbols Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <Options>
@@ -58,6 +57,10 @@
               <ShoLineNum Value="True"/>
             </Verbosity>
             <CustomOptions Value="-dUseCThreads"/>
+            <OtherDefines Count="2">
+              <Define0 Value="UseCThreads"/>
+              <Define1 Value="FPC_PROFILES"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item2>
