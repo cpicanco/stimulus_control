@@ -5,7 +5,8 @@ Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
 - It is aimed at fast programming of behavioral experiments.
 - It can be extended to Design, Present, Record and Archive a wide range of behavioral experiments.
 - It was designed for Participants, Researchers and Developers.
-- It is a prototype being inspired by OpenSesame.
+- It is a prototype to run non time-critical experiments.
+- It is being inspired by OpenSesame, Psychopy and Expyrement.
 
 ### Some features
 
