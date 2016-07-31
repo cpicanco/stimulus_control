@@ -1,26 +1,40 @@
-Validation Project (PCRF)
-==================
+# Stimulus Control
 
-// english
+Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
 
-This is a repository to stimulus control programs that I have contributed for.
+- It is aimed at fast programming of behavioral experiments.
+- It can be extended to Design, Present, Record and Archive a wide range of behavioral experiments.
+- It was designed for Participants, Researchers and Developers.
+- It is a prototype being inspired by OpenSesame.
 
-Validation Project (PCRF) is an ongoing project and includes a stimulus control program (Stimulus Control App) and some simple python scripts. The main program was written in Object Free Pascal with the lazarus 1.2.6 IDE and was compiled on Ubuntu 13.10, Crunchbang 11, Windows 8.1 and Windows 10 and was thought to be cross-platform.
+### Some features
 
-The python scripts were meant to be interfaces to the Pupil Capture software. Pupil is an open source software platform to track eye movements (https://github.com/pupil-labs/pupil).
+  - Text Messages
+  - Simple Discriminations
+  - Conditional Discriminations
+  - Stimuli (antecedents, consequents):
+      - Sounds using the Bass library
+      - Videos using the LCLVLC component and the libvlc library
+      - Images (jpg, bmp)
 
-For example, the script 'timestamps_by_trial.py' ilustrates how to read the data of the '*.timestamps' files (an output from the Stimulus Control App).
+  - Responses (schedules of reinforcements):
+      - CRF, EXT
+      - FT, VT
+      - FR, VR
+      - FI, VI,
+      - DRH, DRL
 
-Many thanks to Drausio Capobianco (first main developer, now retired) for have allowed me to continue his work.
+  - Designs
+    - Free operant
+    - Discrete Trials
 
-// português
+  - Timestamped Events and some communication with Pupil Software (https://github.com/pupil-labs/pupil);
 
-Este é um repositório para os programas de controle de estímulo para os quais eu tenho colaborado.
+  - Cross-Platform (tested under Windows (7, 8 and 10), Crunchbang 11, Ubuntu (13.10 and 14.04) and Debian 8.
 
-Validation Project (PCRF) é um projeto em andamento e inclui um programa de controle de estímulo (Stimulus Control App) e alguns scripts simples em python. O programa principal foi escrito em object free pascal com a IDE 'Lazarus 1.2.6' e foi compilado no Ubuntu 13.10, Crunchbang 11, Windows 8.1 e Windows 10 e foi pensado para ser multi-plataforma.
+  - Free software (GPL3) written in Object Free Pascal (Lazarus 1.6.0, FPC 3.0.0).
+  - Core code was written using a Behavior Analytic ontology.
 
-Os scripts em python foram feitos para serem uma interface para o programa Pupil Capture. Pupil é uma plataforma open source (software) de rastreamento de movimentos oculares (https://github.com/pupil-labs/pupil).
+### Running from source
 
-O script 'timestamps_by_trial.py' ilustra como ler os dados dos arquivos '*.timestamps' (um dos arquivos de saída do Stimulus Control App).
-
-Eu agredeço ao Drausio Capobianco (o primeiro principal desenvolvedor, agora aposentado) por me permitir dar continuidade ao seu trabalho.
+https://github.com/cpicanco/validation_project/wiki
