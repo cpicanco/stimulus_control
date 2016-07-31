@@ -36,6 +36,17 @@ Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
   - Free software (GPL3) written in Object Free Pascal (Lazarus 1.6.0, FPC 3.0.0).
   - Core code was written using a Behavior Analytic ontology.
 
+
+### Changes Made
+
+- Adapted from Delphi to Free Pascal compiler and Lazarus development environment
+- Replaced old GUI for a new prototype one
+- Fixed some timing bugs
+- Fixed some bugs related to the TTrial create/free life cycle
+- New trial types inherited from TTrial
+- Refactoring for better Behavior Analytic ontology fit.
+- For more, please check GitHub issues: https://github.com/cpicanco/stimulus_control/issues
+
 ### Running from source
 
 https://github.com/cpicanco/validation_project/wiki
