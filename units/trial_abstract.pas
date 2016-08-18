@@ -166,9 +166,8 @@ begin
   FClockList[Length(FClockList) - 1] := @FClockThread.Start;
 
   // TClockThread.Start
-  if Length(FClockList) > 0 then
-    for i := 0 to Length(FClockList) -1 do
-      TThreadMethod(FClockList[i]);
+  for i := 0 to Length(FClockList) -1 do
+    TThreadMethod(FClockList[i]);
 
   SetLength(FClockList, 0);
 end;
