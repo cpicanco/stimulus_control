@@ -36,6 +36,9 @@ Participante1/*
 units/backup/*
 units/my_backups/*
 
+# link
+stimulus_control
+
 # tests
 tests/*/lib/*
 tests/fancy_timer/fancy_timer
