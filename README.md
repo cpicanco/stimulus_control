@@ -14,7 +14,7 @@ Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
   - Simple Discriminations
   - Conditional Discriminations
   - Stimuli (antecedents, consequents):
-      - Sounds using the Bass library
+      - Sounds using the (non-free, as in freedom) Bass library (a substitute is in need)
       - Videos using the LCLVLC component and the libvlc library
       - Images (jpg, bmp)
 
