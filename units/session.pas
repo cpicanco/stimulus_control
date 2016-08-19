@@ -21,9 +21,7 @@ uses Classes, Controls, SysUtils, LCLIntf
      , FileUtil
      , regdata
      , blocs
-     , timestamps_logger
-     , timestamp
-     , client
+     , pupil_communication
      ;
 
 type
@@ -42,8 +40,8 @@ type
     FCrtReached : Boolean;
     FDataTicks: Boolean;
     FManager : TCounterManager;
-    FClientThread : TClientThread;
-
+    FPupilClient : TPupilCommunication;
+    FPupilClientEnabled: Boolean;
     FRegData: TRegData;
     FRegDataTicks: TRegData;
     FTimestampsData : TRegData;
@@ -73,6 +71,7 @@ type
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure SetBackGround(BackGround: TWinControl);
+    procedure SetPupilClient(AValue: Boolean);
     procedure StmResponse(Sender:TObject);
   public
     constructor Create(AOwner: TComponent); override;
@@ -80,13 +79,14 @@ type
     procedure DoEndSess(Sender: TObject);
     procedure Play(CfgSes: TCfgSes; Manager : TCounterManager; FileData: String);
     procedure PlayBlc(Sender: TObject);
+    property PupilClientEnabled : Boolean read FPupilClientEnabled write SetPupilClient;
     property AudioDevice : TBassAudioDevice read FAudioDevice write FAudioDevice;
-    property BackGround: TWinControl read FBackGround write SetBackGround;
+    property BackGround : TWinControl read FBackGround write SetBackGround;
     property ServerAddress : string read FServerAddress write FServerAddress;
-    property SessName: String  read FSessName write FSessName;
+    property SessName : String  read FSessName write FSessName;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
-    property SubjName: String  read FSubjName write FSubjName;
-    property TestMode: Boolean  read FTestMode write FTestMode;
+    property SubjName : String  read FSubjName write FSubjName;
+    property TestMode : Boolean  read FTestMode write FTestMode;
     property DataTicks : Boolean read FDataTicks write FDataTicks;
   public
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
@@ -102,10 +102,13 @@ type
 
 implementation
 
+uses
+  timestamps_logger
+  , timestamp
 {$ifdef DEBUG}
-  uses debug_logger;
+  , debug_logger
 {$endif}
-
+  ;
 procedure TSession.BkGndResponse(Sender: TObject);
 begin
   if Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
@@ -136,7 +139,7 @@ end;
 
 procedure TSession.EndSess(Sender: TObject);
 begin
-  FClientThread.SendRequest('pupil_stop_recording',-1,'r');
+  FPupilClient.StopRecording;
   //Sleep(1000);
   FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + LineEnding);
 
@@ -164,6 +167,19 @@ end;
 procedure TSession.SetBackGround(BackGround: TWinControl);
 begin
   FBackGround:= BackGround;
+end;
+
+procedure TSession.SetPupilClient(AValue: Boolean);
+begin
+  if FPupilClientEnabled=AValue then Exit;
+  if AValue then
+    begin
+      FPupilClient := TPupilCommunication.Create(FServerAddress);
+      FBlc.PupilClient := FPupilClient;
+    end
+  else FPupilClient.Terminate;
+
+  FPupilClientEnabled:=AValue;
 end;
 
 procedure TSession.StmResponse(Sender: TObject);
@@ -214,7 +230,7 @@ begin
   FCfgSes := nil;
 
   //internal objects
-  FClientThread.Terminate;
+  if PupilClientEnabled then PupilClientEnabled := False;
   if Assigned(FRegData) then FreeAndNil(FRegData);
   if Assigned(FRegDataTicks) then FreeAndNil(FRegDataTicks);
   if Assigned(FBlc) then FreeAndNil(FBlc);
@@ -271,16 +287,19 @@ begin
 
     end;
 
-  FClientThread := TClientThread.Create(FServerAddress);
-  FClientThread.Start;
-  FClientThread.SendRequest('pupil_start_recording',-1,'R');
-
   FTimeStart := GetCustomTick;
+  if PupilClientEnabled then
+    begin
+      FPupilClient.Start;
+      FPupilClient.StartRecording;
+    end;
+
   FBlc.TimeStart := FTimeStart;
+
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TimeStart:' + GetTimeStampF);
   {$endif}
-  FBlc.SetClientThread(FClientThread);
+
   FManager.OnBeginSess(Self);
 
   PlayBlc(Self);

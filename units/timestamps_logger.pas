@@ -13,8 +13,6 @@ unit timestamps_logger;
 
 interface
 
-uses regdata;
-
   {
 
     We choose to use as external logger to avoid synchronization issues
@@ -29,25 +27,23 @@ procedure UpdateTimestampsFileName(NewFilename : string);
 
 implementation
 
-uses SysUtils;
+uses SysUtils
+     , regdata
+     , timestamp
+     ;
 
 var
   Timestamps : TRegData;
 
 procedure TimestampLn(msg: string);
 begin
-  if TextRec(Timestamps.DataFile).Mode = 55218 then
-    begin
-      WriteLn(Timestamps.DataFile, msg);
-      Timestamps.CloseFFile;
-    end
-  else
+  if not TextRec(Timestamps.DataFile).Mode = 55218 then
     begin
       Timestamps.AssignFFile;
       Timestamps.AppendF;
-      WriteLn(Timestamps.DataFile, msg);
-      Timestamps.CloseFFile;
     end;
+  WriteLn(Timestamps.DataFile, msg);
+  Timestamps.CloseFFile;
 end;
 
 procedure UpdateTimestampsFileName(NewFilename: string);

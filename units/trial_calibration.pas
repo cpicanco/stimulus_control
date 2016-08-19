@@ -17,6 +17,8 @@ uses LCLIntf, Classes, SysUtils
     , trial_abstract
     , Graphics
     , constants
+    , zmq_client
+    , timestamp
     ;
 
 type
@@ -30,8 +32,8 @@ type
   end;
 
   FDataSupport = record
-    StmBegin : cardinal;
-    StmEnd : cardinal;
+    TrialBegin : Extended;
+    TrialEnd : Extended;
     Dots : array of TDot;
   end;
 
@@ -42,9 +44,8 @@ type
   }
   TCLB = class(TTrial)
   private
-    { private declarations }
     FShowDots : Boolean;
-    FCurrTrial : FDataSupport;
+    FDataSupport : FDataSupport;
   protected
     procedure None(Sender: TObject);
     procedure ThreadClock(Sender: TObject); //override;
@@ -58,7 +59,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(TestMode: Boolean; Correction : Boolean); override;
-    //procedure DispenserPlusCall; override;
   end;
 
 
@@ -76,7 +76,7 @@ end;
 procedure TCLB.ThreadClock(Sender: TObject);
 begin
   Hide;
-  FCurrTrial.StmEnd := GetTickCount64;
+  FDataSupport.TrialEnd := GetCustomTick;
   WriteData(Sender);
 
   if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
@@ -86,16 +86,16 @@ end;
 procedure TCLB.StartTrial(Sender: TObject);
 begin
   FShowDots := True;
-  FCurrTrial.StmBegin := GetTickCount64;
+  FDataSupport.TrialBegin := GetCustomTick;
   inherited StartTrial(Sender);
 end;
 
 procedure TCLB.WriteData(Sender: TObject);
 begin
   Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
-           FormatFloat('00000000;;00000000', FCurrTrial.StmBegin - TimeStart) + #9 +
-           FormatFloat('00000000;;00000000', FCurrTrial.StmEnd - TimeStart) + #9 +
-           IntToStr(Length(FCurrTrial.Dots)) +
+           FloatToStrF(FDataSupport.TrialBegin - TimeStart, ffFixed, 0,9) + #9 +
+           FloatToStrF(FDataSupport.TrialEnd - TimeStart, ffFixed, 0,9) + #9 +
+           IntToStr(Length(FDataSupport.Dots)) +
            Data;
 
 end;
@@ -121,19 +121,28 @@ begin
       Invalidate;
     end;
 
-  if key = 66 {b} then
+  if ssCtrl in Shift then
     begin
-      Result := 'NONE';
-      IETConsequence := 'NONE';
-      NextTrial := '0'; // NextTrial
-      EndTrial(Self)
+      if key = 66 {b} then
+        begin
+          Result := 'NONE';
+          IETConsequence := 'NONE';
+          NextTrial := '0'; // NextTrial
+          EndTrial(Self)
+        end;
+
+      if key = 67 {c} then // start pupil calibration
+        begin
+          Result := 'NONE';
+          IETConsequence := 'NONE';
+          NextTrial := '0'; // NextTrial
+          EndTrial(Self)
+        end;
     end;
 end;
 
 procedure TCLB.Paint;
 var
-  aRect : TRect;
-
   aleft, atop, asize,
   i : integer;
 
@@ -142,14 +151,15 @@ begin
 
   if FShowDots then
     with Canvas do
-      for i := Low(FCurrTrial.Dots) to High(FCurrTrial.Dots) do
+      for i := Low(FDataSupport.Dots) to High(FDataSupport.Dots) do
         begin
-          aleft := FCurrTrial.Dots[i].X;
-          atop  := FCurrTrial.Dots[i].Y;
-          asize := FCurrTrial.Dots[i].Size;
-
-          aRect := Rect(aleft, atop, aleft + asize, atop + asize);
-          Ellipse(aRect);
+          with FDataSupport.Dots[i] do
+            begin
+              aleft := X;
+              atop  := Y;
+              asize := Size;
+            end;
+          Ellipse(Rect(aleft, atop, aleft + asize, atop + asize));
         end;
 end;
 
@@ -190,25 +200,21 @@ var
 
 begin
   NumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
-  SetLength(FCurrTrial.Dots, NumComp);
-  for i := Low(FCurrTrial.Dots) to High(FCurrTrial.Dots) do
+  SetLength(FDataSupport.Dots, NumComp);
+  for i := Low(FDataSupport.Dots) to High(FDataSupport.Dots) do
     begin
       s1 := CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
-      FCurrTrial.Dots[i].Y := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); // top, left, width, height
+      FDataSupport.Dots[i].Y := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); // top, left, width, height
 
       NextSpaceDelimitedParameter;
-      FCurrTrial.Dots[i].X := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+      FDataSupport.Dots[i].X := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
 
       NextSpaceDelimitedParameter;
-      FCurrTrial.Dots[i].Size := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+      FDataSupport.Dots[i].Size := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
     end;
   StartTrial(Self);
 end;
 
-//procedure TCLB.DispenserPlusCall;
-//begin
-//  // dispensers were not implemented yet
-//end;
 
 end.
 

@@ -19,7 +19,7 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
 
     , draw_methods
     , bass_player
-    , client
+    , pupil_communication
     , session
     , config_session
     , countermanager
@@ -49,6 +49,7 @@ type
     btnContentFile: TButton;
     btnApply: TButton;
     btnExportStimulus: TButton;
+    cbPupilClient: TCheckBox;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
     cbDataTicks: TCheckBox;
@@ -137,7 +138,7 @@ type
     procedure EndSession(Sender : TObject);
     procedure RandTrialOrder(BeginRow, EndRow : integer);
     procedure ResetRepetionMatrix;
-    procedure DebugStatus(Message: String);
+    procedure ReceiveTimestamp(Sender: TObject; ATimestamp: String);
     //SimpleGui : TSimpleGui;
     //FData : TRegData;
     //FConfig : TConfig;
@@ -423,11 +424,11 @@ begin
   StringGrid1.Invalidate;
 end;
 
-procedure TUserConfig.DebugStatus(Message: String);
+procedure TUserConfig.ReceiveTimestamp(Sender: TObject; ATimestamp: String);
 begin
-  ShowMessage(Message);
+  ShowMessage(Sender.ClassName + #32 + ATimestamp);
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'response:' + Message);
+    DebugLn(mt_Debug + 'response:' + ATimestamp);
   {$endif}
 end;
 
@@ -715,37 +716,16 @@ begin
 end;
 
 procedure TUserConfig.btnClientTestClick(Sender: TObject);
-var
-  Filename : UTF8String;
-  Client : TClientThread;
+var PupilClient : TPupilCommunication;
 begin
+  PupilClient := TPupilCommunication.Create(leServerAddress.Text);
+  PupilClient.OnReceiveTimestamp := @ReceiveTimestamp;
 
-  if not Assigned(FData) then
-    begin
-      Filename := GetCurrentDir + '/Test_000.timestamps';
-      FData := TRegData.Create(Self, Filename);
-      Sleep(1000);
-    end;
+  PupilClient.Start;
+  PupilClient.RequestTimestamp;
 
-  Client := TClientThread.Create(leServerAddress.Text);
-  Client.OnShowStatus := @DebugStatus;
-
-  {$ifdef DEBUG}
-  try
-    Client.Start;
-    Client.SendRequest('-1:teste', 0, 'R');
-  except
-    on E:exception do
-      begin
-        DebugLn(mt_Exception + E.Message );
-      end;
-  end;
-  {$else}
-    Client.Start;
-    Client.SendRequest('-1:teste', 0, 'R');
-  {$endif}
   Sleep (1000);
-  Client.Terminate;
+  PupilClient.Terminate;
 end;
 
 procedure TUserConfig.btnExportStimulusClick(Sender: TObject);
@@ -1256,18 +1236,23 @@ begin
       if not Assigned(FAudioDevice) then FAudioDevice := TBassAudioDevice.Create(WindowHandle);
 
       FSession := TSession.Create(nil);
-      FSession.OnEndSess:= @EndSession;
-      FSession.AudioDevice := FAudioDevice;
-      FSession.BackGround := bkgnd;
-      FSession.DataTicks := cbDataTicks.Checked;
+      with FSession do
+        begin
+          OnEndSess:= @EndSession;
+          AudioDevice := FAudioDevice;
+          BackGround := bkgnd;
+          DataTicks := cbDataTicks.Checked;
+          ServerAddress := leServerAddress.Text;
+          PupilClientEnabled := cbPupilClient.Enabled;
+          SessName := FConfigs.Name;
+          SubjName := FConfigs.Subject;
+          ShowCounter := False;
 
-      FSession.SessName := FConfigs.Name;
-      FSession.SubjName := FConfigs.Subject;
-      FSession.ShowCounter := False;
-      FSession.ServerAddress := leServerAddress.Text;
-      FSession.TestMode := False;
+          TestMode := False;
 
-      FSession.Play(FConfigs, FManager, aDataName);
+          Play(FConfigs, FManager, aDataName);
+
+        end;
     end;
 
 end;

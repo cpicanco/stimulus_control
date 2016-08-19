@@ -100,7 +100,7 @@ end;
 
 procedure TMRD.Consequence(Sender: TObject);
 begin
-  SendRequest('C' + #9 + GetTimeStampF);
+  LogEvent('C');
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 
   TrialResult(Sender);
@@ -159,13 +159,13 @@ begin
             begin
               //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
               FDataSupport.Latency := TickCount;
-              SendRequest('*R' + #9 + GetTimeStampF);
+              LogEvent('*R');
               FShowStarter := False;
               Invalidate;
               StartTrial(Self);
             end;
         end
-      else SendRequest('R' + #9 + GetTimeStampF);
+      else LogEvent('R');
     end;
 end;
 
@@ -340,7 +340,7 @@ end;
 
 procedure TMRD.BeginStarter;
 begin
-  SendRequest('S' + #9 + GetTimeStampF);
+  LogEvent('S');
   FCanResponse:= True;
   Invalidate;
 end;

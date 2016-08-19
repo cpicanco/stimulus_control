@@ -16,10 +16,9 @@ interface
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, LCLProc
 
   , config_session
-  , client
+  , zmq_client
   , countermanager
   , custom_timer
-  , timestamps_logger
   ;
 
 type
@@ -29,7 +28,7 @@ type
   TTrial = class(TCustomControl)
   private
     FCfgTrial: TCfgTrial;
-    FClientThread : TClientThread;
+    //FClientThread : TZMQThread;
     FClockThread : TClockThread;
     FCounterManager : TCounterManager;
     FData: string;
@@ -61,10 +60,12 @@ type
     FClockList : array of TThreadMethod;
     FLimitedHold : integer;
     FIscorrection : Boolean;
-    procedure ClientStatus(msg : string);
     {$ifdef DEBUG}
       procedure ClockStatus(msg : string);
     {$endif}
+    // Log timestamped event:
+    // TimestampF, TrialID, ACode
+    procedure LogEvent(ACode: string);
     procedure EndTrial(Sender: TObject);
     procedure StartTrial(Sender: TObject); virtual;
     procedure WriteData(Sender: TObject); virtual; abstract;
@@ -75,8 +76,6 @@ type
     destructor Destroy; override;
 //    procedure DispenserPlusCall; virtual; abstract;
     procedure Play(TestMode: Boolean; Correction : Boolean); virtual; abstract;
-    procedure SendRequest(ACode : string);
-    procedure SetClientThread(AClientThread:TClientThread);
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
     property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property Data: string read FData write FData;
@@ -108,37 +107,25 @@ type
 
 implementation
 
-{$ifdef DEBUG}
-uses debug_logger;
-{$endif}
+
+uses timestamp
+    , timestamps_logger
+    {$ifdef DEBUG}
+    , debug_logger
+    {$endif}
+    ;
+
 
 { TTrial }
 
-procedure TTrial.SendRequest(ACode: string);
+procedure TTrial.LogEvent(ACode: string);  // logger
+var Event : string;
 begin
-  if Assigned(FClientThread) then
-    FClientThread.SendRequest(ACode,FCfgTrial.Id)
-  else
+  Event := GetTimeStampF + #9 + IntToStr(FCfgTrial.Id) + #9 + ACode;
   {$ifdef DEBUG}
-    DebugLn('TTrial.SendRequest:' + ACode + ' has failed');
+    DebugLn(Event);
   {$else}
-    TimestampLn('TTrial.SendRequest:' + ACode + ' has failed');
-  {$endif}
-
-end;
-
-procedure TTrial.SetClientThread(AClientThread: TClientThread);
-begin
-  FClientThread := AClientThread;
-  FClientThread.OnShowStatus := @ClientStatus;
-end;
-
-procedure TTrial.ClientStatus(msg: string);
- begin
-  {$ifdef DEBUG}
-    DebugLn(msg);
-  {$else}
-    TimestampLn(msg);
+    TimestampLn(Event);
   {$endif}
 end;
 
@@ -198,7 +185,6 @@ begin
   OnEndTrial := nil;
 
   FLimitedHold := 0;
-  FClientThread := nil;
   FClockThread := TClockThread.Create(True);
 end;
 
