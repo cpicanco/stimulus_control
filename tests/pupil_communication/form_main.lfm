@@ -1,0 +1,66 @@
+object Form1: TForm1
+  Left = 435
+  Height = 341
+  Top = 166
+  Width = 301
+  Caption = 'Form1'
+  ClientHeight = 341
+  ClientWidth = 301
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '1.6.0.4'
+  object btnReceiveTimestamp: TButton
+    Left = 48
+    Height = 40
+    Top = 248
+    Width = 208
+    Caption = 'Receive Timestamp'
+    OnClick = btnReceiveTimestampClick
+    TabOrder = 4
+  end
+  object btnStopRecording: TButton
+    Left = 48
+    Height = 40
+    Top = 48
+    Width = 208
+    Caption = 'Stop Recording'
+    OnClick = btnStopRecordingClick
+    TabOrder = 1
+  end
+  object btnStartCalibration: TButton
+    Left = 48
+    Height = 40
+    Top = 128
+    Width = 208
+    Caption = 'Start Calibration'
+    OnClick = btnStartCalibrationClick
+    TabOrder = 2
+  end
+  object btnStopCalibration: TButton
+    Left = 48
+    Height = 40
+    Top = 168
+    Width = 208
+    Caption = 'Stop Calibration'
+    OnClick = btnStopCalibrationClick
+    TabOrder = 3
+  end
+  object btnReceiveRecordingPath: TButton
+    Left = 48
+    Height = 40
+    Top = 288
+    Width = 208
+    Caption = 'Receive Recording Path'
+    OnClick = btnReceiveRecordingPathClick
+    TabOrder = 5
+  end
+  object btnStartRecording: TButton
+    Left = 48
+    Height = 40
+    Top = 8
+    Width = 208
+    Caption = 'Start Recording'
+    OnClick = btnStartRecordingClick
+    TabOrder = 0
+  end
+end
