@@ -162,11 +162,11 @@ begin
           FSchedule.DoResponse;
           if FFirstResp then
             begin
-              SendRequest('*R' + #9 + GetTimeStampF);
+              LogEvent('*R');
               FFirstResp := False;
               FDataSupport.Latency := TickCount;
             end
-          else SendRequest('R' + #9 + GetTimeStampF);
+          else LogEvent('R');
         end;
     end;
 
@@ -198,7 +198,7 @@ begin
   aConsequence.HowManyLoops := 0;
   aConsequence.FullPath := RootMedia + FConsequence;
   aConsequence.Play;
-  SendRequest('C' + #9 + GetTimestampF);
+  LogEvent('C');
 
   { TODO 1 -oRafael -cenhencement : Find a better way to prevent data loss. }
   Sleep(10); // hack to prevent data loss
@@ -263,7 +263,7 @@ begin
         begin
           FSchedule.Kind := T_EXT;
         end;
-  SendRequest(ACode + #9 +  GetTimeStampF);
+  LogEvent(ACode);
   Invalidate;
 
   // must pass Self here, see TBLC.WriteTrialData
@@ -298,7 +298,7 @@ begin
 
   TickCount := GetCustomTick;
   FDataSupport.Timer2 := TickCount;
-  SendRequest(ACode + #9 + GetTimeStampF);
+  LogEvent(ACode);
 
   Invalidate;
   FFirstResp := True;
@@ -488,7 +488,7 @@ begin
   FResponseEnabled := True;
   Invalidate;
   FDataSupport.StmBegin := TickCount;
-  SendRequest('S' + #9 + GetTimeStampF);
+  LogEvent('S');
   inherited StartTrial(Sender);
 end;
 
@@ -501,7 +501,7 @@ begin
   TrialResult(Sender);
   WriteData(Self);
 
-  SendRequest('E' + #9 + GetTimeStampF);
+  LogEvent('E');
 end;
 
 

@@ -23,15 +23,13 @@ uses Classes, Controls, LCLIntf, LCLType,
      , response_key
      , countermanager
      , custom_timer
+     , pupil_communication
      , trial_abstract
-     , timestamp
-     , client
-
         , trial_message
         , trial_simple
-          , trial_mirrored_stm
-          , trial_feature_positive
-          , trial_calibration
+        , trial_mirrored_stm
+        , trial_feature_positive
+        , trial_calibration
         , trial_matching
         , trial_dizzy_timers
      ;
@@ -48,7 +46,7 @@ type
   TBlc = class(TComponent)
   private
     //FOnBeginTrial: TNotifyEvent;
-    //FClientThread : TClientThread;
+    //FClientThread : TZMQThread;
 
     FBlcHeader: String;
     FLastHeader: String;
@@ -69,7 +67,6 @@ type
     FITIEnd,
     FTimeStart : Extended;
 
-
     // Clock System
     FTimer : TClockThread;
     FTimerCsq : TFakeTimer;
@@ -77,7 +74,7 @@ type
     FTimerTO : TFakeTimer;
 
     // main objects/components
-    FClientThread: TClientThread;
+    FPupilClient: TPupilCommunication;
     FBackGround: TWinControl;
     FBlc: TCfgBlc;
     FTrial: TTrial;
@@ -121,7 +118,6 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure SetClientThread(AClientThread:TClientThread);
     procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
@@ -130,6 +126,7 @@ type
     property ServerAddress : string read FServerAddress write FServerAddress;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
     property TimeStart : Extended read FTimeStart write FTimeStart;
+    property PupilClient : TPupilCommunication read FPupilClient write FPupilClient;
   public
     property OnBeginCorrection: TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
@@ -145,10 +142,12 @@ type
 
 implementation
 
+uses
+  timestamp
 {$ifdef DEBUG}
-uses debug_logger;
+  , debug_logger
 {$endif}
-
+  ;
 constructor TBlc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -182,11 +181,6 @@ begin
   FTimer.Enabled := False;
   FTimer.Terminate;
   inherited Destroy;
-end;
-
-procedure TBlc.SetClientThread(AClientThread: TClientThread);
-begin
-  FClientThread := AClientThread;
 end;
 
 procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
@@ -248,7 +242,7 @@ begin
           FTrial.OnMiss := @Miss;
           FTrial.OnNone := @None;
           FTrial.CfgTrial := FBlc.Trials[IndTrial];
-          FTrial.SetClientThread(FClientThread);
+          //FTrial.SetClientThread(FClientThread);
           FTrial.Parent := FBackGround;
           // dependencies above
           FTrial.Visible := False;
