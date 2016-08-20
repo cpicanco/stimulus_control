@@ -1,0 +1,3 @@
+[submodule "dependency/delphizmq"]
+	path = dependency/delphizmq
+	url = git@github.com:cpicanco/delphizmq.git
