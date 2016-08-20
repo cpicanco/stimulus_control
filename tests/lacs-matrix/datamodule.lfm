@@ -1,0 +1,61 @@
+object DataModule1: TDataModule1
+  OldCreateOrder = False
+  Height = 392
+  HorizontalOffset = 621
+  VerticalOffset = 165
+  Width = 318
+  object SQLQuery1: TSQLQuery
+    IndexName = 'DEFAULT_ORDER'
+    FieldDefs = <    
+      item
+        Name = 'session_id'
+        DataType = ftAutoInc
+        Precision = -1
+      end    
+      item
+        Name = 'session_participant'
+        DataType = ftString
+        Precision = -1
+        Size = 45
+      end>
+    Active = True
+    Database = MySQLConnection1
+    Transaction = SQLTransaction1
+    SQL.Strings = (
+      'SELECT * FROM session'
+      'ORDER BY session_id'
+    )
+    Options = []
+    Params = <>
+    left = 144
+    top = 88
+  end
+  object SQLTransaction1: TSQLTransaction
+    Active = True
+    Database = MySQLConnection1
+    Options = []
+    left = 144
+    top = 160
+  end
+  object MySQLConnection1: TMySQL55Connection
+    Connected = True
+    LoginPrompt = False
+    DatabaseName = 'stimulus_control'
+    KeepConnection = False
+    Params.Strings = (
+      'Port=3306'
+    )
+    Password = '!Pib742!'
+    Transaction = SQLTransaction1
+    UserName = 'root'
+    HostName = 'localhost'
+    Options = []
+    left = 144
+    top = 16
+  end
+  object DataSource1: TDataSource
+    DataSet = SQLQuery1
+    left = 144
+    top = 248
+  end
+end
