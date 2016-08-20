@@ -49,3 +49,4 @@ tests/timestamp_comparison/timestamp_comparison
 tests/zmq_subscriber/dependency/*
 tests/zmq_subscriber/zmq_subscriber
 tests/pupil_communication/pupil_example
+tests/lacs-matrix/cultural_matrix
