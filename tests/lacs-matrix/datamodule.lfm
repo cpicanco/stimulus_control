@@ -5,7 +5,6 @@ object DataModule1: TDataModule1
   VerticalOffset = 165
   Width = 318
   object SQLQuery1: TSQLQuery
-    IndexName = 'DEFAULT_ORDER'
     FieldDefs = <    
       item
         Name = 'session_id'
@@ -18,7 +17,6 @@ object DataModule1: TDataModule1
         Precision = -1
         Size = 45
       end>
-    Active = True
     Database = MySQLConnection1
     Transaction = SQLTransaction1
     SQL.Strings = (
@@ -31,14 +29,14 @@ object DataModule1: TDataModule1
     top = 88
   end
   object SQLTransaction1: TSQLTransaction
-    Active = True
+    Active = False
     Database = MySQLConnection1
     Options = []
     left = 144
     top = 160
   end
   object MySQLConnection1: TMySQL55Connection
-    Connected = True
+    Connected = False
     LoginPrompt = False
     DatabaseName = 'stimulus_control'
     KeepConnection = False

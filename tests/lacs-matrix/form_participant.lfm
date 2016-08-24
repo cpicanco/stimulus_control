@@ -1,5 +1,5 @@
 object Form1: TForm1
-  Left = 242
+  Left = 111
   Height = 505
   Top = 149
   Width = 913
@@ -64,9 +64,9 @@ object Form1: TForm1
   end
   object CheckBoxDrawDots: TCheckBox
     Left = 728
-    Height = 21
+    Height = 24
     Top = 16
-    Width = 79
+    Width = 93
     Caption = 'DrawDots'
     OnChange = CheckBoxDrawDotsChange
     TabOrder = 1
