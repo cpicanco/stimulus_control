@@ -1,0 +1,34 @@
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	0
+NumTrials=	2 1
+
+[Blc 1 - T1]
+Name=	M1
+Kind=	CLB
+Cursor=	-1
+
+NumComp = 5
+
+C1Bnd=	52 43 15 15
+C2Bnd=	39 966 15 15
+C3Bnd=	722 31 15 15
+C4Bnd=	724 975 15 15
+C5Bnd=	371 490 15 15
+
+
+[Blc 1 - T3]
+Name=	M5
+Kind=	MSG
+Msg=	End.
