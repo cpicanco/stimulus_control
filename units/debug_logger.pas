@@ -51,7 +51,7 @@ end;
 
 initialization
 begin
-  Logger := TRegData.Create(nil, GetCurrentDir + PathDelim + '_Log_001.txt');
+  Logger := TRegData.Create(nil, GetCurrentDir + PathDelim + 'debug_log' + PathDelim + '_Log_001.txt');
 end
 
 finalization
