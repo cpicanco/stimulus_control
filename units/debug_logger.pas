@@ -70,7 +70,7 @@ begin
             WriteLn(Logger.DataFile, ReadFileToString(Name));
             DeleteFile(Name);
           end;
-          WriteLn(Logger.DataFile, #10#10);
+          WriteLn(Logger.DataFile, LineEnding);
       until FindNext(FileInfo) <> 0;
       Logger.CloseFFile;
     end;

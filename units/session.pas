@@ -195,6 +195,8 @@ end;
 constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FPupilClientEnabled := False;
+
   FBlc:= TBlc.Create(nil);
   FBlc.OnStmResponse:= @StmResponse;
   FBlc.OnConsequence:= @Consequence;
