@@ -21,20 +21,20 @@ uses Classes, SysUtils, Process
 type
   { TResponseReceivedEvent }
 
-  TPupilMultiPartMessage = record
+  TMultiPartMessage = record
     MsgPackage : TMemoryStream;
     MsgTopic : string;
   end;
 
   { TResponseReceivedEvent }
 
-  TMultiPartMessRecvE = procedure(AResponse: TPupilMultiPartMessage) of object;
+  TMultiPartMessRecvE = procedure(AResponse: TMultiPartMessage) of object;
 
   { TZMQSubThread }
 
   TZMQSubThread = class(TThread)
   private
-    FMultipartMessage : TPupilMultiPartMessage;
+    FMultipartMessage : TMultiPartMessage;
     FContext : TZMQContext;
     FSubscriber : TZMQSocket;
     //FPoller : TZMQPoller;
