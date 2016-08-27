@@ -1,17 +1,19 @@
 object Form1: TForm1
-  Left = 435
-  Height = 341
-  Top = 166
-  Width = 301
+  Left = 535
+  Height = 370
+  Top = 160
+  Width = 568
   Caption = 'Form1'
-  ClientHeight = 341
-  ClientWidth = 301
+  ClientHeight = 370
+  ClientWidth = 568
+  Constraints.MinHeight = 370
+  Constraints.MinWidth = 568
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '1.6.0.4'
   object btnReceiveTimestamp: TButton
     Left = 48
-    Height = 40
+    Height = 41
     Top = 248
     Width = 208
     Caption = 'Receive Timestamp'
@@ -20,7 +22,7 @@ object Form1: TForm1
   end
   object btnStopRecording: TButton
     Left = 48
-    Height = 40
+    Height = 41
     Top = 48
     Width = 208
     Caption = 'Stop Recording'
@@ -29,7 +31,7 @@ object Form1: TForm1
   end
   object btnStartCalibration: TButton
     Left = 48
-    Height = 40
+    Height = 41
     Top = 128
     Width = 208
     Caption = 'Start Calibration'
@@ -38,7 +40,7 @@ object Form1: TForm1
   end
   object btnStopCalibration: TButton
     Left = 48
-    Height = 40
+    Height = 41
     Top = 168
     Width = 208
     Caption = 'Stop Calibration'
@@ -47,7 +49,7 @@ object Form1: TForm1
   end
   object btnReceiveRecordingPath: TButton
     Left = 48
-    Height = 40
+    Height = 41
     Top = 288
     Width = 208
     Caption = 'Receive Recording Path'
@@ -56,11 +58,72 @@ object Form1: TForm1
   end
   object btnStartRecording: TButton
     Left = 48
-    Height = 40
+    Height = 41
     Top = 8
     Width = 208
     Caption = 'Start Recording'
     OnClick = btnStartRecordingClick
     TabOrder = 0
+  end
+  object Subscribe: TButton
+    Left = 296
+    Height = 41
+    Top = 128
+    Width = 104
+    Caption = 'Subscribe'
+    OnClick = SubscribeClick
+    TabOrder = 6
+  end
+  object gbxSubscribe: TGroupBox
+    Left = 296
+    Height = 113
+    Top = 8
+    Width = 208
+    Caption = 'Subscribe'
+    ClientHeight = 96
+    ClientWidth = 204
+    TabOrder = 7
+    object rbtnNotifications: TRadioButton
+      Left = 16
+      Height = 21
+      Top = 8
+      Width = 95
+      Caption = 'Notifications'
+      Checked = True
+      TabOrder = 0
+    end
+    object rbtnLoggingInfo: TRadioButton
+      Left = 16
+      Height = 21
+      Top = 32
+      Width = 94
+      Caption = 'Logging Info'
+      TabOrder = 1
+    end
+    object rbtnEyeCamera: TRadioButton
+      Left = 16
+      Height = 21
+      Top = 56
+      Width = 106
+      Caption = 'Eye Camera 0'
+      TabOrder = 2
+    end
+  end
+  object btnUnsubscribe: TButton
+    Left = 400
+    Height = 41
+    Top = 128
+    Width = 104
+    Caption = 'Unsubscribe'
+    OnClick = btnUnsubscribeClick
+    TabOrder = 8
+  end
+  object LabelHost: TLabel
+    Left = 8
+    Height = 15
+    Top = 344
+    Width = 150
+    Caption = 'address = ''localhost:5020'''
+    ParentColor = False
   end
 end
