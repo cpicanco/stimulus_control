@@ -68,20 +68,24 @@ uses
   // helpers
   //, draw_methods
   //, timestamps_logger
+  //, timestamps_helpers
+  //, timestamps
   //, git_vertioning
 
   {$ifdef DEBUG}
   , debug_logger
   , SysUtils
-  , FileUtil
+  , FileUtil, debug_logger_thread
   {$endif}
 
   ;
 
 {$R *.res}
 
-resourcestring
-  ApplicationTitle = 'Controle de Estímulos';
+{$ifdef DEBUG}
+  resourcestring
+    ApplicationTitle = 'Controle de Estímulos';
+{$endif}
 
 begin
 
