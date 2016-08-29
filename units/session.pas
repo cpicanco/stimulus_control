@@ -11,6 +11,8 @@ unit session;
 
 {$mode objfpc}{$H+}
 
+{$DEFINE DEBUG}
+
 interface
 
 uses Classes, Controls, SysUtils, LCLIntf
@@ -44,24 +46,12 @@ type
     FPupilClientEnabled: Boolean;
     FRegData: TRegData;
     FRegDataTicks: TRegData;
-    FTimestampsData : TRegData;
     FServerAddress: string;
     FSessName: string;
     FShowCounter : Boolean;
     FSubjName: string;
     FTestMode: Boolean;
-    FTimeStart : Extended;
-
-    // events
-    FOnBkGndResponse: TNotifyEvent;
-    FOnConsequence: TNotifyEvent;
-    FOnEndBlc: TNotifyEvent;
-    FOnEndSess: TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
-    FOnHit: TNotifyEvent;
-    FOnMiss: TNotifyEvent;
-    FOnStmResponse: TNotifyEvent;
-
+    FFileData : string;
     procedure BkGndResponse(Sender: TObject);
     procedure BlcEndBlc(Sender: TObject);
     procedure Consequence(Sender: TObject);
@@ -70,15 +60,29 @@ type
     procedure EndTrial(Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
+    procedure Play; overload;
+    procedure PlayBlc(Sender: TObject);
+    procedure PupilMultipartReceived(Sender: TObject; AMultipart : TMPMessage);
+    procedure PupilRecordingStarted(Sender: TObject; AMultipart : TMPMessage);
+    procedure PupilRequestReceived(Sender: TObject; ARequest, AResponse : string);
+    procedure PupilCalibrationStopped(Sender: TObject; AMultipart : TMPMessage);
     procedure SetBackGround(BackGround: TWinControl);
     procedure SetPupilClient(AValue: Boolean);
     procedure StmResponse(Sender:TObject);
+  private
+    FOnBkGndResponse: TNotifyEvent;
+    FOnConsequence: TNotifyEvent;
+    FOnEndBlc: TNotifyEvent;
+    FOnEndSess: TNotifyEvent;
+    FOnEndTrial: TNotifyEvent;
+    FOnHit: TNotifyEvent;
+    FOnMiss: TNotifyEvent;
+    FOnStmResponse: TNotifyEvent;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure DoEndSess(Sender: TObject);
-    procedure Play(CfgSes: TCfgSes; Manager : TCounterManager; FileData: String);
-    procedure PlayBlc(Sender: TObject);
+    procedure Play(CfgSes: TCfgSes; Manager : TCounterManager; FileData: String); overload;
     property PupilClientEnabled : Boolean read FPupilClientEnabled write SetPupilClient;
     property AudioDevice : TBassAudioDevice read FAudioDevice write FAudioDevice;
     property BackGround : TWinControl read FBackGround write SetBackGround;
@@ -97,18 +101,25 @@ type
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
     property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
-
   end;
 
 implementation
 
 uses
   timestamps_logger
-  , timestamp
 {$ifdef DEBUG}
   , debug_logger
 {$endif}
   ;
+
+resourcestring
+  HSUBJECT_NAME      = 'Nome_Sujeito:';
+  HSESSION_NAME      = 'Nome_Sessão:';
+  HBEGIN_TIME        = 'Início:';
+  HEND_TIME          = 'Término:';
+  HSESSION_CANCELED  = '----------Sessão Cancelada----------';
+  HTEST_MODE         = '(Modo de Teste)';
+
 procedure TSession.BkGndResponse(Sender: TObject);
 begin
   if Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
@@ -138,13 +149,15 @@ begin
 end;
 
 procedure TSession.EndSess(Sender: TObject);
+var Footer : string;
 begin
-  FPupilClient.StopRecording;
-  //Sleep(1000);
-  FRegData.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + LineEnding);
+  Footer := LineEnding + LineEnding+ HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
+  FPupilClient.Request(REQ_SHOULD_STOP_RECORDING);
 
+  FRegData.SaveData(Footer);
+  SetLogger(Footer);
   if DataTicks then
-    FRegDataTicks.SaveData('Hora de Término:' + #9 + TimeToStr(Time) + LineEnding);
+    FRegDataTicks.SaveData(Footer);
 
   if Assigned(OnEndSess) then FOnEndSess(Sender);
 end;
@@ -162,6 +175,76 @@ end;
 procedure TSession.Miss(Sender: TObject);
 begin
   if Assigned(OnMiss) then FOnMiss (Sender);
+end;
+
+procedure TSession.Play;
+var Header : string;
+begin
+  if FFileData = #0 then FFileData:= '000.data';
+    if FTestMode then
+      begin
+        FSessName:= FSessName + #9 + HTEST_MODE;
+        FFileData:= '000.test';
+      end;
+
+  Header := HSUBJECT_NAME + #9 + FSubjName + LineEnding +
+            HSESSION_NAME + #9 + FSessName + LineEnding +
+            HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding+LineEnding;
+
+  FRegData := TRegData.Create(nil, FCfgSes.RootData + FFileData);
+
+  FRegData.SaveData(Header);
+  SetLogger(ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps', Header);
+
+  if DataTicks then
+    begin
+      FRegDataTicks:= TRegData.Create(nil, ExtractFileNameWithoutExt(FRegData.FileName) + '.ticks');
+      FBlc.RegDataTicks := FRegDataTicks;
+      FRegDataTicks.SaveData(Header);
+    end;
+
+  FBlc.ShowCounter := ShowCounter;
+  FBlc.RegData:= FRegData;
+  FBlc.BackGround:= FBackGround;
+
+  FManager.OnBeginSess(Self);
+
+  PlayBlc(Self);
+end;
+
+procedure TSession.PupilMultipartReceived(Sender: TObject;
+  AMultipart: TMPMessage);
+begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Information + AMultipart.Topic );
+  {$endif}
+end;
+
+procedure TSession.PupilRecordingStarted(Sender: TObject;
+  AMultipart: TMPMessage);
+begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug +  AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim);
+  {$endif}
+  FCfgSes.RootData := AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim;
+  Play;
+end;
+
+procedure TSession.PupilRequestReceived(Sender: TObject; ARequest,
+  AResponse: string);
+begin
+  {$ifdef DEBUG}
+    DebugLn(mt_Information + ARequest + #32 + AResponse);
+  {$endif}
+  //case ARequest of
+  //  REQ_SHOULD_START_RECORDING : Play;
+  //end;
+end;
+
+procedure TSession.PupilCalibrationStopped(Sender: TObject;
+  AMultipart: TMPMessage);
+begin
+  if Assigned(FBackGround) then FBackGround.BringToFront;
 end;
 
 procedure TSession.SetBackGround(BackGround: TWinControl);
@@ -240,11 +323,13 @@ begin
 end;
 
 procedure TSession.DoEndSess(Sender: TObject);
+var Footer : string;
 begin
+  Footer := LineEnding + LineEnding + HSESSION_CANCELED + LineEnding + HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
   if DataTicks then
-    FRegDataTicks.SaveData(LineEnding + 'Sessão Cancelada' + LineEnding);
+    FRegDataTicks.SaveData(Footer);
 
-  FRegData.SaveData(LineEnding + 'Sessão Cancelada' + LineEnding);
+  FRegData.SaveData(Footer);
   EndSess(Sender);
 end;
 
@@ -252,59 +337,23 @@ procedure TSession.Play(CfgSes: TCfgSes; Manager : TCounterManager; FileData: St
 begin
   FCfgSes:= CfgSes;
   FManager := Manager;
+  FFileData := FileData;
 
-  if FileData = #0 then FileData:= 'Dados_000.txt';
-  if FTestMode then
-    begin
-      FSessName:= FSessName + #9 + '(Modo de Teste)';
-      FileData:= 'Teste_000.txt';
-    end;
-
-  FRegData := TRegData.Create(nil, FCfgSes.RootData + FileData);
-
-  {
-    File writing operations are called from a different thread.
-  }
-  FTimestampsData := TRegData.Create(nil, ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps');
-  UpdateTimestampsFileName(FTimestampsData.FileName);
-  FTimestampsData.Free;
-
-  FBlc.ShowCounter := ShowCounter;
-  FBlc.RegData:= FRegData;
-  FBlc.BackGround:= FBackGround;
-
-  FRegData.SaveData('Sujeito:' + #9 + FSubjName + LineEnding +
-                    'Sessão:' + #9+ FSessName + LineEnding +
-                    'Data:' + #9 + DateTimeToStr(Date)+ LineEnding +
-                    'Hora de Início:' + #9 + TimeToStr(Time)+ LineEnding + LineEnding);
-
-  if DataTicks then
-    begin
-      FRegDataTicks:= TRegData.Create(nil, FCfgSes.RootData + 'Ticks_000.txt');
-      FBlc.RegDataTicks := FRegDataTicks;
-      FRegDataTicks.SaveData('Sujeito:' + #9 + FSubjName + LineEnding +
-                    'Sessão:' + #9+ FSessName + LineEnding +
-                    'Data:' + #9 + DateTimeToStr(Date) + LineEnding +
-                    'Hora de Início:' + #9 + TimeToStr(Time)+ LineEnding + LineEnding);
-
-    end;
-
-  FTimeStart := GetCustomTick;
   if PupilClientEnabled then
-    begin
-      FPupilClient.Start;
-      FPupilClient.StartRecording;
-    end;
-
-  FBlc.TimeStart := FTimeStart;
-
-  {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'TimeStart:' + GetTimeStampF);
-  {$endif}
-
-  FManager.OnBeginSess(Self);
-
-  PlayBlc(Self);
+  begin
+    with FPupilClient do
+      begin
+        OnRequestReceived := @PupilRequestReceived;
+        OnMultiPartMessageReceived := @PupilMultipartReceived;
+        OnRecordingStarted := @PupilRecordingStarted;
+        OnCalibrationStopped := @PupilCalibrationStopped;
+        Start;
+        StartSubscriber(True);
+        Subscribe(SUB_ALL_NOTIFICATIONS);
+        Request(REQ_SHOULD_START_RECORDING); // must be non-blocking
+      end;
+  end
+    else Play;
 end;
 
 procedure TSession.PlayBlc(Sender: TObject);
@@ -320,6 +369,6 @@ begin
   else EndSess(Sender);
 end;
 
+
+
 end.
-
-
