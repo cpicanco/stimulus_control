@@ -26,7 +26,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     , draw_methods
     , schedules_main
     , response_key
-    , timestamp
+    , timestamps
     ;
 
 type
@@ -154,7 +154,7 @@ end;
 procedure TFPE.BeforeEndTrial(Sender: TObject);
 begin
   FResponseEnabled := False;
-  FDataSupport.StmEnd := GetCustomTick;
+  FDataSupport.StmEnd := TickCount;
   TrialResult(Sender);
   WriteData(Sender);
 end;
@@ -200,9 +200,9 @@ end;
 
 
 procedure TFPE.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-var TickCount : Extended;
+var LTickCount : Extended;
 begin
-  TickCount := GetCustomTick;
+  LTickCount := TickCount;
 
   if Key = 27 {ESC} then
     begin
@@ -216,7 +216,7 @@ begin
       if FShowStarter then
         begin
           //if FUseMedia then ... not implemented yet
-          FDataSupport.StarterLatency := TickCount;
+          FDataSupport.StarterLatency := LTickCount;
           LogEvent('*R');
           FShowStarter := False;
           Invalidate;
@@ -437,7 +437,7 @@ begin
   FConsequenceFired := False;
   FFirstResp := True;
   FResponseEnabled:= True;
-  FDataSupport.StmBegin := GetCustomTick;
+  FDataSupport.StmBegin := TickCount;
 
   inherited StartTrial(Sender);
 end;
@@ -480,13 +480,13 @@ begin
 end;
 
 procedure TFPE.Response(Sender: TObject);
-var TickCount : Extended;
+var LTickCount : Extended;
 begin
-  TickCount := GetCustomTick;
+  LTickCount := TickCount;
   Inc(FDataSupport.Responses);
   if FFirstResp then
     begin
-      FDataSupport.Latency := TickCount;
+      FDataSupport.Latency := LTickCount;
       FFirstResp := False;
     end
   else;

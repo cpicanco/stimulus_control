@@ -108,7 +108,7 @@ type
 implementation
 
 
-uses timestamp
+uses timestamps
     , timestamps_logger
     {$ifdef DEBUG}
     , debug_logger
@@ -121,7 +121,7 @@ uses timestamp
 procedure TTrial.LogEvent(ACode: string);  // logger
 var Event : string;
 begin
-  Event := GetTimeStampF + #9 + IntToStr(FCfgTrial.Id) + #9 + ACode;
+  Event := IntToStr(FCfgTrial.Id) + #9 + ACode;
   {$ifdef DEBUG}
     DebugLn(Event);
   {$else}
@@ -157,6 +157,7 @@ begin
     TThreadMethod(FClockList[i]);
 
   SetLength(FClockList, 0);
+  LogEvent('TS');
 end;
 
 procedure TTrial.EndTrial(Sender: TObject);

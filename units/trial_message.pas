@@ -57,7 +57,7 @@ resourcestring
 implementation
 
 uses
-  timestamp
+  timestamps
   {$ifdef DEBUG}
   , debug_logger
   {$endif}
@@ -122,7 +122,7 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TMSG.BeforeEndTrial:'+ TObject(Sender).ClassName);
   {$endif}
-  FDataSupport.TrialEnd := GetCustomTick;
+  FDataSupport.TrialEnd := TickCount;
   FResponseEnabled := False;
   WriteData(Self);
 end;
@@ -169,7 +169,7 @@ end;
 procedure TMSG.StartTrial(Sender: TObject);
 begin
   FResponseEnabled := True;
-  FDataSupport.TrialBegin := GetCustomTick;
+  FDataSupport.TrialBegin := TickCount;
   inherited StartTrial(Sender);
 end;
 
