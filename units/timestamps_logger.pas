@@ -13,53 +13,36 @@ unit timestamps_logger;
 
 interface
 
-  {
+uses regdata;
 
-    We choose to use as external logger to avoid synchronization issues
-    with the client thread. Sometimes the program is faster than the client.
-    The consequence is that the program sometimes destroys the filename
-    reference during the client writing operations leading to crashes.
-
-  }
-
-procedure TimestampLn(msg: string);
-procedure UpdateTimestampsFileName(NewFilename : string);
+  function GetLogger : TRegData;
+  procedure SetLogger(Footer : string); overload;
+  procedure SetLogger(Filename, Header : string); overload;
 
 implementation
 
-uses SysUtils
-     , regdata
-     , timestamp
-     ;
+uses timestamps_helpers;
 
-var
-  Timestamps : TRegData;
-
-procedure TimestampLn(msg: string);
+function GetLogger: TRegData;
 begin
-  if not TextRec(Timestamps.DataFile).Mode = 55218 then
+  Result := TimestampLogger;
+end;
+
+procedure SetLogger(Footer: string);
+begin
+  with TimestampLogger do
     begin
-      Timestamps.AssignFFile;
-      Timestamps.AppendF;
+      SaveData(Footer);
+      Free;
     end;
-  WriteLn(Timestamps.DataFile, msg);
-  Timestamps.CloseFFile;
 end;
 
-procedure UpdateTimestampsFileName(NewFilename: string);
+procedure SetLogger(Filename, Header: string);
 begin
-  Timestamps.FileName := NewFilename;
+  TimestampLogger := TRegData.Create(nil, Filename);
+  TimestampLogger.SaveData(Header);
 end;
 
-initialization
-begin
-  Timestamps := TRegData.Create(nil, '');
-end
-
-finalization
-begin
-  Timestamps.Free;
-end
 
 end.
 
