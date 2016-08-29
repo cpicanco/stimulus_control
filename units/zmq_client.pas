@@ -70,7 +70,7 @@ type
     procedure ResponseReceived;
   protected
     procedure Execute; override;
-    procedure SendRequest(ARequest : UTF8string);
+    procedure SendRequest(ARequest : UTF8string; Blocking : Boolean = False);
     property OnResponseReceived: TResponseReceivedEvent read FOnResponseReceived write FOnResponseReceived;
   public
     constructor Create(AHost : string; CreateSuspended: Boolean = True);
@@ -78,6 +78,10 @@ type
   end;
 
 implementation
+
+{$ifdef DEBUG}
+  uses debug_logger;
+{$endif}
 
 { TZMQSubThread }
 
@@ -141,9 +145,7 @@ begin
   FSubscriber.unSubscribe(AFilter);
 end;
 
-{$ifdef DEBUG}
-  uses debug_logger;
-{$endif}
+{ TZMQThread }
 
 constructor TZMQThread.Create(AHost: string; CreateSuspended: Boolean);
 begin
@@ -192,16 +194,26 @@ begin
       Synchronize( @ResponseReceived );
 
       {$ifdef DEBUG}
-        FResponse := mt_Debug + 'TClientThread instance with ThreadID:' + IntToStr(Self.ThreadID);
-        Synchronize( @ResponseReceived );
+        DebugLn(mt_Debug + 'TClientThread:ThreadID:' + IntToStr(Self.ThreadID));
       {$endif}
     end;
 end;
 
-procedure TZMQThread.SendRequest(ARequest: UTF8string);
+procedure TZMQThread.SendRequest(ARequest: UTF8string; Blocking: Boolean);
+var AResponse : UTF8String;
 begin
   FRequest := ARequest;
-  RTLeventSetEvent(FRTLEvent);
+  if not Blocking then
+    RTLeventSetEvent(FRTLEvent)
+  else
+    begin
+      FRequester.send( ARequest );
+      FRequester.recv( AResponse );
+      FResponse := AResponse;
+      ResponseReceived;
+    end;
 end;
+
+
 
 end.
