@@ -11,6 +11,8 @@ unit pupil_communication;
 
 {$mode objfpc}{$H+}
 
+{$DEFINE DEBUG}
+
 interface
 
 uses Classes, SysUtils
@@ -22,7 +24,10 @@ type
 
   { TMPMessage }
 
-  TMPMessage = TMultiPartMessage;
+  TMPMessage = record
+    Topic : string;
+    Message : TSimpleMsgPack;
+  end;
 
   { TNotifyMultipartMessage }
 
@@ -43,23 +48,32 @@ type
       procedure ReceiveSubPort(AResponse: string);
       procedure ReceivePubPort(AResponse: string);
       procedure ReceiveResponse(ARequest, AResponse: string);
-      procedure ReceiveMultipartMessage(AMultipartMessage : TMPMessage);
+      procedure ReceiveMultipartMessage(AMultipartMessage : TMultiPartMessage);
       procedure SubscriberTerminated(Sender : TObject);
     private
+      FOnCalibrationStopped: TNotifyMultipartMessage;
+      FOnRecordingStarted: TNotifyMultipartMessage;
       FOnRequestReceived : TNotifyRequest;
       FOnMultipartMessageReceived : TNotifyMultipartMessage;
+      function GetSubscribed: Boolean;
+      procedure SetOnCalibrationStopped(AValue: TNotifyMultipartMessage);
       procedure SetOnMultiPartMessageReceived(AValue: TNotifyMultipartMessage);
+      procedure SetOnRecordingStarted(AValue: TNotifyMultipartMessage);
       procedure SetOnRequestReceived(AValue: TNotifyRequest);
     public
       constructor Create(AHost : string; CreateSuspended: Boolean = True);
       destructor Destroy; override;
-      procedure Request(AReq : UTF8String);
+      procedure Request(AReq : UTF8String; Blocking : Boolean = False);
 
       // Must call StartSubscriber first
       procedure Subscribe(ASub : UTF8String);
-      procedure StartSubscriber;
+      procedure StartSubscriber; overload;
+      procedure StartSubscriber(Blocking : Boolean); overload;
       procedure UnSubscribe(ASub : UTF8String);
+      property Subscribed : Boolean read GetSubscribed;
     public
+      property OnCalibrationStopped : TNotifyMultipartMessage read FOnCalibrationStopped write SetOnCalibrationStopped;
+      property OnRecordingStarted : TNotifyMultipartMessage read FOnRecordingStarted write SetOnRecordingStarted;
       property OnRequestReceived : TNotifyRequest read FOnRequestReceived write SetOnRequestReceived;
       property OnMultiPartMessageReceived : TNotifyMultipartMessage read FOnMultiPartMessageReceived write SetOnMultiPartMessageReceived;
   end;
@@ -117,6 +131,14 @@ const
   // 'notify.eye_process.should_start.0'
   // 'notify.eye_process.should_start.1'
 
+const
+  KEY_SUBJECT = 'subject';
+  KEY_RECORDING_PATH = 'rec_path';
+  KEY_SESSION_NAME = 'session_name';
+  KEY_RECORD_EYE = 'record_eye';
+  KEY_COMPRESSION = 'compression';
+
+
 
 implementation
 
@@ -153,9 +175,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TPupilCommunication.Request(AReq: UTF8String);
+procedure TPupilCommunication.Request(AReq: UTF8String; Blocking: Boolean);
 begin
-  SendRequest(AReq);
+  SendRequest(AReq,Blocking);
 end;
 
 procedure TPupilCommunication.Subscribe(ASub: UTF8String);
@@ -166,6 +188,11 @@ end;
 procedure TPupilCommunication.StartSubscriber;
 begin
   Request(REQ_SUB_PORT);
+end;
+
+procedure TPupilCommunication.StartSubscriber(Blocking: Boolean);
+begin
+  Request(REQ_SUB_PORT,Blocking);
 end;
 
 procedure TPupilCommunication.UnSubscribe(ASub: UTF8String);
@@ -180,7 +207,9 @@ begin
   with DecodedMessagePackage do
     for j := 0 to Count -1 do
       begin;
-        WriteLn(Items[j].Key,':',Items[j].Value);
+        {$ifdef DEBUG}
+          DebugLn(mt_Debug + Items[j].Key + ':' + Items[j].Value);
+        {$endif};
       end;
 end;
 
@@ -189,8 +218,10 @@ var SubHost : string;
 begin
   if FSubPort = '' then
     begin
-      FSubPort := AResponse;
-      SubHost := FLocalIP + FSubPort; WriteLn('SubHost', #32, SubHost);
+      SubHost := FLocalIP + AResponse;
+      {$ifdef DEBUG}
+        DebugLn(mt_Debug + 'SubHost:' + #32 + SubHost);
+      {$endif};
       FZMQSubThread := TZMQSubThread.Create(SubHost);
       with FZMQSubThread do
         begin;
@@ -198,6 +229,7 @@ begin
           OnMultiPartMessageReceived := @ReceiveMultipartMessage;
           Start;
         end;
+      FSubPort := AResponse;
     end;
 end;
 
@@ -225,19 +257,30 @@ begin
   end;
 end;
 
-procedure TPupilCommunication.ReceiveMultipartMessage(AMultipartMessage: TMPMessage);
+procedure TPupilCommunication.ReceiveMultipartMessage(AMultipartMessage: TMultiPartMessage);
 var Serializer :  TSimpleMsgPack;
+    MPMessage : TMPMessage;
 begin
+  MPMessage.Topic := AMultipartMessage.MsgTopic;
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + MPMessage.Topic)
+  {$endif};
+
   AMultipartMessage.MsgPackage.Position := 0;
-  Write(AMultipartMessage.MsgTopic);
   Serializer := TSimpleMsgPack.Create;
   try
     Serializer.Clear;
     Serializer.DecodeFromStream(AMultipartMessage.MsgPackage);
-    WriteLn(':', IntToStr(Serializer.Count));
+    {$ifdef DEBUG}
+      DebugLn(mt_Debug + 'TopicCount:'+ IntToStr(Serializer.Count));
+    {$endif};
     ReceiveDictionary(Serializer);
-
-    if Assigned(OnMultiPartMessageReceived) then OnMultiPartMessageReceived(Self,AMultipartMessage);
+    MPMessage.Message := Serializer;
+    case AMultipartMessage.MsgTopic of
+      NOTIFY_RECORDING_STARTED : if Assigned(OnRecordingStarted) then OnRecordingStarted(Self,MPMessage);
+      NOTIFY_CALIBRATION_STOPPED : if Assigned(OnCalibrationStopped) then OnCalibrationStopped(Self, MPMessage);
+      else if Assigned(OnMultiPartMessageReceived) then OnMultiPartMessageReceived(Self,MPMessage);
+    end;
 
   finally
     Serializer.Free;
@@ -255,6 +298,25 @@ procedure TPupilCommunication.SetOnMultiPartMessageReceived(
 begin
   if FOnMultiPartMessageReceived = AValue then Exit;
   FOnMultiPartMessageReceived := AValue;
+end;
+
+procedure TPupilCommunication.SetOnCalibrationStopped(
+  AValue: TNotifyMultipartMessage);
+begin
+  if FOnCalibrationStopped = AValue then Exit;
+  FOnCalibrationStopped := AValue;
+end;
+
+function TPupilCommunication.GetSubscribed: Boolean;
+begin
+  Result := FSubPort <> '';
+end;
+
+procedure TPupilCommunication.SetOnRecordingStarted(
+  AValue: TNotifyMultipartMessage);
+begin
+  if FOnRecordingStarted = AValue then Exit;
+  FOnRecordingStarted := AValue;
 end;
 
 procedure TPupilCommunication.SetOnRequestReceived(AValue: TNotifyRequest);
