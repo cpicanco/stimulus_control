@@ -125,7 +125,6 @@ type
     property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property ServerAddress : string read FServerAddress write FServerAddress;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
-    property TimeStart : Extended read FTimeStart write FTimeStart;
     property PupilClient : TPupilCommunication read FPupilClient write FPupilClient;
   public
     property OnBeginCorrection: TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
@@ -143,7 +142,7 @@ type
 implementation
 
 uses
-  timestamp
+  timestamps
 {$ifdef DEBUG}
   , debug_logger
 {$endif}
@@ -151,7 +150,7 @@ uses
 constructor TBlc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-
+  FTimeStart := TickCount;
   with FTimerITI do begin
     Interval := 0;
     Enabled := False;
@@ -214,7 +213,7 @@ begin
 
 
   IndTrial := FCounterManager.CurrentTrial.Counter;
-  if IndTrial = 0 then FFirstTrialBegin := GetCustomTick;
+  if IndTrial = 0 then FFirstTrialBegin := TickCount;
   if IndTrial < FBlc.NumTrials then
     begin
 
@@ -518,7 +517,7 @@ begin
       FTimerCsq.Interval:= -1;
     end;
 
-  FITIBegin := GetCustomTick;
+  FITIBegin := TickCount;
 
   //FTrial.Hide;
 
@@ -541,7 +540,7 @@ begin
         DebugLn(mt_Debug +  'Time Condition 1');
       {$endif}
       TrialTerminate(Sender);
-      FITIEnd := GetCustomTick; // Here it will be near to zero;
+      FITIEnd := TickCount; // Here it will be near to zero;
       PlayTrial;
       Exit;
     end;
@@ -621,7 +620,7 @@ begin
         end
       else
         begin
-          FITIEnd := GetCustomTick;
+          FITIEnd := TickCount;
           FTimer.Enabled := False;
           TrialTerminate(Sender);
           PlayTrial;
@@ -647,7 +646,7 @@ begin
         end
       else
         begin
-          FITIEnd := GetCustomTick;
+          FITIEnd := TickCount;
           FTimer.Enabled := False;
           TrialTerminate(Sender);
           PlayTrial;
@@ -668,7 +667,7 @@ begin
           FCounterLabel.Free;
         end;
 
-      FITIEnd := GetCustomTick;
+      FITIEnd := TickCount;
       FTimer.Enabled := False;
       TrialTerminate(Sender);
       PlayTrial;
