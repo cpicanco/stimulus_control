@@ -138,7 +138,7 @@ type
     procedure EndSession(Sender : TObject);
     procedure RandTrialOrder(BeginRow, EndRow : integer);
     procedure ResetRepetionMatrix;
-    procedure ReceiveTimestamp(Sender: TObject; ATimestamp: String);
+    procedure ReceiveTimestamp(Sender: TObject; ARequest, AResponse: String);
     //SimpleGui : TSimpleGui;
     //FData : TRegData;
     //FConfig : TConfig;
@@ -424,12 +424,12 @@ begin
   StringGrid1.Invalidate;
 end;
 
-procedure TUserConfig.ReceiveTimestamp(Sender: TObject; ATimestamp: String);
+procedure TUserConfig.ReceiveTimestamp(Sender: TObject; ARequest,
+  AResponse: String);
 begin
-  ShowMessage(Sender.ClassName + #32 + ATimestamp);
-  {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'response:' + ATimestamp);
-  {$endif}
+  case ARequest of
+    REQ_TIMESTAMP : ShowMessage(Sender.ClassName + #32 + AResponse);
+  end;
 end;
 
 procedure TUserConfig.CheckRepetitionCol(aCol : integer);
@@ -719,10 +719,10 @@ procedure TUserConfig.btnClientTestClick(Sender: TObject);
 var PupilClient : TPupilCommunication;
 begin
   PupilClient := TPupilCommunication.Create(leServerAddress.Text);
-  PupilClient.OnReceiveTimestamp := @ReceiveTimestamp;
+  PupilClient.OnRequestReceived := @ReceiveTimestamp;
 
   PupilClient.Start;
-  PupilClient.RequestTimestamp;
+  PupilClient.Request(REQ_TIMESTAMP);
 
   Sleep (1000);
   PupilClient.Terminate;
@@ -1215,7 +1215,7 @@ begin
   //FData.SaveData('Participante:' + #9 + leParticipant.Text + LineEnding +
   //               'Sessão:' + #9 + IntToStr(FData.SessionNumber) + LineEnding +
   //               'Data:' + #9 + DateTimeToStr(Date)+ LineEnding + LineEnding);
-  aDataName := 'Data_000.txt';
+  aDataName := '000.data';
   aDirectory := GetCurrentDirUTF8 + PathDelim + leParticipant.Text;
   if ForceDirectoriesUTF8(aDirectory) then
       OpenDialog1.InitialDir := aDirectory;
