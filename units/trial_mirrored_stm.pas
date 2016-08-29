@@ -70,7 +70,7 @@ type
 implementation
 
 uses
-  timestamp
+  timestamps
 {$ifdef DEBUG}
   , debug_logger
   , dialogs
@@ -141,9 +141,9 @@ begin
 end;
 
 procedure TMRD.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-var TickCount : Extended;
+var LTickCount : Extended;
 begin
-  TickCount := GetCustomTick;
+  LTickCount := TickCount;
 
   if Key = 27 {ESC} then
     begin
@@ -158,7 +158,7 @@ begin
           if key = 32 then
             begin
               //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
-              FDataSupport.Latency := TickCount;
+              FDataSupport.Latency := LTickCount;
               LogEvent('*R');
               FShowStarter := False;
               Invalidate;
@@ -333,7 +333,7 @@ begin
 
   FCanResponse := True;
   Invalidate;
-  FDataSupport.StmBegin := GetCustomTick;
+  FDataSupport.StmBegin := TickCount;
 
   inherited StartTrial(Sender);
 end;
@@ -396,15 +396,15 @@ end;
 
 
 procedure TMRD.Response(Sender: TObject);
-var TickCount : Extended;
+var LTickCount : Extended;
 begin
-  TickCount := GetCustomTick;
+  LTickCount := TickCount;
   Inc(FDataSupport.Responses);
 
   if FFirstResp then
     begin
       FFirstResp := False;
-      FDataSupport.Latency := TickCount;
+      FDataSupport.Latency := LTickCount;
     end;
 
   if FUseMedia then
