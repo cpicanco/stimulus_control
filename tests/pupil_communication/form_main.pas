@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2016 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit form_main;
 
 {$mode objfpc}{$H+}
@@ -44,6 +53,8 @@ type
   private
     FPupilClient : TPupilCommunication;
     procedure ReceiveRequest(Sender: TObject; ARequest, AResponse: String);
+    procedure RecordingStarted(Sender: TObject; AMultipartMessage : TMPMessage);
+    procedure CalibrationStopped(Sender: TObject; AMultipartMessage : TMPMessage);
     procedure MultipartMessage(Sender: TObject; AMultipartMessage : TMPMessage);
   public
     { public declarations }
@@ -118,6 +129,8 @@ begin
     begin
       OnRequestReceived := @ReceiveRequest;
       OnMultiPartMessageReceived := @MultipartMessage;
+      OnCalibrationStopped := @CalibrationStopped;
+      OnRecordingStarted := @RecordingStarted;
       Start;
       StartSubscriber;
     end;
@@ -150,18 +163,30 @@ end;
 procedure TForm1.ReceiveRequest(Sender: TObject; ARequest, AResponse: String);
 begin
   case ARequest of
-    REQ_RECORDING_PATH: ShowMessage('Not implemented');
+    REQ_RECORDING_PATH: ShowMessage('Not implemented.');
     else ShowMessage(Sender.ClassName + #32 + ARequest + #32 + AResponse);
   end;
+end;
+
+procedure TForm1.RecordingStarted(Sender: TObject; AMultipartMessage: TMPMessage
+  );
+begin
+  ShowMessage(AMultipartMessage.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim);
+end;
+
+procedure TForm1.CalibrationStopped(Sender: TObject;
+  AMultipartMessage: TMPMessage);
+begin
+  BringToFront;
+  ShowMessage('Calibration Stopped.');
 end;
 
 procedure TForm1.MultipartMessage(Sender: TObject; AMultipartMessage: TMPMessage
   );
 begin
-  case AMultipartMessage.MsgTopic of
+  case AMultipartMessage.Topic of
     NOTIFY_CALIBRATION_FAILED : ShowMessage('Calibration Failed!');
   end;
-
 end;
 
 
