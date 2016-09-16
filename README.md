@@ -1,5 +1,7 @@
 # Stimulus Control
 
+[![Join the chat at https://gitter.im/open_behavior_analysis/stimulus_control](https://badges.gitter.im/open_behavior_analysis/stimulus_control.svg)](https://gitter.im/open_behavior_analysis/stimulus_control?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
 
 - It is aimed at fast programming of behavioral experiments.
