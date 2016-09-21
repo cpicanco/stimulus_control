@@ -1,6 +1,6 @@
 # Stimulus Control
 
-[![Join the chat at https://gitter.im/open_behavior_analysis/stimulus_control](https://badges.gitter.im/open_behavior_analysis/stimulus_control.svg)](https://gitter.im/open_behavior_analysis/stimulus_control?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/open_behavior_analysis/stimulus_control](https://badges.gitter.im/open_behavior_analysis/stimulus_control.svg)](https://gitter.im/open_behavior_analysis/stimulus_control?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![DOI](https://zenodo.org/badge/17609066.svg)](https://zenodo.org/badge/latestdoi/17609066)
 
 Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
 
