@@ -10,28 +10,27 @@
 
 // Timing
 // https://github.com/graemeg/epiktimer/blob/master/epiktimer.pas
+{ TODO -oRafael -cCrossplatform : Implement clock_gettime() alternative for windows. }
 
-unit timestamp;
+unit timestamps_helpers;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  { TODO -oRafael -cCrossplatform : Implement clock_gettime() alternative for windows. }
-  Linux, UnixType,
-  SysUtils;
+  Classes, SysUtils,  Linux, UnixType
+  , regdata
+  ;
 
-function GetCustomTick : Extended;
-function GetTimeStampRaw : timespec;
-function GetTimeStampMono : timespec;
-function GetResolution : string;
-function GetTimeStampF : string; overload;
-function GetTimeStampF (ATimeStart:Extended): string; overload;
+  function GetCustomTick : Extended;
+  function GetMonotonicTime : timespec;
+  function GetMonotonicTimeRaw : timespec;
+  function GetClockResolution : string; // granularity
+
+var TimestampLogger : TRegData;
 
 implementation
-
-
 
 function GetCustomTick: Extended;
 var
@@ -42,18 +41,9 @@ begin
   a := tp.tv_sec;
   b := tp.tv_nsec * 1e-9;
   Result := a+b;
-  //FloatToStrF(Result, ffFixed, 0, 9);
 end;
 
-function GetTimeStampRaw: timespec;
-var
-  tp: timespec;
-begin
-  clock_gettime(CLOCK_MONOTONIC_RAW, @tp);
-  Result := tp;
-end;
-
-function GetTimeStampMono: timespec;
+function GetMonotonicTime: timespec;
 var
   tp: timespec;
 begin
@@ -61,17 +51,16 @@ begin
   Result := tp;
 end;
 
-function GetTimeStampF: string;
+function GetMonotonicTimeRaw: timespec;
+var
+  tp: timespec;
 begin
-  Result:=FloatToStrF(GetCustomTick,ffFixed,0,9)
+  clock_gettime(CLOCK_MONOTONIC_RAW, @tp);
+  Result := tp;
 end;
 
-function GetTimeStampF(ATimeStart: Extended): string;
-begin
-  Result:=FloatToStrF(GetCustomTick-ATimeStart,ffFixed,0,9)
-end;
 
-function GetResolution: string;
+function GetClockResolution: string;
 var
   tp: timespec;
 begin

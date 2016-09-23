@@ -11,60 +11,133 @@ unit pupil_communication;
 
 {$mode objfpc}{$H+}
 
+{$DEFINE DEBUG}
+
 interface
 
 uses Classes, SysUtils
      , zmq_client
+     , SimpleMsgPack
      ;
 
 type
-  { TNotifyPupilEvent }
 
-  TNotifyPupilEvent = procedure(Sender: TObject; AResponse: String) of object;
+  { TMPMessage }
+
+  TMPMessage = record
+    Topic : string;
+    Message : TSimpleMsgPack;
+  end;
+
+  { TNotifyMultipartMessage }
+
+  TNotifyMultipartMessage = procedure(Sender: TObject; AMultiPartMessage : TMPMessage) of object;
+
+  { TNotifyRequest }
+
+  TNotifyRequest = procedure(Sender: TObject; ARequest, AResponse: String) of object;
 
   { TPupilCommunication }
 
   TPupilCommunication = class(TZMQThread)
     private
-      FOnAfterCalibrationStart: TNotifyPupilEvent;
-      FOnAfterRecordingStart: TNotifyPupilEvent;
-      FOnAfterCalibrationStop: TNotifyPupilEvent;
-      FOnAfterRecordingStop: TNotifyPupilEvent;
-      FOnAfterSynchronizeTime: TNotifyPupilEvent;
-      FOnReceiveRecordingPath: TNotifyPupilEvent;
-      FOnReceiveTimestamp: TNotifyPupilEvent;
-      //procedure AfterCalibrationStart(Sender : TObject; AResponse : string);
-      //procedure AfterCalibrationStop(Sender : TObject; AResponse : string);
-      //procedure AfterRecordingStart(Sender : TObject; AResponse : string);
-      //procedure AfterRecordingStop(Sender : TObject; AResponse : string);
-      //procedure AfterSynchronizeTime(Sender : TObject; AResponse : string);
-
-      procedure ReceiveResponse(ARequest, AResponse: String);
-      procedure SetOnAfterCalibrationStart(AValue: TNotifyPupilEvent);
-      procedure SetOnAfterCalibrationStop(AValue: TNotifyPupilEvent);
-      procedure SetOnAfterRecordingStart(AValue: TNotifyPupilEvent);
-      procedure SetOnAfterRecordingStop(AValue: TNotifyPupilEvent);
-      procedure SetOnAfterSynchronizeTime(AValue: TNotifyPupilEvent);
-      procedure SetOnReceiveRecordingPath(AValue: TNotifyPupilEvent);
-      procedure SetOnReceiveTimestamp(AValue: TNotifyPupilEvent);
+      FSubPort : string;
+      FLocalIP : string;
+      FZMQSubThread : TZMQSubThread;
+      procedure ReceiveDictionary(DecodedMessagePackage : TSimpleMsgPack);
+      procedure ReceiveSubPort(AResponse: string);
+      procedure ReceivePubPort(AResponse: string);
+      procedure ReceiveResponse(ARequest, AResponse: string);
+      procedure ReceiveMultipartMessage(AMultipartMessage : TMultiPartMessage);
+      procedure SubscriberTerminated(Sender : TObject);
+    private
+      FOnCalibrationStopped: TNotifyMultipartMessage;
+      FOnRecordingStarted: TNotifyMultipartMessage;
+      FOnRequestReceived : TNotifyRequest;
+      FOnMultipartMessageReceived : TNotifyMultipartMessage;
+      function GetSubscribed: Boolean;
+      procedure SetOnCalibrationStopped(AValue: TNotifyMultipartMessage);
+      procedure SetOnMultiPartMessageReceived(AValue: TNotifyMultipartMessage);
+      procedure SetOnRecordingStarted(AValue: TNotifyMultipartMessage);
+      procedure SetOnRequestReceived(AValue: TNotifyRequest);
     public
       constructor Create(AHost : string; CreateSuspended: Boolean = True);
       destructor Destroy; override;
-      procedure RequestRecordingPath;
-      procedure RequestTimestamp;
-      procedure StartRecording;
-      procedure StopRecording;
-      procedure StartCalibration;
-      procedure StopCalibration;
-      procedure SynchronizeTime(ATime: Extended);
-      property OnAfterCalibrationStart : TNotifyPupilEvent read FOnAfterCalibrationStart write SetOnAfterCalibrationStart ;
-      property OnAfterCalibrationStop : TNotifyPupilEvent read FOnAfterCalibrationStop write SetOnAfterCalibrationStop  ;
-      property OnAfterRecordingStart : TNotifyPupilEvent read FOnAfterRecordingStart write SetOnAfterRecordingStart  ;
-      property OnAfterRecordingStop : TNotifyPupilEvent read FOnAfterRecordingStop write SetOnAfterRecordingStop  ;
-      property OnAfterSynchronizeTime : TNotifyPupilEvent read FOnAfterSynchronizeTime write SetOnAfterSynchronizeTime  ;
-      property OnReceiveRecordingPath : TNotifyPupilEvent read FOnReceiveRecordingPath write SetOnReceiveRecordingPath  ;
-      property OnReceiveTimestamp : TNotifyPupilEvent read FOnReceiveTimestamp write SetOnReceiveTimestamp   ;
+      procedure Request(AReq : UTF8String; Blocking : Boolean = False);
+
+      // Must call StartSubscriber first
+      procedure Subscribe(ASub : UTF8String);
+      procedure StartSubscriber; overload;
+      procedure StartSubscriber(Blocking : Boolean); overload;
+      procedure UnSubscribe(ASub : UTF8String);
+      property Subscribed : Boolean read GetSubscribed;
+    public
+      property OnCalibrationStopped : TNotifyMultipartMessage read FOnCalibrationStopped write SetOnCalibrationStopped;
+      property OnRecordingStarted : TNotifyMultipartMessage read FOnRecordingStarted write SetOnRecordingStarted;
+      property OnRequestReceived : TNotifyRequest read FOnRequestReceived write SetOnRequestReceived;
+      property OnMultiPartMessageReceived : TNotifyMultipartMessage read FOnMultiPartMessageReceived write SetOnMultiPartMessageReceived;
   end;
+
+const
+  // start recording with auto generated session name
+  // note: may append a string to session name, 'R [session name]'
+  REQ_SHOULD_START_RECORDING  = 'R';
+
+  // stop recording
+  REQ_SHOULD_STOP_RECORDING = 'r';
+
+  // start currently selected calibration
+  REQ_SHOULD_START_CALIBRATION = 'C';
+
+  // stop currently selected calibration
+  REQ_SHOULD_STOP_CALIBRATION = 'c';
+
+  // '[T][#32][time]' make pupil timestamps count from [time] on.
+  REQ_SYNCHRONIZE_TIME = 'T';
+
+  // get pupil capture timestamp returns a float as string.
+  REQ_TIMESTAMP = 't';
+
+  // request recording path
+  REQ_RECORDING_PATH = 'P';
+
+const
+  SUB_ALL_NOTIFICATIONS = 'notify.';
+
+  SUB_GAZE_DATA = 'gaze';
+  SUB_EYE_CAMERA_0 = 'pupil.0';
+  SUB_EYE_CAMERA_1 = 'pupil.1';
+
+  SUB_LOGGING_INFO = 'logging.info';
+  SUB_LOGGING_ERROR = 'logging.error';
+  SUB_LOGGING_WARNING = 'logging.warning';
+
+  SUB_TIME_SYNC = 'time_sync.';
+
+const
+  NOTIFY_RECORDING_SHOULD_START = 'notify.recording.should_start';
+  NOTIFY_RECORDING_SHOULD_STOP = 'notify.recording.should_stop';
+  NOTIFY_RECORDING_STARTED = 'notify.recording.started';
+  NOTIFY_RECORDING_STOPPED = 'notify.recording.stopped';
+
+  NOTIFY_CALIBRATION_SHOULD_START = 'notify.calibration.should_start';
+  NOTIFY_CALIBRATION_SHOULD_STOP = 'notify.calibration.should_stop';
+  NOTIFY_CALIBRATION_STARTED = 'notify.calibration.started';
+  NOTIFY_CALIBRATION_STOPPED = 'notify.calibration.stopped';
+  NOTIFY_CALIBRATION_FAILED = 'notify.calibration.failed';
+  NOTIFY_CALIBRATION_SUCCESSFUL = 'notify.calibration.successful';
+
+  // 'notify.eye_process.stopped';
+  // 'notify.eye_process.should_start.0'
+  // 'notify.eye_process.should_start.1'
+
+const
+  KEY_SUBJECT = 'subject';
+  KEY_RECORDING_PATH = 'rec_path';
+  KEY_SESSION_NAME = 'session_name';
+  KEY_RECORD_EYE = 'record_eye';
+  KEY_COMPRESSION = 'compression';
+
 
 
 implementation
@@ -73,133 +146,24 @@ implementation
 uses debug_logger;
 {$endif}
 
-//# IPC Backbone communication
-//'PUB_PORT' return the current pub port of the IPC Backbone
-//'SUB_PORT' return the current sub port of the IPC Backbone
-
 resourcestring
   ERROR_UNKNOWN_COMMAND = 'Commando Pupil desconhecido: ';
   ERROR_NOT_IMPLEMENTED = 'Commando Pupil não implementado:';
 
 const
-  // start recording with auto generated session name
-  // note: may append a string to session name, 'R [session name]'
-  SHOULD_START_RECORDING = 'R';
+  // return the current publisher's port of the IPC Backbone
+  REQ_PUB_PORT = 'PUB_PORT';
 
-  // stop recording
-  SHOULD_STOP_RECORDING = 'r';
+  // return the current subscriber's port of the IPC Backbone
+  REQ_SUB_PORT = 'SUB_PORT';
 
-  // start currently selected calibration
-  SHOULD_START_CALIBRATION = 'C';
-
-  // stop currently selected calibration
-  SHOULD_STOP_CALIBRATION = 'c';
-
-  // 'T [time]' make pupil timestamps count from [time] on.
-  SYNCHRONIZE_TIME = 'T';
-
-  // get pupil capture timestamp returns a float as string.
-  REQUEST_TIMESTAMP = 't';
-
-  // request recording path
-  REQUEST_RECORDING_PATH = 'P';
 
 { TPupilCommunication }
 
-//procedure TPupilCommunication.AfterCalibrationStart(Sender: TObject;
-//  AResponse: string);
-//begin
-//
-//end;
-//
-//procedure TPupilCommunication.AfterCalibrationStop(Sender: TObject;
-//  AResponse: string);
-//begin
-//
-//end;
-//
-//procedure TPupilCommunication.AfterRecordingStart(Sender: TObject;
-//  AResponse: string);
-//begin
-//
-//end;
-//
-//procedure TPupilCommunication.AfterRecordingStop(Sender: TObject;
-//  AResponse: string);
-//begin
-//
-//end;
-//
-//procedure TPupilCommunication.AfterSynchronizeTime(Sender: TObject;
-//  AResponse: string);
-//begin
-//
-//end;
-
-procedure TPupilCommunication.ReceiveResponse(ARequest, AResponse: String);
-begin
-  case ARequest of
-    SHOULD_START_RECORDING : if Assigned(OnAfterRecordingStart) then OnAfterRecordingStart(Self, AResponse);
-    SHOULD_STOP_RECORDING : if Assigned(OnAfterRecordingStop) then OnAfterRecordingStop(Self, AResponse);
-    SHOULD_START_CALIBRATION : if Assigned(OnAfterCalibrationStart) then OnAfterCalibrationStart(Self, AResponse);
-    SHOULD_STOP_CALIBRATION : if Assigned(OnAfterCalibrationStop) then OnAfterCalibrationStop(Self, AResponse);
-    SYNCHRONIZE_TIME : if Assigned(OnAfterSynchronizeTime) then OnAfterSynchronizeTime(Self, AResponse);
-    REQUEST_TIMESTAMP : if Assigned(OnReceiveTimestamp) then OnReceiveTimestamp(Self, AResponse);
-    REQUEST_RECORDING_PATH : if Assigned(OnReceiveRecordingPath) then OnReceiveRecordingPath(Self, AResponse);
-    else raise Exception.Create( ERROR_UNKNOWN_COMMAND + ARequest + #32 + Self.ClassName );
-  end;
-end;
-
-procedure TPupilCommunication.SetOnAfterCalibrationStart(
-  AValue: TNotifyPupilEvent);
-begin
-  if FOnAfterCalibrationStart=AValue then Exit;
-  FOnAfterCalibrationStart:=AValue;
-end;
-
-procedure TPupilCommunication.SetOnAfterCalibrationStop(
-  AValue: TNotifyPupilEvent);
-begin
-  if FOnAfterCalibrationStop=AValue then Exit;
-  FOnAfterCalibrationStop:=AValue;
-end;
-
-procedure TPupilCommunication.SetOnAfterRecordingStart(AValue: TNotifyPupilEvent
-  );
-begin
-  if FOnAfterRecordingStart=AValue then Exit;
-  FOnAfterRecordingStart:=AValue;
-end;
-
-procedure TPupilCommunication.SetOnAfterRecordingStop(AValue: TNotifyPupilEvent
-  );
-begin
-  if FOnAfterRecordingStop=AValue then Exit;
-  FOnAfterRecordingStop:=AValue;
-end;
-
-procedure TPupilCommunication.SetOnAfterSynchronizeTime(
-  AValue: TNotifyPupilEvent);
-begin
-  if FOnAfterSynchronizeTime=AValue then Exit;
-  FOnAfterSynchronizeTime:=AValue;
-end;
-
-procedure TPupilCommunication.SetOnReceiveRecordingPath(
-  AValue: TNotifyPupilEvent);
-begin
-  if FOnReceiveRecordingPath=AValue then Exit;
-  FOnReceiveRecordingPath:=AValue;
-end;
-
-procedure TPupilCommunication.SetOnReceiveTimestamp(AValue: TNotifyPupilEvent);
-begin
-  if FOnReceiveTimestamp=AValue then Exit;
-  FOnReceiveTimestamp:=AValue;
-end;
-
 constructor TPupilCommunication.Create(AHost: string; CreateSuspended: Boolean);
 begin
+  FLocalIP := Copy(AHost,1, pos(':', AHost));
+  FSubPort := '';
   inherited Create(AHost, CreateSuspended);
   OnResponseReceived := @ReceiveResponse;
 end;
@@ -207,43 +171,160 @@ end;
 destructor TPupilCommunication.Destroy;
 begin
   OnResponseReceived := nil;
+  if Assigned(FZMQSubThread) then FZMQSubThread.Terminate;
   inherited Destroy;
 end;
 
-procedure TPupilCommunication.StartRecording;
+procedure TPupilCommunication.Request(AReq: UTF8String; Blocking: Boolean);
 begin
-  SendRequest(SHOULD_START_RECORDING);
+  SendRequest(AReq,Blocking);
 end;
 
-procedure TPupilCommunication.StopRecording;
+procedure TPupilCommunication.Subscribe(ASub: UTF8String);
 begin
-  SendRequest(SHOULD_STOP_RECORDING);
+  if Assigned(FZMQSubThread) then FZMQSubThread.Subscribe(ASub);
 end;
 
-procedure TPupilCommunication.StartCalibration;
+procedure TPupilCommunication.StartSubscriber;
 begin
-  SendRequest(SHOULD_START_CALIBRATION);
+  Request(REQ_SUB_PORT);
 end;
 
-procedure TPupilCommunication.StopCalibration;
+procedure TPupilCommunication.StartSubscriber(Blocking: Boolean);
 begin
-  SendRequest(SHOULD_STOP_CALIBRATION);
+  Request(REQ_SUB_PORT,Blocking);
 end;
 
-procedure TPupilCommunication.RequestRecordingPath;
+procedure TPupilCommunication.UnSubscribe(ASub: UTF8String);
 begin
-  raise Exception.Create( ERROR_NOT_IMPLEMENTED + REQUEST_RECORDING_PATH + #32 + Self.ClassName );
+  if Assigned(FZMQSubThread) then FZMQSubThread.UnSubscribe(ASub);
 end;
 
-procedure TPupilCommunication.RequestTimestamp;
+
+procedure TPupilCommunication.ReceiveDictionary(DecodedMessagePackage: TSimpleMsgPack);
+var j : integer;
 begin
-  SendRequest(REQUEST_TIMESTAMP);
+  with DecodedMessagePackage do
+    for j := 0 to Count -1 do
+      begin;
+        {$ifdef DEBUG}
+          DebugLn(mt_Debug + Items[j].Key + ':' + Items[j].Value);
+        {$endif};
+      end;
 end;
 
-procedure TPupilCommunication.SynchronizeTime(ATime: Extended);
+procedure TPupilCommunication.ReceiveSubPort(AResponse: string);
+var SubHost : string;
 begin
-  SendRequest(SYNCHRONIZE_TIME + #32 + FloatToStrF(ATime,ffFixed,0,9));
+  if FSubPort = '' then
+    begin
+      SubHost := FLocalIP + AResponse;
+      {$ifdef DEBUG}
+        DebugLn(mt_Debug + 'SubHost:' + #32 + SubHost);
+      {$endif};
+      FZMQSubThread := TZMQSubThread.Create(SubHost);
+      with FZMQSubThread do
+        begin;
+          OnTerminate := @SubscriberTerminated;
+          OnMultiPartMessageReceived := @ReceiveMultipartMessage;
+          Start;
+        end;
+      FSubPort := AResponse;
+    end;
 end;
+
+procedure TPupilCommunication.ReceivePubPort(AResponse: string);
+begin
+  raise Exception.Create( ERROR_NOT_IMPLEMENTED + REQ_PUB_PORT + #32 + Self.ClassName + '#32' + AResponse);
+  //SendRequest(REQUEST_PUB_PORT);
+  { TODO 1 -oRafael -c-enhencement : publish to the pupil ipc backbone }
+end;
+
+procedure TPupilCommunication.ReceiveResponse(ARequest, AResponse: string);
+begin
+  case ARequest of
+    REQ_SHOULD_START_RECORDING, REQ_SHOULD_STOP_RECORDING,
+    REQ_SHOULD_START_CALIBRATION, REQ_SHOULD_STOP_CALIBRATION,
+    REQ_TIMESTAMP : if Assigned(OnRequestReceived) then OnRequestReceived(Self, ARequest, AResponse);
+    REQ_SUB_PORT : ReceiveSubPort(AResponse);
+    REQ_PUB_PORT : ReceivePubPort(AResponse);
+    else
+      if Pos(REQ_SYNCHRONIZE_TIME,ARequest) <> 0 then
+        begin
+          if Assigned(OnRequestReceived) then OnRequestReceived(Self, ARequest, AResponse);
+        end
+      else raise Exception.Create( ERROR_UNKNOWN_COMMAND + ARequest + #32 + Self.ClassName );
+  end;
+end;
+
+procedure TPupilCommunication.ReceiveMultipartMessage(AMultipartMessage: TMultiPartMessage);
+var Serializer :  TSimpleMsgPack;
+    MPMessage : TMPMessage;
+begin
+  MPMessage.Topic := AMultipartMessage.MsgTopic;
+  {$ifdef DEBUG}
+    DebugLn(mt_Debug + MPMessage.Topic)
+  {$endif};
+
+  AMultipartMessage.MsgPackage.Position := 0;
+  Serializer := TSimpleMsgPack.Create;
+  try
+    Serializer.Clear;
+    Serializer.DecodeFromStream(AMultipartMessage.MsgPackage);
+    {$ifdef DEBUG}
+      DebugLn(mt_Debug + 'TopicCount:'+ IntToStr(Serializer.Count));
+    {$endif};
+    ReceiveDictionary(Serializer);
+    MPMessage.Message := Serializer;
+    case AMultipartMessage.MsgTopic of
+      NOTIFY_RECORDING_STARTED : if Assigned(OnRecordingStarted) then OnRecordingStarted(Self,MPMessage);
+      NOTIFY_CALIBRATION_STOPPED : if Assigned(OnCalibrationStopped) then OnCalibrationStopped(Self, MPMessage);
+      else if Assigned(OnMultiPartMessageReceived) then OnMultiPartMessageReceived(Self,MPMessage);
+    end;
+
+  finally
+    Serializer.Free;
+    AMultipartMessage.MsgPackage.Free;
+  end;
+end;
+
+procedure TPupilCommunication.SubscriberTerminated(Sender: TObject);
+begin
+  FSubPort := '';
+end;
+
+procedure TPupilCommunication.SetOnMultiPartMessageReceived(
+  AValue: TNotifyMultipartMessage);
+begin
+  if FOnMultiPartMessageReceived = AValue then Exit;
+  FOnMultiPartMessageReceived := AValue;
+end;
+
+procedure TPupilCommunication.SetOnCalibrationStopped(
+  AValue: TNotifyMultipartMessage);
+begin
+  if FOnCalibrationStopped = AValue then Exit;
+  FOnCalibrationStopped := AValue;
+end;
+
+function TPupilCommunication.GetSubscribed: Boolean;
+begin
+  Result := FSubPort <> '';
+end;
+
+procedure TPupilCommunication.SetOnRecordingStarted(
+  AValue: TNotifyMultipartMessage);
+begin
+  if FOnRecordingStarted = AValue then Exit;
+  FOnRecordingStarted := AValue;
+end;
+
+procedure TPupilCommunication.SetOnRequestReceived(AValue: TNotifyRequest);
+begin
+  if FOnRequestReceived = AValue then Exit;
+  FOnRequestReceived := AValue;
+end;
+
 
 end.
 

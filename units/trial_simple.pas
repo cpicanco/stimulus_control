@@ -89,7 +89,7 @@ type
 
 implementation
 
-uses timestamp;
+uses timestamps;
 
 constructor TSimpl.Create(AOwner: TComponent);
 begin
@@ -243,13 +243,8 @@ begin
 end;
 
 procedure TSimpl.TrialResult(Sender: TObject);
-var
-    TickCount : Extended;
-    I : integer;
-
+var I : integer;
 begin
-  TickCount := GetCustomTick;
-
   FDataSupport.StmEnd := TickCount;
   FResponseEnabled:= False;
 
@@ -343,7 +338,7 @@ begin
   FFirstResp := False;
   FResponseEnabled := True;
 
-  FDataSupport.StmBegin := GetCustomTick;
+  FDataSupport.StmBegin := TickCount;
   inherited StartTrial(Sender);
 end;
 
@@ -468,12 +463,12 @@ end;
 procedure TSimpl.TrialMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
-    TickCount : Extended;
+    LTickCount : Extended;
     aTime, aCode, aStimulus, aLeft, aTop : string;
 begin
-  TickCount := GetCustomTick;
+  LTickCount := TickCount;
 
-  aTime := FloatToStrF(TickCount - TimeStart, ffFixed, 0, 9);
+  aTime := FloatToStrF(LTickCount - TimeStart, ffFixed, 0, 9);
   aCode := 'BK';
   aStimulus := '-';
   aLeft := IntToStr(X);
@@ -506,13 +501,13 @@ end;
 
 procedure TSimpl.Response(Sender: TObject);
 var
-    TickCount : Extended;
+    LTickCount : Extended;
     aTime, aCode, aStimulus, aLeft, aTop : string;
 begin
-  TickCount := GetCustomTick;
+  LTickCount := TickCount;
   if FResponseEnabled then
     begin
-      aTime := FloatToStrF(TickCount - TimeStart, ffFixed, 0, 9);
+      aTime := FloatToStrF(LTickCount - TimeStart, ffFixed, 0, 9);
 
       if Sender is TKey then
         begin
@@ -527,7 +522,7 @@ begin
 
       if FFirstResp = False then
         begin
-          FDataSupport.Latency := TickCount;
+          FDataSupport.Latency := LTickCount;
           FFirstResp := True;
         end;
 
