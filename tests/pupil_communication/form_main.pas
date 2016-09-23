@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2016 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit form_main;
 
 {$mode objfpc}{$H+}
@@ -7,7 +16,6 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls
   , pupil_communication
-  , timestamp
   ;
 
 type
@@ -21,17 +29,33 @@ type
     btnStopRecording: TButton;
     btnStartCalibration: TButton;
     btnStopCalibration: TButton;
+    btnUnsubscribe: TButton;
+    btnReqTimeSync: TButton;
+    gbxSubscribe: TGroupBox;
+    LabelHost: TLabel;
+    rbtnGazeData: TRadioButton;
+    rbtnTimeSync: TRadioButton;
+    rbtnNotifications: TRadioButton;
+    rbtnLoggingInfo: TRadioButton;
+    rbtnEyeCamera: TRadioButton;
+    Subscribe: TButton;
     procedure btnReceiveTimestampClick(Sender: TObject);
     procedure btnReceiveRecordingPathClick(Sender: TObject);
+    procedure btnReqTimeSyncClick(Sender: TObject);
     procedure btnStartRecordingClick(Sender: TObject);
     procedure btnStopRecordingClick(Sender: TObject);
     procedure btnStartCalibrationClick(Sender: TObject);
     procedure btnStopCalibrationClick(Sender: TObject);
+    procedure btnUnsubscribeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure SubscribeClick(Sender: TObject);
   private
     FPupilClient : TPupilCommunication;
-    procedure ReceiveResponse(Sender: TObject; AResponse: String);
+    procedure ReceiveRequest(Sender: TObject; ARequest, AResponse: String);
+    procedure RecordingStarted(Sender: TObject; AMultipartMessage : TMPMessage);
+    procedure CalibrationStopped(Sender: TObject; AMultipartMessage : TMPMessage);
+    procedure MultipartMessage(Sender: TObject; AMultipartMessage : TMPMessage);
   public
     { public declarations }
   end;
@@ -47,32 +71,55 @@ implementation
 
 procedure TForm1.btnReceiveTimestampClick(Sender: TObject);
 begin
-  FPupilClient.RequestTimestamp;
+  FPupilClient.Request(REQ_TIMESTAMP);
 end;
 
 procedure TForm1.btnReceiveRecordingPathClick(Sender: TObject);
 begin
-  FPupilClient.RequestRecordingPath;
+  FPupilClient.Request(REQ_RECORDING_PATH);
+end;
+
+procedure TForm1.btnReqTimeSyncClick(Sender: TObject);
+begin
+  FPupilClient.Request(REQ_SYNCHRONIZE_TIME + #32 + '0');
 end;
 
 procedure TForm1.btnStartRecordingClick(Sender: TObject);
 begin
-  FPupilClient.StartRecording;
+  FPupilClient.Request(REQ_SHOULD_START_RECORDING);
 end;
 
 procedure TForm1.btnStopRecordingClick(Sender: TObject);
 begin
-  FPupilClient.StopRecording;
+  FPupilClient.Request(REQ_SHOULD_STOP_RECORDING);
 end;
 
 procedure TForm1.btnStartCalibrationClick(Sender: TObject);
 begin
-  FPupilClient.StartCalibration;
+  FPupilClient.Request(REQ_SHOULD_START_CALIBRATION);
 end;
 
 procedure TForm1.btnStopCalibrationClick(Sender: TObject);
 begin
-  FPupilClient.StopCalibration;
+  FPupilClient.Request(REQ_SHOULD_STOP_CALIBRATION);
+end;
+
+procedure TForm1.btnUnsubscribeClick(Sender: TObject);
+begin
+  if rbtnNotifications.Checked then
+    FPupilClient.UnSubscribe(SUB_ALL_NOTIFICATIONS);
+
+  if rbtnLoggingInfo.Checked then
+    FPupilClient.UnSubscribe(SUB_LOGGING_INFO);
+
+  if rbtnEyeCamera.Checked then
+    FPupilClient.UnSubscribe(SUB_EYE_CAMERA_0);
+
+  if rbtnTimeSync.Checked then
+    FPupilClient.UnSubscribe(SUB_TIME_SYNC);
+
+  if rbtnGazeData.Checked then
+    FPupilClient.UnSubscribe(SUB_GAZE_DATA);
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -80,13 +127,12 @@ begin
   FPupilClient := TPupilCommunication.Create('localhost:5020');
   with FPupilClient do
     begin
-      OnAfterCalibrationStart:=@ReceiveResponse;
-      OnAfterCalibrationStop:=@ReceiveResponse;
-      OnAfterRecordingStart:=@ReceiveResponse;
-      OnAfterRecordingStop:= @ReceiveResponse;
-      OnReceiveTimestamp := @ReceiveResponse;
-      OnReceiveRecordingPath:=@ReceiveResponse;
+      OnRequestReceived := @ReceiveRequest;
+      OnMultiPartMessageReceived := @MultipartMessage;
+      OnCalibrationStopped := @CalibrationStopped;
+      OnRecordingStarted := @RecordingStarted;
       Start;
+      StartSubscriber;
     end;
 end;
 
@@ -95,9 +141,52 @@ begin
   FPupilClient.Terminate;
 end;
 
-procedure TForm1.ReceiveResponse(Sender: TObject; AResponse: String);
+procedure TForm1.SubscribeClick(Sender: TObject);
 begin
-  ShowMessage(Sender.ClassName + #32 + AResponse)
+  if rbtnNotifications.Checked then
+    FPupilClient.Subscribe(SUB_ALL_NOTIFICATIONS);
+
+  if rbtnLoggingInfo.Checked then
+    FPupilClient.Subscribe(SUB_LOGGING_INFO);
+
+  if rbtnEyeCamera.Checked then
+    FPupilClient.Subscribe(SUB_EYE_CAMERA_0);
+
+  if rbtnTimeSync.Checked then
+    FPupilClient.Subscribe(SUB_TIME_SYNC);
+
+  if rbtnGazeData.Checked then
+    FPupilClient.Subscribe(SUB_GAZE_DATA);
+
+end;
+
+procedure TForm1.ReceiveRequest(Sender: TObject; ARequest, AResponse: String);
+begin
+  case ARequest of
+    REQ_RECORDING_PATH: ShowMessage('Not implemented.');
+    else ShowMessage(Sender.ClassName + #32 + ARequest + #32 + AResponse);
+  end;
+end;
+
+procedure TForm1.RecordingStarted(Sender: TObject; AMultipartMessage: TMPMessage
+  );
+begin
+  ShowMessage(AMultipartMessage.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim);
+end;
+
+procedure TForm1.CalibrationStopped(Sender: TObject;
+  AMultipartMessage: TMPMessage);
+begin
+  BringToFront;
+  ShowMessage('Calibration Stopped.');
+end;
+
+procedure TForm1.MultipartMessage(Sender: TObject; AMultipartMessage: TMPMessage
+  );
+begin
+  case AMultipartMessage.Topic of
+    NOTIFY_CALIBRATION_FAILED : ShowMessage('Calibration Failed!');
+  end;
 end;
 
 

@@ -25,16 +25,12 @@ core
 *.~*~
 *~
 __history
-bin/*
 backup/*
-forms/backup/*
+*/backup/*
+debug_log/*
 lib/i386-win32/*.lfm
 lib/x86_64-linux/*.lfm
-my_backups
-my_backups/*
-Participante1/*
-units/backup/*
-units/my_backups/*
+Participante*/*
 
 # link
 stimulus_control

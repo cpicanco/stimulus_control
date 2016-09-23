@@ -20,7 +20,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     , schedules_main
     , response_key
     , custom_timer
-    , timestamp
+    , timestamps
     ;
 
 type
@@ -151,9 +151,9 @@ begin
 end;
 
 procedure TDZT.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-var TickCount : Extended;
+var LTickCount : Extended;
 begin
-  TickCount := GetCustomTick;
+  LTickCount := TickCount;
 
   if FResponseEnabled then
     begin
@@ -164,7 +164,7 @@ begin
             begin
               LogEvent('*R');
               FFirstResp := False;
-              FDataSupport.Latency := TickCount;
+              FDataSupport.Latency := LTickCount;
             end
           else LogEvent('R');
         end;
@@ -215,11 +215,11 @@ begin
 end;
 
 procedure TDZT.UpdateTimer1(Sender: TObject);
-var TickCount : Extended;
+var LTickCount : Extended;
     ACode : string;
 begin
-  TickCount := GetCustomTick;
-  FDataSupport.Cycle := TickCount;
+  LTickCount := TickCount;
+  FDataSupport.Cycle := LTickCount;
   Inc(FCycles);
 
   with FDizzyTimer do
@@ -273,7 +273,7 @@ end;
 
 procedure TDZT.UpdateTimer2(Sender: TObject);
 var
-    TickCount : Extended;
+    LTickCount : Extended;
     ACode : string;
 begin
   TClockThread(Sender).Enabled := False;
@@ -296,8 +296,8 @@ begin
         ACode := '2b';
     end;
 
-  TickCount := GetCustomTick;
-  FDataSupport.Timer2 := TickCount;
+  LTickCount := TickCount;
+  FDataSupport.Timer2 := LTickCount;
   LogEvent(ACode);
 
   Invalidate;
@@ -466,7 +466,7 @@ end;
 
 procedure TDZT.StartTrial(Sender: TObject);
 var
-  TickCount : Extended;
+  LTickCount : Extended;
 
   procedure KeyStart(var aKey : TKey);
   begin
@@ -476,7 +476,7 @@ var
 
 begin
   FFirstResp := True;
-  TickCount := GetCustomTick;
+  LTickCount := TickCount;
 
   with FDataSupport do
     begin
@@ -487,7 +487,7 @@ begin
 
   FResponseEnabled := True;
   Invalidate;
-  FDataSupport.StmBegin := TickCount;
+  FDataSupport.StmBegin := LTickCount;
   LogEvent('S');
   inherited StartTrial(Sender);
 end;
@@ -496,7 +496,7 @@ procedure TDZT.BeforeEndTrial(Sender: TObject);
 begin
   FResponseEnabled := False;
 
-  FDataSupport.Cycle := GetCustomTick;
+  FDataSupport.Cycle := TickCount;
   FDataSupport.Timer2 := TimeStart;
   TrialResult(Sender);
   WriteData(Self);
