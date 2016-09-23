@@ -19,10 +19,40 @@ uses Classes, SysUtils, Process
   ;
 
 type
+  { TResponseReceivedEvent }
 
-  {
-    http://wiki.freepascal.org/Multithreaded_Application_Tutorial
-  }
+  TMultiPartMessage = record
+    MsgPackage : TMemoryStream;
+    MsgTopic : string;
+  end;
+
+  { TResponseReceivedEvent }
+
+  TMultiPartMessRecvE = procedure(AResponse: TMultiPartMessage) of object;
+
+  { TZMQSubThread }
+
+  TZMQSubThread = class(TThread)
+  private
+    FMultipartMessage : TMultiPartMessage;
+    FContext : TZMQContext;
+    FSubscriber : TZMQSocket;
+    //FPoller : TZMQPoller;
+    //FRTLEvent: PRTLEvent;
+    FOnMultipartMessageReceived: TMultiPartMessRecvE;
+    procedure MultipartMessageReceived;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(ASubHost : string; CreateSuspended: Boolean = True);
+    destructor Destroy; override;
+    procedure Subscribe(AFilter : UTF8string);
+    procedure Unsubscribe(AFilter : UTF8string);
+    property OnMultiPartMessageReceived: TMultiPartMessRecvE read FOnMultipartMessageReceived write FOnMultipartMessageReceived;
+
+  end;
+
+  { TResponseReceivedEvent }
 
   TResponseReceivedEvent = procedure(ARequest, AResponse: String) of object;
 
@@ -40,12 +70,11 @@ type
     procedure ResponseReceived;
   protected
     procedure Execute; override;
-    procedure SendRequest(ARequest : UTF8string);
+    procedure SendRequest(ARequest : UTF8string; Blocking : Boolean = False);
     property OnResponseReceived: TResponseReceivedEvent read FOnResponseReceived write FOnResponseReceived;
   public
     constructor Create(AHost : string; CreateSuspended: Boolean = True);
     destructor Destroy; override;
-
   end;
 
 implementation
@@ -53,6 +82,70 @@ implementation
 {$ifdef DEBUG}
   uses debug_logger;
 {$endif}
+
+{ TZMQSubThread }
+
+procedure TZMQSubThread.MultipartMessageReceived;
+begin
+  if Assigned(FOnMultipartMessageReceived) then FOnMultipartMessageReceived(FMultipartMessage);
+end;
+
+procedure TZMQSubThread.Execute;
+var
+  ZMQMessages : TZMQMsg;
+  LCount : integer;
+begin
+  while not Terminated do
+    begin
+      FMultipartMessage.MsgPackage := TMemoryStream.Create;
+      ZMQMessages := TZMQMsg.Create;
+      try
+        // wait for multipart message
+        LCount := FSubscriber.recv( ZMQMessages );
+
+        if LCount = 2 then
+          begin
+            FMultipartMessage.MsgTopic := ZMQMessages.item[0].asUtf8String;
+            FMultipartMessage.MsgPackage.WriteBuffer( ZMQMessages.item[1].data^, ZMQMessages.item[1].size );
+            Synchronize( @MultipartMessageReceived );
+          end;
+
+      finally
+        ZMQMessages.Free;
+      end;
+    end;
+end;
+
+constructor TZMQSubThread.Create(ASubHost: string; CreateSuspended: Boolean);
+begin
+  FreeOnTerminate := True;
+  //FRTLEvent := RTLEventCreate;
+
+  FContext := TZMQContext.Create;
+  FSubscriber := FContext.Socket( stSub );
+  FSubscriber.connect( 'tcp://' + ASubHost );
+  inherited Create(CreateSuspended);
+end;
+
+destructor TZMQSubThread.Destroy;
+begin
+  FSubscriber.Free;
+  FContext.Free;
+  //RTLEventDestroy(FRTLEvent);
+  inherited Destroy;
+end;
+
+procedure TZMQSubThread.Subscribe(AFilter: UTF8string);
+begin
+  FSubscriber.Subscribe(AFilter);
+end;
+
+procedure TZMQSubThread.Unsubscribe(AFilter: UTF8string);
+begin
+  FSubscriber.unSubscribe(AFilter);
+end;
+
+{ TZMQThread }
 
 constructor TZMQThread.Create(AHost: string; CreateSuspended: Boolean);
 begin
@@ -101,16 +194,26 @@ begin
       Synchronize( @ResponseReceived );
 
       {$ifdef DEBUG}
-        FResponse := mt_Debug + 'TClientThread instance with ThreadID:' + IntToStr(Self.ThreadID);
-        Synchronize( @ResponseReceived );
+        DebugLn(mt_Debug + 'TClientThread:ThreadID:' + IntToStr(Self.ThreadID));
       {$endif}
     end;
 end;
 
-procedure TZMQThread.SendRequest(ARequest: UTF8string);
+procedure TZMQThread.SendRequest(ARequest: UTF8string; Blocking: Boolean);
+var AResponse : UTF8String;
 begin
   FRequest := ARequest;
-  RTLeventSetEvent(FRTLEvent);
+  if not Blocking then
+    RTLeventSetEvent(FRTLEvent)
+  else
+    begin
+      FRequester.send( ARequest );
+      FRequester.recv( AResponse );
+      FResponse := AResponse;
+      ResponseReceived;
+    end;
 end;
+
+
 
 end.

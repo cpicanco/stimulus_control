@@ -13,11 +13,11 @@ unit debug_logger;
 
 interface
 
-uses LCLProc, regdata;
+uses LCLProc
+     , regdata
+     ;
 
 procedure DebugLn(msg : string);
-
-procedure DebuglnThreadLog(const Msg: string);
 
 var
   Logger : TRegData;
@@ -31,27 +31,23 @@ const
 
 implementation
 
-uses LCLIntf, FileUtil, LazFileUtils, SysUtils, timestamp;
+uses LCLIntf, FileUtil, LazFileUtils, SysUtils
+     , debug_logger_thread
+     ;
 
 var
   FileInfo : TSearchRec;
 
 procedure DebugLn(msg: string);
 begin
+  WriteLn(msg);
   DebuglnThreadLog(msg);
 end;
 
-procedure DebuglnThreadLog(const Msg: string);
-var
-  PID: PtrInt;
-begin
-  PID:=PtrInt(GetThreadID);
-  DbgOutThreadLog(FloatToStrF(GetCustomTick, ffFixed,0,9) + ' : ' + IntToStr(PtrInt(PID)) + ' : ' + Msg + LineEnding);
-end;
 
 initialization
 begin
-  Logger := TRegData.Create(nil, GetCurrentDir + PathDelim + '_Log_001.txt');
+  Logger := TRegData.Create(nil, GetCurrentDir + PathDelim + 'debug_log' + PathDelim + '000.log');
 end
 
 finalization
@@ -70,7 +66,7 @@ begin
             WriteLn(Logger.DataFile, ReadFileToString(Name));
             DeleteFile(Name);
           end;
-          WriteLn(Logger.DataFile, #10#10);
+          WriteLn(Logger.DataFile, LineEnding);
       until FindNext(FileInfo) <> 0;
       Logger.CloseFFile;
     end;

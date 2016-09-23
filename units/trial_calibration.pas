@@ -18,7 +18,7 @@ uses LCLIntf, Classes, SysUtils
     , Graphics
     , constants
     , zmq_client
-    , timestamp
+    , timestamps
     ;
 
 type
@@ -76,7 +76,7 @@ end;
 procedure TCLB.ThreadClock(Sender: TObject);
 begin
   Hide;
-  FDataSupport.TrialEnd := GetCustomTick;
+  FDataSupport.TrialEnd := TickCount;
   WriteData(Sender);
 
   if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
@@ -86,7 +86,7 @@ end;
 procedure TCLB.StartTrial(Sender: TObject);
 begin
   FShowDots := True;
-  FDataSupport.TrialBegin := GetCustomTick;
+  FDataSupport.TrialBegin := TickCount;
   inherited StartTrial(Sender);
 end;
 

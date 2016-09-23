@@ -13,9 +13,7 @@ unit regdata;
 
 interface
 
-uses SysUtils, Classes, LazFileUtils
-    //, Dialogs
-    ;
+uses SysUtils, Classes, LazFileUtils;
 
 type
 
@@ -26,7 +24,9 @@ type
     FFileName: string;
     FFile: TextFile;
     FSessionNumber: integer;
+    procedure Close;
     procedure UpdateFileName(NewFileName : string);
+    function OpenNoOverride(Filename : string):string;
   public
     constructor Create(AOwner: TComponent; FileName: String); reintroduce;
     destructor Destroy; override;
@@ -42,93 +42,78 @@ type
 implementation
 
    {
-
    Do not use the DebugLn inside this unit
    it will create a circular reference.
    use writeln instead.
-   yeah.. need to find a way to debug the debugger.
-
    }
 
 {$ifdef DEBUG}
-  uses debug_logger, Dialogs;
+  uses Dialogs
+    , debug_logger
+    ;
 {$endif}
+
+procedure TRegData.Close;
+begin
+  if FFilename <> '' then
+    if TextRec(FFile).Mode = 55218 then // file is opened read/write
+      begin
+        CloseFile(FFile);
+      end
+end;
 
 procedure TRegData.UpdateFileName(NewFileName : string);
 begin
-  if (NewFileName <> '') and (NewFileName <> FFilename) then
-    if FileExistsUTF8(NewFileName) then
-      FFileName := NewFileName;
+  if (NewFileName = '') or (NewFileName = FFilename) then Exit;
+  Close;
+  FFileName := OpenNoOverride(NewFileName);
+end;
+
+function TRegData.OpenNoOverride(Filename: string):string;
+var
+  i : Integer;
+  FilePath, LExtension: string;
+begin
+  if FileName <> '' then
+      begin
+        ForceDirectoriesUTF8(ExtractFilePath(FileName));
+        FilePath := ExtractFilePath(FileName);
+        LExtension := ExtractFileExt(Filename);
+        i := 0;
+
+        // ensure to never override an exinting file
+        while FileExistsUTF8(FileName) do begin
+          Inc(i);
+          FileName := FilePath + StringOfChar(#48, 3 - Length(IntToStr(i))) + IntToStr(i) + LExtension;
+        end;
+
+        FSessionNumber := i;
+
+        // as override is impossible, don't mind about an Assign/Rewrite conditional
+        AssignFile(FFile, FileName);
+        Rewrite(FFile);
+        {$ifdef DEBUG}
+          WriteLn(FFile, mt_Debug + 'Saving data to:' + FileName );
+        {$endif}
+        Result := FileName;
+     end;
 end;
 
 constructor TRegData.Create(AOwner: TComponent; FileName: String);
-var
-  i, ExtensionLength : Integer;
-
-  sName, aSeparator, aExtension: string;
-
-      {
-
-       We expect a filename with that structure:
-       Data_001.txt or Data_001.timestamp
-       4 char => sName
-       1 char = aSeparator
-       3 char = StringOfChar
-       4 char = '.TXT' Extention or 10 char = '.timestamps' extension
-
-       note : we begin from i := 1;
-      }
-
 begin
   inherited Create(AOwner);
-  if FileName <> '' then
-    begin
-      ForceDirectoriesUTF8(ExtractFilePath(FileName)); { *Converted from ForceDirectories*  }
-
-      if Pos('timestamps', FileName) <> 0 then
-        begin
-          ExtensionLength := 10;
-        end
-      else ExtensionLength := 3;
-
-      i := 0;
-      sName:= Copy(FileName, 0, Length(FileName)- (ExtensionLength + 5));
-      aExtension := Copy(FileName, Length(FileName) - ExtensionLength, ExtensionLength + 1);
-      aSeparator := '_';
-
-      // ensure to never override an exinting data file
-      while FileExistsUTF8(FileName) do begin
-        Inc(i);
-        FileName:= sName + aSeparator + StringOfChar(#48, 3 - Length(IntToStr(i))) + IntToStr(i) + aExtension;
-      end;
-
-      FSessionNumber := i;
-      FFileName := FileName;
-
-      // as override is impossible, don't mind about an Assign/Rewrite conditional
-      AssignFile(FFile, FileName);
-      Rewrite(FFile);
-
-      {$ifdef DEBUG}
-        WriteLn(FFile, mt_Debug + 'Saving data to:' + FFileName )
-      {$endif}
-   end;
+  FFilename := OpenNoOverride(FileName);
 end;
 
 destructor TRegData.Destroy;
 // With the current implementation
 // if undefined DEBUG, CloseFile should be called only once
 begin
-  if FFilename <> '' then
-    if TextRec(FFile).Mode = 55218 then // file is opened read/write
-      begin
-        CloseFile(FFile);
-      end;
+  Close;
   inherited Destroy;
 end;
 
 procedure TRegData.SaveData(Data: string);
-//var bol : Boolean;
 begin
   if FFileName <> '' then
     begin
