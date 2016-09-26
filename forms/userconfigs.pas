@@ -113,6 +113,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
+    procedure pgRodarChange(Sender: TObject);
 
     procedure piClick(Sender: TObject);
     procedure piFillEvenClick(Sender: TObject);
@@ -185,6 +186,11 @@ procedure TUserConfig.ImageDblClick(Sender: TObject);
 begin
   if OpenPictureDialog1.Execute then
     TImage(Sender).Picture.LoadFromFile(OpenPictureDialog1.FileName);
+end;
+
+procedure TUserConfig.pgRodarChange(Sender: TObject);
+begin
+
 end;
 
 
@@ -1187,6 +1193,7 @@ begin
   StringGrid1.ColCount := 9;
   Caption := Application.Title;
   stAppTitle.Caption := Application.Title;
+  stVersion.Caption := CurrentVersion(GetCommitTag());
   MemoAppInfo.Lines.Append('Stimulus Control App.');
   MemoAppInfo.Lines.Append('Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.');
   MemoAppInfo.Lines.Append('');
