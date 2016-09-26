@@ -111,19 +111,19 @@ begin
       Align := alClient;
       AutoSize := True;
       Text :=
-        'Validation Project (PCRF) - Stimulus Control App' + LineEnding +
+        'Stimulus Control' + LineEnding +
         'Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.' + LineEnding +
         LineEnding +
         'This software is part of Validation Project (PCRF).' + LineEnding +
         'You can see on GitHub:' + LineEnding +
         '<http://github.com/cpicanco/validation_project>' + LineEnding +
         LineEnding +
-        'Validation Project (PCRF) is free software: you can redistribute it and/or modify' + LineEnding +
+        'Stimulus Control is free software: you can redistribute it and/or modify' + LineEnding +
         'it under the terms of the GNU General Public License as published by' + LineEnding +
         'the Free Software Foundation, either version 3 of the License, or' + LineEnding +
         '(at your option) any later version.' + LineEnding +
         LineEnding +
-        'Validation Project (PCRF) is distributed in the hope that it will be useful,' + LineEnding +
+        'Stimulus Control is distributed in the hope that it will be useful,' + LineEnding +
         'but WITHOUT ANY WARRANTY; without even the implied warranty of' + LineEnding +
         'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the' + LineEnding +
         'GNU General Public License for more details.' + LineEnding +

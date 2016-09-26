@@ -1,16 +1,16 @@
 object FormSchedules: TFormSchedules
-  Left = 538
+  Left = 464
   Height = 331
   Top = 119
   Width = 560
   ActiveControl = ListBoxSchedules
   Caption = 'Schedules of Reinforcement'
-  ClientHeight = 312
+  ClientHeight = 331
   ClientWidth = 560
   Menu = MainMenu1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '1.4.0.4'
+  LCLVersion = '1.6.0.4'
   object ListBoxSchedules: TListBox
     Left = 8
     Height = 83
@@ -28,15 +28,15 @@ object FormSchedules: TFormSchedules
       'DRL 5000'
       'DRH 5 3000'
     )
-    ItemHeight = 21
+    ItemHeight = 23
     ItemIndex = 0
     OnClick = ListBoxSchedulesClick
-    ScrollWidth = 89
+    ScrollWidth = 96
     TabOrder = 0
   end
   object PanelCumulativeRecord: TPanel
     Left = 114
-    Height = 229
+    Height = 248
     Top = 33
     Width = 441
     Align = alClient
@@ -66,16 +66,16 @@ object FormSchedules: TFormSchedules
   end
   object LabelSchedules: TLabel
     Left = 8
-    Height = 15
+    Height = 17
     Top = 11
-    Width = 54
+    Width = 60
     Caption = 'Schedule'
     ParentColor = False
   end
   object PanelClock: TPanel
     Left = 114
     Height = 21
-    Top = 284
+    Top = 303
     Width = 100
     Anchors = [akLeft, akBottom]
     Caption = '0'
@@ -84,7 +84,7 @@ object FormSchedules: TFormSchedules
   object PanelLatency: TPanel
     Left = 225
     Height = 21
-    Top = 284
+    Top = 303
     Width = 100
     Anchors = [akLeft, akBottom]
     Caption = '0'
@@ -93,7 +93,7 @@ object FormSchedules: TFormSchedules
   object PanelEnd: TPanel
     Left = 337
     Height = 21
-    Top = 284
+    Top = 303
     Width = 100
     Anchors = [akLeft, akBottom]
     Caption = '0'
@@ -101,36 +101,36 @@ object FormSchedules: TFormSchedules
   end
   object lblClock: TLabel
     Left = 114
-    Height = 15
-    Top = 266
-    Width = 33
+    Height = 17
+    Top = 283
+    Width = 37
     Anchors = [akLeft, akBottom]
     Caption = 'Clock'
     ParentColor = False
   end
   object lblLatency: TLabel
     Left = 225
-    Height = 15
-    Top = 266
-    Width = 46
+    Height = 17
+    Top = 283
+    Width = 52
     Anchors = [akLeft, akBottom]
     Caption = 'Latency'
     ParentColor = False
   end
   object lblScheduleEnd: TLabel
     Left = 337
-    Height = 15
-    Top = 266
-    Width = 79
+    Height = 17
+    Top = 283
+    Width = 89
     Anchors = [akLeft, akBottom]
     Caption = 'Consequence'
     ParentColor = False
   end
   object lblResponseDelta: TLabel
     Left = 448
-    Height = 15
-    Top = 266
-    Width = 92
+    Height = 17
+    Top = 283
+    Width = 104
     Anchors = [akLeft, akBottom]
     Caption = 'Response Delta'
     ParentColor = False
@@ -138,7 +138,7 @@ object FormSchedules: TFormSchedules
   object PanelDelta: TPanel
     Left = 448
     Height = 21
-    Top = 284
+    Top = 303
     Width = 100
     Anchors = [akLeft, akBottom]
     Caption = '0'
@@ -146,9 +146,9 @@ object FormSchedules: TFormSchedules
   end
   object chkSaveBeforeReset: TCheckBox
     Left = 112
-    Height = 21
+    Height = 24
     Top = 8
-    Width = 224
+    Width = 250
     Caption = 'Save Cummulative Record on disk'
     OnChange = chkSaveBeforeResetChange
     TabOrder = 7
