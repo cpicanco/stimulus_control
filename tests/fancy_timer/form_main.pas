@@ -98,7 +98,7 @@ procedure TForm1.btnRestartClick(Sender: TObject);
 begin
   FCardinal := 0;
   LabelCounter.Caption := IntToStr(FCardinal);
-  RTLeventSetEvent(FClock.ResumeEvent);
+  RTLeventSetEvent(FClock.RTLEvent);
 end;
 
 procedure TForm1.OnClockTimer(Sender: TObject);
@@ -176,7 +176,7 @@ begin
 
   FCardinals[aThread] := 0;
   FLabels[aThread].Caption := IntToStr(FCardinals[aThread]);
-  RTLeventSetEvent(FClocks[aThread].ResumeEvent);
+  RTLeventSetEvent(FClocks[aThread].RTLEvent);
 
 end;
 
