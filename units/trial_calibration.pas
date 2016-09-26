@@ -17,7 +17,6 @@ uses LCLIntf, Classes, SysUtils
     , trial_abstract
     , Graphics
     , constants
-    , zmq_client
     , timestamps
     ;
 
@@ -58,7 +57,7 @@ type
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(Correction : Boolean); override;
   end;
 
 
@@ -185,18 +184,12 @@ begin
             ;
 end;
 
-procedure TCLB.Play(TestMode: Boolean; Correction: Boolean);
+procedure TCLB.Play(Correction: Boolean);
 var
   s1 : string;
 
   NumComp,
   i : integer;
-
-  procedure NextSpaceDelimitedParameter;
-  begin
-    Delete(s1, 1, pos(#32, s1));
-    if Length(s1) > 0 then while s1[1] = #32 do Delete(s1, 1, 1);
-  end;
 
 begin
   NumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
@@ -205,11 +198,11 @@ begin
     begin
       s1 := CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
       FDataSupport.Dots[i].Y := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); // top, left, width, height
+      NextSpaceDelimitedParameter(s1);
 
-      NextSpaceDelimitedParameter;
       FDataSupport.Dots[i].X := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+      NextSpaceDelimitedParameter(s1);
 
-      NextSpaceDelimitedParameter;
       FDataSupport.Dots[i].Size := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
     end;
   StartTrial(Self);

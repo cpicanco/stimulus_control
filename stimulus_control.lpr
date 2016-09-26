@@ -37,7 +37,6 @@ uses
   //, custom_timer
   //, regdata
   //, constants
-  //, counter
   //, countermanager
 
   // Responses, Schedules of Reinforcement, Stimuli
