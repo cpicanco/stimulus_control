@@ -36,7 +36,6 @@
       <Unit0>
         <Filename Value="fancy_timer.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="fancy_timer"/>
       </Unit0>
       <Unit1>
         <Filename Value="form_main.pas"/>
@@ -44,7 +43,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="form_main"/>
       </Unit1>
     </Units>
   </ProjectOptions>
@@ -66,11 +64,7 @@
       </Options>
     </Linking>
     <Other>
-      <CompilerMessages>
-        <MsgFileName Value=""/>
-      </CompilerMessages>
       <CustomOptions Value="-dUseCThreads"/>
-      <CompilerPath Value="$(CompPath)"/>
     </Other>
   </CompilerOptions>
   <Debugging>
