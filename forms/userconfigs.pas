@@ -22,7 +22,6 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
     , pupil_communication
     , session
     , config_session
-    , countermanager
     , escriba
     , regdata
     , constants
@@ -129,7 +128,7 @@ type
     FLastFocusedCol : integer;
     //FNumTrials : integer;
     FSession : TSession;
-    FManager : TCounterManager;
+    //FManager : TCounterManager;
     FConfigs : TCfgSes;
     FAudioDevice : TBassAudioDevice;
     FEscriba : TEscriba;
@@ -478,9 +477,9 @@ end;
 
 procedure TUserConfig.EndSession(Sender: TObject);
 begin
-  if Assigned(FSession) then FreeAndNil(FSession);
-  if Assigned(FConfigs) then FreeAndNil(FConfigs);
-  if Assigned(FManager) then FreeAndNil(FManager);
+  //if Assigned(FSession) then FreeAndNil(FSession);
+  //if Assigned(FConfigs) then FreeAndNil(FConfigs);
+  //if Assigned(FManager) then FreeAndNil(FManager);
   //if Assigned(FAudioDevice) then FreeAndNil(FAudioDevice);
   //bkgnd.SetFullScreen(False);
   bkgnd.Hide;
@@ -862,9 +861,9 @@ begin
       aBlc := 0;
 
       FEscriba.Name := leSessionName.Text;
-      FEscriba.Subject := leParticipant.Text;
+      FEscriba.SessionSubject := leParticipant.Text;
       FEscriba.Blcs[aBlc].ITI := seITI.Value;
-      FEscriba.SesType  := 'CIC';
+      FEscriba.SessionType  := T_CIC;
       FEscriba.Data := 'Data';
       FEscriba.Media:= 'Media';
      // FEscriba.SetVariables;
@@ -922,9 +921,9 @@ begin
       aBlc := 0;
 
       FEscriba.Name := leSessionName.Text;
-      FEscriba.Subject := leParticipant.Text;
+      FEscriba.SessionSubject := leParticipant.Text;
       FEscriba.Blcs[aBlc].ITI := seITI.Value;
-      FEscriba.SesType  := 'CIC';
+      FEscriba.SessionType  := 'CIC';
       FEscriba.Data := 'Data';
       FEscriba.Media:= 'Media';
       // FEscriba.SetVariables;
@@ -1237,20 +1236,19 @@ begin
 
   if OpenDialog1.Execute then
     begin
+      FSession := TSession.Create(nil);
       if not Assigned(bkgnd) then
         bkgnd := Tbkgnd.Create(Application);
-        bkgnd.Show;
-        //bkgnd.SetFullScreen(True);
-        if chkPlayOnSecondMonitor.Checked then
-           bkgnd.Left := Screen.Width + 1;
+      bkgnd.Show;
+      if chkPlayOnSecondMonitor.Checked then
+         bkgnd.Left := Screen.Width + 1;
 
-      FConfigs := TCfgSes.Create(nil);
+      FConfigs := TCfgSes.Create(FSession);
       FConfigs.LoadFromFile(OpenDialog1.Filename, False);
 
-      FManager := TCounterManager.Create(nil);
       if not Assigned(FAudioDevice) then FAudioDevice := TBassAudioDevice.Create(WindowHandle);
 
-      FSession := TSession.Create(nil);
+
       with FSession do
         begin
           OnEndSess:= @EndSession;
@@ -1258,14 +1256,14 @@ begin
           BackGround := bkgnd;
           DataTicks := cbDataTicks.Checked;
           ServerAddress := leServerAddress.Text;
-          PupilClientEnabled := cbPupilClient.Enabled;
+          PupilClientEnabled := cbPupilClient.Checked;
           SessName := FConfigs.Name;
-          SubjName := FConfigs.Subject;
+          SubjName := FConfigs.SessionSubject;
           ShowCounter := False;
-
+          Configs := FConfigs;
           TestMode := False;
 
-          Play(FConfigs, FManager, aDataName);
+          Play(aDataName);
 
         end;
     end;

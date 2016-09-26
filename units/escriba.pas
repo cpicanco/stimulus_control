@@ -13,7 +13,7 @@ unit escriba;
 
 interface
 
-uses Dialogs, Classes, StdCtrls, Graphics, SysUtils, Forms, FileUtil
+uses Dialogs, Classes, StdCtrls, Graphics, SysUtils, Forms, LazFileUtils
     , config_session
     , constants
     ;
@@ -451,11 +451,11 @@ procedure TEscriba.WriteMain;
 begin
   FText.Add(
             KMain  + KEnter +
-            KName  + FName + KEnter +
-            KSubject + FSubject + KEnter +
-            KType  + FType + KEnter +
-            KRootMedia + FMedia + KEnter +
-            KRootData  + FData + KEnter +
+            KName  + SessionName + KEnter +
+            KSubject + SessionSubject + KEnter +
+            KType  + SessionType + KEnter +
+            KRootMedia + GlobalContainer.RootMedia + KEnter +
+            KRootData  + GlobalContainer.RootData + KEnter +
             KNumBlc  + IntToStr(FNumBlc) + KEnter
             );
 end;

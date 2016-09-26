@@ -41,6 +41,7 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
+              <UseHeaptrc Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <Options>
@@ -216,7 +217,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="45">
+    <Units Count="44">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -271,147 +272,143 @@
         <IsPartOfProject Value="True"/>
       </Unit10>
       <Unit11>
-        <Filename Value="units/counter.pas"/>
+        <Filename Value="units/schedules.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit11>
       <Unit12>
-        <Filename Value="units/schedules.pas"/>
+        <Filename Value="units/response_key.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit12>
       <Unit13>
-        <Filename Value="units/response_key.pas"/>
+        <Filename Value="units/trial_feature_positive.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="units/trial_feature_positive.pas"/>
+        <Filename Value="units/trial_message.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit14>
       <Unit15>
-        <Filename Value="units/trial_message.pas"/>
+        <Filename Value="units/trial_matching.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit15>
       <Unit16>
-        <Filename Value="units/trial_matching.pas"/>
+        <Filename Value="units/trial_simple.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit16>
       <Unit17>
-        <Filename Value="units/trial_simple.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit17>
-      <Unit18>
         <Filename Value="forms/userconfigs_simple_discrimination_matrix.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="MatrixForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit18>
-      <Unit19>
+      </Unit17>
+      <Unit18>
         <Filename Value="forms/userconfigs_get_matrix.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="MatrixConfigForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="units/criatore.pas"/>
+        <IsPartOfProject Value="True"/>
       </Unit19>
       <Unit20>
-        <Filename Value="units/criatore.pas"/>
+        <Filename Value="units/trial_abstract.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit20>
       <Unit21>
-        <Filename Value="units/trial_abstract.pas"/>
+        <Filename Value="units/bass_player.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit21>
       <Unit22>
-        <Filename Value="units/bass_player.pas"/>
+        <Filename Value="units/debug_logger.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit22>
       <Unit23>
-        <Filename Value="units/debug_logger.pas"/>
+        <Filename Value="units/timestamps_logger.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit23>
       <Unit24>
-        <Filename Value="units/timestamps_logger.pas"/>
+        <Filename Value="units/trial_calibration.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit24>
       <Unit25>
-        <Filename Value="units/trial_calibration.pas"/>
+        <Filename Value="backup/tool_ini.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit25>
       <Unit26>
-        <Filename Value="backup/tool_ini.pas"/>
+        <Filename Value="units/interface_rs232.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit26>
       <Unit27>
-        <Filename Value="units/interface_rs232.pas"/>
+        <Filename Value="units/trial_dizzy_timers.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit27>
       <Unit28>
-        <Filename Value="units/trial_dizzy_timers.pas"/>
+        <Filename Value="units/git_vertioning.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit28>
       <Unit29>
-        <Filename Value="units/git_vertioning.pas"/>
+        <Filename Value="units/trial_mirrored_stm.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit29>
       <Unit30>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
+        <Filename Value="units/timestamps.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit30>
       <Unit31>
-        <Filename Value="units/timestamps.pas"/>
+        <Filename Value="units/schedules_main.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit31>
       <Unit32>
-        <Filename Value="units/schedules_main.pas"/>
+        <Filename Value="units/interface_plp.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit32>
       <Unit33>
-        <Filename Value="units/interface_plp.pas"/>
+        <Filename Value="units/escriba.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit33>
       <Unit34>
-        <Filename Value="units/escriba.pas"/>
+        <Filename Value="units/config_session.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit34>
       <Unit35>
-        <Filename Value="units/config_session.pas"/>
+        <Filename Value="units/pupil_communication.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit35>
       <Unit36>
-        <Filename Value="units/pupil_communication.pas"/>
+        <Filename Value="units/zmq_client.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit36>
       <Unit37>
-        <Filename Value="units/zmq_client.pas"/>
+        <Filename Value="dependency/delphizmq/zhelpers.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit37>
       <Unit38>
-        <Filename Value="dependency/delphizmq/zhelpers.pas"/>
+        <Filename Value="dependency/delphizmq/zmq.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit38>
       <Unit39>
-        <Filename Value="dependency/delphizmq/zmq.inc"/>
+        <Filename Value="dependency/delphizmq/zmq.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit39>
       <Unit40>
-        <Filename Value="dependency/delphizmq/zmq.pas"/>
+        <Filename Value="units/zmqapi.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit40>
       <Unit41>
-        <Filename Value="units/zmqapi.pas"/>
+        <Filename Value="units/debug_logger_thread.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit41>
       <Unit42>
-        <Filename Value="units/debug_logger_thread.pas"/>
+        <Filename Value="units/timestamps_logger_private.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit42>
       <Unit43>
-        <Filename Value="units/timestamps_logger_private.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit43>
-      <Unit44>
         <Filename Value="units/timestamps_helpers.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit44>
+      </Unit43>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

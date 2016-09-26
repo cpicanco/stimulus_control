@@ -15,6 +15,7 @@ interface
 
 uses  SysUtils;
 
+function TimestampToStr(ATimestamp: Extended) : string;
 function GetTimeStampF : string; overload;
 function GetTimeStampF (ATimeStart:Extended): string; overload;
 function TickCount : Extended;
@@ -24,6 +25,11 @@ procedure TimestampLn(msg: string);
 implementation
 
 uses timestamps_helpers;
+
+function TimestampToStr(ATimestamp: Extended): string;
+begin
+  Result:=FloatToStrF(ATimestamp,ffFixed,0,9)
+end;
 
 function GetTimeStampF: string;
 begin

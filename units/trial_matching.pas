@@ -110,7 +110,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(Correction : Boolean); override;
     //procedure DispenserPlusCall; override;
   end;
 
@@ -182,10 +182,10 @@ end;
 //  Dispenser(FKPlus.Csq, FKPlus.Usb);
 //end;
 
-procedure TMTS.Play(TestMode: Boolean; Correction : Boolean);
+procedure TMTS.Play(Correction : Boolean);
 var s1, sName, sLoop, sColor: String; R: TRect; a1: Integer;
 begin
-  RootMedia:= CfgTrial.SList.Values[_RootMedia];
+  RootMedia:= GlobalContainer.RootMedia;
   Randomize;
   NextTrial:= '-1';
   FFlagResp:= False;
@@ -225,7 +225,7 @@ begin
     Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
     s1:= CfgTrial.SList.Values[_Samp + _cStm] + #32;
-    //showmessage(CfgTrial.SList.Values[_RootMedia] + Copy(s1, 0, pos(#32, s1)-1));
+    //showmessage(GlobalContainer.RootMedia + Copy(s1, 0, pos(#32, s1)-1));
     sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
     Delete(s1, 1, pos(#32, s1)); If Length(s1)>0 then While s1[1]=#32 do Delete(s1, 1, 1);
     sLoop := Copy(s1, 0, pos(#32, s1)-1);
@@ -234,7 +234,7 @@ begin
     Key.Color := StrToIntDef(sColor, $0000FF);
     Key.HowManyLoops:= StrToIntDef(sLoop, 0);
     Key.FullPath:= sName;
-    //Key.FileName:= CfgTrial.SList.Values['RootMedia'] + CfgTrial.SList.Values['SStm'];
+    //Key.FileName:= GlobalContainer.RootMedia + CfgTrial.SList.Values['SStm'];
 
     Key.Schedule.Kind:= CfgTrial.SList.Values[_Samp + _cSch];
 
@@ -274,7 +274,7 @@ begin
       Key.HowManyLoops:= StrToIntDef(sLoop, 0);
       Key.FullPath:= sName;
 
-      //Key.FileName:= CfgTrial.SList.Values['RootMedia'] + CfgTrial.SList.Values['C'+IntToStr(a1+1)+'Stm'];
+      //Key.FileName:= GlobalContainer.RootMedia + CfgTrial.SList.Values['C'+IntToStr(a1+1)+'Stm'];
 
       Key.Schedule.Kind:= CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cSch];
       Csq:= StrToIntDef(CfgTrial.SList.Values[_Comp+IntToStr(a1+1)+_cCsq], 0);

@@ -17,6 +17,7 @@ interface
 
 uses Classes, Controls, SysUtils, LCLIntf
      //,dialogs
+     , constants
      , bass_player
      , config_session
      , countermanager
@@ -24,6 +25,7 @@ uses Classes, Controls, SysUtils, LCLIntf
      , regdata
      , blocs
      , pupil_communication
+     , timestamps
      ;
 
 type
@@ -32,17 +34,14 @@ type
 
   TSession = class(TComponent)
   private
-    //FOnBeginSess: TNotifyEvent;
-    //FOnBeginTrial: TNotifyEvent;
-    //FOnCriteria: TNotifyEvent;
     FAudioDevice: TBassAudioDevice;
     FBackGround: TWinControl;
     FBlc: TBlc;
-    FCfgSes: TCfgSes;
+    FConfigs: TCfgSes;
     FCrtReached : Boolean;
     FDataTicks: Boolean;
+    FGlobalContainer : TGlobalContainer;
     FManager : TCounterManager;
-    FPupilClient : TPupilCommunication;
     FPupilClientEnabled: Boolean;
     FRegData: TRegData;
     FRegDataTicks: TRegData;
@@ -50,8 +49,8 @@ type
     FSessName: string;
     FShowCounter : Boolean;
     FSubjName: string;
-    FTestMode: Boolean;
     FFileData : string;
+    function GetTestMode: Boolean;
     procedure BkGndResponse(Sender: TObject);
     procedure BlcEndBlc(Sender: TObject);
     procedure Consequence(Sender: TObject);
@@ -65,11 +64,15 @@ type
     procedure PupilMultipartReceived(Sender: TObject; AMultipart : TMPMessage);
     procedure PupilRecordingStarted(Sender: TObject; AMultipart : TMPMessage);
     procedure PupilRequestReceived(Sender: TObject; ARequest, AResponse : string);
-    procedure PupilCalibrationStopped(Sender: TObject; AMultipart : TMPMessage);
     procedure SetBackGround(BackGround: TWinControl);
     procedure SetPupilClient(AValue: Boolean);
     procedure StmResponse(Sender:TObject);
+    procedure SetTestMode(AValue: Boolean);
+    procedure SetConfigs(AValue: TCfgSes);
   private
+    //FOnBeginSess: TNotifyEvent;
+    //FOnBeginTrial: TNotifyEvent;
+    //FOnCriteria: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
     FOnEndBlc: TNotifyEvent;
@@ -78,11 +81,12 @@ type
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
+    procedure SetManager(AValue: TCounterManager);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure DoEndSess(Sender: TObject);
-    procedure Play(CfgSes: TCfgSes; Manager : TCounterManager; FileData: String); overload;
+    procedure Play(AFileData: String); overload;
     property PupilClientEnabled : Boolean read FPupilClientEnabled write SetPupilClient;
     property AudioDevice : TBassAudioDevice read FAudioDevice write FAudioDevice;
     property BackGround : TWinControl read FBackGround write SetBackGround;
@@ -90,8 +94,10 @@ type
     property SessName : String  read FSessName write FSessName;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
     property SubjName : String  read FSubjName write FSubjName;
-    property TestMode : Boolean  read FTestMode write FTestMode;
+    property TestMode : Boolean  read GetTestMode write SetTestMode;
     property DataTicks : Boolean read FDataTicks write FDataTicks;
+    property Configs : TCfgSes read FConfigs write SetConfigs;
+    property Manager : TCounterManager read FManager write SetManager;
   public
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
@@ -127,22 +133,26 @@ end;
 
 procedure TSession.BlcEndBlc(Sender: TObject);
 begin
-  if FCfgSes.SesType = 'CIC' then
+  case Configs.SessionType of
+  T_CIC:
     begin
-      if FBlc.NextBlc = 'END' then FManager.CurrentBlc.Counter := FCfgSes.NumBlc //ir para último bloco apenas se END constar
+      if FBlc.NextBlc = 'END' then Manager.CurrentBlc := Configs.NumBlc //ir para último bloco apenas se END constar
       else  //próximo bloco sob qualquer outra condição
         begin
-          FManager.OnEndBlc(Sender)
+          Manager.OnEndBlc(Sender)
         end;
     end;
-  if FCfgSes.SesType = 'CRT' then
+
+  T_CRT:
     begin
-      if not FCrtReached then FManager.CurrentBlc.Counter := FCfgSes.NumBlc
+      if not FCrtReached then Manager.CurrentBlc := Configs.NumBlc
       else  //próximo bloco apenas se o critério foi alcançado
         begin
-          FManager.OnEndBlc(Sender)
+          Manager.OnEndBlc(Sender)
         end;
     end;
+
+  end;
 
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
   PlayBlc(Sender);
@@ -152,7 +162,8 @@ procedure TSession.EndSess(Sender: TObject);
 var Footer : string;
 begin
   Footer := LineEnding + LineEnding+ HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
-  FPupilClient.Request(REQ_SHOULD_STOP_RECORDING);
+  if PupilClientEnabled then
+     FGlobalContainer.PupilClient.Request(REQ_SHOULD_STOP_RECORDING);
 
   FRegData.SaveData(Footer);
   SetLogger(Footer);
@@ -180,8 +191,8 @@ end;
 procedure TSession.Play;
 var Header : string;
 begin
-  if FFileData = #0 then FFileData:= '000.data';
-    if FTestMode then
+  if FFileData = #0 then FFileData := '000.data';
+    if TestMode then
       begin
         FSessName:= FSessName + #9 + HTEST_MODE;
         FFileData:= '000.test';
@@ -191,14 +202,14 @@ begin
             HSESSION_NAME + #9 + FSessName + LineEnding +
             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding+LineEnding;
 
-  FRegData := TRegData.Create(nil, FCfgSes.RootData + FFileData);
+  FRegData := TRegData.Create(Self, FGlobalContainer.RootData + FFileData);
 
   FRegData.SaveData(Header);
   SetLogger(ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps', Header);
 
   if DataTicks then
     begin
-      FRegDataTicks:= TRegData.Create(nil, ExtractFileNameWithoutExt(FRegData.FileName) + '.ticks');
+      FRegDataTicks:= TRegData.Create(Self, ExtractFileNameWithoutExt(FRegData.FileName) + '.ticks');
       FBlc.RegDataTicks := FRegDataTicks;
       FRegDataTicks.SaveData(Header);
     end;
@@ -226,7 +237,7 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug +  AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim);
   {$endif}
-  FCfgSes.RootData := AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim;
+  FGlobalContainer.RootData := AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim;
   Play;
 end;
 
@@ -241,12 +252,6 @@ begin
   //end;
 end;
 
-procedure TSession.PupilCalibrationStopped(Sender: TObject;
-  AMultipart: TMPMessage);
-begin
-  if Assigned(FBackGround) then FBackGround.BringToFront;
-end;
-
 procedure TSession.SetBackGround(BackGround: TWinControl);
 begin
   FBackGround:= BackGround;
@@ -257,10 +262,9 @@ begin
   if FPupilClientEnabled=AValue then Exit;
   if AValue then
     begin
-      FPupilClient := TPupilCommunication.Create(FServerAddress);
-      FBlc.PupilClient := FPupilClient;
+      FGlobalContainer.PupilClient := TPupilCommunication.Create(FServerAddress);
     end
-  else FPupilClient.Terminate;
+  else FGlobalContainer.PupilClient.Terminate;
 
   FPupilClientEnabled:=AValue;
 end;
@@ -268,6 +272,30 @@ end;
 procedure TSession.StmResponse(Sender: TObject);
 begin
   if Assigned(OnStmResponse) then FOnStmResponse (Sender);
+end;
+
+procedure TSession.SetTestMode(AValue: Boolean);
+begin
+  if FGlobalContainer.TestMode=AValue then Exit;
+  FGlobalContainer.TestMode:=AValue;
+end;
+
+procedure TSession.SetConfigs(AValue: TCfgSes);
+begin
+  if FConfigs=AValue then Exit;
+  FConfigs:=AValue;
+  FGlobalContainer := FConfigs.GlobalContainer;
+end;
+
+procedure TSession.SetManager(AValue: TCounterManager);
+begin
+  if FManager=AValue then Exit;
+  FManager:=AValue;
+end;
+
+function TSession.GetTestMode: Boolean;
+begin
+  Result := FGlobalContainer.TestMode;
 end;
 
 procedure TSession.Consequence(Sender: TObject);
@@ -278,9 +306,10 @@ end;
 constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FManager := TCounterManager.Create(Self);
   FPupilClientEnabled := False;
 
-  FBlc:= TBlc.Create(nil);
+  FBlc:= TBlc.Create(Self);
   FBlc.OnStmResponse:= @StmResponse;
   FBlc.OnConsequence:= @Consequence;
   FBlc.OnBkGndResponse:= @BkGndResponse;
@@ -298,27 +327,12 @@ end;
 
 destructor TSession.Destroy;
 begin
-  //events
-  FBlc.OnStmResponse := nil;
-  FBlc.OnConsequence := nil;
-  FBlc.OnBkGndResponse := nil;
-  FBlc.OnEndTrial := nil;
-  FBlc.OnHit := nil;
-  FBlc.OnMiss := nil;
-  FBlc.OnEndBlc := nil;
-  FBlc.OnCriteria := nil;
-
   //external objects
   FBackGround := nil;
   FAudioDevice := nil;
-  FManager := nil;
-  FCfgSes := nil;
 
   //internal objects
-  if PupilClientEnabled then PupilClientEnabled := False;
-  if Assigned(FRegData) then FreeAndNil(FRegData);
-  if Assigned(FRegDataTicks) then FreeAndNil(FRegDataTicks);
-  if Assigned(FBlc) then FreeAndNil(FBlc);
+  PupilClientEnabled := False;
   inherited;
 end;
 
@@ -333,38 +347,35 @@ begin
   EndSess(Sender);
 end;
 
-procedure TSession.Play(CfgSes: TCfgSes; Manager : TCounterManager; FileData: String);
+procedure TSession.Play(AFileData: String);
 begin
-  FCfgSes:= CfgSes;
-  FManager := Manager;
-  FFileData := FileData;
+  FFileData := AFileData;
+  FGlobalContainer.TimeStart := TickCount;
 
   if PupilClientEnabled then
-  begin
-    with FPupilClient do
-      begin
-        OnRequestReceived := @PupilRequestReceived;
-        OnMultiPartMessageReceived := @PupilMultipartReceived;
-        OnRecordingStarted := @PupilRecordingStarted;
-        OnCalibrationStopped := @PupilCalibrationStopped;
-        Start;
-        StartSubscriber(True);
-        Subscribe(SUB_ALL_NOTIFICATIONS);
-        Request(REQ_SHOULD_START_RECORDING); // must be non-blocking
-      end;
-  end
-    else Play;
+    begin
+      with FGlobalContainer.PupilClient do
+        begin
+          OnRequestReceived := @PupilRequestReceived;
+          OnMultiPartMessageReceived := @PupilMultipartReceived;
+          OnRecordingStarted := @PupilRecordingStarted;
+          //OnCalibrationStopped := @PupilCalibrationStopped;
+          Start;
+          StartSubscriber(True);
+          Subscribe(SUB_ALL_NOTIFICATIONS);
+          Request(REQ_SYNCHRONIZE_TIME+#32+TimestampToStr(FGlobalContainer.TimeStart));
+          Request(REQ_SHOULD_START_RECORDING); // must be non-blocking
+        end
+    end
+  else Play;
 end;
 
 procedure TSession.PlayBlc(Sender: TObject);
-var IndBlc, IndTrial : integer;
 begin
-  IndBlc := FManager.CurrentBlc.Counter;
-  IndTrial := FManager.CurrentTrial.Counter;
-  if IndBlc < FCfgSes.NumBlc then
+  if Manager.CurrentBlc < Configs.NumBlc then
     begin
-      FManager.SetVirtualTrialValue(FCfgSes.Blcs[IndBlc].VirtualTrialValue);
-      FBlc.Play(FCfgSes.CfgBlc[IndBlc], FManager, IndTrial, FTestMode)
+      Manager.SetVirtualTrialValue(Configs.Blcs[Manager.CurrentBlc].VirtualTrialValue);
+      FBlc.Play(Configs.Blc[Manager.CurrentBlc], FManager, FGlobalContainer)
     end
   else EndSess(Sender);
 end;

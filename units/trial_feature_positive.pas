@@ -92,7 +92,7 @@ type
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(Correction : Boolean); override;
     //procedure DispenserPlusCall; override;
 
   end;
@@ -256,7 +256,7 @@ begin
     end;
 end;
 
-procedure TFPE.Play(TestMode: Boolean; Correction : Boolean);
+procedure TFPE.Play(Correction : Boolean);
 var
   s1{, sName, sLoop, sColor, sGap, sGapDegree, sGapLength} : string;
   R : TRect;
@@ -267,12 +267,6 @@ var
   begin
     Delete(s1, 1, pos(#44, s1));
     if Length(s1) > 0 then while s1[1] = #44 do Delete(s1, 1, 1);
-  end;
-
-  procedure NextSpaceDelimitedParameter;
-  begin
-    Delete(s1, 1, pos(#32, s1));
-    if Length(s1) > 0 then while s1[1] = #32 do Delete(s1, 1, 1);
   end;
 
   procedure KeyConfig(var aKey : TKey);
@@ -297,7 +291,7 @@ begin
   FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
   FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
-  RootMedia := CfgTrial.SList.Values[_RootMedia];
+  RootMedia := GlobalContainer.RootMedia;
 
   if FUseMedia then
     // not implemented yet
@@ -371,10 +365,10 @@ begin
         s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd];
 
         R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
-        NextSpaceDelimitedParameter;
+        NextSpaceDelimitedParameter(s1);
 
         R.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
-        NextSpaceDelimitedParameter;
+        NextSpaceDelimitedParameter(s1);
 
         R.Right := StrToIntDef(s1, 100);
         R.Bottom := R.Right;
@@ -385,10 +379,10 @@ begin
            {s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
 
            sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
-           NextSpaceDelimitedParameter;
+           NextSpaceDelimitedParameter(s1);
 
            sLoop := Copy(s1, 0, pos(#32, s1)-1);
-           NextSpaceDelimitedParameter;
+           NextSpaceDelimitedParameter(s1);
 
            sColor := s1;
 

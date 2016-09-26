@@ -23,7 +23,6 @@ uses Classes, Controls, LCLIntf, LCLType,
      , response_key
      , countermanager
      , custom_timer
-     , pupil_communication
      , trial_abstract
         , trial_message
         , trial_simple
@@ -74,7 +73,7 @@ type
     FTimerTO : TFakeTimer;
 
     // main objects/components
-    FPupilClient: TPupilCommunication;
+    FGlobalContainer: TGlobalContainer;
     FBackGround: TWinControl;
     FBlc: TCfgBlc;
     FTrial: TTrial;
@@ -118,14 +117,13 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
+    procedure Play(ACfgBlc: TCfgBlc; AManager : TCountermanager; AGlobalContainer: TGlobalContainer);
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
     property RegData: TRegData read FRegData write FRegData;
     property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
     property ServerAddress : string read FServerAddress write FServerAddress;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
-    property PupilClient : TPupilCommunication read FPupilClient write FPupilClient;
   public
     property OnBeginCorrection: TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
@@ -150,7 +148,6 @@ uses
 constructor TBlc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FTimeStart := TickCount;
   with FTimerITI do begin
     Interval := 0;
     Enabled := False;
@@ -182,16 +179,13 @@ begin
   inherited Destroy;
 end;
 
-procedure TBlc.Play(CfgBlc: TCfgBlc; Manager : TCountermanager; IndTent: Integer; TestMode: Boolean);
+procedure TBlc.Play(ACfgBlc: TCfgBlc; AManager: TCountermanager; AGlobalContainer: TGlobalContainer);
 begin
-  FBlc:= CfgBlc;
-  FCounterManager := Manager;
-
-  FTestMode:= TestMode;
+  FBlc:= ACfgBlc;
+  FCounterManager := AManager;
+  FGlobalContainer:= AGlobalContainer;
 
   FLastHeader:= '';
-
-  FCounterManager.CurrentTrial.Counter := IndTent;
   FIsCorrection := False;
 
   FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
@@ -212,7 +206,7 @@ begin
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
 
 
-  IndTrial := FCounterManager.CurrentTrial.Counter;
+  IndTrial := FCounterManager.CurrentTrial;
   if IndTrial = 0 then FFirstTrialBegin := TickCount;
   if IndTrial < FBlc.NumTrials then
     begin
@@ -229,6 +223,7 @@ begin
 
       if Assigned(FTrial) then
         begin
+          FTrial.GlobalContainer := FGlobalContainer;
           FTrial.CounterManager := FCounterManager;
           FTrial.TimeStart := FTimeStart;
           FTrial.DoubleBuffered := True;
@@ -245,7 +240,7 @@ begin
           FTrial.Parent := FBackGround;
           // dependencies above
           FTrial.Visible := False;
-          FTrial.Play(FTestMode, FIsCorrection);
+          FTrial.Play(FIsCorrection);
           FTrial.Visible := True;
           FTrial.SetFocus;
         end else
@@ -285,13 +280,13 @@ begin
   FLastHeader := FTrial.Header;
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
 
-  CountTr := IntToStr(FCounterManager.Trials.Counter + 1);
-  NumTr:= IntToStr(FCounterManager.CurrentTrial.Counter + 1);
+  CountTr := IntToStr(FCounterManager.Trials + 1);
+  NumTr:= IntToStr(FCounterManager.CurrentTrial + 1);
 
   // Fill Empty Names
-  if FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name = '' then
+  if FBlc.Trials[FCounterManager.CurrentTrial].Name = '' then
     NameTr := '--------'
-  else NameTr := FBlc.Trials[FCounterManager.CurrentTrial.Counter].Name;
+  else NameTr := FBlc.Trials[FCounterManager.CurrentTrial].Name;
 
   NewData := CountTr + #9 + NumTr + #9 + NameTr;
 
@@ -310,7 +305,7 @@ begin
         ITIData :=  DoNotApply + #9 + DoNotApply
       else
         // Check if it is the fisrt trial
-        if (FCounterManager.Trials.Counter + 1) = 1 then
+        if (FCounterManager.Trials + 1) = 1 then
           IsFirst := True
         else IsFirst := False;
 
@@ -318,7 +313,7 @@ begin
   else
     begin
 
-      if (FCounterManager.Trials.Counter + 1) = 1 then
+      if (FCounterManager.Trials + 1) = 1 then
         IsFirst := True
       else IsFirst := False;
 
@@ -353,11 +348,6 @@ var s0, s1, s2, s3, s4 : string;
     NegativeCsqInt : boolean;
     //TimestampsData : TRegData;
 
-  procedure NextSpaceDelimitedParameter;
-  begin
-    Delete(s0, 1, pos(#32, s0));
-    if Length(s0) > 0 then while s0[1] = #32 do Delete(s0, 1, 1);
-  end;
 
   procedure SetValuesToStrings (var as1, as2, as3, as4 : string);
   var
@@ -386,11 +376,11 @@ var s0, s1, s2, s3, s4 : string;
 
     s0 := Values + #32;
     as1:= FTrial.RootMedia + Copy(s0, 0, pos(#32, s0)-1);
-    NextSpaceDelimitedParameter;
+    NextSpaceDelimitedParameter(s0);
     as2:= Copy(s0, 0, pos(#32, s0)-1);
-    NextSpaceDelimitedParameter;
+    NextSpaceDelimitedParameter(s0);
     as3:= Copy(s0, 0, pos(#32, s0)-1);
-    NextSpaceDelimitedParameter;
+    NextSpaceDelimitedParameter(s0);
     as4:= Copy(s0, 0, pos(#32, s0)-1);
   end;
 begin
@@ -404,12 +394,12 @@ begin
   HasCsqInterval := False;
 
   if  (FTrial.NextTrial = 'END') then //end bloc
-    FCounterManager.CurrentTrial.Counter := FBlc.NumTrials
+    FCounterManager.CurrentTrial := FBlc.NumTrials
   else // continue
     if (FTrial.NextTrial = 'CRT') or // FTrial.NextTrial base 1, FCounterManager.CurrentTrial.Counter base 0)
-       (FTrial.NextTrial = (IntToStr(FCounterManager.CurrentTrial.Counter + 1))) then
+       (FTrial.NextTrial = (IntToStr(FCounterManager.CurrentTrial + 1))) then
       begin //correction trials were on
-        if ((FBlc.MaxCorrection) = FCounterManager.BlcCscCorrections.Counter) and
+        if ((FBlc.MaxCorrection) = FCounterManager.BlcCscCorrections) and
            (FBlc.MaxCorrection <> 0) then
           begin //correction
             FCounterManager._VirtualTrialFix;
@@ -427,17 +417,17 @@ begin
       if StrToIntDef(FTrial.NextTrial, 0) > 0 then
         begin //go to the especified trial
           if FTrial.Result = 'MISS' then
-            FCounterManager.VirtualTrialLoop.Counter := FCounterManager.VirtualTrialValue;
+            FCounterManager.VirtualTrialLoop := FCounterManager.VirtualTrialValue;
 
           FCounterManager.OnNotCorrection(Sender);
-          FCounterManager.CurrentTrial.Counter := StrToIntDef(FTrial.NextTrial, 0) - 1;
+          FCounterManager.CurrentTrial := StrToIntDef(FTrial.NextTrial, 0) - 1;
           FCounterManager.OnNxtTrial (Sender);
           FIsCorrection := False;
         end
       else // go to the next trial,
         begin
           if FTrial.Result = 'MISS' then
-            FCounterManager.VirtualTrialLoop.Counter := FCounterManager.VirtualTrialValue;
+            FCounterManager.VirtualTrialLoop := FCounterManager.VirtualTrialValue;
 
           FCounterManager.OnNotCorrection(Sender);
           FCounterManager.OnEndTrial (Sender);
@@ -445,13 +435,13 @@ begin
         end;
 
   //Critérios de ACERTO atingido
-  if  ((FBlc.CrtConsecutiveHit > 0) and (FBlc.CrtConsecutiveHit = FCounterManager.BlcCscHits.Counter))
+  if  ((FBlc.CrtConsecutiveHit > 0) and (FBlc.CrtConsecutiveHit = FCounterManager.BlcCscHits))
    //or ((FCfgBlc.CrtConsecutiveMiss > 0) and (FCfgBlc.CrtConsecutiveMiss = FCounterManager.BlcCscMisses.Counter))
    or ((FTrial.NextTrial = IntToStr(FBlc.CrtMaxTrials)) and (FBlc.CrtMaxTrials > 0))
   then
       begin
         if Assigned(OnCriteria) then FOnCriteria(Sender);
-        FCounterManager.CurrentTrial.Counter := FBlc.NumTrials
+        FCounterManager.CurrentTrial := FBlc.NumTrials
       end;
 
 
@@ -747,7 +737,7 @@ procedure TBlc.Hit(Sender: TObject);
 begin
   FCounterManager.OnHit(Sender);
   if FBlc.CrtKCsqHit > 0 then
-    if FBlc.CrtKCsqHit = FCounterManager.BlcCsqHits.Counter then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
+    if FBlc.CrtKCsqHit = FCounterManager.BlcCsqHits then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
       begin
         FCounterManager.OnCsqCriterion(Sender);
         //FTrial.DispenserPlusCall;

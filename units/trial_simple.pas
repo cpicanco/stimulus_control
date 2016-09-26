@@ -83,7 +83,7 @@ type
     procedure TrialMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(Correction : Boolean); override;
     //procedure DispenserPlusCall; override;
   end;
 
@@ -128,18 +128,11 @@ end;
 //  Dispenser(FKPlus.Csq, FKPlus.Usb);
 //end;
 
-procedure TSimpl.Play(TestMode: Boolean; Correction : Boolean);
+procedure TSimpl.Play(Correction : Boolean);
 var
   s1, sName, sLoop, sColor : string;
   R : TRect;
   a1 : Integer;
-
-  procedure NextSpaceDelimitedParameter;
-  begin
-    Delete(s1, 1, pos(#32, s1));
-    if Length(s1) > 0 then while s1[1] = #32 do Delete(s1, 1, 1);
-  end;
-
 begin
   Randomize;
 
@@ -150,7 +143,7 @@ begin
   else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], Parent.Cursor);
 
   // TTrial
-  RootMedia := CfgTrial.SList.Values[_RootMedia];
+  RootMedia := GlobalContainer.RootMedia;
   NextTrial := '-1';
 
   if Correction then FIsCorrection := True
@@ -186,13 +179,13 @@ begin
 
           s1 := CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd] + #32;
           R.Top := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-          NextSpaceDelimitedParameter;
+          NextSpaceDelimitedParameter(s1);
 
           R.Left := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-          NextSpaceDelimitedParameter;
+          NextSpaceDelimitedParameter(s1);
 
           R.Bottom := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-          NextSpaceDelimitedParameter;
+          NextSpaceDelimitedParameter(s1);
 
           R.Right := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
           Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
@@ -200,11 +193,11 @@ begin
           s1 := CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cStm] + #32;
           sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
           Key.FullPath := sName;
-          NextSpaceDelimitedParameter;
+          NextSpaceDelimitedParameter(s1);
 
           sLoop := Copy(s1, 0, pos(#32, s1)-1);
           Key.HowManyLoops:= StrToIntDef(sLoop, 0);
-          NextSpaceDelimitedParameter;
+          NextSpaceDelimitedParameter(s1);
 
           sColor := Copy(s1, 0, pos(#32, s1)-1);
           Key.Color := StrToIntDef(sColor, $0000FF); //clRed
@@ -473,11 +466,9 @@ begin
   aStimulus := '-';
   aLeft := IntToStr(X);
   aTop := IntToStr(Y);
-  DataTicks := DataTicks +
-    aTime + #9 + aCode + #9 + aStimulus + #9 + aLeft + #9 + aTop + LineEnding;
+  DataTicks := DataTicks + aTime + #9 + aCode + #9 + aStimulus + #9 + aLeft + #9 + aTop + LineEnding;
 
   Inc(FDataSupport.BackgroundResponseCount);
-
   CounterManager.OnBkgndResponse(Self);
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;

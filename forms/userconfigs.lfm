@@ -4,7 +4,7 @@ object UserConfig: TUserConfig
   Top = 95
   Width = 466
   HorzScrollBar.Page = 427
-  VertScrollBar.Page = 276
+  VertScrollBar.Page = 271
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
   Caption = 'Configurar'
@@ -1638,7 +1638,7 @@ object UserConfig: TUserConfig
     Left = 74
     Height = 21
     Top = 453
-    Width = 95
+    Width = 99
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
     TabOrder = 1
@@ -1791,9 +1791,9 @@ object UserConfig: TUserConfig
       ClientWidth = 460
       object StringGrid1: TStringGrid
         Left = 0
-        Height = 264
+        Height = 262
         Top = 110
-        Width = 462
+        Width = 460
         Align = alClient
         BorderSpacing.Top = 110
         BorderSpacing.Bottom = 40
@@ -1869,7 +1869,7 @@ object UserConfig: TUserConfig
         TabOrder = 4
         object seCount: TSpinEdit
           Left = 78
-          Height = 27
+          Height = 25
           Top = 2
           Width = 50
           Anchors = [akTop, akRight]
@@ -1880,15 +1880,15 @@ object UserConfig: TUserConfig
         end
         object cbShowRepetitions: TCheckBox
           Left = 8
-          Height = 24
+          Height = 21
           Top = 3
-          Width = 24
+          Width = 21
           TabOrder = 1
         end
       end
       object leFillValue: TLabeledEdit
         Left = 104
-        Height = 27
+        Height = 25
         Top = 80
         Width = 144
         EditLabel.AnchorSideLeft.Control = leFillValue
@@ -1896,8 +1896,8 @@ object UserConfig: TUserConfig
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leFillValue
         EditLabel.Left = 104
-        EditLabel.Height = 17
-        EditLabel.Top = 60
+        EditLabel.Height = 15
+        EditLabel.Top = 62
         EditLabel.Width = 144
         EditLabel.Caption = 'Esquema'
         EditLabel.ParentColor = False
@@ -1931,9 +1931,9 @@ object UserConfig: TUserConfig
         TabOrder = 7
         object cbDrawTrialGroup: TCheckBox
           Left = 8
-          Height = 24
+          Height = 21
           Top = 3
-          Width = 24
+          Width = 21
           Checked = True
           OnChange = cbDrawTrialGroupChange
           State = cbChecked
@@ -1941,7 +1941,7 @@ object UserConfig: TUserConfig
         end
         object edtTrialGroup: TEdit
           Left = 48
-          Height = 27
+          Height = 25
           Top = 3
           Width = 80
           TabOrder = 1
@@ -3727,7 +3727,7 @@ object UserConfig: TUserConfig
     Left = 192
     Height = 21
     Top = 453
-    Width = 107
+    Width = 103
     Anchors = [akLeft, akBottom]
     Caption = 'Registrar ticks'
     TabOrder = 3
