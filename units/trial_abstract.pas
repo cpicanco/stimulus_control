@@ -27,6 +27,7 @@ type
 
   TTrial = class(TCustomControl)
   private
+    FGlobalContainer: TGlobalContainer;
     FCfgTrial: TCfgTrial;
     //FClientThread : TZMQThread;
     FClockThread : TClockThread;
@@ -39,10 +40,7 @@ type
     FIETConsequence: string;
     FNextTrial: string;
     FResult: string;
-    FRootMedia: string;
-    FServerAddress: string;
     FTimeOut: Integer;
-    FTimeStart: Extended;
     // events
     FOnBeforeEndTrial: TNotifyEvent;
     FOnBeginCorrection: TNotifyEvent;
@@ -55,7 +53,14 @@ type
     FOnNone: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
     FOnWriteTrialData: TNotifyEvent;
+
     procedure EndTrialThread(Sender: TObject);
+    function GetRootMedia: string;
+    function GetTestMode: Boolean;
+    function GetTimeStart: Extended;
+    procedure SetRootMedia(AValue: string);
+    procedure SetTestMode(AValue: Boolean);
+    procedure SetTimeStart(AValue: Extended);
   strict protected
     FClockList : array of TThreadMethod;
     FLimitedHold : integer;
@@ -75,21 +80,22 @@ type
     constructor Create (AOwner : TComponent); override;
     destructor Destroy; override;
 //    procedure DispenserPlusCall; virtual; abstract;
-    procedure Play(TestMode: Boolean; Correction : Boolean); virtual; abstract;
+    procedure Play(Correction : Boolean); virtual; abstract;
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
     property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property Data: string read FData write FData;
     property DataTicks: string read FDataTicks write FDataTicks;
     property FileName : string read FFilename write FFilename;
+    property GlobalContainer : TGlobalContainer read FGlobalContainer write FGlobalContainer;
     property Header: string read FHeader write FHeader;
     property HeaderTicks: string read FHeaderTicks write FHeaderTicks;
     property IETConsequence : string read FIETConsequence write FIETConsequence;
     property NextTrial: string read FNextTrial write FNextTrial;
     property Result: string read FResult write FResult;
-    property RootMedia : string read FRootMedia write FRootMedia;
-    property ServerAddress : string read FServerAddress write FServerAddress;
+    property TestMode : Boolean read GetTestMode write SetTestMode;
     property TimeOut : Integer read FTimeOut write FTimeOut;
-    property TimeStart : Extended read FTimeStart write FTimeStart;
+    property TimeStart : Extended read GetTimeStart write SetTimeStart;
+    property RootMedia : string read GetRootMedia write SetRootMedia;
   public
     property OnBeforeEndTrial: TNotifyEvent read FOnBeforeEndTrial write FOnBeforeEndTrial;
     property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write FOnBeginCorrection;
@@ -109,7 +115,7 @@ implementation
 
 
 uses timestamps
-    , timestamps_logger
+    //, timestamps_logger
     {$ifdef DEBUG}
     , debug_logger
     {$endif}
@@ -177,6 +183,39 @@ begin
   Hide;
   if Assigned(OnBeforeEndTrial) then OnBeforeEndTrial(Sender);
   if Assigned(OnEndTrial) then OnEndTrial(Sender);
+end;
+
+function TTrial.GetRootMedia: string;
+begin
+  Result := FGlobalContainer.RootMedia;
+end;
+
+function TTrial.GetTestMode: Boolean;
+begin
+  Result := FGlobalContainer.TestMode;
+end;
+
+function TTrial.GetTimeStart: Extended;
+begin
+  Result := FGlobalContainer.TimeStart;
+end;
+
+procedure TTrial.SetRootMedia(AValue: string);
+begin
+  if FGlobalContainer.RootMedia=AValue then Exit;
+  FGlobalContainer.RootMedia:=AValue;
+end;
+
+procedure TTrial.SetTestMode(AValue: Boolean);
+begin
+  if FGlobalContainer.TestMode=AValue then Exit;
+  FGlobalContainer.TestMode:=AValue;
+end;
+
+procedure TTrial.SetTimeStart(AValue: Extended);
+begin
+  if FGlobalContainer.TimeStart=AValue then Exit;
+  FGlobalContainer.TimeStart:=AValue;
 end;
 
 constructor TTrial.Create(AOwner: TComponent);

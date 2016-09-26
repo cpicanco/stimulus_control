@@ -15,9 +15,20 @@ interface
 
 uses Classes, ComCtrls, IniFiles, SysUtils,  Dialogs, Forms
     , constants
+    , pupil_communication
     ;
 
 type
+
+  { TGlobalContainer }
+
+  TGlobalContainer = class //(TObject)
+    PupilClient: TPupilCommunication;
+    RootData: string;
+    RootMedia: string;
+    TimeStart : Extended;
+    TestMode : Boolean;
+  end;
 
   TCircle = record
     o : TPoint;  //Left/Top
@@ -85,26 +96,26 @@ type
   { TCfgSes }
 
   TCfgSes = class(TComponent)
-  protected
-    //Fddd: Cardinal;
-    FBlcs: TVetCfgBlc;
-    FCol: integer;
+  private
+    FGlobalContainer : TGlobalContainer;
+
+    // todo: refactoring
     FData: string;
-    FEdtMode : Boolean;
-    FIniFile: TCIniFile;
-    FLoaded : Boolean;
     FMedia: string;
-    FName: string;
-    FNumBlc: Integer;
-    FNumPos: Integer;
-    FPositions : array of TCoordenates;
-    FRootData: string;
-    FRootMedia: string;
-    FRow: integer;
-    FSubject: string;
-    FType : string;
+    FLoaded : Boolean;
+
+    // session only
+    FSessionName: string;
+    FSessionSubject : string;
+    FSessionType : string;
     function GetCfgBlc(Ind: Integer): TCfgBlc;
-  published
+  protected
+    FCol: integer;
+    FRow: integer;
+    FNumBlc: Integer; // Number of blocs in a session
+    FBlcs: TVetCfgBlc; // blocs in session
+    FNumPos: Integer; // Number of positions were stimuli will be presented
+    FPositions : array of TCoordenates; // positions were stimuli will be presented
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -112,22 +123,24 @@ type
     function LoadTreeFromFile(FileName:string; aTree : TTreeView):Boolean;
     procedure SetLengthVetBlc;
     procedure SetLengthVetTrial (Blc : Integer);
+  public
+    property GlobalContainer : TGlobalContainer read FGlobalContainer;
+    property SessionName : string read FSessionName write FSessionName;
+    property SessionSubject : string read FSessionSubject write FSessionSubject;
+    property SessionType : string read FSessionType write FSessionType;
+  public
     property Blcs : TVetCfgBlc read FBlcs write FBlcs;
-    property CfgBlc[Ind: Integer]: TCfgBlc read GetCfgBlc;
-    property Col : integer read FCol write FCol;
-    property Data : string read FData write FData;
-    property EditMode : Boolean read FEdtMode write FEdtMode;
+    property Blc[I: Integer]: TCfgBlc read GetCfgBlc;
     property IsLoaded : Boolean read FLoaded write FLoaded;
-    property Media: string read FMedia write FMedia;
-    property Name: string read FName write FName;
     property NumBlc: Integer read FNumBlc write FNumBlc;
     property NumPos: Integer read FNumPos write FNumPos;
-    property RootData: string read FRootData write FRootData;
-    property RootMedia: string read FRootMedia write FRootMedia;
+  public
+    property Data : string read FData write FData;
+    property Media: string read FMedia write FMedia;
+    property Col : integer read FCol write FCol;
     property Row : integer read FRow write FRow;
-    property SesType : string read FType write FType;
-    property Subject : string read FSubject write FSubject;
   end;
+
 resourcestring
   messuCfgSessionMainError = 'Valor não encontrado: Main, Name or NumBlc.';
   messLoading = 'Carregando...';
@@ -140,7 +153,7 @@ resourcestring
 
 implementation
 
-//uses formMainLaz;
+{ TCfgSes }
 
 function TCfgSes.GetCfgBlc(Ind: Integer): TCfgBlc;
 begin
@@ -150,12 +163,14 @@ end;
 constructor TCfgSes.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FGlobalContainer:= TGlobalContainer.Create;
   FLoaded := False;
 end;
 
 destructor TCfgSes.Destroy;
 var a1, a2 : Integer;
 begin
+  FGlobalContainer.Destroy;
   if Length(FBlcs) > 0 then
     for a1:= Low(FBlcs) to High(FBlcs) do
       begin
@@ -215,46 +230,48 @@ end;
 
 function TCfgSes.LoadFromFile(FileName: string; EdtMode : Boolean): Boolean;
 var
-  a1, a2, a3, a4: Integer; s1: string; NumList : TStringList;
+  a1, a2, a3, a4: Integer; s1: string;
+  LIniFile: TCIniFile;
+  NumList : TStringList;
 
-    function GetBarPosition(NowNumber, MaxNumber : integer):integer;
-    begin
-      Result := (100 * NowNumber) div MaxNumber;
-    end;
+  function GetBarPosition(NowNumber, MaxNumber : integer):integer;
+  begin
+    Result := (100 * NowNumber) div MaxNumber;
+  end;
 
-    procedure ListCreate;
-    begin
-      NumList := TStringList.Create;
-      //NumList.Sorted := False;
-      NumList.Duplicates := dupIgnore;
-    end;
+  procedure HandleRootPath(var APath : string);
+  begin
+    while Pos(PathDelim, s1) <> 0 do Delete(s1, 1, Pos(PathDelim, s1));
+    APath:= ExtractFilePath(FileName) + s1;
+    if not (APath[Length(APath)] = PathDelim) then APath:= APath + PathDelim;
+  end;
+
+  procedure ListCreate;
+  begin
+    NumList := TStringList.Create;
+    //NumList.Sorted := False;
+    NumList.Duplicates := dupIgnore;
+  end;
 begin
   if FileExists(FileName) then begin
-    FIniFile:= TCIniFile.Create(FileName);
-    with FIniFile do begin
+    LIniFile:= TCIniFile.Create(FileName);
+    with LIniFile do begin
       //frmMain.Statusbar1.Panels[0].Text := messLoading;
       if  SectionExists(_Main) and
           ValueExists(_Main, _Name) and
           ValueExists(_Main, _NumBlc) then begin
 
-        FName := ReadString(_Main, _Name, DefName);
-        FSubject := ReadString(_Main, _Subject, DefSubject);
+        FSessionName := ReadString(_Main, _Name, DefName);
+        FSessionSubject := ReadString(_Main, _Subject, DefSubject);
+        FSessionType := ReadString(_Main, _Type, T_CIC);
         FNumBlc := ReadInteger(_Main, _NumBlc, 0);
-        FType := ReadString(_Main, _Type, T_CIC);
-
-        if (FType = T_CIC) or (FType = T_CRT) then
-        else FType := T_CIC;
 
         // set media and data paths
         s1 := ReadString(_Main, _RootMedia, '');
-        while Pos(PathDelim, s1) <> 0 do Delete(s1, 1, Pos(PathDelim, s1));
-        FRootMedia:= ExtractFilePath(FileName) + s1;
-        if not (FRootMedia[Length(FRootMedia)] = PathDelim) then FRootMedia:= FRootMedia + PathDelim;
+        HandleRootPath(FGlobalContainer.RootMedia);
 
         s1 := ReadString(_Main, _RootData, '');
-        while Pos(PathDelim, s1) <> 0 do Delete(s1, 1, Pos(PathDelim, s1));
-        FRootData:= ExtractFilePath(FileName) + s1;
-        if not (FRootData[Length(FRootData)] = PathDelim) then FRootData:= FRootData + PathDelim;
+        HandleRootPath(FGlobalContainer.RootData);
 
         //Fddd := GetTickCount;
         SetLength(FBlcs, FNumBlc);
@@ -283,12 +300,9 @@ begin
                 with FBlcs[a1].Trials[a2] do
                   begin
                     Id :=  a2 + 1;
-                    Name:=
-                      ReadString(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1),_Name, '');
-                    Kind:=
-                      ReadString(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1), _Kind, '');
-                    NumComp :=
-                      ReadInteger(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1), _NumComp, 0);
+                    Name:= ReadString(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1),_Name, '');
+                    Kind:= ReadString(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1), _Kind, '');
+                    NumComp := ReadInteger(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1), _NumComp, 0);
                     SList:= TStringList.Create;
                     with SList do
                       begin
@@ -297,7 +311,6 @@ begin
                         Duplicates := dupIgnore;
                         BeginUpdate;
                         ReadSectionValues(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1), SList);
-                        Add(_RootMedia + '=' + FRootMedia);
                         EndUpdate;
                       end;
                   end;
@@ -309,62 +322,62 @@ begin
         //ShowMessage(FormatFloat('#####,###',GetTickCount - Fddd));
         if EdtMode then
           begin
-            If  SectionExists(_Positions) and
-                ValueExists(_Positions, _NumPos) then begin
-              FMedia := ExtractFileName(ExcludeTrailingPathDelimiter(FRootMedia));
-              FData := ExtractFileName(ExcludeTrailingPathDelimiter(FRootData));
-              FNumPos := ReadInteger(_Positions, _NumPos, 0);
-              FRow := ReadInteger(_Positions, _Rows, 0);
-              FCol := ReadInteger(_Positions, _Cols, 0);
-              SetLength(FPositions, FNumPos);
-              for a4 := 0 to FNumPos - 1 do
-                begin
-                  s1:= ReadString(_Positions, _Pos + IntToStr(a4 + 1), '0');
-                  with FPositions[a4] do
-                    begin
-                      Index := a4 + 1;
-                      Top:= StrToIntDef(Copy(s1, 0, pos(' ', s1)-1), 0); Delete(s1, 1, pos(' ', s1)); If Length(s1)>0 then While s1[1]=' ' do Delete(s1, 1, 1);
-                      Left:= StrToIntDef(Copy(s1, 0, pos(' ', s1)-1), 0); Delete(s1, 1, pos(' ', s1)); If Length(s1)>0 then While s1[1]=' ' do Delete(s1, 1, 1);
-                      Width:= StrToIntDef(Copy(s1, 0, pos(' ', s1)-1), 0); Delete(s1, 1, pos(' ', s1)); If Length(s1)>0 then While s1[1]=' ' do Delete(s1, 1, 1);
-                      Height:= StrToIntDef(s1, 0);
-                    end;
-                end;
-              ListCreate;
-              for a4 := 0 to FNumPos - 1 do NumList.Add(ReadString(_Positions, _Pos + IntToStr(a4 + 1), '0'));
-
-              for a1:= Low(FBlcs) to High(FBlcs) do
-                for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
+            if SectionExists(_Positions) and ValueExists(_Positions, _NumPos) then
+              begin
+                FMedia := ExtractFileName(ExcludeTrailingPathDelimiter(FGlobalContainer.RootMedia));
+                FData := ExtractFileName(ExcludeTrailingPathDelimiter(FGlobalContainer.RootData));
+                FNumPos := ReadInteger(_Positions, _NumPos, 0);
+                FRow := ReadInteger(_Positions, _Rows, 0);
+                FCol := ReadInteger(_Positions, _Cols, 0);
+                SetLength(FPositions, FNumPos);
+                for a4 := 0 to FNumPos - 1 do
                   begin
-                    FBlcs[a1].Trials[a2].SList.BeginUpdate;
-                    with FBlcs[a1].Trials[a2].SList do
+                    s1:= ReadString(_Positions, _Pos + IntToStr(a4 + 1), '0');
+                    with FPositions[a4] do
                       begin
-                        if NumList.IndexOf(Values[_Samp + _cBnd]) = -1 then
-                          Values[_Samp + _cBnd] := '1'
-                        else
-                          begin
-                            Values[_Samp + _cBnd] :=
-                            IntToStr(NumList.IndexOf(Values[_Samp + _cBnd]) + 1);
-                          end;
+                        Index := a4 + 1;
+                        Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); NextSpaceDelimitedParameter(s1);
+                        Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); NextSpaceDelimitedParameter(s1);
+                        Width:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); NextSpaceDelimitedParameter(s1);
+                        Height:= StrToIntDef(s1, 0);
                       end;
-                    if FBlcs[a1].Trials[a2].NumComp > 0 then
-                      for a3 := 0 to (FBlcs[a1].Trials[a2].NumComp - 1) do
-                          with FBlcs[a1].Trials[a2].SList do
-                            begin
-                              if NumList.IndexOf(Values[_Comp + IntToStr(a3 + 1) + _cBnd]) = -1 then
-                                Values[_Comp+IntToStr(a3+1)+_cBnd]:= '1'
-                              else
-                                Values[_Comp+IntToStr(a3+1)+_cBnd]:= IntToStr(NumList.IndexOf(Values[_Comp+IntToStr(a3+1)+_cBnd])+1);
-                            end;
-
-                    FBlcs[a1].Trials[a2].SList.EndUpdate;
                   end;
-              NumList.Free;
-            end;
+                ListCreate;
+                for a4 := 0 to FNumPos - 1 do NumList.Add(ReadString(_Positions, _Pos + IntToStr(a4 + 1), '0'));
+
+                for a1:= Low(FBlcs) to High(FBlcs) do
+                  for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
+                    begin
+                      FBlcs[a1].Trials[a2].SList.BeginUpdate;
+                      with FBlcs[a1].Trials[a2].SList do
+                        begin
+                          if NumList.IndexOf(Values[_Samp + _cBnd]) = -1 then
+                            Values[_Samp + _cBnd] := '1'
+                          else
+                            begin
+                              Values[_Samp + _cBnd] :=
+                              IntToStr(NumList.IndexOf(Values[_Samp + _cBnd]) + 1);
+                            end;
+                        end;
+                      if FBlcs[a1].Trials[a2].NumComp > 0 then
+                        for a3 := 0 to (FBlcs[a1].Trials[a2].NumComp - 1) do
+                            with FBlcs[a1].Trials[a2].SList do
+                              begin
+                                if NumList.IndexOf(Values[_Comp + IntToStr(a3 + 1) + _cBnd]) = -1 then
+                                  Values[_Comp+IntToStr(a3+1)+_cBnd]:= '1'
+                                else
+                                  Values[_Comp+IntToStr(a3+1)+_cBnd]:= IntToStr(NumList.IndexOf(Values[_Comp+IntToStr(a3+1)+_cBnd])+1);
+                              end;
+
+                      FBlcs[a1].Trials[a2].SList.EndUpdate;
+                    end;
+                NumList.Free;
+              end;
           end;
         FLoaded := True; //Diferencia "Abrir Sessão" de "Nova sessão".
         //frmMain.Statusbar1.Panels[0].Text := messReady;
         //frmMain.Statusbar1.Panels[1].Text := FName;
-        FIniFile.Free;
+        LIniFile.Free;
         Result:= True;
       end else Result:= False;
     end;
@@ -380,13 +393,14 @@ var
   i1, i2, i3, aNumBlc, aNumTrials, aNumComp : Integer;
   ANode : TTreeNode;
   CurrStr, aux: string;
+  LIniFile : TCIniFile;
 begin
   Result:= False;
   if FileExists(FileName) then
     begin
-      FIniFile:= TCIniFile.Create(FileName);
+      LIniFile:= TCIniFile.Create(FileName);
       aTree.BeginUpdate;
-      with FIniFile do
+      with LIniFile do
         try
           if  SectionExists(_Main) and
               ValueExists(_Main, _Name) and
@@ -463,7 +477,7 @@ begin
             end
           else ShowMessage(messuCfgSessionMainError);
         finally
-          FIniFile.Free;
+          LIniFile.Free;
           aTree.EndUpdate;
         end;
   end;

@@ -81,7 +81,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(Correction : Boolean); override;
     property Cycles : integer read GetCycles;
 
   end;
@@ -333,19 +333,12 @@ begin
     end;
 end;
 
-procedure TDZT.Play(TestMode: Boolean; Correction : Boolean);
+procedure TDZT.Play(Correction : Boolean);
 var
   s1 : string;
   R : TRect;
 
   NumComp, a1 : Integer;
-
-  procedure NextSpaceDelimitedParameter;
-  begin
-    Delete(s1, 1, pos(#32, s1));
-    if Length(s1) > 0 then while s1[1] = #32 do Delete(s1, 1, 1);
-  end;
-
 begin
   FResponseEnabled := False;
   Randomize;
@@ -359,7 +352,7 @@ begin
   // self descends from TTrial
   Result := '';
   NextTrial := CfgTrial.SList.Values[_NextTrial];
-  RootMedia := CfgTrial.SList.Values[_RootMedia];
+  RootMedia := GlobalContainer.RootMedia;
   FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
 
   // self
@@ -386,13 +379,13 @@ begin
       Color2 := True;
 
       Min := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-      NextSpaceDelimitedParameter;
+      NextSpaceDelimitedParameter(s1);
 
       Max := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-      NextSpaceDelimitedParameter;
+      NextSpaceDelimitedParameter(s1);
 
       Version := Copy(s1, 0, pos(#32, s1)-1);
-      NextSpaceDelimitedParameter;
+      NextSpaceDelimitedParameter(s1);
 
       Mode := Copy(s1, 0, pos(#32, s1)-1);
       Mode := UpperCase(Mode);
@@ -443,13 +436,13 @@ begin
         s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd] + #32;
 
         R.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-        NextSpaceDelimitedParameter;
+        NextSpaceDelimitedParameter(s1);
 
         R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-        NextSpaceDelimitedParameter;
+        NextSpaceDelimitedParameter(s1);
 
         R.Bottom := R.Top + StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 100);
-        NextSpaceDelimitedParameter;
+        NextSpaceDelimitedParameter(s1);
 
         R.Right := R.Left + StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 100);
 

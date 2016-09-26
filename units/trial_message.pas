@@ -47,7 +47,7 @@ type
     //procedure ThreadClock(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(TestMode: Boolean; Correction : Boolean); override;
+    procedure Play(Correction : Boolean); override;
   end;
 
 resourcestring
@@ -127,7 +127,7 @@ begin
   WriteData(Self);
 end;
 
-procedure TMSG.Play(TestMode: Boolean; Correction : Boolean);
+procedure TMSG.Play(Correction : Boolean);
 var
   LFontColor : Integer;
 begin
