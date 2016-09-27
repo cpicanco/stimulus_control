@@ -25,8 +25,6 @@ type
 
   TImage = (stmNone, stmPicture, stmAnimation, stmVideo);
 
-  TResponsePoint = array [0..1] of Integer;
-
   TKind = record
     stmAudio : boolean;
     stmImage : TImage;
@@ -37,63 +35,51 @@ type
   TKey = class(TCustomControl)
   private
     FAudioChannel : TBassChannel;
-    FKeyPress: TNotifyEvent;
     FSchMan: TSchMan;
-    FResponseCount : integer;
-    FOnConsequence: TNotifyEvent;
-    FOnResponse: TNotifyEvent;
-    FOnEndMedia: TNotifyEvent;
+
     FBitMap: TBitMap;
     //FGifImage: TJvGIFAnimator;
     //FMedia : TWindowsMediaPlayer;
-    FColor: TColor;
     FEdge: TColor;
-    FFileName: String;
+    FFileName: string;
     FKind: TKind;
     FEditMode: Boolean;
+    FResponseCount: Integer;
     FLoopNumber: Integer;
-    FLRespPnt: TResponsePoint;
+    FLastResponseLog : string;
     procedure SetFileName(Path: string);
+  private
+    FOnConsequence: TNotifyEvent;
+    FOnResponse: TNotifyEvent;
+    FOnEndMedia: TNotifyEvent;
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
-    procedure MouseDown(Sender: TObject; Button: TMouseButton;
+    procedure KeyMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
-    //procedure CMMouseEnter(var msg: TMessage); message CM_MOUSEENTER;
-    //procedure CMMouseLeave(var msg: TMessage); message CM_MOUSELEAVE;
-  protected
-    //procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
-    //procedure MouseDown(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);reintroduce; overload;
-    //procedure MouseDown(Sender : TObject; Button: Smallint; ShiftState: Smallint; X: Integer; Y: Integer); reintroduce; overload;
-  public
+public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function ResponseCount : integer;
     procedure Paint; override;
     procedure Play;
     procedure Stop;
     procedure FullScreen;
-    procedure IncResponseCount;
-    property Caption;
-    property Color : TColor read FColor write FColor;
+    property Schedule : TSchMan read FSchMan;
     property Edge : TColor read FEdge write FEdge;
     property EditMode: Boolean read FEditMode write FEditMode;
-    property Font;
-    property FullPath: String read FFileName write SetFileName;
-    property HowManyLoops : Integer read FLoopNumber write FLoopNumber;
+    property FullPath: string read FFileName write SetFileName;
+    property Loops : Integer read FLoopNumber write FLoopNumber;
     property Kind: TKind read FKind;
-    property LastResponsePoint : TResponsePoint read FLRespPnt;
-    //property FileName2: String read FFileName2 write SetFileName;
-    property OnClick;
-    //property OnGesture;
-    property OnMouseDown;
-    property OnMouseEnter;
-    property OnMouseLeave;
-    property OnKeyPress: TNotifyEvent read FKeyPress write FKeyPress;
+    property LastResponseLog : string read FLastResponseLog;
+    property ResponseCount : integer read FResponseCount;
+  public
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
     property OnEndMedia: TNotifyEvent read FOnEndMedia write FOnEndMedia;
-    property Schedule: TSchMan read FSchMan;
-    //property Touch;
+  public
+    property Color;
+    property Caption;
+    property Font;
+    property OnMouseDown;
   end;
 
 implementation
@@ -104,11 +90,9 @@ begin
   Height:= 45;
   Width:= 45;
   EditMode := False;
-  FLRespPnt[0] := 0;
-  FLRespPnt[1] := 0;
   Color:= clRed;
   Edge:= clInactiveCaption;
-  OnMouseDown := @MouseDown;
+  OnMouseDown := @KeyMouseDown;
 
   FSchMan := TSchMan.Create(self);
   with FSchMan do
@@ -147,11 +131,6 @@ begin
       FMedia.fullScreen := True;
     end;  }
   Invalidate;
-end;
-
-procedure TKey.IncResponseCount;
-begin
-  Inc(FResponseCount);
 end;
 
 procedure TKey.Paint;
@@ -199,9 +178,7 @@ begin
       FAudioChannel.Play;
     except
       on E:Exception do
-        begin
-
-        end;
+        WriteLn('TKey Could not play audio.');
     end;
 end;
 
@@ -466,12 +443,13 @@ begin
   Invalidate;
 end;
 
-procedure TKey.MouseDown(Sender: TObject; Button: TMouseButton;
+procedure TKey.KeyMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  //inherited MouseDown(Button, Shift, X, Y);
-  FLRespPnt[0] := X;
-  FLRespPnt[1] := Y;
+  Inc(FResponseCount);
+  FLastResponseLog := ExtractFileNameOnly(FullPath) + #9 +
+                      IntToStr(X + Left) + #9 +
+                      IntToStr(Y + Top);
   FSchMan.DoResponse;
 end;
 
@@ -530,9 +508,5 @@ begin
   if Assigned(OnResponse) then FOnResponse(Self);   //Necessariamente  SELF
 end;
 
-function TKey.ResponseCount: integer;
-begin
-  Result := FResponseCount;
-end;
 
 end.
