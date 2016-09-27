@@ -52,11 +52,13 @@ type
       procedure SubscriberTerminated(Sender : TObject);
     private
       FOnCalibrationStopped: TNotifyMultipartMessage;
+      FOnCalibrationSuccessful: TNotifyMultipartMessage;
       FOnRecordingStarted: TNotifyMultipartMessage;
       FOnRequestReceived : TNotifyRequest;
       FOnMultipartMessageReceived : TNotifyMultipartMessage;
       function GetSubscribed: Boolean;
       procedure SetOnCalibrationStopped(AValue: TNotifyMultipartMessage);
+      procedure SetOnCalibrationSuccessful(AValue: TNotifyMultipartMessage);
       procedure SetOnMultiPartMessageReceived(AValue: TNotifyMultipartMessage);
       procedure SetOnRecordingStarted(AValue: TNotifyMultipartMessage);
       procedure SetOnRequestReceived(AValue: TNotifyRequest);
@@ -72,6 +74,7 @@ type
       procedure UnSubscribe(ASub : UTF8String);
       property Subscribed : Boolean read GetSubscribed;
     public
+      property OnCalibrationSuccessful : TNotifyMultipartMessage read FOnCalibrationSuccessful write SetOnCalibrationSuccessful;
       property OnCalibrationStopped : TNotifyMultipartMessage read FOnCalibrationStopped write SetOnCalibrationStopped;
       property OnRecordingStarted : TNotifyMultipartMessage read FOnRecordingStarted write SetOnRecordingStarted;
       property OnRequestReceived : TNotifyRequest read FOnRequestReceived write SetOnRequestReceived;
@@ -279,6 +282,7 @@ begin
     case AMultipartMessage.MsgTopic of
       NOTIFY_RECORDING_STARTED : if Assigned(OnRecordingStarted) then OnRecordingStarted(Self,MPMessage);
       NOTIFY_CALIBRATION_STOPPED : if Assigned(OnCalibrationStopped) then OnCalibrationStopped(Self, MPMessage);
+      NOTIFY_CALIBRATION_SUCCESSFUL : if Assigned(OnCalibrationSuccessful) then OnCalibrationSuccessful(Self, MPMessage);
       else if Assigned(OnMultiPartMessageReceived) then OnMultiPartMessageReceived(Self,MPMessage);
     end;
 
@@ -305,6 +309,13 @@ procedure TPupilCommunication.SetOnCalibrationStopped(
 begin
   if FOnCalibrationStopped = AValue then Exit;
   FOnCalibrationStopped := AValue;
+end;
+
+procedure TPupilCommunication.SetOnCalibrationSuccessful(
+  AValue: TNotifyMultipartMessage);
+begin
+  if FOnCalibrationSuccessful=AValue then Exit;
+  FOnCalibrationSuccessful:=AValue;
 end;
 
 function TPupilCommunication.GetSubscribed: Boolean;
