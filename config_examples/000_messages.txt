@@ -21,53 +21,53 @@ LimitedHold= 500
 Msg=	This is a test 1
 
 [Blc 1 - T2]
-Name= M1
+Name= M2
 Kind= MSG
 LimitedHold= 500
 Msg=  This is a test 2
 
 [Blc 1 - T3]
-Name= M1
+Name= M3
 Kind= MSG
 LimitedHold= 500
 Msg=  This is a test 3
 
 [Blc 1 - T4]
-Name= M1
+Name= M4
 Kind= MSG
 LimitedHold= 500
 Msg=  This is a test 4
 
 [Blc 1 - T5]
-Name= M1
+Name= M5
 Kind= MSG
 LimitedHold= 500
 Msg=  This is a test 5
 
 [Blc 1 - T6]
-Name= M1
+Name= M6
 Kind= MSG
 Msg=  This is a test 6
 
 [Blc 1 - T7]
-Name= M1
+Name= M7
 Kind= MSG
 LimitedHold= 500
 Msg=  This is a test 7
 
 [Blc 1 - T8]
-Name= M1
+Name= M8
 Kind= MSG
 LimitedHold= 500
 Msg=  This is a test 8
 
 [Blc 1 - T9]
-Name= M1
+Name= M9
 Kind= MSG
 LimitedHold= 500
 Msg=  This is a test 9
 
 [Blc 1 - T10]
-Name= M1
+Name= M10
 Kind= MSG
 Msg=  This is a test 10
