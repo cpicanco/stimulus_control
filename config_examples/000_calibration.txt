@@ -11,24 +11,95 @@ NumBlc=	1
 
 Name=	Bloco 1
 BkGnd=	16777215
-ITI=	0
-NumTrials=	2 1
+ITI=	1000
+NumTrials=	5 1
 
 [Blc 1 - T1]
 Name=	M1
+Kind=	MSG
+Msg=	This is a test 1
+
+[Blc 1 - T2]
+Name=	C1
 Kind=	CLB
 Cursor=	-1
 
-NumComp = 5
-
-C1Bnd=	52 43 15 15
-C2Bnd=	39 966 15 15
-C3Bnd=	722 31 15 15
-C4Bnd=	724 975 15 15
-C5Bnd=	371 490 15 15
-
-
 [Blc 1 - T3]
-Name=	M5
+
+Name=	FPE 1
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+
+NumComp=	9
+UseMedia=	0
+Starter=	1
+LimitedHold=	3000
+Schedule=	FR 3 0
+Response=	Positiva
+TIET=	NONE,MISS,HIT,
+NextTrial=	0
+
+C1Bnd=	134 390 100 100
+C1Stm=	
+C1Gap=	1
+C1GapDegree=	235
+C1GapLength=	1
+
+C2Bnd=	134 590 100 100
+C2Stm=	
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	134 790 100 100
+C3Stm=	
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	334 390 100 100
+C4Stm=	
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	334 590 100 100
+C5Stm=	
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	334 790 100 100
+C6Stm=	
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	534 390 100 100
+C7Stm=	
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	534 590 100 100
+C8Stm=	
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	534 790 100 100
+C9Stm=	
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T4]
+Name=	C2
+Kind=	CLB
+Cursor=	-1
+
+[Blc 1 - T5]
+Name=	M2
 Kind=	MSG
 Msg=	End.
