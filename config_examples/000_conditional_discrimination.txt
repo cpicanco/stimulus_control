@@ -1,0 +1,73 @@
+[Main]
+
+Name=	Sessão1
+Subject= Participante1
+Type=	CIC
+RootMedia= Media
+RootData= Data
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	0
+NumTrials=	2 1
+
+[Blc 1 - T1]
+Name=	M1
+Kind=	MTS
+
+Delayed = True
+Delay = 2000
+SBnd=400 142 100 100
+SStm=A1.bmp 0 200
+SSch=CRF
+SMsg= M - 1
+
+NumComp = 2
+
+C1Bnd=500 388 200 100
+C1Stm=A1.bmp 0 200
+C1Sch=CRF
+C1IET=CSQ1.wav 0 -1 1
+C1Msg=A1 - 9
+C1Res=HIT
+C1Nxt=0
+
+C2Bnd=142 534 100 100
+C2Stm=A1.bmp 0 255
+C2Sch=EXT
+C2IET=CSQ1.wav 0 -1 1
+C2Msg=A2 - 4
+C2Res=NONE
+C2Nxt=0
+
+[Blc 1 - T2]
+Name= M1
+Kind= MTS
+
+Delayed = False
+
+SBnd=500 142 200 200
+SStm=A1.bmp 0 200
+SSch=CRF
+SMsg= M - 1
+
+NumComp = 2
+
+C1Bnd=142 242 100 100
+C1Stm=A1.bmp 0 255
+C1Sch=CRF
+C1IET=HIT
+C1Msg=A1 - 18
+C1Res=HIT
+C1Nxt=0
+
+C2Bnd=334 388 100 100
+C2Stm=A1.bmp 0 200
+C2Sch=CRF
+C2IET=MISS
+C2Msg=A1 - 9
+C2Res=MISS
+C2Nxt=0
