@@ -14,10 +14,9 @@ unit trial_calibration;
 interface
 
 uses LCLIntf, Classes, SysUtils
+    , pupil_communication
     , trial_abstract
     , Graphics
-    , constants
-    , timestamps
     ;
 
 type
@@ -43,48 +42,98 @@ type
   }
   TCLB = class(TTrial)
   private
+    FBlocking,
     FShowDots : Boolean;
     FDataSupport : FDataSupport;
-  protected
     procedure None(Sender: TObject);
-    procedure ThreadClock(Sender: TObject); //override;
+    procedure PupilCalibrationSuccessful(Sender: TObject; AMultiPartMessage : TMPMessage);
+  private
+    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+  protected
+    procedure BeforeEndTrial(Sender: TObject); override;
     procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
 
     { TCustomControl overrides }
-    procedure KeyDown(var Key: Word; Shift: TShiftState); override;
-    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(Correction : Boolean); override;
+    procedure Play(ACorrection : Boolean); override;
   end;
 
 
 
 implementation
 
+uses constants, timestamps, background;
+
 { TCLB }
+
+procedure TCLB.PupilCalibrationSuccessful(Sender: TObject;
+  AMultiPartMessage: TMPMessage);
+begin
+  FrmBackground.Show;
+  FrmBackground.SetFullScreen(True);
+  if not FBlocking then
+    EndTrial(Self);
+end;
+
+procedure TCLB.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Key = 27 {ESC}) and (FShowDots = True) then
+    begin
+      //FShowDots:= False;
+      Invalidate;
+    end;
+end;
+
+procedure TCLB.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if Key = 27 {ESC} then
+      begin
+        //FShowDots := True;
+        Invalidate;
+      end;
+
+    if ssCtrl in Shift then
+      begin
+        if key = 66 {b} then
+          begin
+            Result := 'NONE';
+            IETConsequence := 'NONE';
+            NextTrial := '0'; // NextTrial
+            EndTrial(Self)
+          end;
+
+        if key = 67 {c} then // start pupil calibration
+          begin
+            if GlobalContainer.PupilEnabled then
+              GlobalContainer.PupilClient.Request(REQ_SHOULD_START_CALIBRATION);
+            FrmBackground.Hide;
+          end;
+      end;
+end;
 
 procedure TCLB.None(Sender: TObject);
 begin
-  { This trial type does not implement an OnNone event }
+  { Implement an OnNone event here }
   if Assigned(OnNone) then OnNone(Sender);
 end;
 
-procedure TCLB.ThreadClock(Sender: TObject);
+procedure TCLB.BeforeEndTrial(Sender: TObject);
 begin
-  Hide;
+  // Trial Result
+  Result := 'NONE';
+  IETConsequence := 'NONE';
   FDataSupport.TrialEnd := TickCount;
-  WriteData(Sender);
 
-  if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
-  if Assigned(OnEndTrial) then OnEndTrial(Sender);
+  // Write Data
+  WriteData(Sender);
 end;
 
 procedure TCLB.StartTrial(Sender: TObject);
 begin
-  FShowDots := True;
   FDataSupport.TrialBegin := TickCount;
   inherited StartTrial(Sender);
 end;
@@ -92,52 +141,11 @@ end;
 procedure TCLB.WriteData(Sender: TObject);
 begin
   Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
-           FloatToStrF(FDataSupport.TrialBegin - TimeStart, ffFixed, 0,9) + #9 +
-           FloatToStrF(FDataSupport.TrialEnd - TimeStart, ffFixed, 0,9) + #9 +
+           TimestampToStr(FDataSupport.TrialBegin - TimeStart) + #9 +
+           TimestampToStr(FDataSupport.TrialEnd - TimeStart) + #9 +
            IntToStr(Length(FDataSupport.Dots)) +
            Data;
-
-end;
-
-procedure TCLB.KeyDown(var Key: Word; Shift: TShiftState);
-begin
-  inherited KeyDown(Key, Shift);
-
-  if (Key = 27 {ESC}) and (FShowDots = True) then
-    begin
-      FShowDots:= False;
-      Invalidate;
-    end;
-end;
-
-procedure TCLB.KeyUp(var Key: Word; Shift: TShiftState);
-begin
-  inherited KeyUp(Key, Shift);
-
-  if Key = 27 {ESC} then
-    begin
-      FShowDots := True;
-      Invalidate;
-    end;
-
-  if ssCtrl in Shift then
-    begin
-      if key = 66 {b} then
-        begin
-          Result := 'NONE';
-          IETConsequence := 'NONE';
-          NextTrial := '0'; // NextTrial
-          EndTrial(Self)
-        end;
-
-      if key = 67 {c} then // start pupil calibration
-        begin
-          Result := 'NONE';
-          IETConsequence := 'NONE';
-          NextTrial := '0'; // NextTrial
-          EndTrial(Self)
-        end;
-    end;
+  if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
 end;
 
 procedure TCLB.Paint;
@@ -165,7 +173,9 @@ end;
 constructor TCLB.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-
+  OnBeforeEndTrial := @BeforeEndTrial;
+  OnKeyDown := @TrialKeyDown;
+  OnKeyUp := @TrialKeyUp;
   FShowDots := False;
 
   with Canvas do
@@ -184,27 +194,40 @@ begin
             ;
 end;
 
-procedure TCLB.Play(Correction: Boolean);
+procedure TCLB.Play(ACorrection: Boolean);
 var
   s1 : string;
 
   NumComp,
   i : integer;
-
 begin
+  inherited Play(ACorrection);
+
   NumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
-  SetLength(FDataSupport.Dots, NumComp);
-  for i := Low(FDataSupport.Dots) to High(FDataSupport.Dots) do
+  FShowDots := StrToBoolDef(CfgTrial.SList.Values[_ShowDots], False);
+  FBlocking := StrToBoolDef(CfgTrial.SList.Values[_Blocking], False);
+  if NumComp > 0 then
     begin
-      s1 := CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
-      FDataSupport.Dots[i].Y := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); // top, left, width, height
-      NextSpaceDelimitedParameter(s1);
+      SetLength(FDataSupport.Dots, NumComp);
+      for i := Low(FDataSupport.Dots) to High(FDataSupport.Dots) do
+        begin
+          s1 := CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
+          FDataSupport.Dots[i].Y := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); // top, left, width, height
+          NextSpaceDelimitedParameter(s1);
 
-      FDataSupport.Dots[i].X := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-      NextSpaceDelimitedParameter(s1);
+          FDataSupport.Dots[i].X := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+          NextSpaceDelimitedParameter(s1);
 
-      FDataSupport.Dots[i].Size := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+          FDataSupport.Dots[i].Size := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+        end;
     end;
+
+  if GlobalContainer.PupilEnabled then
+    with GlobalContainer.PupilClient do
+      begin
+      OnCalibrationSuccessful := @PupilCalibrationSuccessful;
+      Request(REQ_SHOULD_START_CALIBRATION);
+      end;
   StartTrial(Self);
 end;
 
