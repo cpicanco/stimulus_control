@@ -32,6 +32,7 @@ const
   _RootMedia  = 'RootMedia';
   _NumBlc = 'NumBlc';
   _Type = 'Type';
+  _ServerAddress = 'ServerAddress';
 
   // Blc
   _NumTrials = 'NumTrials';
@@ -75,6 +76,10 @@ const
   // MTS
   _Delayed = 'Delayed';
   _Delay = 'Delay';
+
+  // TCLB
+  _ShowDots = 'ShowDots';
+  _Blocking = 'Blocking';
 
   // SIMPLE
   _NumComp = 'NumComp';   // number of stimuli on screen / comparisons
