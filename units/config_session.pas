@@ -14,7 +14,6 @@ unit config_session;
 interface
 
 uses Classes, ComCtrls, IniFiles, SysUtils,  Dialogs, Forms
-    , constants
     , pupil_communication
     ;
 
@@ -24,6 +23,7 @@ type
 
   TGlobalContainer = class //(TObject)
     PupilClient: TPupilCommunication;
+    PupilEnabled : Boolean;
     RootData: string;
     RootMedia: string;
     TimeStart : Extended;
@@ -97,18 +97,23 @@ type
 
   TCfgSes = class(TComponent)
   private
+    FFilename: string;
     FGlobalContainer : TGlobalContainer;
 
     // todo: refactoring
     FData: string;
     FMedia: string;
     FLoaded : Boolean;
+    FEditMode : Boolean;
 
     // session only
     FSessionName: string;
     FSessionSubject : string;
     FSessionType : string;
+    FSessionServer : string;
     function GetCfgBlc(Ind: Integer): TCfgBlc;
+    function GetPupilEnabled: Boolean;
+    procedure SetPupilEnabled(AValue: Boolean);
   protected
     FCol: integer;
     FRow: integer;
@@ -119,15 +124,19 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function LoadFromFile(FileName: string; EdtMode : Boolean): Boolean;
+    function LoadFromFile(AFileName: string; AEditMode : Boolean): Boolean;
     function LoadTreeFromFile(FileName:string; aTree : TTreeView):Boolean;
     procedure SetLengthVetBlc;
-    procedure SetLengthVetTrial (Blc : Integer);
+    procedure SetLengthVetTrial(Blc : Integer);
+    property EditMode : Boolean read FEditMode;
   public
     property GlobalContainer : TGlobalContainer read FGlobalContainer;
+    property PupilEnabled : Boolean read GetPupilEnabled write SetPupilEnabled;
     property SessionName : string read FSessionName write FSessionName;
     property SessionSubject : string read FSessionSubject write FSessionSubject;
     property SessionType : string read FSessionType write FSessionType;
+    property SessionServer : string read FSessionServer write FSessionServer;
+    property Filename : string read FFilename;
   public
     property Blcs : TVetCfgBlc read FBlcs write FBlcs;
     property Blc[I: Integer]: TCfgBlc read GetCfgBlc;
@@ -150,14 +159,27 @@ resourcestring
   messLevel_04_M = 'Mensagem';
   DefName = 'No name';
   DefSubject = 'No subject';
+  DefAddress = 'localhost:5020';
 
 implementation
 
+uses constants;
 { TCfgSes }
 
 function TCfgSes.GetCfgBlc(Ind: Integer): TCfgBlc;
 begin
   Result:= FBlcs[Ind];
+end;
+
+function TCfgSes.GetPupilEnabled: Boolean;
+begin
+  Result := FGlobalContainer.PupilEnabled;
+end;
+
+procedure TCfgSes.SetPupilEnabled(AValue: Boolean);
+begin
+  if FGlobalContainer.PupilEnabled=AValue then Exit;
+  FGlobalContainer.PupilEnabled:=AValue;
 end;
 
 constructor TCfgSes.Create(AOwner: TComponent);
@@ -228,11 +250,11 @@ begin
     end;
 end;
 
-function TCfgSes.LoadFromFile(FileName: string; EdtMode : Boolean): Boolean;
+function TCfgSes.LoadFromFile(AFileName: string; AEditMode: Boolean): Boolean;
 var
   a1, a2, a3, a4: Integer; s1: string;
   LIniFile: TCIniFile;
-  NumList : TStringList;
+  LNumList : TStringList;
 
   function GetBarPosition(NowNumber, MaxNumber : integer):integer;
   begin
@@ -242,19 +264,21 @@ var
   procedure HandleRootPath(var APath : string);
   begin
     while Pos(PathDelim, s1) <> 0 do Delete(s1, 1, Pos(PathDelim, s1));
-    APath:= ExtractFilePath(FileName) + s1;
+    APath:= ExtractFilePath(AFileName) + s1;
     if not (APath[Length(APath)] = PathDelim) then APath:= APath + PathDelim;
   end;
 
   procedure ListCreate;
   begin
-    NumList := TStringList.Create;
-    //NumList.Sorted := False;
-    NumList.Duplicates := dupIgnore;
+    LNumList := TStringList.Create;
+    //LNumList.Sorted := False;
+    LNumList.Duplicates := dupIgnore;
   end;
 begin
-  if FileExists(FileName) then begin
-    LIniFile:= TCIniFile.Create(FileName);
+  if FileExists(AFileName) then begin
+    FEditMode := AEditMode;
+    FFilename := AFileName;
+    LIniFile:= TCIniFile.Create(AFileName);
     with LIniFile do begin
       //frmMain.Statusbar1.Panels[0].Text := messLoading;
       if  SectionExists(_Main) and
@@ -265,6 +289,7 @@ begin
         FSessionSubject := ReadString(_Main, _Subject, DefSubject);
         FSessionType := ReadString(_Main, _Type, T_CIC);
         FNumBlc := ReadInteger(_Main, _NumBlc, 0);
+        FSessionServer := ReadString(_Main,_ServerAddress, DefAddress);
 
         // set media and data paths
         s1 := ReadString(_Main, _RootMedia, '');
@@ -320,7 +345,7 @@ begin
               end;
           end;
         //ShowMessage(FormatFloat('#####,###',GetTickCount - Fddd));
-        if EdtMode then
+        if AEditMode then
           begin
             if SectionExists(_Positions) and ValueExists(_Positions, _NumPos) then
               begin
@@ -343,7 +368,7 @@ begin
                       end;
                   end;
                 ListCreate;
-                for a4 := 0 to FNumPos - 1 do NumList.Add(ReadString(_Positions, _Pos + IntToStr(a4 + 1), '0'));
+                for a4 := 0 to FNumPos - 1 do LNumList.Add(ReadString(_Positions, _Pos + IntToStr(a4 + 1), '0'));
 
                 for a1:= Low(FBlcs) to High(FBlcs) do
                   for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
@@ -351,27 +376,27 @@ begin
                       FBlcs[a1].Trials[a2].SList.BeginUpdate;
                       with FBlcs[a1].Trials[a2].SList do
                         begin
-                          if NumList.IndexOf(Values[_Samp + _cBnd]) = -1 then
+                          if LNumList.IndexOf(Values[_Samp + _cBnd]) = -1 then
                             Values[_Samp + _cBnd] := '1'
                           else
                             begin
                               Values[_Samp + _cBnd] :=
-                              IntToStr(NumList.IndexOf(Values[_Samp + _cBnd]) + 1);
+                              IntToStr(LNumList.IndexOf(Values[_Samp + _cBnd]) + 1);
                             end;
                         end;
                       if FBlcs[a1].Trials[a2].NumComp > 0 then
                         for a3 := 0 to (FBlcs[a1].Trials[a2].NumComp - 1) do
                             with FBlcs[a1].Trials[a2].SList do
                               begin
-                                if NumList.IndexOf(Values[_Comp + IntToStr(a3 + 1) + _cBnd]) = -1 then
+                                if LNumList.IndexOf(Values[_Comp + IntToStr(a3 + 1) + _cBnd]) = -1 then
                                   Values[_Comp+IntToStr(a3+1)+_cBnd]:= '1'
                                 else
-                                  Values[_Comp+IntToStr(a3+1)+_cBnd]:= IntToStr(NumList.IndexOf(Values[_Comp+IntToStr(a3+1)+_cBnd])+1);
+                                  Values[_Comp+IntToStr(a3+1)+_cBnd]:= IntToStr(LNumList.IndexOf(Values[_Comp+IntToStr(a3+1)+_cBnd])+1);
                               end;
 
                       FBlcs[a1].Trials[a2].SList.EndUpdate;
                     end;
-                NumList.Free;
+                LNumList.Free;
               end;
           end;
         FLoaded := True; //Diferencia "Abrir Sessão" de "Nova sessão".
