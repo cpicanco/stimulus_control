@@ -19,7 +19,6 @@ uses Classes, Controls, LCLIntf, LCLType,
 
      , config_session
      , regdata
-     , constants
      , response_key
      , countermanager
      , custom_timer
@@ -139,12 +138,11 @@ type
 
 implementation
 
-uses
-  timestamps
-{$ifdef DEBUG}
-  , debug_logger
-{$endif}
-  ;
+uses constants, timestamps
+     {$ifdef DEBUG}
+     , debug_logger
+     {$endif}
+     ;
 constructor TBlc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -421,7 +419,7 @@ begin
 
           FCounterManager.OnNotCorrection(Sender);
           FCounterManager.CurrentTrial := StrToIntDef(FTrial.NextTrial, 0) - 1;
-          FCounterManager.OnNxtTrial (Sender);
+          FCounterManager.OnNxtTrial(Sender);
           FIsCorrection := False;
         end
       else // go to the next trial,
@@ -430,7 +428,7 @@ begin
             FCounterManager.VirtualTrialLoop := FCounterManager.VirtualTrialValue;
 
           FCounterManager.OnNotCorrection(Sender);
-          FCounterManager.OnEndTrial (Sender);
+          FCounterManager.OnEndTrial(Sender);
           FIsCorrection := False;
         end;
 
@@ -691,7 +689,7 @@ begin
   FIETMedia.Parent:= FBackGround;
   FIETMedia.OnConsequence:= @IETConsequence;
   FIETMedia.OnResponse:= @IETResponse;
-  FIETMedia.HowManyLoops := StrToIntDef(HowManyLoops, 1) - 1;
+  FIETMedia.Loops := StrToIntDef(HowManyLoops, 1) - 1;
   FIETMedia.Color := StrToIntDef(Color, 0);
   FIETMedia.Width := Screen.Width;
   FIETMedia.Height := Screen.Height;
