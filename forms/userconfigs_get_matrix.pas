@@ -84,12 +84,12 @@ type
     //FEscriba : TEscriba;
     //FOnPosCfg: TNotifyEvent;
   public
-    property aBackGround : TForm read FBackground write FBackground;
+    property BackGround : TForm read FBackground write FBackground;
 
   end;
 
 var
-  MatrixConfigForm : TMatrixConfigForm;
+  FrmMatrixConfig : TMatrixConfigForm;
 
 resourcestring
   CMatrizDefault = '1';
@@ -99,7 +99,7 @@ resourcestring
 
 implementation
 
-uses {background,} userconfigs_simple_discrimination_matrix;
+uses userconfigs_simple_discrimination_matrix;
 
 {$R *.lfm}
 
@@ -147,7 +147,7 @@ begin
         TForm(Application.Components[i]).Visible := True;
         Break;
       end;
-  aBackground.Free;
+  Background.Hide;
   {$IFDEF WINDOWS}
   Close;
   {$ELSE}
@@ -169,7 +169,7 @@ begin
       end;
   if lbCoordenates.Items.Text <> '' then
     TMatrixForm(Application.Components[i]).SetMatrix(lbCoordenates.Items);
-  aBackground.Free;
+  Background.Hide;
   {$IFDEF WINDOWS}
   Close;
   {$ELSE}
@@ -303,7 +303,7 @@ end;
 
 procedure TMatrixConfigForm.FormActivate(Sender: TObject);
 begin
-  FDrawCoordenates := TAleatorizator.Create(aBackground, lbCoordenates.Items);
+  FDrawCoordenates := TAleatorizator.Create(Background, lbCoordenates.Items);
 end;
 
 procedure TMatrixConfigForm.FormCreate(Sender: TObject);

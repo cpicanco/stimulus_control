@@ -147,7 +147,7 @@ procedure btnAddAxisClick(Sender: TObject);
   end;
 
 var
-  BresenhamLineForm: TBresenhamLineForm;
+  FrmBresenhamLine: TBresenhamLineForm;
 
 implementation
 
