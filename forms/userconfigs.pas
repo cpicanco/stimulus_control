@@ -36,22 +36,19 @@ type
   { TUserConfig }
 
   TUserConfig = class(TForm)
+    btnClientTest: TButton;
     btnFillCondition: TButton;
     btnRun: TButton;
     btnRandomize: TButton;
     btnSave: TButton;
-    btnNextStimuli: TButton;
-    btnNextGeneral: TButton;
-    btnNextTrials: TButton;
-    btnClientTest: TButton;
     btnTargetFile: TButton;
     btnContentFile: TButton;
     btnApply: TButton;
     btnExportStimulus: TButton;
-    cbPupilClient: TCheckBox;
+    chkPupilClient: TCheckBox;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
-    cbDataTicks: TCheckBox;
+    chkDataTicks: TCheckBox;
     cbDrawTrialGroup: TCheckBox;
     chkPlayOnSecondMonitor: TCheckBox;
     edtTrialGroup: TEdit;
@@ -60,8 +57,6 @@ type
     gbRepetitions: TGroupBox;
     gbTrialGroup: TGroupBox;
     Image1: TImage;
-    leServerAddress: TLabeledEdit;
-    lblITI: TLabel;
     leParticipant: TLabeledEdit;
     leFillValue: TLabeledEdit;
     leSessionName: TLabeledEdit;
@@ -84,7 +79,6 @@ type
     pmFillCondition: TPopupMenu;
     SaveDialog1: TSaveDialog;
     seCount: TSpinEdit;
-    seITI: TSpinEdit;
     stAppTitle: TStaticText;
     stVersion: TStaticText;
     StringGrid1: TStringGrid;
@@ -149,7 +143,7 @@ type
   end;
 
 var
-  UserConfig: TUserConfig;
+  FrmUserConfig: TUserConfig;
 resourcestring
   rsPosition = 'Bnd';
   rsComparison = 'C';
@@ -486,10 +480,9 @@ begin
   //if Assigned(FSession) then FreeAndNil(FSession);
   //if Assigned(FConfigs) then FreeAndNil(FConfigs);
   //if Assigned(FManager) then FreeAndNil(FManager);
-  //if Assigned(FAudioDevice) then FreeAndNil(FAudioDevice);
-  //bkgnd.SetFullScreen(False);
-  bkgnd.Hide;
-  //if Assigned(bkgnd) then FreeAndNil(bkgnd);
+  //FrmBackground.SetFullScreen(False);
+  FrmBackground.Hide;
+  //if Assigned(FrmBackground) then FreeAndNil(FrmBackground);
   ShowMessage(rsEndSession)
 end;
 
@@ -724,13 +717,13 @@ end;
 procedure TUserConfig.btnClientTestClick(Sender: TObject);
 var PupilClient : TPupilCommunication;
 begin
-  PupilClient := TPupilCommunication.Create(leServerAddress.Text);
+  PupilClient := TPupilCommunication.Create('localhost:5020');
   PupilClient.OnRequestReceived := @ReceiveTimestamp;
 
   PupilClient.Start;
   PupilClient.Request(REQ_TIMESTAMP);
 
-  Sleep (1000);
+  Sleep(1000);
   PupilClient.Terminate;
 end;
 
@@ -868,7 +861,7 @@ begin
 
       FEscriba.Name := leSessionName.Text;
       FEscriba.SessionSubject := leParticipant.Text;
-      FEscriba.Blcs[aBlc].ITI := seITI.Value;
+      FEscriba.Blcs[aBlc].ITI := 1000;
       FEscriba.SessionType  := T_CIC;
       FEscriba.Data := 'Data';
       FEscriba.Media:= 'Media';
@@ -928,7 +921,7 @@ begin
 
       FEscriba.Name := leSessionName.Text;
       FEscriba.SessionSubject := leParticipant.Text;
-      FEscriba.Blcs[aBlc].ITI := seITI.Value;
+      FEscriba.Blcs[aBlc].ITI := 1000;
       FEscriba.SessionType  := 'CIC';
       FEscriba.Data := 'Data';
       FEscriba.Media:= 'Media';
@@ -1024,7 +1017,7 @@ var
 
   procedure AddAxesToGrid;
   begin
-    with BresenhamLineForm.Axis do
+    with FrmBresenhamLine.Axis do
       begin
         cX0 := IntToStr(List[aAxis].Line[aNode].X);
         cY0 := IntToStr(List[aAxis].Line[aNode].Y);
@@ -1057,7 +1050,7 @@ var
     aContingency, aConsequence, aPosition : string;
 
   begin
-    if MatrixForm.Trials[aTrial].Positive then
+    if FrmMatrix.Trials[aTrial].Positive then
       begin
         aContingency := rsPositive;
         aConsequence := rsDefaultPositiveCsq;
@@ -1077,27 +1070,27 @@ var
         Cells[3, aRow] := aConsequence;
         aCol := 4;
 
-        LowComp := Low(MatrixForm.Trials[aTrial].Comps);
-        HighComp := High(MatrixForm.Trials[aTrial].Comps);
+        LowComp := Low(FrmMatrix.Trials[aTrial].Comps);
+        HighComp := High(FrmMatrix.Trials[aTrial].Comps);
         //ShowMessage(IntToStr(LowComp) + ' ' + IntToStr(HighComp));
         for aComp := LowComp to HighComp do
           begin
             if (aCol + 1) > ColCount then ColCount := aCol + 1;
             Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1);
-            Cells[aCol, aRow] := MatrixForm.Trials[aTrial].Comps[aComp].Path;
+            Cells[aCol, aRow] := FrmMatrix.Trials[aTrial].Comps[aComp].Path;
             Inc(aCol);
           end;
 
-        LowComp := Low(MatrixForm.Trials[aTrial].Comps);
-        HighComp := High(MatrixForm.Trials[aTrial].Comps);
+        LowComp := Low(FrmMatrix.Trials[aTrial].Comps);
+        HighComp := High(FrmMatrix.Trials[aTrial].Comps);
         for aComp := LowComp to HighComp do
           begin
             if (aCol + 1) > ColCount then ColCount := aCol + 1;
             Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1) + rsPosition;
-            aPosition := IntToStr(MatrixForm.Trials[aTrial].Comps[aComp].Top) + #32 +
-                         IntToStr(MatrixForm.Trials[aTrial].Comps[aComp].Left) + #32 +
-                         IntToStr(MatrixForm.Trials[aTrial].Comps[aComp].Width) + #32 +
-                         IntToStr(MatrixForm.Trials[aTrial].Comps[aComp].Height);
+            aPosition := IntToStr(FrmMatrix.Trials[aTrial].Comps[aComp].Top) + #32 +
+                         IntToStr(FrmMatrix.Trials[aTrial].Comps[aComp].Left) + #32 +
+                         IntToStr(FrmMatrix.Trials[aTrial].Comps[aComp].Width) + #32 +
+                         IntToStr(FrmMatrix.Trials[aTrial].Comps[aComp].Height);
 
             Cells[aCol, aRow] := aPosition;
             Inc(aCol);
@@ -1124,14 +1117,14 @@ begin
   if piAxes.Checked then
   begin
     aRow := 1;
-    BresenhamLineForm := TBresenhamLineForm.Create(Application);
+    FrmBresenhamLine := TBresenhamLineForm.Create(Application);
     if chkPlayOnSecondMonitor.Checked then
-       BresenhamLineForm.Left := Screen.Width + 1;
+       FrmBresenhamLine.Left := Screen.Width + 1;
 
-    if BresenhamLineForm.ShowModal = mrOk then
+    if FrmBresenhamLine.ShowModal = mrOk then
       begin
-        for aRepeat := 0 to BresenhamLineForm.seRepeat.Value -1 do
-          with BresenhamLineForm.Axis do
+        for aRepeat := 0 to FrmBresenhamLine.seRepeat.Value -1 do
+          with FrmBresenhamLine.Axis do
             for aAxis := Low(List) to High(List) do
               begin
                 cAngle := List[aAxis].Angle;
@@ -1144,7 +1137,7 @@ begin
         {$ifdef DEBUG}
           DebugLn(mt_Information + BresenhamLineForm.ClassName +  ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
         {$endif}
-        BresenhamLineForm.Free;
+        FrmBresenhamLine.Free;
         ResetRepetionMatrix;
         FLastFocusedCol := -1;
       end;
@@ -1166,20 +1159,20 @@ begin
     begin
       aRow := 1;
       aCol := 0;
-      MatrixForm := TMatrixForm.Create(Application);
+      FrmMatrix := TMatrixForm.Create(Application);
       if chkPlayOnSecondMonitor.Checked then
-          MatrixForm.Left := Screen.Width + 1;
+          FrmMatrix.Left := Screen.Width + 1;
 
 
-      if MatrixForm.ShowModal = mrOk then
+      if FrmMatrix.ShowModal = mrOk then
           begin
-            for aTrial := Low(MatrixForm.Trials) to High(MatrixForm.Trials) do AddMatrixTrialToGrid;
+            for aTrial := Low(FrmMatrix.Trials) to High(FrmMatrix.Trials) do AddMatrixTrialToGrid;
 
             //FNumTrials := aRow - 1;
             {$ifdef DEBUG}
               DebugLn(mt_Information + MatrixForm.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
             {$endif}
-            MatrixForm.Free;
+            FrmMatrix.Free;
             ResetRepetionMatrix;
             FLastFocusedCol := -1;
           end;
@@ -1188,7 +1181,8 @@ end;
 
 procedure TUserConfig.FormCreate(Sender: TObject);
 begin
-  Randomize;
+  FAudioDevice := TBassAudioDevice.Create(WindowHandle);
+  FrmBackground := TBackground.Create(Application);
   FLastFocusedCol := -1;
   StringGrid1.ColCount := 9;
   Caption := Application.Title;
@@ -1213,7 +1207,7 @@ begin
       //aRowCount := RowCount;
       //aColCount := ColCount;
     end;
-
+  Randomize;
   ResetRepetionMatrix;
 
   FEscriba := TEscriba.Create(Application);
@@ -1224,9 +1218,8 @@ end;
 
 procedure TUserConfig.FormDestroy(Sender: TObject);
 begin
-  //FPosArray.Free;
+  FAudioDevice.Free;
 end;
-
 
 procedure TUserConfig.btnRunClick(Sender: TObject);
 var aDirectory, aDataName : string;
@@ -1236,40 +1229,32 @@ begin
   //FData.SaveData('Participante:' + #9 + leParticipant.Text + LineEnding +
   //               'Sessão:' + #9 + IntToStr(FData.SessionNumber) + LineEnding +
   //               'Data:' + #9 + DateTimeToStr(Date)+ LineEnding + LineEnding);
-  aDataName := '000.data';
   aDirectory := GetCurrentDirUTF8 + PathDelim + leParticipant.Text;
   if ForceDirectoriesUTF8(aDirectory) then
       OpenDialog1.InitialDir := aDirectory;
 
   if OpenDialog1.Execute then
     begin
-      FSession := TSession.Create(nil);
-      if not Assigned(bkgnd) then
-        bkgnd := Tbkgnd.Create(Application);
-      bkgnd.Show;
+      FrmBackground.Show;
+      FrmBackground.SetFullScreen(True);
       if chkPlayOnSecondMonitor.Checked then
-         bkgnd.Left := Screen.Width + 1;
+         FrmBackground.Left := Screen.Width + 1;
 
+      FSession := TSession.Create(nil);
       FConfigs := TCfgSes.Create(FSession);
       FConfigs.LoadFromFile(OpenDialog1.Filename, False);
+      FConfigs.PupilEnabled := chkPupilClient.Checked;
 
-      if not Assigned(FAudioDevice) then FAudioDevice := TBassAudioDevice.Create(WindowHandle);
-
-
+      aDataName := '000.data';
       with FSession do
         begin
           OnEndSess:= @EndSession;
           AudioDevice := FAudioDevice;
-          BackGround := bkgnd;
-          DataTicks := cbDataTicks.Checked;
-          ServerAddress := leServerAddress.Text;
-          PupilClientEnabled := cbPupilClient.Checked;
-          SessName := FConfigs.Name;
-          SubjName := FConfigs.SessionSubject;
-          ShowCounter := False;
+          BackGround := FrmBackground;
+          DataTicks := chkDataTicks.Checked;
           Configs := FConfigs;
           TestMode := False;
-
+          ShowCounter := False;
           Play(aDataName);
 
         end;
