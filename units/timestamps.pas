@@ -49,14 +49,6 @@ end;
 procedure TimestampLn(msg: string);
 begin
   TimestampLogger.SaveData(GetTimeStampF + #9 + msg + LineEnding);
-
-  //if TextRec(Timestamps.DataFile).Mode <> 55218 then
-  //  begin
-  //    Timestamps.AssignFFile;
-  //    Timestamps.AppendF;
-  //  end;
-  // WriteLn(Timestamps.DataFile, msg);
-  //Timestamps.CloseFFile;
 end;
 
 

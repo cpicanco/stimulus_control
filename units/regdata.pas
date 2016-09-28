@@ -115,11 +115,7 @@ end;
 
 procedure TRegData.SaveData(Data: string);
 begin
-  if FFileName <> '' then
-    begin
-      Write(FFile, Data);
-    end
-  else {$ifdef DEBUG}  WriteLn( FFile, mt_Warning + 'Filename is empty.' + '[' + Data + ']' + 'will not be saved.' + LineEnding)  {$endif} ;
+  Write(FFile, Data);
 end;
 
 procedure TRegData.AppendF;
