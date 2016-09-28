@@ -252,6 +252,7 @@ end;
 
 procedure TCounterManager.BkGndResponse(Sender: TObject);
 begin
+  Inc(FBkGndResponses);
   Inc(FTrialBkGndResponses);
 end;
 
@@ -309,6 +310,8 @@ procedure TCounterManager.EndTrial(Sender: TObject);
 begin
   Inc(FTrials);
   Inc(FCurrentTrial);
+  FTrialBkGndResponses := 0;
+  FTrialStmResponses := 0;
 end;
 
 //cada Trial.Consequence pode produzir um 'acerto' ou um 'erro' (uTrialMTS e uTrialSimpl);
