@@ -16,11 +16,9 @@ interface
 uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
     , trial_abstract
-    , constants
     , schedules_main
     , response_key
     , custom_timer
-    , timestamps
     ;
 
 type
@@ -81,19 +79,19 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Play(Correction : Boolean); override;
+    procedure Play(ACorrection : Boolean); override;
     property Cycles : integer read GetCycles;
 
   end;
 
 implementation
 
-{$ifdef DEBUG}
-uses
-  debug_logger
-, dialogs;
-{$endif}
-
+uses constants, timestamps
+     {$ifdef DEBUG}
+     , debug_logger
+     , dialogs
+     {$endif}
+     ;
 constructor TDZT.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -195,7 +193,7 @@ begin
   {$endif}
   aConsequence := TKey.Create(Self);
   aConsequence.Parent:= Self;
-  aConsequence.HowManyLoops := 0;
+  aConsequence.Loops := 0;
   aConsequence.FullPath := RootMedia + FConsequence;
   aConsequence.Play;
   LogEvent('C');
@@ -333,27 +331,15 @@ begin
     end;
 end;
 
-procedure TDZT.Play(Correction : Boolean);
+procedure TDZT.Play(ACorrection: Boolean);
 var
   s1 : string;
   R : TRect;
 
   NumComp, a1 : Integer;
 begin
+  inherited Play(ACorrection);
   FResponseEnabled := False;
-  Randomize;
-
-  // self descends from TCustomControl
-  Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], 0);
-
-  if TestMode then Cursor:= 0
-  else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
-
-  // self descends from TTrial
-  Result := '';
-  NextTrial := CfgTrial.SList.Values[_NextTrial];
-  RootMedia := GlobalContainer.RootMedia;
-  FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
 
   // self
   FDizzyTimer.Schedule := CfgTrial.SList.Values[_Schedule];
@@ -364,11 +350,9 @@ begin
       OnResponse:= @Response;
       Kind := FDizzyTimer.Schedule;
       if Loaded then
-        begin
-          SetLength(FClockList, Length(FClockList) + 1);
-          FClockList[Length(FClockList) -1] := StartMethod;
-        end
-      else raise Exception.Create(ExceptionNoScheduleFound);
+        AddToClockList(StartMethod)
+      else
+        raise Exception.Create(ExceptionNoScheduleFound);
     end;
 
   s1 := CfgTrial.SList.Values[_Trial + _cRes] + #32;
@@ -500,22 +484,17 @@ end;
 
 procedure TDZT.WriteData(Sender: TObject);  //
 var
-    Latency, Timer2, Version, Mode : string;
+    Latency, Timer2 : string;
 begin
   if not FFirstResp then
-    Latency := FloatToStrF(FDataSupport.Latency - TimeStart,ffFixed,0,9)
+    Latency := TimestampToStr(FDataSupport.Latency - TimeStart)
   else Latency := #32#32#32#32#32#32 + 'NA';
 
   if FDataSupport.Timer2 <> TimeStart then
-    Timer2 :=  FloatToStrF(FDataSupport.Timer2 - TimeStart,ffFixed,0,9)
+    Timer2 := TimestampToStr(FDataSupport.Timer2 - TimeStart)
   else Timer2 := #32#32#32#32#32#32 + 'NA';
 
-  Version := FDizzyTimer.Version;
-
-  Mode := FDizzyTimer.Mode;
-
   {
-
   Header :=  'StmBegin' + #9 +
              '_Latency' + #9 +
              '___Cycle' + #9 +
@@ -526,18 +505,17 @@ begin
              ;
 
   }
-  Data :=  FloatToStrF(FDataSupport.StmBegin - TimeStart,ffFixed,0,9) + #9 +
+  Data :=  TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
            Latency + #9 +
-           FloatToStrF(FDataSupport.Cycle - TimeStart, ffFixed,0,0) + #9 +
+           TimestampToStr(FDataSupport.Cycle - TimeStart) + #9 +
            Timer2 + #9 +
-           Version + #9 +
-           Mode + #9 +
+           FDizzyTimer.Version + #9 +
+           FDizzyTimer.Mode + #9 +
            Format('%-*.*d', [4, 8, FDataSupport.Responses])
            + Data;
 
 
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
-
   Data := '';
 end;
 
