@@ -62,7 +62,7 @@ type
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(Correction : Boolean); override;
+    procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
 
   end;
@@ -188,7 +188,7 @@ begin
     end;
 end;
 
-procedure TMRD.Play(Correction : Boolean);
+procedure TMRD.Play(ACorrection: Boolean);
 var
   s1, sName, sLoop, sColor{, sGap, sGapDegree, sGapLength} : string;
   R : TRect;
@@ -200,7 +200,7 @@ var
       begin
         BoundsRect := R;
         Color := StrToIntDef(sColor, $0000FF); // clRed
-        HowManyLoops := StrToIntDef(sLoop, 0);
+        Loops := StrToIntDef(sLoop, 0);
         FullPath := sName;
         Schedule.Kind := CfgTrial.SList.Values[_Schedule];
         // Visible := False;
@@ -208,28 +208,13 @@ var
   end;
 
 begin
+  inherited Play(ACorrection);
   FCanResponse := False;
-  NextTrial := '-1';
-  Randomize;
 
   FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
-  FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
-  FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
 
-  if FUseMedia then
-    RootMedia := GlobalContainer.RootMedia
-  else
-    begin
-      SetLength(FCircles.C, 2);
-    end;
-
-  if Correction then FIsCorrection := True
-  else FIsCorrection := False;
-
-  //self descends from TCustomControl
-  Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], 0);
-  if TestMode then Cursor:= 0
-  else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
+  if not FUseMedia then
+    SetLength(FCircles.C, 2);
 
   FSchedule := TSchMan.Create(self);
   with FSchedule do
@@ -237,17 +222,10 @@ begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
       Kind := CfgTrial.SList.Values[_Schedule];
-      if Loaded then
-        begin
-          SetLength(FClockList, Length(FClockList) +1);
-          FClockList[Length(FClockList) -1] := StartMethod;
-        end
-      else raise Exception.Create(ExceptionNoScheduleFound);
     end;
-
+  AddToClockList(FSchedule);
   FCircles.angle := StrToFloatDef(CfgTrial.SList.Values[_Angle], 0.0);
   FCircles.response := CfgTrial.SList.Values[_Comp + '1' + _cGap];
-  FCircles.NextTrial := CfgTrial.SList.Values[_NextTrial];
 
   for a1 := 0 to 1 do
     begin
@@ -355,22 +333,21 @@ begin
              'RespFreq'
              ;
   }
-  Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
-           FloatToStrF(FDataSupport.StmBegin - TimeStart,ffFixed,0,9) + #9 +
-           FloatToStrF(FDataSupport.Latency - TimeStart,ffFixed,0,9) + #9 +
-           FloatToStrF(FDataSupport.StmEnd - TimeStart,ffFixed,0,9) + #9 +
-           #32#32#32#32#32 + FormatFloat('000;;00', FCircles.angle) + #9 +
-           Format('%-*.*d', [4,8,FCircles.C[0].o.X]) + #9 +
-           Format('%-*.*d', [4,8,FCircles.C[0].o.Y]) + #9 +
-           Format('%-*.*d', [4,8,FCircles.C[1].o.X]) + #9 +
-           Format('%-*.*d', [4,8,FCircles.C[1].o.Y]) + #9 +
-           #32#32#32#32#32#32#32 + FCircles.response + #9 +
-           Format('%-*.*d', [4,8,FDataSupport.Responses])
-           //FormatFloat('00000000;;00000000',FData.LatencyStmResponse) + #9 +
-           //FormatFloat('00000000;;00000000',FData.ITIBEGIN) + #9 +
-           //FormatFloat('00000000;;00000000',FData.ITIEND) + #9 +
-           //'' + #9 +
-           + Data;
+  Data := TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
+          TimestampToStr(FDataSupport.Latency - TimeStart) + #9 +
+          TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
+          #32#32#32#32#32 + FormatFloat('000;;00', FCircles.angle) + #9 +
+          Format('%-*.*d', [4,8,FCircles.C[0].o.X]) + #9 +
+          Format('%-*.*d', [4,8,FCircles.C[0].o.Y]) + #9 +
+          Format('%-*.*d', [4,8,FCircles.C[1].o.X]) + #9 +
+          Format('%-*.*d', [4,8,FCircles.C[1].o.Y]) + #9 +
+          #32#32#32#32#32#32#32 + FCircles.response + #9 +
+          Format('%-*.*d', [4,8,FDataSupport.Responses])
+          //FormatFloat('00000000;;00000000',FData.LatencyStmResponse) + #9 +
+          //FormatFloat('00000000;;00000000',FData.ITIBEGIN) + #9 +
+          //FormatFloat('00000000;;00000000',FData.ITIEND) + #9 +
+          //'' + #9 +
+          + Data;
 end;
 
 procedure TMRD.BeforeEndTrial(Sender: TObject);
@@ -400,9 +377,6 @@ begin
       FFirstResp := False;
       FDataSupport.Latency := LTickCount;
     end;
-
-  if FUseMedia then
-    if Sender is TKey then TKey(Sender).IncResponseCount;
 
   //Invalidate;
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);
