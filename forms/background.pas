@@ -22,7 +22,7 @@ type
 
   { Tbkgnd }
 
-  Tbkgnd = class(TForm)
+  TBackground = class(TForm)
     procedure FormCreate(Sender: TObject);
   private
     FFullScreen : Boolean;
@@ -37,7 +37,7 @@ type
   end;
 
 var
-  bkgnd: Tbkgnd;
+  FrmBackground: TBackground;
 
 implementation
 
@@ -45,13 +45,13 @@ implementation
 
 { Tbkgnd }
 
-procedure Tbkgnd.FormCreate(Sender: TObject);
+procedure TBackground.FormCreate(Sender: TObject);
 begin
   FFullScreen := False;
 end;
 
 
-procedure Tbkgnd.SetFullScreen(TurnOn: Boolean);
+procedure TBackground.SetFullScreen(TurnOn: Boolean);
 begin
 
   if TurnOn then

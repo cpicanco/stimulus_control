@@ -48,49 +48,49 @@ type
     { TMatrixForm }
 
     TMatrixForm = class(TForm)
-        btnEditNodes: TButton;
-        btnClose: TButton;
-        btnEditNodes1: TButton;
-        btnMinimizeTopTab: TButton;
-        btnOk: TButton;
-        btnGetMatrix: TButton;
-        cbChooseGrid: TComboBox;
-        cbPreview: TCheckBox;
-        cbUseStimuliSet: TCheckBox;
-        gbTrials: TGroupBox;
-        gbStimuli: TGroupBox;
-        gbGapLength: TGroupBox;
-        Panel1: TPanel;
-        seTrials: TSpinEdit;
-        seGapLength: TSpinEdit;
-        PreviewTimer: TTimer;
-        procedure btnGetMatrixClick(Sender: TObject);
-        procedure btnMinimizeTopTabClick(Sender: TObject);
-        procedure Button1Click(Sender: TObject);
-        procedure Button2Click(Sender: TObject);
-        procedure cbPreviewChange(Sender: TObject);
-        procedure FormActivate(Sender: TObject);
-        procedure FormKeyPress(Sender: TObject; var Key: char);
-        procedure FormPaint(Sender: TObject);
-        procedure PreviewTimerTimer(Sender: TObject);
+      btnEditNodes: TButton;
+      btnClose: TButton;
+      btnEditNodes1: TButton;
+      btnMinimizeTopTab: TButton;
+      btnOk: TButton;
+      btnGetMatrix: TButton;
+      cbChooseGrid: TComboBox;
+      cbPreview: TCheckBox;
+      cbUseStimuliSet: TCheckBox;
+      gbTrials: TGroupBox;
+      gbStimuli: TGroupBox;
+      gbGapLength: TGroupBox;
+      Panel1: TPanel;
+      seTrials: TSpinEdit;
+      seGapLength: TSpinEdit;
+      PreviewTimer: TTimer;
+      procedure btnGetMatrixClick(Sender: TObject);
+      procedure btnMinimizeTopTabClick(Sender: TObject);
+      procedure Button1Click(Sender: TObject);
+      procedure Button2Click(Sender: TObject);
+      procedure cbPreviewChange(Sender: TObject);
+      procedure FormActivate(Sender: TObject);
+      procedure FormKeyPress(Sender: TObject; var Key: char);
+      procedure FormPaint(Sender: TObject);
+      procedure PreviewTimerTimer(Sender: TObject);
     private
     // fullscreen
-        FFullScreen : Boolean;
-        FOriginalBounds : TRect;
-        FOriginalWindowState : TWindowState;
-        FScreenBounds : TRect;
+      FFullScreen : Boolean;
+      FOriginalBounds : TRect;
+      FOriginalWindowState : TWindowState;
+      FScreenBounds : TRect;
     // other
-        FCanDraw : Boolean;
-        FCurrentTrial : integer;
-        FTrials : TTrials;
+      FCanDraw : Boolean;
+      FCurrentTrial : integer;
+      FTrials : TTrials;
     public
-        procedure SetMatrix(MatrixCoordenates : TStrings);
-        procedure SetFullScreen(TurnOn : Boolean);
-        property Trials : TTrials read FTrials write FTrials;
+      procedure SetMatrix(MatrixCoordenates : TStrings);
+      procedure SetFullScreen(TurnOn : Boolean);
+      property Trials : TTrials read FTrials write FTrials;
     end;
 
 var
-    MatrixForm: TMatrixForm;
+  FrmMatrix: TMatrixForm;
 
 implementation
 
@@ -310,17 +310,16 @@ procedure TMatrixForm.btnGetMatrixClick(Sender: TObject);
 begin
   //WindowState := wsMinimized;
   Visible := False;
-  MatrixConfigForm := TMatrixConfigForm.Create(Application);
-  bkgnd := TBkgnd.Create(Application);
-  with bkgnd do
+  FrmMatrixConfig := TMatrixConfigForm.Create(Application);
+  with FrmBackground do
     begin
       color := clBlack;
       //WindowState := wsMaximized;
       Show;
       SetFullScreen(True);
     end;
-  MatrixConfigForm.aBackGround := bkgnd;
-  MatrixConfigForm.Show;
+  FrmMatrixConfig.BackGround := FrmBackground;
+  FrmMatrixConfig.Show;
 end;
 
 procedure TMatrixForm.btnMinimizeTopTabClick(Sender: TObject);
