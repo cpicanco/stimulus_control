@@ -100,7 +100,7 @@ begin
     DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
     DebugLn(mt_Debug + 'Application ThreadID:' + IntToStr(ThreadID));
   {$endif}
-  Application.CreateForm(TUserConfig, UserConfig);
+  Application.CreateForm(TUserConfig, FrmUserConfig);
   Application.Run;
 end.
 
