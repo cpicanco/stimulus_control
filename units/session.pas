@@ -69,6 +69,7 @@ type
     procedure StmResponse(Sender:TObject);
     procedure SetTestMode(AValue: Boolean);
     procedure SetConfigs(AValue: TCfgSes);
+    procedure SetManager(AValue: TCounterManager);
   private
     //FOnBeginSess: TNotifyEvent;
     //FOnBeginTrial: TNotifyEvent;
@@ -81,16 +82,14 @@ type
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
-    procedure SetManager(AValue: TCounterManager);
+    property PupilClientEnabled : Boolean read FPupilClientEnabled write SetPupilClient;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure DoEndSess(Sender: TObject);
     procedure Play(AFileData: String); overload;
-    property PupilClientEnabled : Boolean read FPupilClientEnabled write SetPupilClient;
     property AudioDevice : TBassAudioDevice read FAudioDevice write FAudioDevice;
     property BackGround : TWinControl read FBackGround write SetBackGround;
-    property ServerAddress : string read FServerAddress write FServerAddress;
     property SessName : String  read FSessName write FSessName;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
     property SubjName : String  read FSubjName write FSubjName;
@@ -163,7 +162,10 @@ var Footer : string;
 begin
   Footer := LineEnding + LineEnding+ HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
   if PupilClientEnabled then
-     FGlobalContainer.PupilClient.Request(REQ_SHOULD_STOP_RECORDING);
+    begin
+      FGlobalContainer.PupilClient.Request(REQ_SHOULD_STOP_RECORDING);
+      CopyFile(FConfigs.Filename,FGlobalContainer.RootData + ExtractFileName(FConfigs.Filename));
+    end;
 
   FRegData.SaveData(Footer);
   SetLogger(Footer);
@@ -207,6 +209,7 @@ begin
   FRegData.SaveData(Header);
   SetLogger(ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps', Header);
 
+  // MTS, SIMPLE Trials only
   if DataTicks then
     begin
       FRegDataTicks:= TRegData.Create(Self, ExtractFileNameWithoutExt(FRegData.FileName) + '.ticks');
@@ -284,7 +287,11 @@ procedure TSession.SetConfigs(AValue: TCfgSes);
 begin
   if FConfigs=AValue then Exit;
   FConfigs:=AValue;
+  FSessName := FConfigs.Name;
+  FSubjName := FConfigs.SessionSubject;
+  FServerAddress := FConfigs.SessionServer;
   FGlobalContainer := FConfigs.GlobalContainer;
+  PupilClientEnabled := FGlobalContainer.PupilEnabled;
 end;
 
 procedure TSession.SetManager(AValue: TCounterManager);
@@ -359,7 +366,7 @@ begin
           OnRequestReceived := @PupilRequestReceived;
           OnMultiPartMessageReceived := @PupilMultipartReceived;
           OnRecordingStarted := @PupilRecordingStarted;
-          //OnCalibrationStopped := @PupilCalibrationStopped;
+          //OnCalibrationSuccessful := @PupilCalibrationSuccessful;
           Start;
           StartSubscriber(True);
           Subscribe(SUB_ALL_NOTIFICATIONS);
