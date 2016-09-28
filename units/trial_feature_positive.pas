@@ -21,12 +21,10 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     //, countermanager
     , trial_abstract
     //, custom_timer
-    , constants
     //, client
     , draw_methods
     , schedules_main
     , response_key
-    , timestamps
     ;
 
 type
@@ -92,13 +90,14 @@ type
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(Correction : Boolean); override;
+    procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
 
   end;
 
 implementation
 
+uses constants, timestamps;
 
 { TFPE }
 
@@ -171,7 +170,7 @@ begin
   //aConsequence.OnConsequence2:=@Consequence2;
   //aConsequence.OnConsequence:= @Consequence;
   //aConsequence.OnResponse:= @Response;
-  aConsequence.HowManyLoops := 0;
+  aConsequence.Loops := 0;
   aConsequence.Color := 255;
   aConsequence.FullPath := RootMedia + FDataSupport.CSQ2;
   aConsequence.Play;
@@ -240,7 +239,7 @@ begin
     begin
       if FShowStarter then
         begin
-          DrawCenteredCircle (Canvas, Width, Height, 6);
+          DrawCenteredCircle(Canvas, Width, Height, 6);
         end
       else
         if FUseMedia then
@@ -256,7 +255,7 @@ begin
     end;
 end;
 
-procedure TFPE.Play(Correction : Boolean);
+procedure TFPE.Play(ACorrection: Boolean);
 var
   s1{, sName, sLoop, sColor, sGap, sGapDegree, sGapLength} : string;
   R : TRect;
@@ -284,14 +283,10 @@ var
 
 begin
   FResponseEnabled:= False;
-  NextTrial:= '-1';
-  Randomize;
 
   FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
   FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
-  FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
-  RootMedia := GlobalContainer.RootMedia;
 
   if FUseMedia then
     // not implemented yet
@@ -299,14 +294,6 @@ begin
     begin
       SetLength(FCurrTrial.C, FNumComp);
     end;
-
-  if Correction then FIsCorrection := True
-  else FIsCorrection := False;
-
-
-  Color:= StrToIntDef(CfgTrial.SList.Values[_BkGnd], 0);
-  if TestMode then Cursor:= 0
-  else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
 
   //self descends from TCustomControl
   FSchedule := TSchMan.Create(self);
@@ -358,7 +345,6 @@ begin
 
 
   FCurrTrial.Result := T_NONE;
-  FCurrTrial.NextTrial := CfgTrial.SList.Values[_NextTrial];
 
   for a1 := 0 to FNumComp -1 do
     begin
@@ -448,7 +434,7 @@ procedure TFPE.WriteData(Sender: TObject);  //
 var Latency : string;
 begin
   if not FFirstResp then
-    Latency := FloatToStrF(FDataSupport.Latency - TimeStart, ffFixed, 0,9)
+    Latency := TimestampToStr(FDataSupport.Latency - TimeStart)
   else Latency := 'NA';
 
   {
@@ -461,10 +447,10 @@ begin
              '__Result'
   }
 
-  Data :=  FloatToStrF(FDataSupport.StarterLatency - TimeStart, ffFixed, 0,9) + #9 +
-           FloatToStrF(FDataSupport.StmBegin - TimeStart, ffFixed, 0,9) + #9 +
+  Data :=  TimestampToStr(FDataSupport.StarterLatency - TimeStart) + #9 +
+           TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
            Latency + #9 +
-           FloatToStrF(FDataSupport.StmEnd - TimeStart, ffFixed, 0,9) + #9 +
+           TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
            FCurrTrial.response + #9 +
            FCurrTrial.Result + #9 +

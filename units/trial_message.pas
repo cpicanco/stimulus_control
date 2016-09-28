@@ -17,8 +17,6 @@ uses  LCLIntf, LCLType, Controls,
       Classes, SysUtils, StdCtrls, Graphics
 
      , trial_abstract
-     , constants
-     //, countermanager
      ;
 
 type
@@ -47,7 +45,7 @@ type
     //procedure ThreadClock(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure Play(Correction : Boolean); override;
+    procedure Play(ACorrection : Boolean); override;
   end;
 
 resourcestring
@@ -57,7 +55,7 @@ resourcestring
 implementation
 
 uses
-  timestamps
+  constants, timestamps
   {$ifdef DEBUG}
   , debug_logger
   {$endif}
@@ -127,22 +125,12 @@ begin
   WriteData(Self);
 end;
 
-procedure TMSG.Play(Correction : Boolean);
+procedure TMSG.Play(ACorrection : Boolean);
 var
   LFontColor : Integer;
 begin
-  //FIscorrection := Correction; //Messages with corrections were not implemented yet
-
-  // TCustomControl
-  Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], $FFFFFF);
+  inherited Play(ACorrection);
   LFontColor :=  StrToIntDef(CfgTrial.SList.Values[_MsgFontColor], $000000);
-
-  if TestMode then Cursor := 0
-  else Cursor := StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
-
-  // TTrial
-  NextTrial := CfgTrial.SList.Values[_NextTrial];
-  FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
 
   with FMessage do
     begin
@@ -177,8 +165,8 @@ end;
 procedure TMSG.WriteData(Sender: TObject);
 var aStart, aDuration : string;
 begin
-  aStart := FloatToStrF(FDataSupport.TrialBegin - TimeStart, ffFixed, 0, 9);
-  aDuration := FloatToStrF(FDataSupport.TrialEnd - TimeStart, ffFixed, 0, 9);
+  aStart := TimestampToStr(FDataSupport.TrialBegin - TimeStart);
+  aDuration := TimestampToStr(FDataSupport.TrialEnd - TimeStart);
 
   Data := aStart + #9 + aDuration + #9 + FMessage.Caption + Data;
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
