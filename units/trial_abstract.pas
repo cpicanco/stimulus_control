@@ -15,8 +15,8 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, LCLProc
 
+  , schedules_main
   , config_session
-  , zmq_client
   , countermanager
   , custom_timer
   ;
@@ -29,7 +29,6 @@ type
   private
     FGlobalContainer: TGlobalContainer;
     FCfgTrial: TCfgTrial;
-    //FClientThread : TZMQThread;
     FClockThread : TClockThread;
     FCounterManager : TCounterManager;
     FData: string;
@@ -41,7 +40,9 @@ type
     FNextTrial: string;
     FResult: string;
     FTimeOut: Integer;
-    // events
+
+  { events }
+
     FOnBeforeEndTrial: TNotifyEvent;
     FOnBeginCorrection: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
@@ -53,11 +54,11 @@ type
     FOnNone: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
     FOnWriteTrialData: TNotifyEvent;
-
-    procedure EndTrialThread(Sender: TObject);
     function GetRootMedia: string;
     function GetTestMode: Boolean;
     function GetTimeStart: Extended;
+
+    procedure EndTrialThread(Sender: TObject);
     procedure SetRootMedia(AValue: string);
     procedure SetTestMode(AValue: Boolean);
     procedure SetTimeStart(AValue: Extended);
@@ -68,9 +69,9 @@ type
     {$ifdef DEBUG}
       procedure ClockStatus(msg : string);
     {$endif}
-    // Log timestamped event:
-    // TimestampF, TrialID, ACode
-    procedure LogEvent(ACode: string);
+    procedure AddToClockList(ASchedule: TSchMan); overload;
+    procedure AddToClockList(AClockStart : TThreadMethod); overload;
+    procedure LogEvent(ACode: string);// Log timestamped event: TimestampF, TrialID, ACode
     procedure EndTrial(Sender: TObject);
     procedure StartTrial(Sender: TObject); virtual;
     procedure WriteData(Sender: TObject); virtual; abstract;
@@ -79,8 +80,7 @@ type
   public
     constructor Create (AOwner : TComponent); override;
     destructor Destroy; override;
-//    procedure DispenserPlusCall; virtual; abstract;
-    procedure Play(Correction : Boolean); virtual; abstract;
+    procedure Play(ACorrection: Boolean); virtual;
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
     property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property Data: string read FData write FData;
@@ -114,7 +114,7 @@ type
 implementation
 
 
-uses timestamps
+uses constants, timestamps
     //, timestamps_logger
     {$ifdef DEBUG}
     , debug_logger
@@ -142,21 +142,18 @@ begin
 end;
 {$endif}
 
-{
-  FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
-}
 procedure TTrial.StartTrial(Sender: TObject);
 var
   i : integer;
 begin
+  //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
   FClockThread.Interval := FLimitedHold;
   FClockThread.OnTimer := @EndTrialThread;
   {$ifdef DEBUG}
     FClockThread.OnDebugStatus := @ClockStatus;
   {$endif};
 
-  SetLength(FClockList, Length(FClockList) + 1);
-  FClockList[Length(FClockList) - 1] := @FClockThread.Start;
+  AddToClockList(@FClockThread.Start);
 
   // TClockThread.Start
   for i := 0 to Length(FClockList) -1 do
@@ -242,6 +239,52 @@ begin
       FClockThread := nil;
     end;
   inherited Destroy;
+end;
+
+procedure TTrial.Play(ACorrection: Boolean);
+begin
+  // full path of media files
+  RootMedia:= FGlobalContainer.RootMedia;
+
+  // what will be the next trial?
+  NextTrial := CfgTrial.SList.Values[_NextTrial];
+
+  // The Trial will count as MISS, HIT or NONE?
+  Result := 'NONE';
+
+  // what will happen during the inter trial interval?
+  IETConsequence := 'NONE';
+
+  // is it a correction trial?
+  if ACorrection then FIsCorrection := True
+  else FIsCorrection := False;
+
+  // Trial background color
+  Color:= StrToIntDef(CfgTrial.SList.Values[_BkGnd], Parent.Color);
+
+  // Trial will last LimitedHold ms
+  FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
+
+  // image of the mouse cursor
+  if TestMode then Cursor:= 0
+  else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
+
+  // Initialize randomness generator
+  Randomize;
+end;
+
+procedure TTrial.AddToClockList(AClockStart: TThreadMethod);
+begin
+  SetLength(FClockList, Length(FClockList) + 1);
+  FClockList[Length(FClockList) - 1] := AClockStart;
+end;
+
+procedure TTrial.AddToClockList(ASchedule: TSchMan);
+begin
+  if ASchedule.Loaded then
+    AddToClockList(ASchedule.StartMethod)
+  else
+    raise Exception.Create(ExceptionNoScheduleFound);
 end;
 
 
