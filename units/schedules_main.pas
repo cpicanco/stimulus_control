@@ -30,11 +30,14 @@ type
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
     procedure Consequence(Sender: TObject);
+    function GetTimeEnabled: Boolean;
     procedure Response(Sender: TObject);
+    procedure SetTimeEnabled(AValue: Boolean);
     procedure SetKind(Kind: String);
   public
     procedure DoResponse;
     function StartMethod : TThreadMethod;
+    property Enabled : Boolean read GetTimeEnabled write SetTimeEnabled;
     property Kind: string read FKind write SetKind;
     property Loaded : Boolean read FAbsSchLoaded;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
@@ -157,9 +160,20 @@ begin
   if Assigned(OnConsequence) then FOnConsequence(Self);
 end;
 
+function TSchMan.GetTimeEnabled: Boolean;
+begin
+  Result := FAbsSch.TimeEnabled;
+end;
+
 procedure TSchMan.Response(Sender: TObject);
 begin
   if Assigned(OnResponse) then FOnResponse (Self);
+end;
+
+procedure TSchMan.SetTimeEnabled(AValue: Boolean);
+begin
+  if FAbsSch.TimeEnabled = AValue then Exit;
+  FAbsSch.TimeEnabled := AValue;
 end;
 
 procedure TSchMan.DoResponse;

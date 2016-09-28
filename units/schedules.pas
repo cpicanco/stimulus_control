@@ -35,10 +35,12 @@ type
     FParameter3  : integer;
     FParameter4 : integer;
     FResponseCounter : integer;
+    function GetTimeEnabled: Boolean;
+    function GetStartMethod : TThreadMethod;
     procedure Consequence;
     procedure Response;
     procedure Pass;
-    function GetStartMethod : TThreadMethod;
+    procedure SetTimeEnabled(AValue: Boolean);
   {$ifdef DEBUG}
   strict protected
     procedure DebugStatus(DebugMessage : string);
@@ -48,6 +50,7 @@ type
     procedure AssignParameters; virtual; abstract;
     procedure DoResponse; virtual; abstract;
     procedure Reset; virtual; abstract;
+    property TimeEnabled : Boolean read GetTimeEnabled write SetTimeEnabled;
     property StartMethod : TThreadMethod read GetStartMethod;
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse : TNotifyEvent read FOnResponse write FOnResponse;
@@ -340,6 +343,12 @@ begin
     end;
 end;
 
+function TAbsSch.GetTimeEnabled: Boolean;
+begin
+  if Assigned(FClockThread) then Result := FClockThread.Enabled
+  else Result := False;
+end;
+
 procedure TAbsSch.Response;
 begin
   Inc(FResponseCounter);
@@ -355,6 +364,15 @@ function TAbsSch.GetStartMethod: TThreadMethod;
 begin
   if Assigned(FClockThread) then Result := @FClockThread.Start
   else Result := @Self.Pass;
+end;
+
+procedure TAbsSch.SetTimeEnabled(AValue: Boolean);
+begin
+  if Assigned(FClockThread) then
+    begin
+      if FClockThread.Enabled = AValue then Exit;
+      FClockThread.Enabled := AValue;
+    end;
 end;
 
 {$ifdef DEBUG}
