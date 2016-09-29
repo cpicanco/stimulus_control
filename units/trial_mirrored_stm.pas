@@ -42,24 +42,21 @@ type
     FKey2 : TKey;
     FFirstResp : Boolean;
     FUseMedia : Boolean;
-    FShowStarter : Boolean;
-    FCanResponse : Boolean;
     procedure BeginCorrection (Sender : TObject);
-    procedure BeginStarter;
     procedure Consequence(Sender: TObject);
     procedure EndCorrection (Sender : TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
+    procedure TrialStart(Sender: TObject);
     procedure TrialResult(Sender : TObject);
+    procedure TrialPaint;
+    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     procedure BeforeEndTrial(Sender: TObject); override;
-    procedure StartTrial(Sender: TObject); override;
-    procedure WriteData(Sender: TObject); override;
-    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure Paint; override;
+    procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(ACorrection : Boolean); override;
@@ -80,11 +77,14 @@ uses
 constructor TMRD.Create(AOwner: TComponent);
 begin
   OnBeforeEndTrial := @BeforeEndTrial;
-  OnKeyDown := @TrialKeyDown;
-  OnKeyUp := @TrialKeyUp;
+  OnTrialKeyUp := @TrialKeyUp;
+  OnTrialPaint := @TrialPaint;
+  OnTrialStart := @TrialStart;
 
   inherited Create(AOwner);
-  Header :=  'StmBegin' + #9 +
+
+  Header :=  Header + #9 +
+             'StmBegin' + #9 +
              '_Latency' + #9 +
              '__StmEnd' + #9 +
              '___Angle' + #9 +
@@ -93,8 +93,9 @@ begin
              '______X2' + #9 +
              '______Y2' + #9 +
              'ExpcResp' + #9 +
-             'RespFreq'
-             ;
+             'RespFreq';
+
+  HeaderTimestamps := HeaderTimestamps + #9 + 'Event';
   FDataSupport.Responses:= 0;
 end;
 
@@ -113,79 +114,23 @@ begin
 
   if FCircles.NextTrial = T_CRT then NextTrial := T_CRT
   else NextTrial := FCircles.NextTrial;
-
-  if FLimitedHold = 0 then EndTrial(Sender);
-end;
-
-
-procedure TMRD.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  if (Key = 27 {ESC}) and (FCanResponse = True) then
-    begin
-      FCanResponse:= False;
-      Invalidate;
-    end;
-
-  if ssCtrl in Shift then
-     begin
-       if Key = 81 {q} then
-         begin
-           Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
-           Result := 'NONE';
-           IETConsequence := 'NONE';
-           NextTrial := 'END';
-           None(Self);
-           EndTrial(Self);
-         end;
-     end;
 end;
 
 procedure TMRD.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-var LTickCount : Extended;
 begin
-  LTickCount := TickCount;
-
-  if Key = 27 {ESC} then
+  if FResponseEnabled then
     begin
-      FCanResponse:= True;
-      Invalidate;
-    end;
-
-  if FCanResponse then
-    begin
-      if FShowStarter then
-        begin
-          if key = 32 then
-            begin
-              //FSchedule.DoResponse; need to fix that, this line does not apply when no TResponseKey is used
-              FDataSupport.Latency := LTickCount;
-              LogEvent('*R');
-              FShowStarter := False;
-              Invalidate;
-              StartTrial(Self);
-            end;
-        end
-      else LogEvent('R');
+      LogEvent('R');
     end;
 end;
 
-
-procedure TMRD.Paint;
+procedure TMRD.TrialPaint;
 var i : integer;
 begin
-  inherited Paint;
-
-  if FCanResponse then
-    begin
-      if FShowStarter then DrawCenteredCircle(Canvas, Width, Height, 6)
-      else
-        if FUseMedia then
-          //do nothing, TKey draws itself
-
-        else
-          for i := 0 to 1 do
-            with FCircles.C[i] do DrawCircle(Canvas, o.X, o.Y, size, gap, gap_degree, gap_length);
-    end;
+  if not FUseMedia then
+    for i := 0 to 1 do
+      with FCircles.C[i] do
+        DrawCircle(Canvas, o.X, o.Y, size, gap, gap_degree, gap_length);
 end;
 
 procedure TMRD.Play(ACorrection: Boolean);
@@ -209,8 +154,6 @@ var
 
 begin
   inherited Play(ACorrection);
-  FCanResponse := False;
-
   FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
 
   if not FUseMedia then
@@ -269,11 +212,7 @@ begin
             end;
       end;
 
-  {$ifdef DEBUG}
-  DebugLn(mt_Information + 'Starter:' + BoolToStr(FShowStarter, 'True', 'False'));
-  {$endif}
-
-  if FShowStarter then BeginStarter else StartTrial(Self);
+  Config(Self);
 end;
 
 //procedure TMRD.DispenserPlusCall;
@@ -281,14 +220,14 @@ end;
 //  // dispensers were not implemented yet
 //end;
 
-procedure TMRD.StartTrial(Sender: TObject);
-
+procedure TMRD.TrialStart(Sender: TObject);
+{
   procedure KeyStart(var aKey : TKey);
   begin
     aKey.Play;
     aKey.Visible:= True;
   end;
-
+}
 begin
   if FIsCorrection then
     begin
@@ -303,37 +242,14 @@ begin
   }
   FFirstResp := True;
 
-  FCanResponse := True;
-  Invalidate;
+  FResponseEnabled := True;
   FDataSupport.StmBegin := TickCount;
-
-  inherited StartTrial(Sender);
-end;
-
-procedure TMRD.BeginStarter;
-begin
-  LogEvent('S');
-  FCanResponse:= True;
-  Invalidate;
 end;
 
 procedure TMRD.WriteData(Sender: TObject);  //
 begin
-
-  {
-  Header :=  'StmBegin' + #9 +
-             '_Latency' + #9 +
-             '__StmEnd' + #9 +
-             '___Angle' + #9 +
-             '______X1' + #9 +
-             '______Y1' + #9 +
-             '______X2' + #9 +
-             '______Y2' + #9 +
-             'ExpcResp' + #9 +
-             'RespFreq'
-             ;
-  }
-  Data := TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
+  Data := Data +
+          TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
           TimestampToStr(FDataSupport.Latency - TimeStart) + #9 +
           TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
           #32#32#32#32#32 + FormatFloat('000;;00', FCircles.angle) + #9 +
@@ -342,17 +258,11 @@ begin
           Format('%-*.*d', [4,8,FCircles.C[1].o.X]) + #9 +
           Format('%-*.*d', [4,8,FCircles.C[1].o.Y]) + #9 +
           #32#32#32#32#32#32#32 + FCircles.response + #9 +
-          Format('%-*.*d', [4,8,FDataSupport.Responses])
-          //FormatFloat('00000000;;00000000',FData.LatencyStmResponse) + #9 +
-          //FormatFloat('00000000;;00000000',FData.ITIBEGIN) + #9 +
-          //FormatFloat('00000000;;00000000',FData.ITIEND) + #9 +
-          //'' + #9 +
-          + Data;
+          Format('%-*.*d', [4,8,FDataSupport.Responses]);
 end;
 
 procedure TMRD.BeforeEndTrial(Sender: TObject);
 begin
-  FCanResponse := False;
   FDataSupport.StmEnd := GetTickCount64;
   FCircles.Result := Result;
 
