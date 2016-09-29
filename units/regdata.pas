@@ -25,12 +25,12 @@ type
     FFile: TextFile;
     FSessionNumber: integer;
     procedure Close;
-    procedure UpdateFileName(NewFileName : string);
-    function OpenNoOverride(Filename : string):string;
+    procedure UpdateFileName(ANewFileName : string);
+    function OpenNoOverride(AFilename : string):string;
   public
-    constructor Create(AOwner: TComponent; FileName: String); reintroduce;
+    constructor Create(AOwner: TComponent; AFileName: String); reintroduce;
     destructor Destroy; override;
-    procedure SaveData(Data: string);
+    procedure SaveData(AData: string);
     procedure AppendF;
     procedure AssignFFile;
     procedure CloseFFile;
@@ -62,47 +62,47 @@ begin
       end
 end;
 
-procedure TRegData.UpdateFileName(NewFileName : string);
+procedure TRegData.UpdateFileName(ANewFileName: string);
 begin
-  if (NewFileName = '') or (NewFileName = FFilename) then Exit;
+  if (ANewFileName = '') or (ANewFileName = FFilename) then Exit;
   Close;
-  FFileName := OpenNoOverride(NewFileName);
+  FFileName := OpenNoOverride(ANewFileName);
 end;
 
-function TRegData.OpenNoOverride(Filename: string):string;
+function TRegData.OpenNoOverride(AFilename: string): string;
 var
   i : Integer;
   FilePath, LExtension: string;
 begin
-  if FileName <> '' then
+  if AFileName <> '' then
       begin
-        ForceDirectoriesUTF8(ExtractFilePath(FileName));
-        FilePath := ExtractFilePath(FileName);
-        LExtension := ExtractFileExt(Filename);
+        ForceDirectoriesUTF8(ExtractFilePath(AFilename));
+        FilePath := ExtractFilePath(AFilename);
+        LExtension := ExtractFileExt(AFilename);
         i := 0;
 
         // ensure to never override an exinting file
-        while FileExistsUTF8(FileName) do begin
+        while FileExistsUTF8(AFilename) do begin
           Inc(i);
-          FileName := FilePath + StringOfChar(#48, 3 - Length(IntToStr(i))) + IntToStr(i) + LExtension;
+          AFilename := FilePath + StringOfChar(#48, 3 - Length(IntToStr(i))) + IntToStr(i) + LExtension;
         end;
 
         FSessionNumber := i;
 
         // as override is impossible, don't mind about an Assign/Rewrite conditional
-        AssignFile(FFile, FileName);
+        AssignFile(FFile, AFilename);
         Rewrite(FFile);
         {$ifdef DEBUG}
-          WriteLn(FFile, mt_Debug + 'Saving data to:' + FileName );
+          WriteLn(FFile, mt_Debug + 'Saving data to:' + AFilename );
         {$endif}
-        Result := FileName;
+        Result := AFilename;
      end;
 end;
 
-constructor TRegData.Create(AOwner: TComponent; FileName: String);
+constructor TRegData.Create(AOwner: TComponent; AFileName: String);
 begin
   inherited Create(AOwner);
-  FFilename := OpenNoOverride(FileName);
+  FFilename := OpenNoOverride(AFilename);
 end;
 
 destructor TRegData.Destroy;
@@ -113,9 +113,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TRegData.SaveData(Data: string);
+procedure TRegData.SaveData(AData: string);
 begin
-  Write(FFile, Data);
+  Write(FFile, AData);
 end;
 
 procedure TRegData.AppendF;
