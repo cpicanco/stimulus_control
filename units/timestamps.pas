@@ -19,8 +19,6 @@ function TimestampToStr(ATimestamp: Extended) : string;
 function GetTimeStampF : string; overload;
 function GetTimeStampF (ATimeStart:Extended): string; overload;
 function TickCount : Extended;
-procedure TimestampLn(msg: string);
-
 
 implementation
 
@@ -44,11 +42,6 @@ end;
 function TickCount: Extended;
 begin
   Result := GetCustomTick;
-end;
-
-procedure TimestampLn(msg: string);
-begin
-  TimestampLogger.SaveData(GetTimeStampF + #9 + msg + LineEnding);
 end;
 
 
