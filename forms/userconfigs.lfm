@@ -3,7 +3,7 @@ object UserConfig: TUserConfig
   Height = 483
   Top = 88
   Width = 466
-  HorzScrollBar.Page = 444
+  HorzScrollBar.Page = 397
   VertScrollBar.Page = 269
   AutoScroll = True
   BiDiMode = bdRightToLeftNoAlign
@@ -1635,9 +1635,9 @@ object UserConfig: TUserConfig
     TabOrder = 0
   end
   object chkPlayOnSecondMonitor: TCheckBox
-    Left = 74
+    Left = 80
     Height = 24
-    Top = 450
+    Top = 451
     Width = 112
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
@@ -3650,23 +3650,14 @@ object UserConfig: TUserConfig
       end
     end
   end
-  object chkDataTicks: TCheckBox
-    Left = 192
-    Height = 24
-    Top = 450
-    Width = 123
-    Anchors = [akLeft, akBottom]
-    Caption = 'Registrar ticks'
-    TabOrder = 3
-  end
   object chkPupilClient: TCheckBox
-    Left = 320
+    Left = 200
     Height = 24
-    Top = 450
+    Top = 451
     Width = 124
     Anchors = [akLeft, akBottom]
     Caption = 'Interface Pupil'
-    TabOrder = 4
+    TabOrder = 3
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Options = [ofPathMustExist, ofEnableSizing, ofViewDetail]

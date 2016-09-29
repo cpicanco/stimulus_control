@@ -720,31 +720,10 @@ end;
 
 procedure TBresenhamLineForm.ToggleFullScreen;
 begin
-  { TODO 1 -oRafael -cdev : Update fullscreen behavior }
+  { DONE 1 -oRafael -cdev : Update fullscreen behavior }
   //BorderStyle := bsNone;
   WindowState := wsFullScreen;
   BoundsRect := Screen.MonitorFromWindow(Handle).BoundsRect;
-
-  //if BorderStyle <> bsNone then begin
-  //  // To full screen
-  //  FOriginalWindowState := WindowState;
-  //  FOriginalBounds := BoundsRect;
-  //
-  //  BorderStyle := bsNone;
-  //  BoundsRect := Screen.MonitorFromWindow(Handle).BoundsRect;
-  //end else begin
-  //  // From full screen
-  //  {$IFDEF MSWINDOWS}
-  //  FBorderStyle := bsSizeable;
-  //  {$ENDIF}
-  //  if FOriginalWindowState = wsMaximized then
-  //    WindowState := wsMaximized
-  //  else
-  //    BoundsRect := FOriginalBounds;
-  //  {$IFDEF LINUX}
-  //  BorderStyle := bsSizeable;
-  //  {$ENDIF}
-  //end;
 end;
 
 end.

@@ -48,7 +48,6 @@ type
     chkPupilClient: TCheckBox;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
-    chkDataTicks: TCheckBox;
     cbDrawTrialGroup: TCheckBox;
     chkPlayOnSecondMonitor: TCheckBox;
     edtTrialGroup: TEdit;
@@ -477,12 +476,7 @@ end;
 
 procedure TUserConfig.EndSession(Sender: TObject);
 begin
-  //if Assigned(FSession) then FreeAndNil(FSession);
-  //if Assigned(FConfigs) then FreeAndNil(FConfigs);
-  //if Assigned(FManager) then FreeAndNil(FManager);
-  //FrmBackground.SetFullScreen(False);
   FrmBackground.Hide;
-  //if Assigned(FrmBackground) then FreeAndNil(FrmBackground);
   ShowMessage(rsEndSession)
 end;
 
@@ -1222,16 +1216,11 @@ begin
 end;
 
 procedure TUserConfig.btnRunClick(Sender: TObject);
-var aDirectory, aDataName : string;
+var LDirectory : string;
 begin
-  //FileName := GetCurrentDir + PathDelim + leParticipant.Text + PathDelim + 'Dados_001.txt';
-  //FData:= TRegData.Create(Self, Filename);
-  //FData.SaveData('Participante:' + #9 + leParticipant.Text + LineEnding +
-  //               'Sessão:' + #9 + IntToStr(FData.SessionNumber) + LineEnding +
-  //               'Data:' + #9 + DateTimeToStr(Date)+ LineEnding + LineEnding);
-  aDirectory := GetCurrentDirUTF8 + PathDelim + leParticipant.Text;
-  if ForceDirectoriesUTF8(aDirectory) then
-      OpenDialog1.InitialDir := aDirectory;
+  LDirectory := GetCurrentDirUTF8 + PathDelim + leParticipant.Text;
+  if ForceDirectoriesUTF8(LDirectory) then
+      OpenDialog1.InitialDir := LDirectory;
 
   if OpenDialog1.Execute then
     begin
@@ -1245,18 +1234,15 @@ begin
       FConfigs.LoadFromFile(OpenDialog1.Filename, False);
       FConfigs.PupilEnabled := chkPupilClient.Checked;
 
-      aDataName := '000.data';
       with FSession do
         begin
           OnEndSess:= @EndSession;
           AudioDevice := FAudioDevice;
           BackGround := FrmBackground;
-          DataTicks := chkDataTicks.Checked;
           Configs := FConfigs;
           TestMode := False;
           ShowCounter := False;
-          Play(aDataName);
-
+          Play('000');
         end;
     end;
 
