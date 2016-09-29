@@ -67,25 +67,21 @@ type
     FDataSupport : TDataSupport;
     FFirstResp : Boolean;
     FNumComp : integer;
-    FResponseEnabled : Boolean;
     FSchedule : TSchMan;
-    FShowStarter : Boolean;
     FUseMedia : Boolean;
+    procedure TrialPaint;
     procedure BeginCorrection(Sender: TObject);
-    procedure BeginStarter;
     procedure Consequence(Sender: TObject);
     procedure EndCorrection (Sender: TObject);
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
+    procedure TrialStart(Sender: TObject);
     procedure TrialResult(Sender: TObject);
-  private { TCustomControl }
-    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected { TTrial }
     procedure BeforeEndTrial(Sender: TObject); override;
-    procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
     procedure Paint; override;
   public
@@ -106,28 +102,27 @@ constructor TFPE.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   OnBeforeEndTrial := @BeforeEndTrial;
-  OnKeyDown := @TrialKeyDown;
   OnKeyUp := @TrialKeyUp;
+  OnTrialStart := @TrialStart;
+  OnTrialPaint := @TrialPaint;
 
-  Header :=  'StartLat' + #9 +
+  Header :=  Header + #9 +
+             'StartLat' + #9 +
              'StmBegin' + #9 +
              '_Latency' + #9 +
              '__StmEnd' + #9 +
              'RespFreq' + #9 +
              'ExpcResp' + #9 +
-             '__Result'
-             //'__DBegin' + #9 +
-             //'DLatency' + #9 +
-             ;
+             '__Result';
 
+  HeaderTimestamps := HeaderTimestamps + #9 + 'Event';
   FDataSupport.Responses:= 0;
 end;
 
 procedure TFPE.TrialResult(Sender: TObject);
 begin
-  LogEvent('C');
-
   //FDataSupport.StmDuration := GetCustomTick;
+  LogEvent('C');
 
   if FConsequenceFired then
     begin
@@ -160,99 +155,40 @@ end;
 
 procedure TFPE.Consequence(Sender: TObject);
 var
-  aConsequence : TKey;
-
+  LConsequence : TKey;
 begin
   if FConsequenceFired = False then FConsequenceFired := True;
-  aConsequence := TKey.Create(Self);
-  aConsequence.Cursor:= Self.Cursor;
-  aConsequence.Parent:= Self;
-  //aConsequence.OnConsequence2:=@Consequence2;
-  //aConsequence.OnConsequence:= @Consequence;
-  //aConsequence.OnResponse:= @Response;
-  aConsequence.Loops := 0;
-  aConsequence.Color := 255;
-  aConsequence.FullPath := RootMedia + FDataSupport.CSQ2;
-  aConsequence.Play;
-  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
-  //aConsequence.FullScreen;
-end;
-
-
-procedure TFPE.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  if (Key = 27 {ESC}) and (FResponseEnabled = True) then
+  LConsequence := TKey.Create(Self);
+  with LConsequence do
     begin
-      FResponseEnabled:= False;
-      Invalidate;
+      Cursor:= Self.Cursor;
+      Parent:= Self;
+      Loops := 0;
+      Color := 255;
+      FullPath := RootMedia + FDataSupport.CSQ2;
+      Play;
     end;
-
-   if (ssCtrl in shift) and (Key = 81) {q} then
-      begin
-        Data := Data + LineEnding + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + LineEnding;
-        Result := 'NONE';
-        IETConsequence := 'NONE';
-        NextTrial := 'END';
-        EndTrial(Self);
-      end;
+  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
-
 
 procedure TFPE.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-var LTickCount : Extended;
 begin
-  LTickCount := TickCount;
-
-  if Key = 27 {ESC} then
+  if Key = 32 then
     begin
-      FResponseEnabled:= True;
-      Invalidate;
+      //if FUseMedia then ... not implemented yet
+      LogEvent('R');
+      FSchedule.DoResponse;
     end;
-
-  if FResponseEnabled then
-  begin
-    if Key = 32 then
-      if FShowStarter then
-        begin
-          //if FUseMedia then ... not implemented yet
-          FDataSupport.StarterLatency := LTickCount;
-          LogEvent('*R');
-          FShowStarter := False;
-          Invalidate;
-          StartTrial(Self);
-        end
-      else
-        begin
-          //if FUseMedia then ... not implemented yet
-          LogEvent('R');
-          FSchedule.DoResponse;
-        end;
   end;
-
 end;
 
-procedure TFPE.Paint;
+procedure TFPE.TrialPaint;
 var i : integer;
 begin
-  inherited Paint;
-  if FResponseEnabled then
-    begin
-      if FShowStarter then
-        begin
-          DrawCenteredCircle(Canvas, Width, Height, 6);
-        end
-      else
-        if FUseMedia then
-          begin
-            // do nothing, TKey draws itself
-            // use of custom TKey was not implemented yet
-          end
-        else
-          begin
-            for i := Low(FCurrTrial.C) to High(FCurrTrial.C) do
-              with FCurrTrial.C[i] do DrawCircle(Canvas, o.X, o.Y, size, gap, gap_degree, gap_length);
-          end;
-    end;
+  if not FUseMedia then
+    for i := Low(FCurrTrial.C) to High(FCurrTrial.C) do
+      with FCurrTrial.C[i] do
+        DrawCircle(Canvas, o.X, o.Y, size, gap, gap_degree, gap_length);
 end;
 
 procedure TFPE.Play(ACorrection: Boolean);
@@ -282,10 +218,10 @@ var
   end;
 
 begin
+  inherited Play(ACorrection);
   FResponseEnabled:= False;
 
   FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
-  FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
 
   if FUseMedia then
@@ -302,14 +238,9 @@ begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
       Kind := CfgTrial.SList.Values[_Schedule];
-      if Loaded then
-        begin
-          SetLength(FClockList, Length(FClockList) +1);
-          FClockList[Length(FClockList) -1] := StartMethod;
-        end
-      else raise Exception.Create(ExceptionNoScheduleFound);
+      Enabled := False;
     end;
-
+  AddToClockList(FSchedule);
   // allow user defined differential consequences
   // we expect something like:
 
@@ -389,19 +320,10 @@ begin
             end;
       end;
 
-  if FShowStarter then BeginStarter else StartTrial(Self);
-  //showmessage(BoolToStr(FShowStarter));
+  Config(Self);
 end;
 
-procedure TFPE.StartTrial(Sender: TObject);
-//var a1 : integer;
-  {
-  procedure KeyStart(var aKey : TKey);
-  begin
-    aKey.Play;
-    aKey.Visible:= True;
-  end;
-  }
+procedure TFPE.TrialStart(Sender: TObject);
 begin
   if FIsCorrection then
     begin
@@ -416,18 +338,7 @@ begin
 
   FConsequenceFired := False;
   FFirstResp := True;
-  FResponseEnabled:= True;
   FDataSupport.StmBegin := TickCount;
-
-  inherited StartTrial(Sender);
-end;
-
-
-procedure TFPE.BeginStarter;
-begin
-  LogEvent('S');
-  FResponseEnabled:= True;
-  Invalidate;
 end;
 
 procedure TFPE.WriteData(Sender: TObject);  //
@@ -476,7 +387,6 @@ begin
   //  if Sender is TKey then TKey(Sender).IncCounterResponse
   //    else;
 
-  //Invalidate;
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
