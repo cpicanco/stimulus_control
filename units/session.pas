@@ -22,7 +22,6 @@ uses Classes, Controls, SysUtils, LCLIntf
      , config_session
      , countermanager
      , FileUtil
-     , regdata
      , blocs
      , pupil_communication
      , timestamps
@@ -38,21 +37,18 @@ type
     FBackGround: TWinControl;
     FBlc: TBlc;
     FConfigs: TCfgSes;
-    FCrtReached : Boolean;
-    FDataTicks: Boolean;
+    FCrtReached : Boolean; // blc criteria achieved
     FGlobalContainer : TGlobalContainer;
     FManager : TCounterManager;
     FPupilClientEnabled: Boolean;
-    FRegData: TRegData;
-    FRegDataTicks: TRegData;
     FServerAddress: string;
     FSessName: string;
     FShowCounter : Boolean;
     FSubjName: string;
-    FFileData : string;
+    FFilename : string;
     function GetTestMode: Boolean;
     procedure BkGndResponse(Sender: TObject);
-    procedure BlcEndBlc(Sender: TObject);
+    procedure EndBlc(Sender: TObject);
     procedure Consequence(Sender: TObject);
     procedure Criteria(Sender: TObject);
     procedure EndSess(Sender: TObject);
@@ -86,15 +82,13 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure DoEndSess(Sender: TObject);
-    procedure Play(AFileData: String); overload;
+    procedure Play(AFilename: String); overload;
     property AudioDevice : TBassAudioDevice read FAudioDevice write FAudioDevice;
     property BackGround : TWinControl read FBackGround write SetBackGround;
     property SessName : String  read FSessName write FSessName;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
     property SubjName : String  read FSubjName write FSubjName;
     property TestMode : Boolean  read GetTestMode write SetTestMode;
-    property DataTicks : Boolean read FDataTicks write FDataTicks;
     property Configs : TCfgSes read FConfigs write SetConfigs;
     property Manager : TCounterManager read FManager write SetManager;
   public
@@ -111,7 +105,7 @@ type
 implementation
 
 uses
-  timestamps_logger
+  data_logger
 {$ifdef DEBUG}
   , debug_logger
 {$endif}
@@ -130,27 +124,18 @@ begin
   if Assigned(OnBkGndResponse) then FOnBkGndResponse(Sender);
 end;
 
-procedure TSession.BlcEndBlc(Sender: TObject);
+procedure TSession.EndBlc(Sender: TObject);
 begin
   case Configs.SessionType of
-  T_CIC:
-    begin
-      if FBlc.NextBlc = 'END' then Manager.CurrentBlc := Configs.NumBlc //ir para último bloco apenas se END constar
-      else  //próximo bloco sob qualquer outra condição
-        begin
-          Manager.OnEndBlc(Sender)
-        end;
-    end;
+    T_CIC : if FBlc.NextBlc = T_END then
+              Manager.CurrentBlc := Configs.NumBlc
+            else
+              Manager.OnEndBlc(Sender);
 
-  T_CRT:
-    begin
-      if not FCrtReached then Manager.CurrentBlc := Configs.NumBlc
-      else  //próximo bloco apenas se o critério foi alcançado
-        begin
-          Manager.OnEndBlc(Sender)
-        end;
-    end;
-
+    T_CRT:  if FCrtReached then
+              Manager.OnEndBlc(Sender)
+            else
+              Manager.CurrentBlc := Configs.NumBlc;
   end;
 
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
@@ -160,18 +145,16 @@ end;
 procedure TSession.EndSess(Sender: TObject);
 var Footer : string;
 begin
-  Footer := LineEnding + LineEnding+ HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
+  Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
   if PupilClientEnabled then
     begin
       FGlobalContainer.PupilClient.Request(REQ_SHOULD_STOP_RECORDING);
       CopyFile(FConfigs.Filename,FGlobalContainer.RootData + ExtractFileName(FConfigs.Filename));
     end;
 
-  FRegData.SaveData(Footer);
-  SetLogger(Footer);
-  if DataTicks then
-    FRegDataTicks.SaveData(Footer);
-
+  Sleep(100);
+  FreeLogger(LGData, Footer);
+  FreeLogger(LGTimestamps,Footer);
   if Assigned(OnEndSess) then FOnEndSess(Sender);
 end;
 
@@ -191,38 +174,29 @@ begin
 end;
 
 procedure TSession.Play;
-var Header : string;
+var
+  LHeader : string;
 begin
-  if FFileData = #0 then FFileData := '000.data';
-    if TestMode then
-      begin
-        FSessName:= FSessName + #9 + HTEST_MODE;
-        FFileData:= '000.test';
-      end;
+  if (FFilename = #0) or (FFilename = '') then
+    FFilename := '000';
 
-  Header := HSUBJECT_NAME + #9 + FSubjName + LineEnding +
-            HSESSION_NAME + #9 + FSessName + LineEnding +
-            HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding+LineEnding;
+  LHeader := HSUBJECT_NAME + #9 + FSubjName + LineEnding +
+             HSESSION_NAME + #9 + FSessName + LineEnding +
+             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding + LineEnding;
 
-  FRegData := TRegData.Create(Self, FGlobalContainer.RootData + FFileData);
+  FFilename := FGlobalContainer.RootData + FFilename;
+  CreateLogger(LGData, FFilename, LHeader);
+  CreateLogger(LGTimestamps, FFilename, LHeader);
 
-  FRegData.SaveData(Header);
-  SetLogger(ExtractFileNameWithoutExt(FRegData.FileName) + '.timestamps', Header);
+  { TODO -oRafael -cdebug : if test mode then }
+  // if TestMode then
+  //
 
-  // MTS, SIMPLE Trials only
-  if DataTicks then
-    begin
-      FRegDataTicks:= TRegData.Create(Self, ExtractFileNameWithoutExt(FRegData.FileName) + '.ticks');
-      FBlc.RegDataTicks := FRegDataTicks;
-      FRegDataTicks.SaveData(Header);
-    end;
-
-  FBlc.ShowCounter := ShowCounter;
-  FBlc.RegData:= FRegData;
+  FBlc.SaveData := GetSaveDataProc(LGData);
+  FBlc.SaveTData := GetSaveDataProc(LGTimestamps);
   FBlc.BackGround:= FBackGround;
-
+  FBlc.ShowCounter := FShowCounter;
   FManager.OnBeginSess(Self);
-
   PlayBlc(Self);
 end;
 
@@ -250,9 +224,6 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Information + ARequest + #32 + AResponse);
   {$endif}
-  //case ARequest of
-  //  REQ_SHOULD_START_RECORDING : Play;
-  //end;
 end;
 
 procedure TSession.SetBackGround(BackGround: TWinControl);
@@ -320,10 +291,10 @@ begin
   FBlc.OnStmResponse:= @StmResponse;
   FBlc.OnConsequence:= @Consequence;
   FBlc.OnBkGndResponse:= @BkGndResponse;
+  FBlc.OnEndBlc:= @EndBlc;
   FBlc.OnEndTrial:= @EndTrial;
   FBlc.OnHit:= @Hit;
   FBlc.OnMiss:= @Miss;
-  FBlc.OnEndBlc:= @BlcEndBlc;
   FBlc.OnCriteria := @Criteria;
 end;
 
@@ -343,20 +314,9 @@ begin
   inherited;
 end;
 
-procedure TSession.DoEndSess(Sender: TObject);
-var Footer : string;
+procedure TSession.Play(AFilename: String);
 begin
-  Footer := LineEnding + LineEnding + HSESSION_CANCELED + LineEnding + HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
-  if DataTicks then
-    FRegDataTicks.SaveData(Footer);
-
-  FRegData.SaveData(Footer);
-  EndSess(Sender);
-end;
-
-procedure TSession.Play(AFileData: String);
-begin
-  FFileData := AFileData;
+  FFilename := AFilename;
   FGlobalContainer.TimeStart := TickCount;
 
   if PupilClientEnabled then

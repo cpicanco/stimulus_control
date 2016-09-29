@@ -18,7 +18,6 @@ uses Classes, Controls, LCLIntf, LCLType,
      Dialogs,StdCtrls
 
      , config_session
-     , regdata
      , response_key
      , countermanager
      , custom_timer
@@ -43,12 +42,16 @@ type
 
   TBlc = class(TComponent)
   private
+    function GetTimeStart: Extended;
+  private
     //FOnBeginTrial: TNotifyEvent;
     //FClientThread : TZMQThread;
 
     FBlcHeader: String;
     FLastHeader: String;
     FNextBlc: String;
+    FSaveData: TDataProcedure;
+    FSaveTData: TDataProcedure;
 
     // session/global parameters
     FServerAddress: string;
@@ -57,13 +60,11 @@ type
     FIsCorrection : Boolean;
 
     // Trial data
-    FDataTicks,
     FLastData,
     FLastITIData : string;
     FFirstTrialBegin,
     FITIBegin,
-    FITIEnd,
-    FTimeStart : Extended;
+    FITIEnd : Extended;
 
     // Clock System
     FTimer : TClockThread;
@@ -76,8 +77,6 @@ type
     FBackGround: TWinControl;
     FBlc: TCfgBlc;
     FTrial: TTrial;
-    FRegData: TRegData;
-    FRegDataTicks: TRegData;
     FCounterManager : TCounterManager;
     FCounterLabel : TLabel;
     FIETMedia : TKey;
@@ -113,14 +112,15 @@ type
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
+    property TimeStart : Extended read GetTimeStart;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Play(ACfgBlc: TCfgBlc; AManager : TCountermanager; AGlobalContainer: TGlobalContainer);
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
-    property RegData: TRegData read FRegData write FRegData;
-    property RegDataTicks: TRegData read FRegDataTicks write FRegDataTicks;
+    property SaveData : TDataProcedure read FSaveData write FSaveData;
+    property SaveTData : TDataProcedure read FSaveTData write FSaveTData;
     property ServerAddress : string read FServerAddress write FServerAddress;
     property ShowCounter : Boolean read FShowCounter write FShowCounter;
   public
@@ -186,8 +186,8 @@ begin
   FLastHeader:= '';
   FIsCorrection := False;
 
-  FBlcHeader:= 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
-  FRegData.SaveData(FBlc.Name);
+  FBlcHeader:= 'Bloc__Id' + #9 + 'Bloc_Nam' + #9 + 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
+  //SaveData(FBlc.Name + LineEnding);
 
   PlayTrial;
 end;
@@ -223,7 +223,7 @@ begin
         begin
           FTrial.GlobalContainer := FGlobalContainer;
           FTrial.CounterManager := FCounterManager;
-          FTrial.TimeStart := FTimeStart;
+          FTrial.SaveTData := SaveTData;
           FTrial.DoubleBuffered := True;
           FTrial.Align := AlClient;
           FTrial.OnEndTrial := @EndTrial;
@@ -256,9 +256,10 @@ begin
       end;
 end;
 
+//todo: rewrite WriteTrialData
 procedure TBlc.WriteTrialData(Sender: TObject);
 var
-  CountTr, NumTr, NameTr, ITIData, NewData, Report : string;
+  CountBlc,CountTr, NumTr, NameTr, ITIData, NewData, LReportLn : string;
   IsFirst : Boolean;
 const
   EmptyBlock = #32#32#32#32#32#32#32#32;
@@ -266,17 +267,16 @@ const
 begin
   if FTrial.Header <> FLastHeader then
     begin
-      Report := LineEnding +
-                FBlcHeader +
+      LReportLn := FBlcHeader +
                 'ITIBegin' + #9 + '__ITIEnd' + #9 +
                 FTrial.Header + LineEnding;
 
-      FDataTicks := LineEnding +
-                    FBlcHeader +
-                    FTrial.HeaderTicks + LineEnding;
+
     end;
   FLastHeader := FTrial.Header;
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
+
+  CountBlc := IntToStr(FCounterManager.CurrentBlc + 1);
 
   CountTr := IntToStr(FCounterManager.Trials + 1);
   NumTr:= IntToStr(FCounterManager.CurrentTrial + 1);
@@ -286,10 +286,10 @@ begin
     NameTr := '--------'
   else NameTr := FBlc.Trials[FCounterManager.CurrentTrial].Name;
 
-  NewData := CountTr + #9 + NumTr + #9 + NameTr;
+  NewData := FBlc.Name + #9 + CountBlc + #9 + CountTr + #9 + NumTr + #9 + NameTr;
 
-  ITIData := FloatToStrF(FITIBegin - FTimeStart, ffFixed,0,9) + #9 +
-            FloatToStrF(FITIEND - FTimeStart, ffFixed,0,9);
+  ITIData := FloatToStrF(FITIBegin - TimeStart, ffFixed,0,9) + #9 +
+            FloatToStrF(FITIEND - TimeStart, ffFixed,0,9);
 
   // Check where it is coming from
   if Sender is TDZT then
@@ -318,23 +318,14 @@ begin
     end;
 
   if IsFirst then
-    ITIData := DoNotApply + #9 + FloatToStrF(FFirstTrialBegin - FTimeStart,ffFixed,0,9);
+    ITIData := DoNotApply + #9 + FloatToStrF(FFirstTrialBegin - TimeStart,ffFixed,0,9);
 
   // write data
-  Report := Report + NewData + #9 + ITIData + #9 + FTrial.Data + LineEnding;
-  FLastData := CountTr + #9 + NumTr + #9 + NameTr;
+  LReportLn := LReportLn + NewData + #9 + ITIData + #9 + FTrial.Data + LineEnding;
+  SaveData(LReportLn);
+  FLastData := NewData;
   FLastITIData := ITIData;
-  FRegData.SaveData(Report);
-
-  {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'ITI:' + FloatToStrF((FITIEND - FTimeStart) - (FITIBegin - FTimeStart),ffFixed,0,9));
-  {$endif}
-
-  FDataTicks := FDataTicks + CountTr + #9 + NumTr + #9 + FTrial.DataTicks +  LineEnding;
-  if Assigned(RegDataTicks) then
-    RegDataTicks.SaveData(FDataTicks);
-
-  FDataTicks := '';
+  FTrial.Data := '';
 end;
 
 procedure TBlc.EndTrial(Sender: TObject);
@@ -664,11 +655,7 @@ end;
 
 procedure TBlc.EndBlc(Sender: TObject);
 begin
-  FRegData.SaveData(LineEnding);
-
-  if Assigned(RegDataTicks) then
-    RegDataTicks.SaveData(LineEnding);
-
+  SaveData(LineEnding);
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
 end;
 
@@ -678,6 +665,11 @@ begin
   DebugLn(msg);
 end;
 {$endif}
+
+function TBlc.GetTimeStart: Extended;
+begin
+  Result := FGlobalContainer.TimeStart
+end;
 
 procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
 //var
