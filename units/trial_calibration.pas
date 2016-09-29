@@ -50,9 +50,9 @@ type
   private
     procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialStart(Sender: TObject);
   protected
     procedure BeforeEndTrial(Sender: TObject); override;
-    procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
 
     { TCustomControl overrides }
@@ -90,29 +90,20 @@ end;
 
 procedure TCLB.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if Key = 27 {ESC} then
-      begin
-        //FShowDots := True;
-        Invalidate;
-      end;
+  //if (ssCtrl in Shift) and (key = 66) { b } then
+  //  begin
+  //    Result := 'NONE';
+  //    IETConsequence := 'NONE';
+  //    NextTrial := '0'; // NextTrial
+  //    EndTrial(Self)
+  //  end;
 
-    if ssCtrl in Shift then
-      begin
-        if key = 66 {b} then
-          begin
-            Result := 'NONE';
-            IETConsequence := 'NONE';
-            NextTrial := '0'; // NextTrial
-            EndTrial(Self)
-          end;
-
-        if key = 67 {c} then // start pupil calibration
-          begin
-            if GlobalContainer.PupilEnabled then
-              GlobalContainer.PupilClient.Request(REQ_SHOULD_START_CALIBRATION);
-            FrmBackground.Hide;
-          end;
-      end;
+  if (ssCtrl in Shift) and (key = 67) { c } then
+    begin
+      if GlobalContainer.PupilEnabled then
+        GlobalContainer.PupilClient.Request(REQ_SHOULD_START_CALIBRATION);
+      FrmBackground.Hide;
+    end;
 end;
 
 procedure TCLB.None(Sender: TObject);
@@ -132,20 +123,19 @@ begin
   WriteData(Sender);
 end;
 
-procedure TCLB.StartTrial(Sender: TObject);
+procedure TCLB.TrialStart(Sender: TObject);
 begin
   FDataSupport.TrialBegin := TickCount;
-  inherited StartTrial(Sender);
 end;
 
 procedure TCLB.WriteData(Sender: TObject);
 begin
-  Data := //Format('%-*.*d', [4,8,CfgTrial.Id + 1]) + #9 +
-           TimestampToStr(FDataSupport.TrialBegin - TimeStart) + #9 +
-           TimestampToStr(FDataSupport.TrialEnd - TimeStart) + #9 +
-           IntToStr(Length(FDataSupport.Dots)) +
-           Data;
-  if Assigned(OnWriteTrialData) then OnWriteTrialData (Self);
+  inherited WriteData(Sender);
+  Data := Data + #9 +
+          TimestampToStr(FDataSupport.TrialBegin - TimeStart) + #9 +
+          TimestampToStr(FDataSupport.TrialEnd - TimeStart) + #9 +
+          IntToStr(Length(FDataSupport.Dots));
+  if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
 end;
 
 procedure TCLB.Paint;
@@ -228,7 +218,7 @@ begin
       OnCalibrationSuccessful := @PupilCalibrationSuccessful;
       Request(REQ_SHOULD_START_CALIBRATION);
       end;
-  StartTrial(Self);
+  Config(Self);
 end;
 
 

@@ -24,6 +24,8 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
 type
 
+  { TSampleDataSupport }
+
   TSampleDataSupport = record
     SampBkndRespCount,
     DelaBkndRespCount : integer;
@@ -43,23 +45,17 @@ type
     FDelay : TClockThread;
     FSample : TSupportKey;
     FSDataSupport : TSampleDataSupport;
-
+    procedure BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
     procedure DelayEnd(Sender: TObject);
     procedure SampleConsequence(Sender: TObject);
     procedure SampleResponse(Sender: TObject);
-    procedure VisibleComparisons(AValue: Boolean);
+    procedure TrialStart(Sender: TObject);
     procedure VisibleSample(AValue: Boolean);
-    procedure BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
   protected
     // TTrial
-    procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
     procedure BeforeEndTrial(Sender: TObject); override;
-    // TCustomControl
-    //procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    //procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(ACorrection : Boolean); override;
@@ -73,7 +69,6 @@ constructor TMTS.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   OnBeforeEndTrial := @BeforeEndTrial;
-  OnMouseDown := @BackgroundMouseDown;
 
   Header := 'Pos.Mod.' + #9 +
             'Res.Mod.' + #9 +
@@ -83,12 +78,6 @@ begin
             'Atr.Mod.' + #9 +
             'Frq.Mod.' + #9 +
             Header;
-
-  HeaderTicks := 'Tmp.Mod.' + #9 +
-                 'Ext.Mod.' + #9 +
-                 'Lft.Mod.' + #9 +
-                 'Top.Mod.' + #9 +
-                 HeaderTicks;
 end;
 
 
@@ -97,6 +86,7 @@ var
   s1, LName, LLoop, LColor: string;
   R: TRect;
 begin
+  inherited Play(ACorrection);
   with FSample do begin
     Key:= TKey.Create(Self);
     Key.Cursor:= Self.Cursor;
@@ -138,8 +128,7 @@ begin
       FDelay.Enabled := False;
       AddToClockList(@FDelay.Start);
     end;
-
-  inherited Play(ACorrection);
+  Config(Self);
 end;
 
 procedure TMTS.DelayEnd(Sender: TObject);
@@ -171,7 +160,7 @@ begin
         LTickCount := TickCount;
         LTime := TimestampToStr(LTickCount - TimeStart);
 
-        DataTicks := DataTicks + LTime + #9 + TKey(Sender).LastResponseLog + LineEnding;
+        LogEvent(TKey(Sender).LastResponseLog);
 
         if FSDataSupport.SampLatency = TimeStart then
             FSDataSupport.SampLatency := LTickCount;
@@ -179,16 +168,6 @@ begin
         if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
         if Assigned(OnStmResponse) then OnStmResponse (Self);
       end;
-end;
-
-procedure TMTS.VisibleComparisons(AValue: Boolean);
-var i : integer;
-begin
-  for i := Low(FComparisons) to High(FComparisons) do
-  begin
-    FComparisons[i].Key.Schedule.Enabled := AValue;
-    FComparisons[i].Key.Visible := AValue;
-  end;
 end;
 
 procedure TMTS.VisibleSample(AValue: Boolean);
@@ -200,12 +179,8 @@ procedure TMTS.BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 
 var
-  LTickCount : Extended;
   aTime, aStimulus : string;
 begin
-  LTickCount := TickCount;
-  aTime := TimestampToStr(LTickCount - TimeStart);
-
   if FSample.Key.Visible then
     begin
       aStimulus := 'BK.S';
@@ -216,19 +191,20 @@ begin
       aStimulus := 'BK.D';
       Inc(FSDataSupport.DelaBkndRespCount);
     end;
-  DataTicks := DataTicks + aTime + #9 + aStimulus + #9 + IntToStr(X) + #9 + IntToStr(Y) + LineEnding;
+  LogEvent(aStimulus + #9 + IntToStr(X) + #9 + IntToStr(Y));
 
   CounterManager.OnBkgndResponse(Self);
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;
 
-procedure TMTS.StartTrial(Sender: TObject);
+procedure TMTS.TrialStart(Sender: TObject);
 begin
+  if FIsCorrection then BeginCorrection(Self);
   FSDataSupport.SampLatency := TimeStart;
   FSDataSupport.SampleBegin := TickCount;
   VisibleSample(True);
   VisibleComparisons(False);
-  StartTrialDontShow(Sender);
+  OnMouseDown := @BackgroundMouseDown;
 end;
 
 

@@ -54,8 +54,6 @@ type
     FCycles : integer;
     FDataSupport : TDataSupport;
     FDizzyTimer : TDizzyTimer;
-    FFirstResp : Boolean;
-    FResponseEnabled : Boolean;
     FSchedule : TSchMan;
     FStimuli : array of TRect;
     function GetCycles: integer;
@@ -66,14 +64,13 @@ type
     procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
     procedure TrialResult(Sender: TObject);
-    procedure UpdateTimer1(Sender: TObject);
-    procedure UpdateTimer2(Sender: TObject);
-  private { TCustomControl }
     procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialStart(Sender: TObject);
+    procedure UpdateTimer1(Sender: TObject);
+    procedure UpdateTimer2(Sender: TObject);
   protected { TTrial }
     procedure BeforeEndTrial(Sender: TObject); override;
-    procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
     procedure Paint; override;
   public
@@ -107,6 +104,7 @@ begin
              '____Mode' + #9 +
              'RespFreq'
              ;
+  HeaderTimestamps := HeaderTimestamps + #9 + 'Event';
   FCycles := 0;
   FDataSupport.Responses:= 0;
 end;
@@ -149,57 +147,33 @@ begin
 end;
 
 procedure TDZT.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-var LTickCount : Extended;
 begin
-  LTickCount := TickCount;
-
   if FResponseEnabled then
     begin
       if Key = 32 {space} then
         begin
           FSchedule.DoResponse;
-          if FFirstResp then
-            begin
-              LogEvent('*R');
-              FFirstResp := False;
-              FDataSupport.Latency := LTickCount;
-            end
-          else LogEvent('R');
+          // first response
+          if FDataSupport.Latency = TimeStart then
+              FDataSupport.Latency := TickCount;
+          LogEvent('R');
         end;
-    end;
-
-  if Key = 27 {ESC} then
-    begin
-      FResponseEnabled := True;
-      Invalidate;
-    end;
-
-  if (ssCtrl in Shift) and (Key = 81 {q}) then
-    begin
-      Data := Data + #13#10 + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + #13#10;
-      Result := 'NONE';
-      IETConsequence := 'NONE';
-      NextTrial := 'END';
-      None(Self);
-      EndTrial(Self);
     end;
 end;
 
 procedure TDZT.Consequence(Sender: TObject);
-var aConsequence : TKey;
+var LConsequence : TKey;
 begin
-  {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'C' + #9 +  RootMedia + FConsequence);
-  {$endif}
-  aConsequence := TKey.Create(Self);
-  aConsequence.Parent:= Self;
-  aConsequence.Loops := 0;
-  aConsequence.FullPath := RootMedia + FConsequence;
-  aConsequence.Play;
+  LConsequence := TKey.Create(Self);
+  with LConsequence do
+    begin
+      Parent:= Self;
+      Loops := 0;
+      FullPath := RootMedia + FConsequence;
+      Play;
+    end;
   LogEvent('C');
 
-  { TODO 1 -oRafael -cenhencement : Find a better way to prevent data loss. }
-  Sleep(10); // hack to prevent data loss
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
 
@@ -207,9 +181,9 @@ procedure TDZT.TrialResult(Sender: TObject);
 begin
   Result := T_NONE;
   IETConsequence := T_NONE;
-  if Result = T_HIT then Hit(Sender);
-  if Result = T_MISS then  Miss(Sender);
-  if Result = T_NONE then  None(Sender);
+  //if Result = T_HIT then Hit(Sender);
+  //if Result = T_MISS then  Miss(Sender);
+  //if Result = T_NONE then  None(Sender);
 end;
 
 procedure TDZT.UpdateTimer1(Sender: TObject);
@@ -266,13 +240,12 @@ begin
 
   // must pass Self here, see TBLC.WriteTrialData
   WriteData(Self);
-  FFirstResp := True;
 end;
 
 procedure TDZT.UpdateTimer2(Sender: TObject);
 var
-    LTickCount : Extended;
-    ACode : string;
+  LTickCount : Extended;
+  ACode : string;
 begin
   TClockThread(Sender).Enabled := False;
 
@@ -299,7 +272,7 @@ begin
   LogEvent(ACode);
 
   Invalidate;
-  FFirstResp := True;
+  FDataSupport.Latency := TimeStart;
 end;
 
 
@@ -396,11 +369,8 @@ begin
           Timer2.OnTimer := @UpdateTimer1;
         end;
 
-      SetLength(FClockList, Length(FClockList) + 1);
-      FClockList[Length(FClockList) -1] := @Timer1.Start;
-
-      SetLength(FClockList, Length(FClockList) + 1);
-      FClockList[Length(FClockList) -1] := @Timer2.Start;
+      AddToClockList(@Timer1.Start);
+      AddToClockList(@Timer2.Start);
 
       {$ifdef DEBUG}
         DebugLn(mt_Debug + 'FDizzyTimer:' + IntToStr(Main) +','+ IntToStr(Host) );
@@ -437,11 +407,11 @@ begin
 
         FStimuli[a1] := R;
     end;
-  StartTrial(Self);
+  Config(Self);
 end;
 
 
-procedure TDZT.StartTrial(Sender: TObject);
+procedure TDZT.TrialStart(Sender: TObject);
 var
   LTickCount : Extended;
 
@@ -452,7 +422,7 @@ var
   end;
 
 begin
-  FFirstResp := True;
+  FDataSupport.Latency := TimeStart;
   LTickCount := TickCount;
 
   with FDataSupport do
@@ -462,11 +432,7 @@ begin
       Timer2 := TimeStart;
     end;
 
-  FResponseEnabled := True;
-  Invalidate;
   FDataSupport.StmBegin := LTickCount;
-  LogEvent('S');
-  inherited StartTrial(Sender);
 end;
 
 procedure TDZT.BeforeEndTrial(Sender: TObject);
@@ -486,37 +452,25 @@ procedure TDZT.WriteData(Sender: TObject);  //
 var
     Latency, Timer2 : string;
 begin
-  if not FFirstResp then
-    Latency := TimestampToStr(FDataSupport.Latency - TimeStart)
-  else Latency := #32#32#32#32#32#32 + 'NA';
+  inherited WriteData(Sender);
+  if FDataSupport.Latency = TimeStart then
+    Latency := #32#32#32#32#32#32 + 'NA'
+  else Latency := TimestampToStr(FDataSupport.Latency - TimeStart);
 
-  if FDataSupport.Timer2 <> TimeStart then
-    Timer2 := TimestampToStr(FDataSupport.Timer2 - TimeStart)
-  else Timer2 := #32#32#32#32#32#32 + 'NA';
+  if FDataSupport.Timer2 = TimeStart then
+    Timer2 := #32#32#32#32#32#32 + 'NA'
+  else Timer2 := TimestampToStr(FDataSupport.Timer2 - TimeStart);
 
-  {
-  Header :=  'StmBegin' + #9 +
-             '_Latency' + #9 +
-             '___Cycle' + #9 +
-             '__Timer2' + #9 +
-             '_Version' + #9 +
-             '____Mode' + #9 +
-             'RespFreq'
-             ;
-
-  }
-  Data :=  TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
-           Latency + #9 +
-           TimestampToStr(FDataSupport.Cycle - TimeStart) + #9 +
-           Timer2 + #9 +
-           FDizzyTimer.Version + #9 +
-           FDizzyTimer.Mode + #9 +
-           Format('%-*.*d', [4, 8, FDataSupport.Responses])
-           + Data;
-
+  Data := Data + #9 +
+          TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
+          Latency + #9 +
+          TimestampToStr(FDataSupport.Cycle - TimeStart) + #9 +
+          Timer2 + #9 +
+          FDizzyTimer.Version + #9 +
+          FDizzyTimer.Mode + #9 +
+          Format('%-*.*d', [4, 8, FDataSupport.Responses]);
 
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
-  Data := '';
 end;
 
 procedure TDZT.Hit(Sender: TObject);

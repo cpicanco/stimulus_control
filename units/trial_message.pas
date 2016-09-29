@@ -33,15 +33,15 @@ type
   TMSG = class(TTrial)
   private
     FDataSupport : TDataSupport;
-    FResponseEnabled : Boolean;
     FMessagePrompt,
     FMessage : TLabel;
     procedure MessageMouseUp(Sender: TObject;Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialStart(Sender: TObject);
   protected
     procedure BeforeEndTrial(Sender: TObject); override;
-    procedure StartTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
+    procedure Paint; override;
     //procedure ThreadClock(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -64,11 +64,13 @@ uses
 constructor TMSG.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnKeyUp := @TrialKeyUp;
   OnBeforeEndTrial := @BeforeEndTrial;
+  OnTrialKeyUp := @TrialKeyUp;
+  OnTrialStart := @TrialStart;
 
   FMessage := TLabel.Create(Self);
   with FMessage do begin
+    Visible := False;
     Cursor := -1;
     Alignment := taCenter;
     Anchors := [akLeft,akRight];
@@ -81,6 +83,7 @@ begin
 
   FMessagePrompt := TLabel.Create(Self);
   with FMessagePrompt do begin
+    Visible := False;
     Cursor := -1;
     Caption := MessagePrompt1;
     Font.Name := 'TimesNewRoman';
@@ -89,7 +92,11 @@ begin
     Parent := Self;
   end;
 
-  Header := '___Start' + #9 + 'Duration' + #9 + 'Message';
+  Header := Header +
+            '___Start' + #9 +
+            'Duration' + #9 +
+            'Message';
+
   Result := T_NONE;
   IETConsequence := T_NONE;
   Result := T_NONE;
@@ -99,20 +106,14 @@ procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   if FResponseEnabled then
-    if FLimitedHold = 0 then
-      EndTrial(Sender);
+    EndTrial(Sender);
 end;
 
 procedure TMSG.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if FResponseEnabled then
-    if FLimitedHold = 0 then
-      if (not (ssCtrl in Shift)) and (Key = 32) then
-          EndTrial(Sender);
-
-  {$ifdef DEBUG}
-    DebugLn(mt_Debug +  'TMSG.KeyUp:'+ GetTimeStampF);
-  {$endif}
+    if (not (ssCtrl in Shift)) and (Key = 32) then
+      EndTrial(Sender);
 end;
 
 procedure TMSG.BeforeEndTrial(Sender: TObject);
@@ -139,37 +140,49 @@ begin
       Width := StrToIntDef(CfgTrial.SList.Values[_MsgWidth], 640);
       Font.Size := StrToIntDef(CfgTrial.SList.Values[_MsgFontSize], 22);
       Font.Color := LFontColor;
-      Color := StrToIntDef(CfgTrial.SList.Values[_BkGnd], Self.Color);
+    end;
+
+  with FMessagePrompt do
+    begin
+      Cursor := Self.Cursor;
+      Font.Color:= LFontColor;
+      Enabled := StrToBoolDef(CfgTrial.SList.Values[_Prompt], False);
+    end;
+
+  Config(Self);
+end;
+
+procedure TMSG.TrialStart(Sender: TObject);
+begin
+  with FMessage do
+    begin
+      Visible := True;
       SetBounds((Self.Width - Width) div 2, (Self.Height - Height) div 2, Width, Height);
     end;
 
-  FMessagePrompt.Visible := StrToBoolDef(CfgTrial.SList.Values[_Prompt], False);
-  with FMessagePrompt do
-    if Visible then
+  if FMessagePrompt.Enabled then
+    with FMessagePrompt do
       begin
-        Font.Color:= LFontColor;
+        Visible := True;
         SetBounds((Self.Width - Width) div 2, (Self.Height - Height) - 20, Width, Height);
       end;
-
-  StartTrial(Self);
-end;
-
-procedure TMSG.StartTrial(Sender: TObject);
-begin
-  FResponseEnabled := True;
   FDataSupport.TrialBegin := TickCount;
-  inherited StartTrial(Sender);
 end;
-
 
 procedure TMSG.WriteData(Sender: TObject);
 var aStart, aDuration : string;
 begin
+  inherited WriteData(Sender);
   aStart := TimestampToStr(FDataSupport.TrialBegin - TimeStart);
   aDuration := TimestampToStr(FDataSupport.TrialEnd - TimeStart);
 
-  Data := aStart + #9 + aDuration + #9 + FMessage.Caption + Data;
+  Data := Data + aStart + #9 + aDuration + #9 + FMessage.Caption;
   if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
+end;
+
+procedure TMSG.Paint;
+begin
+  inherited Paint;
 end;
 
 end.
