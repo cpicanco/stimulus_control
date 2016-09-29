@@ -87,6 +87,7 @@ implementation
 constructor TKey.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  Visible := False;
   Height:= 45;
   Width:= 45;
   EditMode := False;
@@ -151,6 +152,7 @@ procedure TKey.Paint;
                    Caption);
         end;
     end;
+
     procedure PaintFBitMap;
     begin
       with Canvas do
@@ -159,16 +161,14 @@ procedure TKey.Paint;
           StretchDraw(Rect(0, 0, Width, Height), FBitMap);
         end;
     end;
+
 begin
-  if FileExists(Self.FullPath) { *Converted from FileExists*  } then
-    begin
-      if (FKind.stmImage = stmPicture) then PaintFBitMap;
-      if (FKind.stmImage = stmAnimation) then ;//FGifImage.Visible := True;
-    end
-  else
-    begin
-      if Color <> -1 then PaintKey(Color);
-    end;
+  case FKind.stmImage of
+    stmPicture:PaintFBitMap;
+    //stmAnimation:PaintGIF;
+    stmNone:PaintKey(Color);
+    stmVideo:;
+  end;
 end;
 
 procedure TKey.Play;
@@ -330,7 +330,7 @@ var
     except
       on E : Exception do
         begin
-          ShowMessage('erro: ' + E.Message);
+          WriteLn('TKey.SetFileName: ' + E.Message);
           Application.Terminate;
         end;
     end;
@@ -453,47 +453,9 @@ begin
   FSchMan.DoResponse;
 end;
 
-//procedure TKey.MouseDown(Sender : TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-//begin
-//  inherited MouseDown(Button, Shift, X, Y);
-//  FLRespPnt[0] := X;
-//  FLRespPnt[1] := Y;
-//  FSchMan.DoResponse;
-//end;
-//
-//procedure TKey.MouseDown(Sender : TObject; Button: Smallint; ShiftState: Smallint; X: Integer; Y: Integer);
-//var Shift : TShiftState;
-//    aButton : TMouseButton;
-//begin
-//  case ShiftState of
-//    0: Shift := [ssShift];
-//    1: Shift := [ssAlt];
-//    2: Shift := [ssCtrl];
-//    3: Shift := [ssLeft];
-//    4: Shift := [ssRight];
-//    5: Shift := [ssMiddle];
-//    6: Shift := [ssDouble];
-//    //7: Shift := [ssTouch];
-//    //8: Shift := [ssPen];
-//    //9: Shift := [ssCommand];
-//      else Shift := [];
-//  end;
-//  case Button of
-//    0: aButton := mbLeft;
-//    1: aButton := mbRight;
-//    2: aButton := mbMiddle;
-//    else aButton := mbLeft;
-//  end;
-//
-//  inherited MouseDown(aButton, Shift, X, Y);
-//  FLRespPnt[0] := X;
-//  FLRespPnt[1] := Y;
-//  FSchMan.DoResponse;
-//end;
 //******
 //**  **
 //******
-// Necessariamente Self, pois o objeto TKey deve enviar suas informações de localização aos descendentes de TTrial
 // Sender is irrelevant at this point, TKey needs to send its info to TTrial decendents.
 //******
 //**  **
