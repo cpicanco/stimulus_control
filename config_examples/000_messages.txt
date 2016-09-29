@@ -47,6 +47,7 @@ Msg=  This is a test 5
 [Blc 1 - T6]
 Name= M6
 Kind= MSG
+Prompt= True
 Msg=  This is a test 6
 
 [Blc 1 - T7]
@@ -58,12 +59,13 @@ Msg=  This is a test 7
 [Blc 1 - T8]
 Name= M8
 Kind= MSG
-LimitedHold= 500
+Starter= True
 Msg=  This is a test 8
 
 [Blc 1 - T9]
 Name= M9
 Kind= MSG
+Starter= True
 LimitedHold= 500
 Msg=  This is a test 9
 
