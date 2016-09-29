@@ -19,16 +19,12 @@ unit timestamps_helpers;
 interface
 
 uses
-  Classes, SysUtils,  Linux, UnixType
-  , regdata
-  ;
+  Classes, SysUtils,  Linux, UnixType;
 
   function GetCustomTick : Extended;
   function GetMonotonicTime : timespec;
   function GetMonotonicTimeRaw : timespec;
   function GetClockResolution : string; // granularity
-
-var TimestampLogger : TRegData;
 
 implementation
 
@@ -58,7 +54,6 @@ begin
   clock_gettime(CLOCK_MONOTONIC_RAW, @tp);
   Result := tp;
 end;
-
 
 function GetClockResolution: string;
 var
