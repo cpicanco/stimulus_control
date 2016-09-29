@@ -19,6 +19,9 @@ uses Classes, ComCtrls, IniFiles, SysUtils,  Dialogs, Forms
 
 type
 
+  { TDataProcedure }
+  TDataProcedure = procedure (S : string) of object;
+
   { TGlobalContainer }
 
   TGlobalContainer = class //(TObject)
