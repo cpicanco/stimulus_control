@@ -146,7 +146,7 @@ begin
       Enabled := StrToBoolDef(CfgTrial.SList.Values[_Prompt], False);
     end;
 
-  Config(Self);
+  if Self.ClassType = TMSG then Config(Self);
 end;
 
 procedure TMSG.TrialStart(Sender: TObject);

@@ -201,7 +201,8 @@ begin
       OnCalibrationSuccessful := @PupilCalibrationSuccessful;
       Request(REQ_SHOULD_START_CALIBRATION);
       end;
-  Config(Self);
+
+  if Self.ClassType = TCLB then Config(Self);
 end;
 
 

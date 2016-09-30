@@ -69,7 +69,7 @@ constructor TMTS.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
-
+  OnTrialStart := @TrialStart;
 
   Header := 'Pos.Mod.' + #9 +
             'Res.Mod.' + #9 +
@@ -84,7 +84,7 @@ end;
 
 procedure TMTS.Play(ACorrection : Boolean);
 var
-  s1, LName, LLoop, LColor: string;
+  s1: string;
   R: TRect;
 begin
   inherited Play(ACorrection);
@@ -95,6 +95,7 @@ begin
     Key.OnConsequence:= @SampleConsequence;
     Key.OnResponse:= @SampleResponse;
 
+    // BND
     s1:= CfgTrial.SList.Values[_Samp + _cBnd];
     R.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
     NextSpaceDelimitedParameter(s1);
@@ -105,21 +106,23 @@ begin
     R.Bottom:= StrToIntDef(s1, 0);
     Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
+    // STM
     s1:= CfgTrial.SList.Values[_Samp + _cStm] + #32;
-    LName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
+    Key.FullPath:= RootMedia + Copy(s1, 0, pos(#32, s1)-1);
     NextSpaceDelimitedParameter(s1);
-    LLoop := Copy(s1, 0, pos(#32, s1)-1);
+    Key.Loops:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
     NextSpaceDelimitedParameter(s1);
-    LColor := Copy(s1, 0, pos(#32, s1)-1);
-    Key.Color := StrToIntDef(LColor, $0000FF);
+    Key.Color := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), $0000FF);
 
-    Key.Loops:= StrToIntDef(LLoop, 0);
-    Key.FullPath:= LName;
+    // SCH
     Key.Schedule.Kind:= CfgTrial.SList.Values[_Samp + _cSch];
     AddToClockList(Key.Schedule);
+
+    // MSG
     Msg:= CfgTrial.SList.Values[_Samp + _cMsg];
   end;
 
+  // DELAY
   FDelayed:= StrToBoolDef(CfgTrial.SList.Values[_Delayed], False);
   if FDelayed then
     begin
@@ -129,7 +132,8 @@ begin
       FDelay.Enabled := False;
       AddToClockList(@FDelay.Start);
     end;
-  Config(Self);
+
+  if Self.ClassType = TMTS then Config(Self);
 end;
 
 procedure TMTS.DelayEnd(Sender: TObject);
@@ -142,10 +146,12 @@ end;
 
 procedure TMTS.SampleConsequence(Sender: TObject);
 begin
-  FSDataSupport.Delay_Begin := TickCount;
-  VisibleSample(False);
   if FDelayed then
-    FDelay.Enabled := True
+    begin
+      VisibleSample(False);
+      FDelay.Enabled := True;
+      FSDataSupport.Delay_Begin := TickCount;
+    end
   else
     VisibleComparisons(True);
 end;
@@ -153,14 +159,11 @@ end;
 procedure TMTS.SampleResponse(Sender: TObject);
 var
   LTickCount : Extended;
-  LTime : string;
 begin
   if Sender is TKey then
     if TKey(Sender).Visible then
       begin
         LTickCount := TickCount;
-        LTime := TimestampToStr(LTickCount - TimeStart);
-
         LogEvent(TKey(Sender).LastResponseLog);
 
         if FSDataSupport.SampLatency = TimeStart then
@@ -180,7 +183,7 @@ procedure TMTS.SampleMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 
 var
-  aTime, aStimulus : string;
+  aStimulus : string;
 begin
   if FSample.Key.Visible then
     begin

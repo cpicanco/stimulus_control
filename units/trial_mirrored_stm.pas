@@ -207,7 +207,7 @@ begin
             end;
       end;
 
-  Config(Self);
+  if Self.ClassType = TMRD then Config(Self);
 end;
 
 procedure TMRD.TrialStart(Sender: TObject);
