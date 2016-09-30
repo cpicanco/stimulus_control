@@ -447,9 +447,7 @@ procedure TKey.KeyMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   Inc(FResponseCount);
-  FLastResponseLog := ExtractFileNameOnly(FullPath) + #9 +
-                      IntToStr(X + Left) + #9 +
-                      IntToStr(Y + Top);
+  FLastResponseLog := IntToStr(X + Left) + #9 + IntToStr(Y + Top);
   FSchMan.DoResponse;
 end;
 

@@ -94,8 +94,6 @@ begin
              'Frq.Cmp.';
 
   HeaderTimestamps := HeaderTimestamps + #9 +
-                      'Tmp.Cmp.' + #9 +
-                      'Ext.Cmp.' + #9 +
                       'Lft.Cmp.' + #9 +
                       'Top.Cmp.';
 
@@ -330,7 +328,7 @@ begin
   if Sender is TKey then
     if TKey(Sender).Visible then
       begin
-        LogEvent(TKey(Sender).LastResponseLog);
+        LogEvent(FComparisons[TKey(Sender).Tag].Msg + #9 + TKey(Sender).LastResponseLog);
 
         if FDataSupport.Latency = TimeStart then
           FDataSupport.Latency := TickCount;

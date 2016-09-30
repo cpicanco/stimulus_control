@@ -163,8 +163,7 @@ begin
 
   Header := 'StmBegin' + #9 +
             '__StmEnd' + #9 +
-            '____Dots'
-            ;
+            '____Dots';
 end;
 
 procedure TCLB.Play(ACorrection: Boolean);
