@@ -306,7 +306,7 @@ begin
             end;
       end;
 
-  Config(Self);
+  if Self.ClassType = TFPE then Config(Self);
 end;
 
 procedure TFPE.TrialStart(Sender: TObject);
