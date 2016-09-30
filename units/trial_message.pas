@@ -36,10 +36,10 @@ type
     FMessagePrompt,
     FMessage : TLabel;
     procedure MessageMouseUp(Sender: TObject;Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
+    procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
   protected
-    procedure BeforeEndTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
     procedure Paint; override;
     //procedure ThreadClock(Sender: TObject); override;
@@ -64,7 +64,7 @@ uses
 constructor TMSG.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnBeforeEndTrial := @BeforeEndTrial;
+  OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
 
@@ -105,24 +105,21 @@ end;
 procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  if FResponseEnabled then
-    EndTrial(Sender);
+  EndTrial(Sender);
 end;
 
 procedure TMSG.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if FResponseEnabled then
-    if (not (ssCtrl in Shift)) and (Key = 32) then
-      EndTrial(Sender);
+  if Key = 32 then
+    EndTrial(Sender);
 end;
 
-procedure TMSG.BeforeEndTrial(Sender: TObject);
+procedure TMSG.TrialBeforeEnd(Sender: TObject);
 begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TMSG.BeforeEndTrial:'+ TObject(Sender).ClassName);
   {$endif}
   FDataSupport.TrialEnd := TickCount;
-  FResponseEnabled := False;
   WriteData(Self);
 end;
 
@@ -177,7 +174,7 @@ begin
   aDuration := TimestampToStr(FDataSupport.TrialEnd - TimeStart);
 
   Data := Data + aStart + #9 + aDuration + #9 + FMessage.Caption;
-  if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
+  if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
 end;
 
 procedure TMSG.Paint;

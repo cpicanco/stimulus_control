@@ -47,8 +47,6 @@ type
     //FOnBeginTrial: TNotifyEvent;
     //FClientThread : TZMQThread;
 
-    FBlcHeader: String;
-    FLastHeader: String;
     FNextBlc: String;
     FSaveData: TDataProcedure;
     FSaveTData: TDataProcedure;
@@ -59,7 +57,10 @@ type
     FTestMode: Boolean;
     FIsCorrection : Boolean;
 
-    // Trial data
+    FBlcHeader: string;
+
+    FLastTrialHeader,
+    FLastTimestampsHeader,
     FLastData,
     FLastITIData : string;
     FFirstTrialBegin,
@@ -88,7 +89,7 @@ type
     FOnCriteria: TNotifyEvent;
     FOnEndBlc: TNotifyEvent;
     FOnEndCorrection : TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
+    FOnTrialEnd: TNotifyEvent;
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
@@ -130,7 +131,7 @@ type
     property OnCriteria: TNotifyEvent read FOnCriteria write FOnCriteria;
     property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
     property OnEndCorrection: TNotifyEvent read FOnEndCorrection write FOnEndCorrection;
-    property OnEndTrial : TNotifyEvent read FOnEndTrial write FOnEndTrial;
+    property OnTrialEnd : TNotifyEvent read FOnTrialEnd write FOnTrialEnd;
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
     property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
@@ -183,7 +184,8 @@ begin
   FCounterManager := AManager;
   FGlobalContainer:= AGlobalContainer;
 
-  FLastHeader:= '';
+  FLastTrialHeader:= '';
+  FLastTimestampsHeader := '';
   FIsCorrection := False;
 
   FBlcHeader:= 'Bloc__Id' + #9 + 'Bloc_Nam' + #9 + 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
@@ -202,7 +204,6 @@ begin
     end;
 
   if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
-
 
   IndTrial := FCounterManager.CurrentTrial;
   if IndTrial = 0 then FFirstTrialBegin := TickCount;
@@ -223,18 +224,18 @@ begin
         begin
           FTrial.GlobalContainer := FGlobalContainer;
           FTrial.CounterManager := FCounterManager;
+          FTrial.CfgTrial := FBlc.Trials[IndTrial];
           FTrial.SaveTData := SaveTData;
           FTrial.DoubleBuffered := True;
           FTrial.Align := AlClient;
-          FTrial.OnEndTrial := @EndTrial;
-          FTrial.OnWriteTrialData := @WriteTrialData;
+          FTrial.OnTrialEnd := @EndTrial;
+          FTrial.OnTrialWriteData := @WriteTrialData;
           FTrial.OnStmResponse := @StmResponse;
           FTrial.OnBkGndResponse := @BkGndResponse;
           FTrial.OnHit := @Hit;
           FTrial.OnMiss := @Miss;
           FTrial.OnNone := @None;
-          FTrial.CfgTrial := FBlc.Trials[IndTrial];
-          //FTrial.SetClientThread(FClientThread);
+
           FTrial.Parent := FBackGround;
           // dependencies above
           FTrial.Visible := False;
@@ -265,15 +266,14 @@ const
   EmptyBlock = #32#32#32#32#32#32#32#32;
   DoNotApply = #32#32#32#32#32#32 + 'NA';
 begin
-  if FTrial.Header <> FLastHeader then
-    begin
-      LReportLn := FBlcHeader +
-                'ITIBegin' + #9 + '__ITIEnd' + #9 +
-                FTrial.Header + LineEnding;
+  if FTrial.Header <> FLastTrialHeader then
+    LReportLn := FBlcHeader + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + LineEnding;
+  FLastTrialHeader := FTrial.Header;
 
+  if FTrial.HeaderTimestamps <> FLastTimestampsHeader then
+    SaveTData(FTrial.HeaderTimestamps + LineEnding);
+  FLastTimestampsHeader := FTrial.HeaderTimestamps;
 
-    end;
-  FLastHeader := FTrial.Header;
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
 
   CountBlc := IntToStr(FCounterManager.CurrentBlc + 1);
@@ -382,10 +382,10 @@ begin
   HasTimeOut := False;
   HasCsqInterval := False;
 
-  if  (FTrial.NextTrial = 'END') then //end bloc
+  if  (FTrial.NextTrial = T_END) then //end bloc
     FCounterManager.CurrentTrial := FBlc.NumTrials
   else // continue
-    if (FTrial.NextTrial = 'CRT') or // FTrial.NextTrial base 1, FCounterManager.CurrentTrial.Counter base 0)
+    if (FTrial.NextTrial = T_CRT) or // FTrial.NextTrial base 1, FCounterManager.CurrentTrial.Counter base 0)
        (FTrial.NextTrial = (IntToStr(FCounterManager.CurrentTrial + 1))) then
       begin //correction trials were on
         if ((FBlc.MaxCorrection) = FCounterManager.BlcCscCorrections) and
@@ -393,7 +393,7 @@ begin
           begin //correction
             FCounterManager._VirtualTrialFix;
             FCounterManager.OnNotCorrection(Sender);
-            FCounterManager.OnEndTrial (Sender);
+            FCounterManager.OnTrialEnd (Sender);
             FIsCorrection := False;
           end
         else
@@ -405,7 +405,7 @@ begin
     else  //correction trials were off
       if StrToIntDef(FTrial.NextTrial, 0) > 0 then
         begin //go to the especified trial
-          if FTrial.Result = 'MISS' then
+          if FTrial.Result = T_MISS then
             FCounterManager.VirtualTrialLoop := FCounterManager.VirtualTrialValue;
 
           FCounterManager.OnNotCorrection(Sender);
@@ -415,11 +415,11 @@ begin
         end
       else // go to the next trial,
         begin
-          if FTrial.Result = 'MISS' then
+          if FTrial.Result = T_MISS then
             FCounterManager.VirtualTrialLoop := FCounterManager.VirtualTrialValue;
 
           FCounterManager.OnNotCorrection(Sender);
-          FCounterManager.OnEndTrial(Sender);
+          FCounterManager.OnTrialEnd(Sender);
           FIsCorrection := False;
         end;
 
@@ -769,7 +769,7 @@ end;
 
 procedure TBlc.TrialTerminate(Sender: TObject);
 begin
-  if Assigned(OnEndTrial) then FOnEndTrial(Sender);
+  if Assigned(OnTrialEnd) then FOnTrialEnd(Sender);
 end;
 
 

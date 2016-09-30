@@ -59,18 +59,15 @@ type
     function GetCycles: integer;
     function RandomInRange(AFrom, ATo : integer):integer;
     procedure Consequence(Sender: TObject);
-    procedure Hit(Sender: TObject);
-    procedure Miss(Sender: TObject);
-    procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
+    procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialResult(Sender: TObject);
-    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialPaint;
     procedure TrialStart(Sender: TObject);
     procedure UpdateTimer1(Sender: TObject);
     procedure UpdateTimer2(Sender: TObject);
   protected { TTrial }
-    procedure BeforeEndTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
     procedure Paint; override;
   public
@@ -92,9 +89,10 @@ uses constants, timestamps
 constructor TDZT.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnKeyDown := @TrialKeyDown;
-  OnKeyUp := @TrialKeyUp;
-  OnBeforeEndTrial := @BeforeEndTrial;
+  OnTrialKeyUp := @TrialKeyUp;
+  OnTrialBeforeEnd := @TrialBeforeEnd;
+  OnTrialStart := @TrialStart;
+  OnTrialPaint := @TrialPaint;
 
   Header :=  'StmBegin' + #9 +
              '_Latency' + #9 +
@@ -102,8 +100,8 @@ begin
              '__Timer2' + #9 +
              '_Version' + #9 +
              '____Mode' + #9 +
-             'RespFreq'
-             ;
+             'RespFreq';
+
   HeaderTimestamps := HeaderTimestamps + #9 + 'Event';
   FCycles := 0;
   FDataSupport.Responses:= 0;
@@ -137,27 +135,15 @@ begin
   Result := Random(ATo - AFrom + 1) + AFrom;
 end;
 
-procedure TDZT.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  if (Key = 27 {ESC}) and (FResponseEnabled = True) then
-    begin
-      FResponseEnabled:= False;
-      Invalidate;
-    end;
-end;
-
 procedure TDZT.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if FResponseEnabled then
+  if Key = 32 {space} then
     begin
-      if Key = 32 {space} then
-        begin
-          FSchedule.DoResponse;
-          // first response
-          if FDataSupport.Latency = TimeStart then
-              FDataSupport.Latency := TickCount;
-          LogEvent('R');
-        end;
+      FSchedule.DoResponse;
+      // first response
+      if FDataSupport.Latency = TimeStart then
+          FDataSupport.Latency := TickCount;
+      LogEvent('R');
     end;
 end;
 
@@ -181,9 +167,6 @@ procedure TDZT.TrialResult(Sender: TObject);
 begin
   Result := T_NONE;
   IETConsequence := T_NONE;
-  //if Result = T_HIT then Hit(Sender);
-  //if Result = T_MISS then  Miss(Sender);
-  //if Result = T_NONE then  None(Sender);
 end;
 
 procedure TDZT.UpdateTimer1(Sender: TObject);
@@ -276,32 +259,26 @@ begin
 end;
 
 
-procedure TDZT.Paint;
+procedure TDZT.TrialPaint;
 const
   clRed : integer = $FF0000;
   clGreen : integer = $00FF00;
   clBlue : integer = $0000FF;
   clCiano : integer = $FFFF00;
 begin
-  inherited Paint;
-  if FResponseEnabled then
-    begin
+  if FDizzyTimer.Color1 then
+    Canvas.Pen.Color := clBlue
+  else Canvas.Pen.Color := clRed;
 
-      if FDizzyTimer.Color1 then
-        Canvas.Pen.Color := clBlue
-      else Canvas.Pen.Color := clRed;
+  Canvas.Brush.Color := Canvas.Pen.Color;
+  Canvas.Rectangle(FStimuli[0]);
 
-      Canvas.Brush.Color := Canvas.Pen.Color;
-      Canvas.Rectangle(FStimuli[0]);
+  if FDizzyTimer.Color2 then
+    Canvas.Pen.Color := clGreen
+  else Canvas.Pen.Color := clCiano;
 
-      if FDizzyTimer.Color2 then
-        Canvas.Pen.Color := clGreen
-      else Canvas.Pen.Color := clCiano;
-
-      Canvas.Brush.Color := Canvas.Pen.Color;
-      Canvas.Ellipse(FStimuli[1]);
-
-    end;
+  Canvas.Brush.Color := Canvas.Pen.Color;
+  Canvas.Ellipse(FStimuli[1]);
 end;
 
 procedure TDZT.Play(ACorrection: Boolean);
@@ -435,16 +412,12 @@ begin
   FDataSupport.StmBegin := LTickCount;
 end;
 
-procedure TDZT.BeforeEndTrial(Sender: TObject);
+procedure TDZT.TrialBeforeEnd(Sender: TObject);
 begin
-  FResponseEnabled := False;
-
   FDataSupport.Cycle := TickCount;
   FDataSupport.Timer2 := TimeStart;
   TrialResult(Sender);
   WriteData(Self);
-
-  LogEvent('E');
 end;
 
 
@@ -470,22 +443,12 @@ begin
           FDizzyTimer.Mode + #9 +
           Format('%-*.*d', [4, 8, FDataSupport.Responses]);
 
-  if Assigned(OnWriteTrialData) then OnWriteTrialData(Sender);
+  if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
 end;
 
-procedure TDZT.Hit(Sender: TObject);
+procedure TDZT.Paint;
 begin
-  if Assigned(OnHit) then OnHit(Sender);
-end;
-
-procedure TDZT.Miss(Sender: TObject);
-begin
-  if Assigned(OnMiss) then OnMiss (Sender);
-end;
-
-procedure TDZT.None(Sender: TObject);
-begin
-  if Assigned(OnNone) then OnNone (Sender);
+  inherited Paint;
 end;
 
 procedure TDZT.Response(Sender: TObject);

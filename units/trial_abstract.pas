@@ -51,32 +51,33 @@ type
 
   { events }
 
-    FOnBeforeEndTrial: TNotifyEvent;
+
     FOnBeginCorrection: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
     FOnEndCorrection: TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnNone: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
+    FOnTrialBeforeEnd: TNotifyEvent;
+    FOnTrialEnd: TNotifyEvent;
     FOnTrialKeyDown: TKeyEvent;
     FOnTrialKeyUp: TKeyEvent;
     FOnTrialPaint: TPaintEvent;
     FOnTrialStart: TNotifyEvent;
-    FOnWriteTrialData: TNotifyEvent;
+    FOnTrialWriteData: TNotifyEvent;
     function GetRootMedia: string;
     function GetTestMode: Boolean;
     function GetTimeStart: Extended;
     procedure BeginStarter;
     procedure EndTrialThread(Sender: TObject);
-    procedure SetOnBeforeEndTrial(AValue: TNotifyEvent);
+    procedure SetOnTrialBeforeEnd(AValue: TNotifyEvent);
     procedure SetOnBeginCorrection(AValue: TNotifyEvent);
     procedure SetOnBkGndResponse(AValue: TNotifyEvent);
     procedure SetOnConsequence(AValue: TNotifyEvent);
     procedure SetOnEndCorrection(AValue: TNotifyEvent);
-    procedure SetOnEndTrial(AValue: TNotifyEvent);
+    procedure SetOnTrialEnd(AValue: TNotifyEvent);
     procedure SetOnHit(AValue: TNotifyEvent);
     procedure SetOnMiss(AValue: TNotifyEvent);
     procedure SetOnNone(AValue: TNotifyEvent);
@@ -85,13 +86,13 @@ type
     procedure SetOnTrialKeyUp(AValue: TKeyEvent);
     procedure SetOnTrialPaint(AValue: TPaintEvent);
     procedure SetOnTrialStart(AValue: TNotifyEvent);
-    procedure SetOnWriteTrialData(AValue: TNotifyEvent);
+    procedure SetOnTrialWriteData(AValue: TNotifyEvent);
     procedure SetRootMedia(AValue: string);
     procedure SetTestMode(AValue: Boolean);
     procedure StartClockList;
     procedure StartTrial(Sender: TObject);
-    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   strict protected
     FResponseEnabled,
     FIscorrection : Boolean;
@@ -100,7 +101,6 @@ type
     {$endif}
     procedure AddToClockList(AClockStart : TThreadMethod); overload;
     procedure AddToClockList(ASchedule: TSchMan); overload;
-    procedure BeforeEndTrial(Sender: TObject); virtual; abstract;
     procedure EndTrial(Sender: TObject);
     procedure LogEvent(ACode: string);
     procedure Config(Sender: TObject);
@@ -131,18 +131,21 @@ type
     property TimeOut : Integer read FTimeOut write FTimeOut;
     property TimeStart : Extended read GetTimeStart;
   public
-    property OnBeforeEndTrial: TNotifyEvent read FOnBeforeEndTrial write SetOnBeforeEndTrial;
+    property OnTrialBeforeEnd: TNotifyEvent read FOnTrialBeforeEnd write SetOnTrialBeforeEnd;
     property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write SetOnBeginCorrection;
     property OnBkGndResponse: TNotifyEvent read FOnBkGndResponse write SetOnBkGndResponse;
     property OnConsequence: TNotifyEvent read FOnConsequence write SetOnConsequence;
     property OnEndCorrection : TNotifyEvent read FOnEndCorrection write SetOnEndCorrection;
-    property OnEndTrial: TNotifyEvent read FOnEndTrial write SetOnEndTrial;
+    property OnTrialEnd: TNotifyEvent read FOnTrialEnd write SetOnTrialEnd;
     property OnHit: TNotifyEvent read FOnHit write SetOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write SetOnMiss;
     property OnNone: TNotifyEvent read FOnNone write SetOnNone;
     property OnStmResponse: TNotifyEvent read FOnStmResponse write SetOnStmResponse;
-    property OnWriteTrialData: TNotifyEvent read FOnWriteTrialData write SetOnWriteTrialData;
+    property OnTrialWriteData: TNotifyEvent read FOnTrialWriteData write SetOnTrialWriteData;
   end;
+
+resourcestring
+  SESSION_CANCELED = '(Sessão cancelada)';
 
 implementation
 
@@ -182,58 +185,58 @@ begin
     Data := TimestampToStr(FStarterLatency - TimeStart) + #9;
 end;
 
-procedure TTrial.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
+procedure TTrial.KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
   );
 begin
-  if (Key = 27 {ESC}) then
+  if FResponseEnabled and (Key = 27 {ESC}) then
     begin
       FResponseEnabled:= False;
       Invalidate;
+      Exit;
     end;
 
-  if (ssCtrl in shift) and (Key = 81) { q } then
+  if (ssCtrl in shift) and (Key = 113 { q }) then
     begin
       FResponseEnabled:= False;
-      Data := Data + LineEnding + '(Sessão cancelada)' + #9#9#9#9#9#9#9#9#9 + LineEnding;
+      Data := Data + LineEnding + SESSION_CANCELED + LineEnding;
       Result := T_NONE;
       IETConsequence := T_NONE;
       NextTrial := T_END;
-      EndTrial(Self);
+      RTLeventSetEvent(FClockThread.RTLEvent); // EndTrial(Self);
+      Exit;
     end;
 
-  if (ssCtrl in Shift) and (Key = 13) { Enter } then
+  if (ssCtrl in Shift) and (Key = 13 { Enter }) then
     begin
       FResponseEnabled := False;
       Result := T_NONE;
       IETConsequence := T_NONE;
       NextTrial := '0';
-      EndTrial(Self);
+      RTLeventSetEvent(FClockThread.RTLEvent); // EndTrial(Self);
+      Exit;
     end;
 
   if Assigned(OnTrialKeyDown) and FResponseEnabled then OnTrialKeyDown(Sender,Key,Shift);
 end;
 
-procedure TTrial.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TTrial.KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if Key = 27 { ESC } then
+  if (not FResponseEnabled) and (Key = 27) { ESC } then
     begin
       FResponseEnabled:= True;
       Invalidate;
+      Exit;
     end;
 
-  if Key = 32 { SPACE }then
-    if FShowStarter then
-      begin
-        FShowStarter := False;
-        FStarterLatency := TickCount;
-        LogEvent('*R');
-        Invalidate;
-        StartTrial(Sender);
-        if Assigned(OnTrialStart) then OnTrialStart(Sender);
-        Exit;
-      end;
+  if FShowStarter and (Key = 32) { SPACE } then
+    begin
+      FShowStarter := False;
+      FStarterLatency := TickCount;
+      StartTrial(Sender);
+      Exit;
+    end;
 
-  if Assigned(OnTrialKeyDown) and FResponseEnabled then OnTrialKeyUp(Sender,Key,Shift);
+  if Assigned(OnTrialKeyUp) and FResponseEnabled then OnTrialKeyUp(Sender,Key,Shift);
 end;
 
 procedure TTrial.EndTrial(Sender: TObject);
@@ -251,9 +254,21 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.EndTrial2');
   {$endif}
+  LogEvent('TE');
+  FResponseEnabled:= False;
   Hide;
-  if Assigned(OnBeforeEndTrial) then OnBeforeEndTrial(Sender);
-  if Assigned(OnEndTrial) then OnEndTrial(Sender);
+  if Assigned(OnTrialBeforeEnd) then OnTrialBeforeEnd(Sender);
+
+  case Result of
+    T_HIT : if Assigned(OnHit) then OnHit(Sender);
+    T_MISS: if Assigned(OnMiss) then OnMiss(Sender);
+    T_NONE: if Assigned(OnNone) then OnMiss(Sender);
+  end;
+
+  if FIsCorrection then
+    if Assigned (OnEndCorrection) then OnEndCorrection(Sender);
+
+  if Assigned(OnTrialEnd) then OnTrialEnd(Sender);
 end;
 
 procedure TTrial.Paint;
@@ -264,16 +279,14 @@ begin
       DrawCenteredCircle(Canvas, Width, Height, 6);
       Exit;
     end;
-  if Assigned(OnTrialPaint) then OnTrialPaint;
+  if Assigned(OnTrialPaint) and FResponseEnabled then OnTrialPaint;
 end;
 
 constructor TTrial.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnBeforeEndTrial := nil;
-  OnEndTrial := nil;
-  OnKeyUp := @TrialKeyUp;
-  OnKeyDown := @TrialKeyDown;
+  OnKeyUp := @KeyUp;
+  OnKeyDown := @KeyDown;
 
   //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
   FLimitedHold := 0;
@@ -372,7 +385,10 @@ begin
   LogEvent('TS');
   StartClockList;
   Invalidate;
+  SetFocus;
   FResponseEnabled := True;
+  if FIsCorrection then
+    if Assigned (OnBeginCorrection) then OnBeginCorrection(Sender);
   if Assigned(OnTrialStart) then OnTrialStart(Sender);
 end;
 
@@ -393,11 +409,10 @@ begin
     raise Exception.Create(ExceptionNoScheduleFound);
 end;
 
-
-procedure TTrial.SetOnBeforeEndTrial(AValue: TNotifyEvent);
+procedure TTrial.SetOnTrialBeforeEnd(AValue: TNotifyEvent);
 begin
-  if FOnBeforeEndTrial = AValue then Exit;
-  FOnBeforeEndTrial := AValue;
+  if FOnTrialBeforeEnd = AValue then Exit;
+  FOnTrialBeforeEnd := AValue;
 end;
 
 procedure TTrial.SetOnBeginCorrection(AValue: TNotifyEvent);
@@ -424,10 +439,10 @@ begin
   FOnEndCorrection := AValue;
 end;
 
-procedure TTrial.SetOnEndTrial(AValue: TNotifyEvent);
+procedure TTrial.SetOnTrialEnd(AValue: TNotifyEvent);
 begin
-  if FOnEndTrial = AValue then Exit;
-  FOnEndTrial := AValue;
+  if FOnTrialEnd = AValue then Exit;
+  FOnTrialEnd := AValue;
 end;
 
 procedure TTrial.SetOnHit(AValue: TNotifyEvent);
@@ -478,10 +493,10 @@ begin
   FOnTrialPaint := AValue;
 end;
 
-procedure TTrial.SetOnWriteTrialData(AValue: TNotifyEvent);
+procedure TTrial.SetOnTrialWriteData(AValue: TNotifyEvent);
 begin
-  if FOnWriteTrialData = AValue then Exit;
-  FOnWriteTrialData := AValue;
+  if FOnTrialWriteData = AValue then Exit;
+  FOnTrialWriteData := AValue;
 end;
 
 function TTrial.GetRootMedia: string;
