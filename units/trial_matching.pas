@@ -32,7 +32,7 @@ type
     SampLatency,
     SampleBegin,
     Delay_Begin : Extended;
-    SampleMsg : string
+    //SampleMsg : string
     //Rs232Code : string;
     //PLPCode : BYTE;
   end;
@@ -72,12 +72,10 @@ begin
   OnTrialStart := @TrialStart;
 
   Header := 'Pos.Mod.' + #9 +
-            'Res.Mod.' + #9 +
             'Lat.Mod.' + #9 +
             'Dur.Mod.' + #9 +
-            'Tmp.Mod.' + #9 +
             'Atr.Mod.' + #9 +
-            'Frq.Mod.' + #9 +
+            'Frq.Mod.' + #9 + #9 + #9 +
             Header;
 end;
 
@@ -140,8 +138,7 @@ procedure TMTS.DelayEnd(Sender: TObject);
 begin
   FDelay.Enabled:= False;
   FDelay.Terminate;
-  OnMouseDown := @ComparisonMouseDown;
-  VisibleComparisons(True);
+  inherited TrialStart(Sender);
 end;
 
 procedure TMTS.SampleConsequence(Sender: TObject);
@@ -153,7 +150,7 @@ begin
       FSDataSupport.Delay_Begin := TickCount;
     end
   else
-    VisibleComparisons(True);
+    inherited TrialStart(Sender);
 end;
 
 procedure TMTS.SampleResponse(Sender: TObject);
@@ -206,7 +203,6 @@ begin
   FSDataSupport.SampLatency := TimeStart;
   FSDataSupport.SampleBegin := TickCount;
   VisibleSample(True);
-  VisibleComparisons(False);
   OnMouseDown := @SampleMouseDown;
 end;
 
@@ -214,7 +210,6 @@ end;
 procedure TMTS.WriteData(Sender: TObject);
 var
   Pos_Mod,
-  Res_Mod,
   Lat_Mod,
   Dur_Mod,
   Atr_Mod,
@@ -222,17 +217,20 @@ var
 begin
   Pos_Mod:= FSample.Msg;
 
-  Res_Mod := FSDataSupport.SampleMsg;
-
   if FSDataSupport.SampLatency = TimeStart then
     Lat_Mod := #32#32#32#32#32#32 + 'NA'
   else Lat_Mod := TimestampToStr(FSDataSupport.SampLatency - TimeStart);
 
-  Dur_Mod := TimestampToStr(FSDataSupport.Delay_Begin - FSDataSupport.SampleBegin);
-
   if FDelayed then
-    Atr_Mod := TimestampToStr(FSDataSupport.Delay_Begin - TimeStart)
-  else Atr_Mod := #32#32#32#32#32#32 + 'NA';
+    begin
+      Dur_Mod := TimestampToStr(FSDataSupport.Delay_Begin - FSDataSupport.SampleBegin);
+      Atr_Mod := TimestampToStr(FSDataSupport.Delay_Begin - TimeStart);
+    end
+  else
+    begin
+      Dur_Mod := TimestampToStr(TickCount - FSDataSupport.SampleBegin);
+      Atr_Mod := #32#32#32#32#32#32 + 'NA';
+    end;
 
   Frq_Mod := _Samp + '=' +
              IntToStr(FSample.Key.ResponseCount) + #9 +
@@ -240,7 +238,6 @@ begin
              'BK.D='+ IntToStr(FSDataSupport.DelaBkndRespCount);
 
   Data := Pos_Mod + #9 +
-          Res_Mod + #9 +
           Lat_Mod + #9 +
           Dur_Mod + #9 +
           Atr_Mod + #9 +

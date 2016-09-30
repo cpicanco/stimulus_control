@@ -218,6 +218,9 @@ begin
         T_Simple : FTrial := TSimpl.Create(FBackGround);
       end;
 
+      if FCounterManager.Trials = 0 then
+        SaveTData(FTrial.HeaderTimestamps + LineEnding);
+
       if Assigned(FTrial) then
         begin
           FTrial.GlobalContainer := FGlobalContainer;
@@ -267,9 +270,6 @@ begin
   if FTrial.Header <> FLastTrialHeader then
     LReportLn := FBlcHeader + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + LineEnding;
   FLastTrialHeader := FTrial.Header;
-
-  if (FTrial.HeaderTimestamps = '') then
-    SaveTData(FTrial.HeaderTimestamps + LineEnding);
 
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
 
