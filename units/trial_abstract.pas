@@ -91,8 +91,8 @@ type
     procedure SetTestMode(AValue: Boolean);
     procedure StartClockList;
     procedure StartTrial(Sender: TObject);
-    procedure KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   strict protected
     FResponseEnabled,
     FIscorrection : Boolean;
@@ -285,8 +285,8 @@ end;
 constructor TTrial.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnKeyUp := @KeyUp;
-  OnKeyDown := @KeyDown;
+  OnKeyUp := @TrialKeyUp;
+  OnKeyDown := @TrialKeyDown;
 
   //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
   FLimitedHold := 0;
@@ -385,7 +385,6 @@ begin
   LogEvent('TS');
   StartClockList;
   Invalidate;
-  SetFocus;
   FResponseEnabled := True;
   if FIsCorrection then
     if Assigned (OnBeginCorrection) then OnBeginCorrection(Sender);
