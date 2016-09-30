@@ -184,7 +184,6 @@ begin
   FGlobalContainer:= AGlobalContainer;
 
   FLastTrialHeader:= '';
-  FLastTimestampsHeader := '';
   FIsCorrection := False;
 
   FBlcHeader:= 'Bloc__Id' + #9 + 'Bloc_Nam' + #9 + 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;

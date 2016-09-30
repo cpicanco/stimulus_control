@@ -298,7 +298,7 @@ begin
                       'Bloc__Id' + #9 +
                       'Trial_ID' + #9 +
                       'Trial_No' + #9 +
-                      'Event;
+                      'Event';
 end;
 
 destructor TTrial.Destroy;
