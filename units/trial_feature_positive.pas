@@ -108,7 +108,6 @@ begin
              'ExpcResp' + #9 +
              '__Result';
 
-  HeaderTimestamps := HeaderTimestamps + #9 + 'Event';
   FDataSupport.Responses:= 0;
 end;
 

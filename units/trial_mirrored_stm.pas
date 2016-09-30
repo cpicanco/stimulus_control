@@ -90,7 +90,6 @@ begin
              'ExpcResp' + #9 +
              'RespFreq';
 
-  HeaderTimestamps := HeaderTimestamps + #9 + 'Event';
   FDataSupport.Responses:= 0;
 end;
 

@@ -60,7 +60,6 @@ type
     FBlcHeader: string;
 
     FLastTrialHeader,
-    FLastTimestampsHeader,
     FLastData,
     FLastITIData : string;
     FFirstTrialBegin,
@@ -270,9 +269,8 @@ begin
     LReportLn := FBlcHeader + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + LineEnding;
   FLastTrialHeader := FTrial.Header;
 
-  if FTrial.HeaderTimestamps <> FLastTimestampsHeader then
+  if (FTrial.HeaderTimestamps = '') then
     SaveTData(FTrial.HeaderTimestamps + LineEnding);
-  FLastTimestampsHeader := FTrial.HeaderTimestamps;
 
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
 
