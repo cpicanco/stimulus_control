@@ -57,13 +57,10 @@ type
     procedure Dispenser(Csq: Byte; Usb: string);
     procedure Response(Sender: TObject);
     procedure TrialStart(Sender: TObject);
-    procedure TrialKeyUp(Sender: TObject;var Key: Word; Shift: TShiftState);
     procedure TrialBeforeEnd(Sender: TObject);
     procedure WriteData(Sender: TObject); override;
   protected
     FDataSupport : TDataSupport;
-    FKMinus : TSupportKey;
-    FKPlus : TSupportKey;
     FConsequenceFired : Boolean;
     FNumComp : Integer;
     FTrialInterval : Integer;
@@ -84,7 +81,6 @@ constructor TSimpl.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
-  OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
 
   Header :=  Header + #9 +
@@ -168,27 +164,6 @@ begin
         TO_ := StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cTO], 0);
         IET := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cIET];
       end;
-
-
-  with FKPlus do begin
-    Csq := StrToIntDef(CfgTrial.SList.Values[_Kplus + _cCsq], 0);
-    //Usb := StrToIntDef(CfgTrial.SList.Values[_Kplus + _cUsb], 0);
-    Msg := CfgTrial.SList.Values[_Kplus + _cMsg];
-    Res := CfgTrial.SList.Values[_Kplus + _cRes];
-    Nxt := CfgTrial.SList.Values[_Kplus + _cNxt];
-    IET := CfgTrial.SList.Values[_Kplus + _cIET];
-    TO_ := StrToIntDef(CfgTrial.SList.Values[_Kplus + _cTO],0);
-  end;
-
-  with FKMinus do begin
-    Csq := StrToIntDef(CfgTrial.SList.Values[_Kminus + _cCsq], 0);
-    //Usb := StrToIntDef(CfgTrial.SList.Values[_Kminus + _cUsb], 0);
-    Msg := CfgTrial.SList.Values[_Kminus + _cMsg];
-    Res := CfgTrial.SList.Values[_Kminus + _cRes];
-    Nxt := CfgTrial.SList.Values[_Kminus + _cNxt];
-    IET := CfgTrial.SList.Values[_Kminus + _cIET];
-    TO_ := StrToIntDef(CfgTrial.SList.Values[_Kminus + _cTO],0);
-  end;
 
   Config(Self);
 end;
@@ -334,31 +309,6 @@ begin
   IntToStr(FDataSupport.BackgroundResponseCount); // local
   CounterManager.OnBkgndResponse(Self); // global
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
-end;
-
-procedure TSimpl.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  if (Key = 107) { + } then
-    begin
-      FDataSupport.CompMsg := FKPlus.Msg;
-      FDataSupport.PLPCode := FKPlus.Csq;
-      FDataSupport.RS232Code := FKPlus.Usb;
-      Result := FKPlus.Res;
-      IETConsequence := FKPlus.IET;
-      TimeOut := FKPlus.TO_;
-      Dispenser(FKPlus.Csq, FKPlus.Usb);
-    end;
-
-  if (Key = 109) { - } then
-    begin
-      FDataSupport.CompMsg := FKMinus.Msg;
-      FDataSupport.PLPCode := FKMinus.Csq;
-      FDataSupport.RS232Code := FKMinus.Usb;
-      Result := FKMinus.Res;
-      TimeOut := FKMinus.TO_;
-      IETConsequence := FKMinus.IET;
-      Dispenser(FKMinus.Csq, FKMinus.Usb);
-    end;
 end;
 
 procedure TSimpl.TrialBeforeEnd(Sender: TObject);
