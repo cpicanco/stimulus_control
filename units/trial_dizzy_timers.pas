@@ -102,7 +102,6 @@ begin
              '____Mode' + #9 +
              'RespFreq';
 
-  HeaderTimestamps := HeaderTimestamps + #9 + 'Event';
   FCycles := 0;
   FDataSupport.Responses:= 0;
 end;

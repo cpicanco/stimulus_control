@@ -164,7 +164,7 @@ begin
     if TKey(Sender).Visible then
       begin
         LTickCount := TickCount;
-        LogEvent(TKey(Sender).LastResponseLog);
+        LogEvent(FSample.Msg + #9 + TKey(Sender).LastResponseLog);
 
         if FSDataSupport.SampLatency = TimeStart then
             FSDataSupport.SampLatency := LTickCount;

@@ -297,7 +297,8 @@ begin
   HeaderTimestamps := 'Time' + #9 +
                       'Bloc__Id' + #9 +
                       'Trial_ID' + #9 +
-                      'Trial_No';
+                      'Trial_No' + #9 +
+                      'Event;
 end;
 
 destructor TTrial.Destroy;
