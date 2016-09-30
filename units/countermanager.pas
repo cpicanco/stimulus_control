@@ -75,7 +75,7 @@ type
     FOnCsqCriterion: TNotifyEvent;
     FOnEndBlc: TNotifyEvent;
     FOnEndSess: TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
+    FOnTrialEnd: TNotifyEvent;
     FOnHit: TNotifyEvent;
     FOnHitResult: integer;
     FOnMiss: TNotifyEvent;
@@ -157,7 +157,7 @@ type
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
     property OnEndSess: TNotifyEvent read FOnEndSess write FOnEndSess;
-    property OnEndTrial : TNotifyEvent read FOnEndTrial write FOnEndTrial;
+    property OnTrialEnd : TNotifyEvent read FOnTrialEnd write FOnTrialEnd;
     property OnNxtTrial : TNotifyEvent read FOnNxtTrial write FOnNxtTrial;
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnHitResult : integer read FOnHitResult;
@@ -225,7 +225,7 @@ begin
   OnCorrection := @Correction;
   OnEndBlc := @EndBlc;
   OnEndSess := @EndSess;
-  OnEndTrial := @EndTrial;
+  OnTrialEnd := @EndTrial;
   OnNxtTrial := @CustomNxtTrial;
   OnHit := @Hit;
   OnMiss := @Miss;

@@ -47,15 +47,12 @@ type
     FDataSupport : FDataSupport;
     procedure None(Sender: TObject);
     procedure PupilCalibrationSuccessful(Sender: TObject; AMultiPartMessage : TMPMessage);
-  private
-    procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
+    procedure TrialBeforeEnd(Sender: TObject);
+    procedure TrialPaint;
   protected
-    procedure BeforeEndTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
-
-    { TCustomControl overrides }
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -79,25 +76,9 @@ begin
     EndTrial(Self);
 end;
 
-procedure TCLB.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-begin
-  if (Key = 27 {ESC}) and (FShowDots = True) then
-    begin
-      //FShowDots:= False;
-      Invalidate;
-    end;
-end;
 
 procedure TCLB.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  //if (ssCtrl in Shift) and (key = 66) { b } then
-  //  begin
-  //    Result := 'NONE';
-  //    IETConsequence := 'NONE';
-  //    NextTrial := '0'; // NextTrial
-  //    EndTrial(Self)
-  //  end;
-
   if (ssCtrl in Shift) and (key = 67) { c } then
     begin
       if GlobalContainer.PupilEnabled then
@@ -112,7 +93,7 @@ begin
   if Assigned(OnNone) then OnNone(Sender);
 end;
 
-procedure TCLB.BeforeEndTrial(Sender: TObject);
+procedure TCLB.TrialBeforeEnd(Sender: TObject);
 begin
   // Trial Result
   Result := 'NONE';
@@ -128,24 +109,10 @@ begin
   FDataSupport.TrialBegin := TickCount;
 end;
 
-procedure TCLB.WriteData(Sender: TObject);
-begin
-  inherited WriteData(Sender);
-  Data := Data + #9 +
-          TimestampToStr(FDataSupport.TrialBegin - TimeStart) + #9 +
-          TimestampToStr(FDataSupport.TrialEnd - TimeStart) + #9 +
-          IntToStr(Length(FDataSupport.Dots));
-  if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
-end;
-
-procedure TCLB.Paint;
+procedure TCLB.TrialPaint;
 var
-  aleft, atop, asize,
-  i : integer;
-
+  aleft, atop, asize, i : integer;
 begin
-  inherited Paint;
-
   if FShowDots then
     with Canvas do
       for i := Low(FDataSupport.Dots) to High(FDataSupport.Dots) do
@@ -160,12 +127,28 @@ begin
         end;
 end;
 
+procedure TCLB.WriteData(Sender: TObject);
+begin
+  inherited WriteData(Sender);
+  Data := Data + #9 +
+          TimestampToStr(FDataSupport.TrialBegin - TimeStart) + #9 +
+          TimestampToStr(FDataSupport.TrialEnd - TimeStart) + #9 +
+          IntToStr(Length(FDataSupport.Dots));
+  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+end;
+
+procedure TCLB.Paint;
+begin
+  inherited Paint;
+
+end;
+
 constructor TCLB.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnBeforeEndTrial := @BeforeEndTrial;
-  OnKeyDown := @TrialKeyDown;
-  OnKeyUp := @TrialKeyUp;
+  OnTrialBeforeEnd := @TrialBeforeEnd;
+  OnTrialKeyUp := @TrialKeyUp;
+  OnTrialStart := @TrialStart;
   FShowDots := False;
 
   with Canvas do

@@ -45,17 +45,17 @@ type
     FDelay : TClockThread;
     FSample : TSupportKey;
     FSDataSupport : TSampleDataSupport;
-    procedure BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+    procedure SampleMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
     procedure DelayEnd(Sender: TObject);
     procedure SampleConsequence(Sender: TObject);
     procedure SampleResponse(Sender: TObject);
+    procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialStart(Sender: TObject);
     procedure VisibleSample(AValue: Boolean);
   protected
     // TTrial
     procedure WriteData(Sender: TObject); override;
-    procedure BeforeEndTrial(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(ACorrection : Boolean); override;
@@ -68,7 +68,8 @@ uses constants, timestamps;
 constructor TMTS.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnBeforeEndTrial := @BeforeEndTrial;
+  OnTrialBeforeEnd := @TrialBeforeEnd;
+
 
   Header := 'Pos.Mod.' + #9 +
             'Res.Mod.' + #9 +
@@ -135,7 +136,7 @@ procedure TMTS.DelayEnd(Sender: TObject);
 begin
   FDelay.Enabled:= False;
   FDelay.Terminate;
-  OnMouseDown := @TrialMouseDown;
+  OnMouseDown := @ComparisonMouseDown;
   VisibleComparisons(True);
 end;
 
@@ -175,7 +176,7 @@ begin
   FSample.Key.Visible := AValue;
 end;
 
-procedure TMTS.BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+procedure TMTS.SampleMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 
 var
@@ -199,12 +200,11 @@ end;
 
 procedure TMTS.TrialStart(Sender: TObject);
 begin
-  if FIsCorrection then BeginCorrection(Self);
   FSDataSupport.SampLatency := TimeStart;
   FSDataSupport.SampleBegin := TickCount;
   VisibleSample(True);
   VisibleComparisons(False);
-  OnMouseDown := @BackgroundMouseDown;
+  OnMouseDown := @SampleMouseDown;
 end;
 
 
@@ -246,8 +246,9 @@ begin
   inherited WriteData(Sender);
 end;
 
-procedure TMTS.BeforeEndTrial(Sender: TObject);
+procedure TMTS.TrialBeforeEnd(Sender: TObject);
 begin
+  TrialResult(Sender);
   WriteData(Sender);
 end;
 

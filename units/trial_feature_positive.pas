@@ -33,7 +33,6 @@ type
 
   TDataSupport = record
     Responses : integer;
-    StarterLatency,
     Latency,
     StmBegin,
     StmEnd : Extended;
@@ -70,18 +69,13 @@ type
     FSchedule : TSchMan;
     FUseMedia : Boolean;
     procedure TrialPaint;
-    procedure BeginCorrection(Sender: TObject);
     procedure Consequence(Sender: TObject);
-    procedure EndCorrection (Sender: TObject);
-    procedure Hit(Sender: TObject);
-    procedure Miss(Sender: TObject);
-    procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
+    procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialStart(Sender: TObject);
     procedure TrialResult(Sender: TObject);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected { TTrial }
-    procedure BeforeEndTrial(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
     procedure Paint; override;
   public
@@ -101,13 +95,12 @@ uses constants, timestamps;
 constructor TFPE.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnBeforeEndTrial := @BeforeEndTrial;
-  OnKeyUp := @TrialKeyUp;
+  OnTrialBeforeEnd := @TrialBeforeEnd;
+  OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
   OnTrialPaint := @TrialPaint;
 
-  Header :=  Header + #9 +
-             'StartLat' + #9 +
+  Header :=  Header +
              'StmBegin' + #9 +
              '_Latency' + #9 +
              '__StmEnd' + #9 +
@@ -139,15 +132,10 @@ begin
   else NextTrial := FCurrTrial.NextTrial;
 
   FCurrTrial.Result := Result;
-
-  if Result = T_HIT then  Hit(Sender);
-  if Result = T_MISS then  Miss(Sender);
-  if Result = T_NONE then  None(Sender);
 end;
 
-procedure TFPE.BeforeEndTrial(Sender: TObject);
+procedure TFPE.TrialBeforeEnd(Sender: TObject);
 begin
-  FResponseEnabled := False;
   FDataSupport.StmEnd := TickCount;
   TrialResult(Sender);
   WriteData(Sender);
@@ -166,8 +154,8 @@ begin
       Loops := 0;
       Color := 255;
       FullPath := RootMedia + FDataSupport.CSQ2;
-      Play;
     end;
+  LConsequence.Play;
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
 
@@ -179,8 +167,8 @@ begin
       LogEvent('R');
       FSchedule.DoResponse;
     end;
-  end;
 end;
+
 
 procedure TFPE.TrialPaint;
 var i : integer;
@@ -193,10 +181,9 @@ end;
 
 procedure TFPE.Play(ACorrection: Boolean);
 var
-  s1{, sName, sLoop, sColor, sGap, sGapDegree, sGapLength} : string;
+  s1: string;
   R : TRect;
   a1 : Integer;
-
 
   procedure NextCommaDelimitedParameter;
   begin
@@ -204,6 +191,7 @@ var
     if Length(s1) > 0 then while s1[1] = #44 do Delete(s1, 1, 1);
   end;
 
+  {
   procedure KeyConfig(var aKey : TKey);
   begin
     with aKey do
@@ -216,10 +204,9 @@ var
         //Visible := False;
       end;
   end;
-
+}
 begin
   inherited Play(ACorrection);
-  FResponseEnabled:= False;
 
   FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
@@ -231,7 +218,6 @@ begin
       SetLength(FCurrTrial.C, FNumComp);
     end;
 
-  //self descends from TCustomControl
   FSchedule := TSchMan.Create(self);
   with FSchedule do
     begin
@@ -290,7 +276,7 @@ begin
         R.Right := StrToIntDef(s1, 100);
         R.Bottom := R.Right;
 
-       if FUseMedia then
+       if FUseMedia then //allow mouse input
          begin
            //not implemented yet
            {s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
@@ -306,7 +292,7 @@ begin
            if a1 = 0 then KeyConfig(FKey1) else KeyConfig(FKey2)}
 
          end
-       else
+       else  // keyboard input only
           with FCurrTrial.C[a1] do
             begin
               o := Point( R.Top, R.Left );
@@ -325,10 +311,6 @@ end;
 
 procedure TFPE.TrialStart(Sender: TObject);
 begin
-  if FIsCorrection then
-    begin
-      BeginCorrection(Self);
-    end;
   {
   if FUseMedia then
     begin
@@ -337,50 +319,40 @@ begin
   }
 
   FConsequenceFired := False;
-  FFirstResp := True;
+  FDataSupport.Latency := TimeStart;
   FDataSupport.StmBegin := TickCount;
 end;
 
 procedure TFPE.WriteData(Sender: TObject);  //
-var Latency : string;
+var LLatency : string;
 begin
-  if not FFirstResp then
-    Latency := TimestampToStr(FDataSupport.Latency - TimeStart)
-  else Latency := 'NA';
+  inherited WriteData(Sender);
 
-  {
-  Header :=  'StartLat' + #9 +
-             'StmBegin' + #9 +
-             '_Latency' + #9 +
-             '__StmEnd' + #9 +
-             'RespFreq' + #9 +
-             'ExpcResp' + #9 +
-             '__Result'
-  }
+  if FDataSupport.Latency = TimeStart then
+    LLatency := 'NA'
+  else LLatency := TimestampToStr(FDataSupport.Latency - TimeStart);
 
-  Data :=  TimestampToStr(FDataSupport.StarterLatency - TimeStart) + #9 +
+  Data :=  Data +
            TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
-           Latency + #9 +
+           LLatency + #9 +
            TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
            FCurrTrial.response + #9 +
-           FCurrTrial.Result + #9 +
-           Data // forced session end data
-           ;
-  if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
+           FCurrTrial.Result;
+
+  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+end;
+
+procedure TFPE.Paint;
+begin
+  inherited Paint;
 end;
 
 procedure TFPE.Response(Sender: TObject);
-var LTickCount : Extended;
 begin
-  LTickCount := TickCount;
   Inc(FDataSupport.Responses);
-  if FFirstResp then
-    begin
-      FDataSupport.Latency := LTickCount;
-      FFirstResp := False;
-    end
-  else;
+  if FDataSupport.Latency = TimeStart then
+      FDataSupport.Latency := TickCount;
 
   // not implemented yet
   //if FUseMedia then
@@ -389,31 +361,6 @@ begin
 
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
-end;
-
-procedure TFPE.BeginCorrection(Sender: TObject);
-begin
-  if Assigned (OnBeginCorrection) then OnBeginCorrection (Sender);
-end;
-
-procedure TFPE.EndCorrection(Sender: TObject);
-begin
-  if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
-end;
-
-procedure TFPE.Hit(Sender: TObject);
-begin
-  if Assigned(OnHit) then OnHit(Sender);
-end;
-
-procedure TFPE.Miss(Sender: TObject);
-begin
-  if Assigned(OnMiss) then OnMiss(Sender);
-end;
-
-procedure TFPE.None(Sender: TObject);
-begin
-  if Assigned(OnNone) then OnNone(Sender);
 end;
 
 end.
