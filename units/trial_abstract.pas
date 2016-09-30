@@ -185,7 +185,7 @@ begin
     Data := TimestampToStr(FStarterLatency - TimeStart) + #9;
 end;
 
-procedure TTrial.KeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
+procedure TTrial.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
   );
 begin
   if FResponseEnabled and (Key = 27 {ESC}) then
@@ -219,7 +219,7 @@ begin
   if Assigned(OnTrialKeyDown) and FResponseEnabled then OnTrialKeyDown(Sender,Key,Shift);
 end;
 
-procedure TTrial.KeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TTrial.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (not FResponseEnabled) and (Key = 27) { ESC } then
     begin
