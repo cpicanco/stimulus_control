@@ -74,7 +74,7 @@ type
     FOnConsequence: TNotifyEvent;
     FOnEndBlc: TNotifyEvent;
     FOnEndSess: TNotifyEvent;
-    FOnEndTrial: TNotifyEvent;
+    FOnTrialEnd: TNotifyEvent;
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
@@ -96,7 +96,7 @@ type
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
     property OnEndSess: TNotifyEvent read FOnEndSess write FOnEndSess;
-    property OnEndTrial : TNotifyEvent read FOnEndTrial write FOnEndTrial;
+    property OnTrialEnd : TNotifyEvent read FOnTrialEnd write FOnTrialEnd;
     property OnHit: TNotifyEvent read FOnHit write FOnHit;
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
     property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
@@ -116,7 +116,7 @@ resourcestring
   HSESSION_NAME      = 'Nome_Sessão:';
   HBEGIN_TIME        = 'Início:';
   HEND_TIME          = 'Término:';
-  HSESSION_CANCELED  = '----------Sessão Cancelada----------';
+//  HSESSION_CANCELED  = '----------Sessão Cancelada----------';
   HTEST_MODE         = '(Modo de Teste)';
 
 procedure TSession.BkGndResponse(Sender: TObject);
@@ -160,7 +160,7 @@ end;
 
 procedure TSession.EndTrial(Sender: TObject);
 begin
-   if Assigned(OnEndTrial) then FOnEndTrial (Sender);
+   if Assigned(OnTrialEnd) then FOnTrialEnd (Sender);
 end;
 
 procedure TSession.Hit(Sender: TObject);
@@ -188,14 +188,17 @@ begin
   CreateLogger(LGData, FFilename, LHeader);
   CreateLogger(LGTimestamps, FFilename, LHeader);
 
-  { TODO -oRafael -cdebug : if test mode then }
-  // if TestMode then
-  //
-
   FBlc.SaveData := GetSaveDataProc(LGData);
   FBlc.SaveTData := GetSaveDataProc(LGTimestamps);
   FBlc.BackGround:= FBackGround;
   FBlc.ShowCounter := FShowCounter;
+
+  if TestMode then
+    begin
+     FBlc.SaveData(HTEST_MODE);
+     FBlc.SaveTData(HTEST_MODE);
+    end;
+
   FManager.OnBeginSess(Self);
   PlayBlc(Self);
 end;
@@ -292,7 +295,7 @@ begin
   FBlc.OnConsequence:= @Consequence;
   FBlc.OnBkGndResponse:= @BkGndResponse;
   FBlc.OnEndBlc:= @EndBlc;
-  FBlc.OnEndTrial:= @EndTrial;
+  FBlc.OnTrialEnd:= @EndTrial;
   FBlc.OnHit:= @Hit;
   FBlc.OnMiss:= @Miss;
   FBlc.OnCriteria := @Criteria;

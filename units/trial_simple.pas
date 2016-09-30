@@ -53,8 +53,13 @@ type
 
   TSimpl = Class(TTrial)
   private
+    procedure Consequence(Sender: TObject);
+    procedure Dispenser(Csq: Byte; Usb: string);
+    procedure Response(Sender: TObject);
     procedure TrialStart(Sender: TObject);
     procedure TrialKeyUp(Sender: TObject;var Key: Word; Shift: TShiftState);
+    procedure TrialBeforeEnd(Sender: TObject);
+    procedure WriteData(Sender: TObject); override;
   protected
     FDataSupport : TDataSupport;
     FKMinus : TSupportKey;
@@ -63,24 +68,9 @@ type
     FNumComp : Integer;
     FTrialInterval : Integer;
     FComparisons : array of TSupportKey;
-    procedure BeginCorrection (Sender: TObject);
-    procedure Consequence(Sender: TObject);
-    procedure Dispenser(Csq: Byte; Usb: string);
-    procedure EndCorrection(Sender: TObject);
-    procedure Hit(Sender: TObject);
-    procedure Miss(Sender: TObject);
-    procedure None(Sender: TObject);
-    procedure Response(Sender: TObject);
     procedure TrialResult(Sender: TObject);
     procedure VisibleComparisons(AValue: Boolean);
-  { TTrial }
-
-    procedure BeforeEndTrial(Sender: TObject); override;
-    procedure WriteData(Sender: TObject); override;
-
-  { TCustomControl}
-
-    procedure TrialMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure ComparisonMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(ACorrection : Boolean); override;
@@ -93,7 +83,7 @@ uses constants, timestamps;
 constructor TSimpl.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnBeforeEndTrial := @BeforeEndTrial;
+  OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
 
@@ -260,15 +250,6 @@ begin
       else
         FDataSupport.CompMsg:= FComparisons[I].Msg;
     end;
-
-  if Result = T_HIT then
-    Hit(Sender);
-
-  if Result = T_MISS then
-    Miss(Sender);
-
-  if Result = T_NONE then
-    None(Sender);
 end;
 
 procedure TSimpl.VisibleComparisons(AValue: Boolean);
@@ -281,16 +262,8 @@ begin
   end;
 end;
 
-procedure TSimpl.BeforeEndTrial(Sender: TObject);
-begin
-  TrialResult(Sender);
-  WriteData(Sender);
-end;
-
 procedure TSimpl.TrialStart(Sender: TObject);
 begin
-  if FIsCorrection then BeginCorrection(Self);
-
   VisibleComparisons(True);
 
   with FDataSupport do
@@ -299,10 +272,8 @@ begin
       StmEnd := TimeStart;
     end;
 
-  FResponseEnabled := True;
-
   FDataSupport.StmBegin := TickCount;
-  OnMouseDown := @TrialMouseDown;
+  OnMouseDown := @ComparisonMouseDown;
 end;
 
 procedure TSimpl.WriteData(Sender: TObject);
@@ -353,7 +324,16 @@ begin
           uDisp   + #9 +
           Frq_Cmp;
 
-  if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
+  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+end;
+
+procedure TSimpl.ComparisonMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  LogEvent('BK.C' + #9 + IntToStr(X) + #9 + IntToStr(Y));
+  IntToStr(FDataSupport.BackgroundResponseCount); // local
+  CounterManager.OnBkgndResponse(Self); // global
+  if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;
 
 procedure TSimpl.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -381,14 +361,10 @@ begin
     end;
 end;
 
-
-procedure TSimpl.TrialMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TSimpl.TrialBeforeEnd(Sender: TObject);
 begin
-  LogEvent('BK.C' + #9 + IntToStr(X) + #9 + IntToStr(Y));
-  IntToStr(FDataSupport.BackgroundResponseCount); // local
-  CounterManager.OnBkgndResponse(Self); // global
-  if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
+  TrialResult(Sender);
+  WriteData(Sender);
 end;
 
 procedure TSimpl.Consequence(Sender: TObject);
@@ -404,49 +380,20 @@ begin
 end;
 
 procedure TSimpl.Response(Sender: TObject);
-var
-  LTickCount : Extended;
-  LTime, LCode, LStimulus, LLeft, LTop : string;
 begin
   if Sender is TKey then
     if TKey(Sender).Visible then
       begin
-        LTickCount := TickCount;
-        LTime := TimestampToStr(LTickCount - TimeStart);
-
         LogEvent(TKey(Sender).LastResponseLog);
 
         if FDataSupport.Latency = TimeStart then
-          FDataSupport.Latency := LTickCount;
+          FDataSupport.Latency := TickCount;
 
         if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
         if Assigned(OnStmResponse) then OnStmResponse (Self);
       end;
 end;
 
-procedure TSimpl.EndCorrection(Sender: TObject);
-begin
-  if Assigned (OnEndCorrection) then OnEndCorrection (Sender);
-end;
 
-procedure TSimpl.Hit(Sender: TObject);
-begin
-  if Assigned(OnHit) then OnHit(Sender);
-end;
-
-procedure TSimpl.None(Sender: TObject);
-begin
-  if Assigned(OnNone) then OnMiss (Sender);
-end;
-
-procedure TSimpl.BeginCorrection(Sender: TObject);
-begin
-  if Assigned (OnBeginCorrection) then OnBeginCorrection (Sender);
-end;
-
-procedure TSimpl.Miss(Sender: TObject);
-begin
-  if Assigned(OnMiss) then OnMiss (Sender);
-end;
 
 end.

@@ -42,19 +42,14 @@ type
     FKey2 : TKey;
     FFirstResp : Boolean;
     FUseMedia : Boolean;
-    procedure BeginCorrection (Sender : TObject);
     procedure Consequence(Sender: TObject);
-    procedure EndCorrection (Sender : TObject);
-    procedure Hit(Sender: TObject);
-    procedure Miss(Sender: TObject);
-    procedure None(Sender: TObject);
     procedure Response(Sender: TObject);
+    procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialStart(Sender: TObject);
     procedure TrialResult(Sender : TObject);
     procedure TrialPaint;
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
-    procedure BeforeEndTrial(Sender: TObject); override;
     procedure Paint; override;
     procedure WriteData(Sender: TObject); override;
   public
@@ -76,7 +71,7 @@ uses
 
 constructor TMRD.Create(AOwner: TComponent);
 begin
-  OnBeforeEndTrial := @BeforeEndTrial;
+  OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialPaint := @TrialPaint;
   OnTrialStart := @TrialStart;
@@ -215,24 +210,8 @@ begin
   Config(Self);
 end;
 
-//procedure TMRD.DispenserPlusCall;
-//begin
-//  // dispensers were not implemented yet
-//end;
-
 procedure TMRD.TrialStart(Sender: TObject);
-{
-  procedure KeyStart(var aKey : TKey);
-  begin
-    aKey.Play;
-    aKey.Visible:= True;
-  end;
-}
 begin
-  if FIsCorrection then
-    begin
-      BeginCorrection (Self);
-    end;
   {
   if FUseMedia then
     begin
@@ -241,8 +220,6 @@ begin
     end;
   }
   FFirstResp := True;
-
-  FResponseEnabled := True;
   FDataSupport.StmBegin := TickCount;
 end;
 
@@ -259,20 +236,19 @@ begin
           Format('%-*.*d', [4,8,FCircles.C[1].o.Y]) + #9 +
           #32#32#32#32#32#32#32 + FCircles.response + #9 +
           Format('%-*.*d', [4,8,FDataSupport.Responses]);
+  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
-procedure TMRD.BeforeEndTrial(Sender: TObject);
+procedure TMRD.TrialBeforeEnd(Sender: TObject);
 begin
-  FDataSupport.StmEnd := GetTickCount64;
+  FDataSupport.StmEnd := TickCount;
   FCircles.Result := Result;
-
-  if Result = T_HIT then Hit(Sender);
-  //if Result = 'MISS' then  Miss(Sender);
-  //if Result = 'NONE' then  None(Sender);
-
   WriteData(Sender);
+end;
 
-  if Assigned(OnWriteTrialData) then OnWriteTrialData(Self);
+procedure TMRD.Paint;
+begin
+  inherited Paint;
 end;
 
 
@@ -291,31 +267,6 @@ begin
   //Invalidate;
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
-end;
-
-procedure TMRD.Hit(Sender: TObject);
-begin
-  if Assigned(OnHit) then OnHit(Sender);
-end;
-
-procedure TMRD.Miss(Sender: TObject);
-begin
-  if Assigned(OnMiss) then OnMiss (Sender);
-end;
-
-procedure TMRD.None(Sender: TObject);
-begin
-  if Assigned(OnNone) then OnNone (Sender);
-end;
-
-procedure TMRD.BeginCorrection(Sender: TObject);
-begin
-  if Assigned(OnBeginCorrection) then OnBeginCorrection (Sender);
-end;
-
-procedure TMRD.EndCorrection(Sender: TObject);
-begin
-  if Assigned(OnEndCorrection) then OnEndCorrection (Sender);
 end;
 
 end.
