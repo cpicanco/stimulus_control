@@ -110,12 +110,11 @@ end;
 
 procedure TSimpl.Play(ACorrection: Boolean);
 var
-  s1, sName, sLoop, sColor : string;
+  s1 : string;
   R : TRect;
   I : Integer;
 begin
   inherited Play(ACorrection);
-  FResponseEnabled := False;
 
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
   SetLength(FComparisons, FNumComp);
@@ -145,16 +144,13 @@ begin
         Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
         s1 := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cStm] + #32;
-        sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
-        Key.FullPath := sName;
+        Key.FullPath := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
         NextSpaceDelimitedParameter(s1);
 
-        sLoop := Copy(s1, 0, pos(#32, s1)-1);
-        Key.Loops:= StrToIntDef(sLoop, 0);
+        Key.Loops:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
         NextSpaceDelimitedParameter(s1);
 
-        sColor := Copy(s1, 0, pos(#32, s1)-1);
-        Key.Color := StrToIntDef(sColor, $0000FF); //clRed
+        Key.Color := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), $0000FF); //clRed
 
         Csq := StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cCsq], 0);
         //Usb := CfgTrial.SList.Values[_Comp+IntToStr(I+1)+_cUsb];
@@ -165,7 +161,7 @@ begin
         IET := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cIET];
       end;
 
-  Config(Self);
+  if Self.ClassType = TSimpl then Config(Self);
 end;
 
 procedure TSimpl.TrialResult(Sender: TObject);

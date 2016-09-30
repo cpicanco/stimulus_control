@@ -384,7 +384,7 @@ begin
 
         FStimuli[a1] := R;
     end;
-  Config(Self);
+  if Self.ClassType = TDZT then Config(Self);
 end;
 
 
