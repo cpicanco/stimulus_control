@@ -56,15 +56,15 @@ type
     procedure Consequence(Sender: TObject);
     procedure Dispenser(Csq: Byte; Usb: string);
     procedure Response(Sender: TObject);
-    procedure TrialStart(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
-    procedure WriteData(Sender: TObject); override;
   protected
     FDataSupport : TDataSupport;
     FConsequenceFired : Boolean;
     FNumComp : Integer;
     FTrialInterval : Integer;
     FComparisons : array of TSupportKey;
+    procedure TrialStart(Sender: TObject); virtual;
+    procedure WriteData(Sender: TObject); override;
     procedure TrialResult(Sender: TObject);
     procedure VisibleComparisons(AValue: Boolean);
     procedure ComparisonMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -83,19 +83,18 @@ begin
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialStart := @TrialStart;
 
-  Header :=  Header + #9 +
-             'Pos.Cmp.' + #9 +
-             'Res.Cmp.' + #9 +
-             'Lat.Cmp.' + #9 +
-             'Dur.Cmp.' + #9 +
-             'Tmp.Cmp.' + #9 +
-             '___Disp.' + #9 +
-             '___UDsp.' + #9 +
-             'Frq.Cmp.';
+  Header :=  Header +
+             'Pos.Cmp.' + #9 + // Msg of each stimulus
+             'Res.Cmp.' + #9 + // Msg of the stimulus that have ended the trial
+             'Lat.Cmp.' + #9 + // Latency
+             'Dur.Cmp.' + #9 + // presentation time of all stimuli
+             '___Disp.' + #9 + // RS232 code of the stimulus that have ended the trial
+             '___UDsp.' + #9 + // USB code of the stimulus that have ended the trial
+             'Frq.Cmp.';       // absolute response frequency from each stimulus
 
   HeaderTimestamps := HeaderTimestamps + #9 +
                       'Lft.Cmp.' + #9 +
-                      'Top.Cmp.';
+                      'Top.Cmp.';              // top left of all clicks
 
 end;
 
@@ -261,11 +260,10 @@ begin
   Pos_Cmp := '';
   Disp := '';
   uDisp := '';
-  for I := 0 to ComponentCount - 1 do
-    if Components[I] is TKey then
-      Frq_Cmp := Frq_Cmp + _Comp + IntToStr(TKey(Components[I]).Tag + 1) + '=' +
-                                   IntToStr(TKey(Components[I]).ResponseCount) + #9;
-  Frq_Cmp := Frq_Cmp + 'BK='+ IntToStr(FDataSupport.BackgroundResponseCount);
+  for I := 0 to High(FComparisons) do
+      Frq_Cmp := Frq_Cmp + FComparisons[I].Msg + '=' +
+                                   IntToStr(FComparisons[I].Key.ResponseCount) + #9;
+  Frq_Cmp := Frq_Cmp + 'BK.C='+ IntToStr(FDataSupport.BackgroundResponseCount);
 
   for I:= 0 to FNumComp-1 do
     begin
@@ -273,7 +271,8 @@ begin
       Pos_Cmp:= Pos_Cmp + FComparisons[I].Msg + #32;
     end;
 
-  if FDataSupport.CompMsg = '' then FDataSupport.CompMsg:= '--------';
+  { todo: separate the comparison message from the GONOGO logic }
+  if FDataSupport.CompMsg = '' then FDataSupport.CompMsg:= '-';
   Res_Cmp:= LeftStr(FDataSupport.CompMsg+#32#32#32#32#32#32#32#32, 8);
 
   if FDataSupport.Latency = TimeStart then
@@ -300,7 +299,7 @@ procedure TSimpl.ComparisonMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   LogEvent('BK.C' + #9 + IntToStr(X) + #9 + IntToStr(Y));
-  IntToStr(FDataSupport.BackgroundResponseCount); // local
+  Inc(FDataSupport.BackgroundResponseCount); // local
   CounterManager.OnBkgndResponse(Self); // global
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;
