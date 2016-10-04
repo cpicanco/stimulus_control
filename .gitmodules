@@ -4,3 +4,6 @@
 [submodule "dependency/msgpack-delphi"]
 	path = dependency/msgpack-delphi
 	url = git@github.com:cpicanco/msgpack-delphi.git
+[submodule "dependency/fpc_zyre"]
+	path = dependency/fpc_zyre
+	url = git@github.com:cpicanco/fpc_zyre.git
