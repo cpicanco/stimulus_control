@@ -47,11 +47,14 @@ end;
 
 initialization
 begin
-  Logger := TRegData.Create(nil, GetCurrentDir + PathDelim + 'debug_log' + PathDelim + '000.log');
+  {$ifdef DEBUG}
+    Logger := TRegData.Create(nil, GetCurrentDir + PathDelim + 'debug_log' + PathDelim + '000.log');
+  {$endif}
 end
 
 finalization
 begin
+  {$ifdef DEBUG}
   if FindFirst('Log*',faAnyFile, FileInfo) = 0 then
     begin
       repeat
@@ -72,6 +75,7 @@ begin
     end;
   FindClose(FileInfo);
   Logger.Free;
+  {$endif}
 end
 
 end.

@@ -711,14 +711,17 @@ end;
 procedure TUserConfig.btnClientTestClick(Sender: TObject);
 var PupilClient : TPupilCommunication;
 begin
-  PupilClient := TPupilCommunication.Create('localhost:5020');
-  PupilClient.OnRequestReceived := @ReceiveTimestamp;
+  if chkPupilClient.Checked then
+    begin
+      PupilClient := TPupilCommunication.Create('localhost:5020');
+      PupilClient.OnRequestReceived := @ReceiveTimestamp;
 
-  PupilClient.Start;
-  PupilClient.Request(REQ_TIMESTAMP);
+      PupilClient.Start;
+      PupilClient.Request(REQ_TIMESTAMP);
 
-  Sleep(1000);
-  PupilClient.Terminate;
+      Sleep(1000);
+      PupilClient.Terminate;
+    end;
 end;
 
 procedure TUserConfig.btnExportStimulusClick(Sender: TObject);
@@ -1129,7 +1132,7 @@ begin
 
         //FNumTrials := aRow - 1;
         {$ifdef DEBUG}
-          DebugLn(mt_Information + BresenhamLineForm.ClassName +  ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
+          DebugLn(mt_Information + FrmBresenhamLine.ClassName +  ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
         {$endif}
         FrmBresenhamLine.Free;
         ResetRepetionMatrix;
@@ -1164,7 +1167,7 @@ begin
 
             //FNumTrials := aRow - 1;
             {$ifdef DEBUG}
-              DebugLn(mt_Information + MatrixForm.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
+              DebugLn(mt_Information + FrmMatrix.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
             {$endif}
             FrmMatrix.Free;
             ResetRepetionMatrix;

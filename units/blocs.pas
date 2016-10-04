@@ -498,7 +498,7 @@ begin
   //FTrial.Hide;
 
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + '[Blc - ' + FBlc.Name + ' T - ' + IntToStr(FCounterManager.CurrentTrial.Counter)+ ']');
+    DebugLn(mt_Debug + '[Blc - ' + FBlc.Name + ' T - ' + IntToStr(FCounterManager.CurrentTrial)+ ']');
     DebugLn(mt_Debug + 'Timer Intervals -> ITI:' + IntToStr(FTimerITI.Interval) + ' TO:' + IntToStr(FTimerTO.Interval) + ' Csq:' + IntToStr(FTimerCsq.Interval));
   {$endif}
 
