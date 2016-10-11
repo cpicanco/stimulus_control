@@ -48,7 +48,7 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="pupil_example"/>
+      <Filename Value="pupil_example.bin"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
