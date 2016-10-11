@@ -14,8 +14,8 @@ unit form_main;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls
-  , pupil_communication
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  ExtCtrls, pupil_communication
   ;
 
 type
@@ -31,13 +31,8 @@ type
     btnStopCalibration: TButton;
     btnUnsubscribe: TButton;
     btnReqTimeSync: TButton;
-    gbxSubscribe: TGroupBox;
     LabelHost: TLabel;
-    rbtnGazeData: TRadioButton;
-    rbtnTimeSync: TRadioButton;
-    rbtnNotifications: TRadioButton;
-    rbtnLoggingInfo: TRadioButton;
-    rbtnEyeCamera: TRadioButton;
+    rgrpSubscribe: TRadioGroup;
     Subscribe: TButton;
     procedure btnReceiveTimestampClick(Sender: TObject);
     procedure btnReceiveRecordingPathClick(Sender: TObject);
@@ -64,6 +59,8 @@ var
   Form1: TForm1;
 
 implementation
+
+const CLOCAL_HOST = '127.0.1.1:5020';
 
 {$R *.lfm}
 
@@ -106,25 +103,20 @@ end;
 
 procedure TForm1.btnUnsubscribeClick(Sender: TObject);
 begin
-  if rbtnNotifications.Checked then
-    FPupilClient.UnSubscribe(SUB_ALL_NOTIFICATIONS);
-
-  if rbtnLoggingInfo.Checked then
-    FPupilClient.UnSubscribe(SUB_LOGGING_INFO);
-
-  if rbtnEyeCamera.Checked then
-    FPupilClient.UnSubscribe(SUB_EYE_CAMERA_0);
-
-  if rbtnTimeSync.Checked then
-    FPupilClient.UnSubscribe(SUB_TIME_SYNC);
-
-  if rbtnGazeData.Checked then
-    FPupilClient.UnSubscribe(SUB_GAZE_DATA);
+  case rgrpSubscribe.ItemIndex of
+    0 : FPupilClient.UnSubscribe(SUB_ALL_NOTIFICATIONS);
+    1 : FPupilClient.UnSubscribe(SUB_LOGGING_INFO);
+    2 : FPupilClient.UnSubscribe(SUB_EYE_CAMERA_0);
+    3 : FPupilClient.UnSubscribe(SUB_TIME_SYNC);
+    4 : FPupilClient.UnSubscribe(SUB_GAZE_DATA);
+    5 : FPupilClient.UnSubscribe(SUB_GROUPS);
+  end;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  FPupilClient := TPupilCommunication.Create('localhost:5020');
+  LabelHost.Caption:='Address:'+CLOCAL_HOST+', Pupil Capture Version:v0.8.5';
+  FPupilClient := TPupilCommunication.Create(CLOCAL_HOST);
   with FPupilClient do
     begin
       OnRequestReceived := @ReceiveRequest;
@@ -143,21 +135,14 @@ end;
 
 procedure TForm1.SubscribeClick(Sender: TObject);
 begin
-  if rbtnNotifications.Checked then
-    FPupilClient.Subscribe(SUB_ALL_NOTIFICATIONS);
-
-  if rbtnLoggingInfo.Checked then
-    FPupilClient.Subscribe(SUB_LOGGING_INFO);
-
-  if rbtnEyeCamera.Checked then
-    FPupilClient.Subscribe(SUB_EYE_CAMERA_0);
-
-  if rbtnTimeSync.Checked then
-    FPupilClient.Subscribe(SUB_TIME_SYNC);
-
-  if rbtnGazeData.Checked then
-    FPupilClient.Subscribe(SUB_GAZE_DATA);
-
+  case rgrpSubscribe.ItemIndex of
+    0 : FPupilClient.Subscribe(SUB_ALL_NOTIFICATIONS);
+    1 : FPupilClient.Subscribe(SUB_LOGGING_INFO);
+    2 : FPupilClient.Subscribe(SUB_EYE_CAMERA_0);
+    3 : FPupilClient.Subscribe(SUB_TIME_SYNC);
+    4 : FPupilClient.Subscribe(SUB_GAZE_DATA);
+    5 : FPupilClient.Subscribe(SUB_GROUPS);
+  end;
 end;
 
 procedure TForm1.ReceiveRequest(Sender: TObject; ARequest, AResponse: String);
