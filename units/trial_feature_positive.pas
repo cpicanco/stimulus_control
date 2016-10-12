@@ -266,17 +266,17 @@ begin
     begin
         s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd];
 
-        LOuterR.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
+        LOuterR.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
         NextSpaceDelimitedParameter(s1);
 
-        LOuterR.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
+        LOuterR.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
         NextSpaceDelimitedParameter(s1);
 
         LWidth := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 100);
         LOuterR.Right := LOuterR.Left + LWidth;
         NextSpaceDelimitedParameter(s1);
 
-        LHeight := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 100);
+        LHeight := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), LWidth);
         LOuterR.Bottom := LOuterR.Top + LHeight;
 
        if FUseMedia then //allow mouse input
@@ -301,7 +301,7 @@ begin
               OuterRect := LOuterR;
               InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
               gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
-              gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Degree], Random(360));
+              gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Degree], 1+Random(360));
               gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Length], 5 );
             end;
       end;
