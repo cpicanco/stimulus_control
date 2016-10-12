@@ -184,6 +184,7 @@ gap: Boolean; gap_degree, gap_length: integer);
 begin
   with Canvas do
     begin
+      Pen.Width := 2;
       Pen.Mode := pmBlack;
       Ellipse(AOuterR);
 
@@ -197,10 +198,13 @@ begin
           Pen.Mode := pmBlack;
           Arc(AInnerR.Left,AInnerR.Top,AInnerR.Right-1,AInnerR.Bottom-1, gap_degree, gap_length);
         end;
+
+      Pen.Width := 1;
       Pen.Mode := pmCopy;
     end;
 end;
 
+// starter
 procedure DrawCenteredCircle (Canvas : TCanvas; Width, Height, Size : integer);
   var center : TPoint;
 begin
@@ -209,16 +213,16 @@ begin
 
   with Canvas do
     begin
-      Brush.Color := clBlack;
       Brush.Style:= bsClear;
-      Pen.Mode := pmCopy;
-      Pen.Style:= psSolid;
-      Pen.Color := clBlack;
+      Pen.Mode := pmBlack;
       Pen.Width := 5;
       with center do
         Ellipse(X - size, Y - size, X + size, Y + size);
 
-   end;
+      Brush.Style:= bsSolid;
+      Pen.Mode := pmCopy;
+      Pen.Width := 1;
+    end;
 end;
 
 
