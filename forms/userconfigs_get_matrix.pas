@@ -58,7 +58,11 @@ type
     SaveDialog1: TSaveDialog;
     procedure btnCancelClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
+    procedure edtDistxEditingDone(Sender: TObject);
     procedure edtRowChange(Sender: TObject);
+    procedure edtRowEditingDone(Sender: TObject);
+    procedure edtScreenLeftEditingDone(Sender: TObject);
+    procedure edtScreenTopEditingDone(Sender: TObject);
     procedure edtWidthChange(Sender: TObject);
     procedure edtDistxChange(Sender: TObject);
     procedure cbSquareClick(Sender: TObject);
@@ -68,12 +72,12 @@ type
     procedure btnShowMatrixClick(Sender: TObject);
     procedure btnClearAllClick(Sender: TObject);
     procedure btnRandomizeMatrixClick(Sender: TObject);
+    procedure edtWidthEditingDone(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure lbCoordenadasEndDock(Sender, Target: TObject; X, Y: Integer);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure edtScreenLeftChange(Sender: TObject);
   published
     procedure SaveAsTXT(Sender: TObject);
   private
@@ -127,15 +131,45 @@ end;
 
 procedure TMatrixConfigForm.edtRowChange(Sender: TObject);
 begin
-  if (TEdit(Sender).Text = '') or
-     (StrToIntDef(TEdit(Sender).Text, 1) < 1) or
-     (StrToIntDef(TEdit(Sender).Text, 1) > 127) then
-    begin
-      TEdit(Sender).Text := CMatrizDefault;
-      TEdit(Sender).SelectAll;
-    end;
-  if (TEdit(Sender).ComponentIndex = edtRow.ComponentIndex) then
-    if cbSquare.Checked then edtCol.Text := edtRow.Text;
+ if (TEdit(Sender).ComponentIndex = edtRow.ComponentIndex) then
+   if cbSquare.Checked then edtCol.Text := edtRow.Text;
+end;
+
+procedure TMatrixConfigForm.edtRowEditingDone(Sender: TObject);
+begin
+ if (TEdit(Sender).Text = '') or
+    (StrToIntDef(TEdit(Sender).Text, 1) < 1) or
+    (StrToIntDef(TEdit(Sender).Text, 1) > 127) then
+   begin
+     TEdit(Sender).Text := CMatrizDefault;
+     TEdit(Sender).SelectAll;
+   end;
+end;
+
+procedure TMatrixConfigForm.edtScreenLeftEditingDone(Sender: TObject);
+begin
+ if (TEdit(Sender).Text = '') or (TEdit(Sender).Text = '0') then
+ begin
+   if (TEdit(Sender).ComponentIndex = edtScreenLeft.ComponentIndex) then
+     TEdit(Sender).Text := CCustomResDefLeft else
+   if (TEdit(Sender).ComponentIndex = edtScreenTop.ComponentIndex) then
+   TEdit(Sender).Text := CCustomResDefTop;
+
+   TEdit(Sender).SelectAll;
+ end;
+end;
+
+procedure TMatrixConfigForm.edtScreenTopEditingDone(Sender: TObject);
+begin
+ if (TEdit(Sender).Text = '') or (TEdit(Sender).Text = '0') then
+ begin
+   if (TEdit(Sender).ComponentIndex = edtScreenLeft.ComponentIndex) then
+     TEdit(Sender).Text := CCustomResDefLeft else
+   if (TEdit(Sender).ComponentIndex = edtScreenTop.ComponentIndex) then
+   TEdit(Sender).Text := CCustomResDefTop;
+
+   TEdit(Sender).SelectAll;
+ end;
 end;
 
 procedure TMatrixConfigForm.btnCancelClick(Sender: TObject);
@@ -169,6 +203,7 @@ begin
       end;
   if lbCoordenates.Items.Text <> '' then
     TMatrixForm(Application.Components[i]).SetMatrix(lbCoordenates.Items);
+  FDrawCoordenates.ClearAll;
   Background.Hide;
   {$IFDEF WINDOWS}
   Close;
@@ -177,29 +212,19 @@ begin
   {$ENDIF}
 end;
 
-procedure TMatrixConfigForm.edtDistxChange(Sender: TObject);
+procedure TMatrixConfigForm.edtDistxEditingDone(Sender: TObject);
 begin
   if TEdit(Sender).Text = '' then
     begin
       TEdit(Sender).Text := '0';
       TEdit(Sender).SelectAll;
     end;
-
-  if (TEdit(Sender).ComponentIndex = edtDistx.ComponentIndex) then
-    if chkPlotEquallySpaced.Checked then edtDisty.Text := edtDistx.Text;
 end;
 
-procedure TMatrixConfigForm.edtScreenLeftChange(Sender: TObject);
+procedure TMatrixConfigForm.edtDistxChange(Sender: TObject);
 begin
-    if (TEdit(Sender).Text = '') or (TEdit(Sender).Text = '0') then
-    begin
-      if (TEdit(Sender).ComponentIndex = edtScreenLeft.ComponentIndex) then
-        TEdit(Sender).Text := CCustomResDefLeft else
-      if (TEdit(Sender).ComponentIndex = edtScreenTop.ComponentIndex) then
-      TEdit(Sender).Text := CCustomResDefTop;
-
-      TEdit(Sender).SelectAll;
-    end;
+  if (TEdit(Sender).ComponentIndex = edtDistx.ComponentIndex) then
+    if chkPlotEquallySpaced.Checked then edtDisty.Text := edtDistx.Text;
 end;
 
 procedure TMatrixConfigForm.SaveAsTXT(Sender: TObject);
@@ -230,12 +255,6 @@ end;
 
 procedure TMatrixConfigForm.edtWidthChange(Sender: TObject);
 begin
-  if (TEdit(Sender).Text = '') or (TEdit(Sender).Text = '0') then
-    begin
-      TEdit(Sender).Text := CSizeDefault;
-      TEdit(Sender).SelectAll;
-    end;
-
   if (TEdit(Sender).ComponentIndex = edtWidth.ComponentIndex) then
     if cbSSquare.Checked then edtHeight.Text := edtWidth.Text;
 end;
@@ -299,6 +318,15 @@ begin
   begin
     FDrawCoordenates.RandomizePositions (True);
   end;
+end;
+
+procedure TMatrixConfigForm.edtWidthEditingDone(Sender: TObject);
+begin
+ if (TEdit(Sender).Text = '') or (TEdit(Sender).Text = '0') then
+   begin
+     TEdit(Sender).Text := CSizeDefault;
+     TEdit(Sender).SelectAll;
+   end;
 end;
 
 procedure TMatrixConfigForm.FormActivate(Sender: TObject);

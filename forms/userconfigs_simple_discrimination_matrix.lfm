@@ -46,9 +46,11 @@ object MatrixForm: TMatrixForm
       Left = 8
       Height = 21
       Top = 128
-      Width = 69
+      Width = 68
       Caption = 'Preview'
+      Checked = True
       OnChange = cbPreviewChange
+      State = cbChecked
       TabOrder = 2
     end
     object gbTrials: TGroupBox
@@ -104,7 +106,7 @@ object MatrixForm: TMatrixForm
         Left = 0
         Height = 21
         Top = 2
-        Width = 74
+        Width = 78
         Anchors = [akLeft, akBottom]
         BorderSpacing.Bottom = 1
         Caption = 'Conjunto'
@@ -114,7 +116,7 @@ object MatrixForm: TMatrixForm
         AnchorSideLeft.Control = cbUseStimuliSet
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = cbUseStimuliSet
-        Left = 87
+        Left = 91
         Height = 25
         Top = 2
         Width = 54
@@ -166,12 +168,11 @@ object MatrixForm: TMatrixForm
         MaxValue = 359
         MinValue = 1
         TabOrder = 0
-        Value = 1
+        Value = 10
       end
     end
   end
   object PreviewTimer: TTimer
-    Enabled = False
     OnTimer = PreviewTimerTimer
     left = 48
     top = 176

@@ -120,7 +120,8 @@ procedure TMatrixForm.FormPaint(Sender: TObject);
 var
     i : integer;
     OldCanvas : TCanvas;
-    aTop, aLeft, aWidth{, aHeight} : integer;
+    aWidth, aHeight : integer;
+    aR : TRect;
     aGapValues : string;
     aGap : Boolean;
     aGapDegree : integer;
@@ -165,21 +166,24 @@ begin
           begin
             for i := Low(Trials[FCurrentTrial].Comps) to Length(Trials[FCurrentTrial].Comps)-1 do
               begin
-                aTop := Trials[FCurrentTrial].Comps[i].Top;
-                aLeft := Trials[FCurrentTrial].Comps[i].Left;
+                aR.Left := Trials[FCurrentTrial].Comps[i].Left;
+                aR.Top := Trials[FCurrentTrial].Comps[i].Top;
                 aWidth := Trials[FCurrentTrial].Comps[i].Width;
-                //aHeight := Trials[FCurrentTrial].Comps[i].Height;
+                aR.Right := aR.Left + aWidth;
+                aHeight := Trials[FCurrentTrial].Comps[i].Height;
+                aR.Bottom := aR.Top + aHeight;
+
                 aGapValues := Trials[FCurrentTrial].Comps[i].Path;
                 //WriteLn(aGapValues);
-                aGap := StrToBoolDef( Copy( aGapValues, 0, pos( #32, aGapValues ) - 1), False);
+                aGap := StrToBoolDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),False);
                 NextValue(aGapValues);
 
-                aGapDegree := StrToIntDef( Copy( aGapValues, 0, pos( #32, aGapValues ) - 1), 1);
+                aGapDegree := 16 * StrToIntDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),1);
                 NextValue(aGapValues);
 
-                aGapLength := StrToIntDef( Copy( aGapValues, 0, pos( #32, aGapValues ) - 1), 360);;
+                aGapLength := 16 * StrToIntDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),360);
 
-                DrawCircle(Canvas, aLeft, aTop, aWidth, aGap, aGapDegree, aGapLength );
+                DrawCustomEllipse(Canvas,aR,GetInnerRect(aR,aWidth,aHeight),aGap,aGapDegree,aGapLength);
               end;
             i := FCurrentTrial + 1;
             Canvas.TextOut(Trials[i-1].Comps[0].Left - 10, Trials[i-1].Comps[0].Top - 10 , IntToStr(i));
@@ -282,7 +286,7 @@ begin
                 begin
                   // positive
                   inct := True;
-                  aGapDegree := Random(360);
+                  aGapDegree := 1+Random(360);
                   aGapLength := seGapLength.Value;
                   Trials[i].Comps[j].Path := '1' + #32 + IntToStr(aGapDegree) + #32 + IntToStr(aGapLength) + #32;
                 end

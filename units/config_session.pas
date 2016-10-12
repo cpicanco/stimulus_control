@@ -34,8 +34,8 @@ type
   end;
 
   TCircle = record
-    o : TPoint;  //Left/Top
-    size : integer;
+    OuterRect : TRect;  //Left/Top
+    InnerRect : TRect;
     gap : Boolean;
     gap_degree : integer;
     gap_length : integer;
