@@ -45,6 +45,7 @@ type
     btnContentFile: TButton;
     btnApply: TButton;
     btnExportStimulus: TButton;
+    btnTrialsDone: TButton;
     chkPupilClient: TCheckBox;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
@@ -95,7 +96,7 @@ type
     procedure btnGridTypeClick(Sender: TObject);
     procedure btnNextGeneralClick(Sender: TObject);
     procedure btnNextStimuliClick(Sender: TObject);
-    procedure btnNextTrialsClick(Sender: TObject);
+    procedure btnTrialsDoneClick(Sender: TObject);
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
@@ -172,6 +173,8 @@ implementation
 
 uses background, userconfigs_trial_mirrored, userconfigs_simple_discrimination_matrix;
 
+const
+  CSESSION_SERVER = '127.0.1.1:5020';
 { TUserConfig }
 
 
@@ -713,7 +716,7 @@ var PupilClient : TPupilCommunication;
 begin
   if chkPupilClient.Checked then
     begin
-      PupilClient := TPupilCommunication.Create('localhost:5020');
+      PupilClient := TPupilCommunication.Create('127.0.1.1:5020');
       PupilClient.OnRequestReceived := @ReceiveTimestamp;
 
       PupilClient.Start;
@@ -727,6 +730,7 @@ end;
 procedure TUserConfig.btnExportStimulusClick(Sender: TObject);
 var
     Bitmap : TBitmap;
+    R : TRect;
 
     procedure DoWhiteBackGround;
     begin
@@ -751,17 +755,19 @@ begin
             // give it a size
             Width := 500;
             Height := 500;
+            R.TopLeft := Point(0, 0);
+            R.BottomRight := Point(0+Width,0+Height);
 
             DoWhiteBackGround;
-            DrawCircle(Canvas, 0, 0, Width, False, 0, 0);
+            DrawCustomEllipse(Canvas, R,GetInnerRect(R,Width, Height), False, 0, 0);
             SaveToFile(SaveDialog1.FileName + '_1.bmp');
 
             DoWhiteBackGround;
-            DrawCircle(Canvas, 0, 0, Width, True, 0, 360);
+            DrawCustomEllipse(Canvas,R,GetInnerRect(R,Width, Height), True, 0, 16*360);
             SaveToFile(SaveDialog1.FileName + '_2.bmp');
 
             DoWhiteBackGround;
-            DrawCircle(Canvas, 0, 0, Width, True, 45, 1);
+            DrawCustomEllipse(Canvas, R,GetInnerRect(R,Width, Height), True, 16*45, 16*1);
             SaveToFile(SaveDialog1.FileName + '_3.bmp');
           end;
 
@@ -795,7 +801,7 @@ begin
   pgRodar.TabIndex := 2;
 end;
 
-procedure TUserConfig.btnNextTrialsClick(Sender: TObject);
+procedure TUserConfig.btnTrialsDoneClick(Sender: TObject);
 var
   aTrial, aStm, aBlc, aNumTrials : integer;
   aHStm : integer;
@@ -851,12 +857,12 @@ var
 
 begin
   aNumTrials := StringGrid1.RowCount -1;
-
+  FEscriba.SessionServer := CSESSION_SERVER;
   if piAxes.Checked then
     begin
       aBlc := 0;
 
-      FEscriba.Name := leSessionName.Text;
+      FEscriba.SessionName := leSessionName.Text;
       FEscriba.SessionSubject := leParticipant.Text;
       FEscriba.Blcs[aBlc].ITI := 1000;
       FEscriba.SessionType  := T_CIC;
@@ -916,7 +922,7 @@ begin
     begin
       aBlc := 0;
 
-      FEscriba.Name := leSessionName.Text;
+      FEscriba.SessionName := leSessionName.Text;
       FEscriba.SessionSubject := leParticipant.Text;
       FEscriba.Blcs[aBlc].ITI := 1000;
       FEscriba.SessionType  := 'CIC';
@@ -951,7 +957,7 @@ begin
               SList.BeginUpdate;
               SList.Values[_BkGnd] := IntToStr (clWhite);
               SList.Values[_Cursor] := IntToStr (crDefault);
-              SList.Values[_UseMedia] := BoolToStr(False, '1','0');
+              // SList.Values[_UseMedia] := BoolToStr(False, '1','0');
               SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
               SList.Values[_LimitedHold] := '4000';
               SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
@@ -1186,7 +1192,7 @@ begin
   stAppTitle.Caption := Application.Title;
   stVersion.Caption := CurrentVersion(GetCommitTag());
   MemoAppInfo.Lines.Append('Stimulus Control App.');
-  MemoAppInfo.Lines.Append('Copyright (C) 2014-2015,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.');
+  MemoAppInfo.Lines.Append('Copyright (C) 2014-2016,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.');
   MemoAppInfo.Lines.Append('');
   MemoAppInfo.Lines.Append('Last Commit: ' + LastCommitShortCode(GetCommitTag()));
   MemoAppInfo.Lines.Append('Contact: cpicanco@ufpa.br');

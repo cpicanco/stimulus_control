@@ -116,6 +116,7 @@ const
   KRootMedia = 'RootMedia=' + #9;
   KData = 'Data=' + #9;
   KRootData = 'RootData=' + #9;
+  KServer = 'ServerAddress=' + #9;
   KNumBlc = 'NumBlc=' + #9;
   KNumTrial = 'NumTrials=' + #9;
   KMaxCorrection = 'MaxCorrection=' + #9;

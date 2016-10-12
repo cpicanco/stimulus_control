@@ -116,6 +116,7 @@ const
   SUB_LOGGING_WARNING = 'logging.warning';
 
   SUB_TIME_SYNC = 'time_sync.';
+  SUB_GROUPS = 'groups.';
 
 const
   NOTIFY_RECORDING_SHOULD_START = 'notify.recording.should_start';

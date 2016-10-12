@@ -19,17 +19,12 @@ type
 
   TPoints = array of TPoint;
 
-  TArc = record
-    p1 : TPoint;
-    p2 : TPoint;
-  end;
-
 function IsPointInPolygon(AX, AY: Integer; APolygon: array of TPoint): Boolean;
-
+function GetInnerRect(R : TRect; AWidth, AHeight:integer) : TRect;
 function BresenhamLine(x0, x1, y0, y1 : integer): TPoints;
 procedure CenteredMarker(Canvas: TCanvas; Width, Height, size: integer);
 procedure DrawCenteredCircle (Canvas : TCanvas; Width, Height, Size : integer);
-procedure DrawCircle(Canvas : TCanvas; left, top, size: integer; gap : Boolean; gap_degree, gap_length: integer);
+procedure DrawCustomEllipse(Canvas: TCanvas; AOuterR, AInnerR: TRect; gap: Boolean; gap_degree, gap_length: integer);
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
 procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
@@ -92,6 +87,14 @@ end;
 procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
 begin
   Canvas.Pixels[aPoint.X, aPoint.Y] := clColor;
+end;
+
+function GetInnerRect(R: TRect; AWidth, AHeight: integer): TRect;
+begin
+  Result.Left := R.Left + (AWidth div 4);
+  Result.Top := R.Top + (AHeight div 4);
+  Result.Right := R.Right - (AWidth div 4);
+  Result.Bottom := R.Bottom - (AHeight div 4);
 end;
 
 function BresenhamLine(x0, x1, y0, y1: integer): TPoints;
@@ -176,49 +179,25 @@ begin
     end;
 end;
 
-procedure DrawCircle(Canvas: TCanvas; left, top, size: integer; gap: Boolean;
-  gap_degree, gap_length: integer);
-var
-  fix : integer;
-  inner_arc : TArc;
+procedure DrawCustomEllipse(Canvas: TCanvas; AOuterR, AInnerR: TRect;
+gap: Boolean; gap_degree, gap_length: integer);
 begin
   with Canvas do
     begin
-      Brush.Style := bsSolid;
-      Pen.Style := psSolid;
-      Pen.Mode := pmXor;
+      Pen.Mode := pmBlack;
+      Ellipse(AOuterR);
 
-      Brush.Color := clWhite;
-      Pen.Color := clBlack;
-      Pen.Width := 1;
-      Ellipse(left,top, left + size, top + size);
-
-      Brush.Color := clBlack;
       Brush.Style := bsClear;
-      Pen.Color := clWhite;
-      Pen.Mode := pmxor;
-      Pen.Width := 1;
+      Pen.Mode := pmWhite;
+      Ellipse(AInnerR);
+      Brush.Style := bsSolid;
 
-      fix := (size div 2) div 2;
-      with inner_arc do
-        begin
-          p1.X := left + (size div 2) - fix;
-          p1.Y := top + (size div 2) - fix;
-          p2.X := left + size - fix;
-          p2.Y := top + size - fix;
-          Ellipse(p1.X, p1.Y, p2.X, p2.Y);
-        end;
-
-      // draw gap on inner circle circumference
       if gap then
         begin
-          Pen.Color := clBlack;
-          Pen.Mode := pmCopy;
-          Pen.Width := 5;
-          with inner_arc do
-            //Arc(p1.X + 1, p1.Y + 1, p2.X - 1, p2.Y - 1, 16 * gap_degree, 16 * gap_length);
-            Arc(p1.X , p1.Y , p2.X , p2.Y , 16 * gap_degree, 16 * gap_length);
+          Pen.Mode := pmBlack;
+          Arc(AInnerR.Left,AInnerR.Top,AInnerR.Right-1,AInnerR.Bottom-1, gap_degree, gap_length);
         end;
+      Pen.Mode := pmCopy;
     end;
 end;
 

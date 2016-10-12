@@ -124,27 +124,27 @@ begin
   if not FUseMedia then
     for i := 0 to 1 do
       with FCircles.C[i] do
-        DrawCircle(Canvas, o.X, o.Y, size, gap, gap_degree, gap_length);
+        DrawCustomEllipse(Canvas,OuterRect,InnerRect, gap, gap_degree, gap_length);
 end;
 
 procedure TMRD.Play(ACorrection: Boolean);
 var
   s1, sName, sLoop, sColor{, sGap, sGapDegree, sGapLength} : string;
-  R : TRect;
-  a1 : Integer;
+  LOuterR : TRect;
+  a1, LWidth, LHeight : Integer;
 
-  procedure KeyConfig(var aKey : TKey);
-  begin
-    with aKey do
-      begin
-        BoundsRect := R;
-        Color := StrToIntDef(sColor, $0000FF); // clRed
-        Loops := StrToIntDef(sLoop, 0);
-        FullPath := sName;
-        Schedule.Kind := CfgTrial.SList.Values[_Schedule];
-        // Visible := False;
-      end;
-  end;
+  //procedure KeyConfig(var aKey : TKey);
+  //begin
+  //  with aKey do
+  //    begin
+  //      BoundsRect := R;
+  //      Color := StrToIntDef(sColor, $0000FF); // clRed
+  //      Loops := StrToIntDef(sLoop, 0);
+  //      FullPath := sName;
+  //      Schedule.Kind := CfgTrial.SList.Values[_Schedule];
+  //      // Visible := False;
+  //    end;
+  //end;
 
 begin
   inherited Play(ACorrection);
@@ -168,41 +168,41 @@ begin
     begin
         s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
 
-        R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+        LOuterR.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
         NextSpaceDelimitedParameter(s1);
 
-        R.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+        LOuterR.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
         NextSpaceDelimitedParameter(s1);
 
-        R.Right := StrToIntDef(s1, 100);
-        R.Bottom := R.Right;
+        LWidth := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 100);
+        LOuterR.Right := LOuterR.Left + LWidth;
+        NextSpaceDelimitedParameter(s1);
+
+        LHeight := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 100);
+        LOuterR.Bottom := LOuterR.Top + LHeight;
 
        if FUseMedia then
          begin
-           s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
-
-           sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
-           NextSpaceDelimitedParameter(s1);
-
-           sLoop := Copy(s1, 0, pos(#32, s1)-1);
-           NextSpaceDelimitedParameter(s1);
-
-           sColor := s1;
-
-           if a1 = 0 then KeyConfig(FKey1) else KeyConfig(FKey2)
-
+           //s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
+           //
+           //sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
+           //NextSpaceDelimitedParameter(s1);
+           //
+           //sLoop := Copy(s1, 0, pos(#32, s1)-1);
+           //NextSpaceDelimitedParameter(s1);
+           //
+           //sColor := s1;
+           //
+           //if a1 = 0 then KeyConfig(FKey1) else KeyConfig(FKey2)
          end
        else
           with FCircles.C[a1] do
             begin
-              o := Point(R.Left, R.Top);
-              size := R.Right;
+              OuterRect := LOuterR;
+              InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
               gap := StrToBoolDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
-              if gap then
-                  begin
-                    gap_degree := StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
-                    gap_length := StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
-                  end;
+              gap_degree := 16 * StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
+              gap_length := 16 * StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
             end;
       end;
 
@@ -229,10 +229,10 @@ begin
           TimestampToStr(FDataSupport.Latency - TimeStart) + #9 +
           TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
           #32#32#32#32#32 + FormatFloat('000;;00', FCircles.angle) + #9 +
-          Format('%-*.*d', [4,8,FCircles.C[0].o.X]) + #9 +
-          Format('%-*.*d', [4,8,FCircles.C[0].o.Y]) + #9 +
-          Format('%-*.*d', [4,8,FCircles.C[1].o.X]) + #9 +
-          Format('%-*.*d', [4,8,FCircles.C[1].o.Y]) + #9 +
+          Format('%-*.*d', [4,8,FCircles.C[0].OuterRect.Left]) + #9 +
+          Format('%-*.*d', [4,8,FCircles.C[0].OuterRect.Top]) + #9 +
+          Format('%-*.*d', [4,8,FCircles.C[1].OuterRect.Left]) + #9 +
+          Format('%-*.*d', [4,8,FCircles.C[1].OuterRect.Top]) + #9 +
           #32#32#32#32#32#32#32 + FCircles.response + #9 +
           Format('%-*.*d', [4,8,FDataSupport.Responses]);
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);

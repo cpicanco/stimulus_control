@@ -159,6 +159,7 @@ procedure TBresenhamLineForm.FormPaint(Sender: TObject);
 var
   i, mX, mY:  integer;
   mP : TPoint;
+  R : TRect;
   OldCanvas : TCanvas;
 
   procedure SaveOldCanvas;
@@ -224,8 +225,17 @@ begin
 
   if cbPreview.Checked then
     begin
-      DrawCircle(Canvas, FLine[FCurrentTrial].X, FLine[FCurrentTrial].Y, seSize.Value, False, 0, 0);
-      DrawCircle(Canvas, FMirroredLine[FCurrentTrial].X, FMirroredLine[FCurrentTrial].Y, seSize.Value, True, 0, 360);
+      R.Left := FLine[FCurrentTrial].X;
+      R.Top := FLine[FCurrentTrial].Y;
+      R.Right := FLine[FCurrentTrial].X + seSize.Value;
+      R.Bottom := FLine[FCurrentTrial].Y + seSize.Value;
+      DrawCustomEllipse(Canvas,R,GetInnerRect(R,seSize.Value,seSize.Value),False, 0, 0);
+
+      R.Left := FMirroredLine[FCurrentTrial].X;
+      R.Top := FMirroredLine[FCurrentTrial].Y;
+      R.Right := FMirroredLine[FCurrentTrial].X + seSize.Value;
+      R.Bottom := FMirroredLine[FCurrentTrial].Y + seSize.Value;
+      DrawCustomEllipse(Canvas,R,GetInnerRect(R,seSize.Value,seSize.Value),True, 0, 16*360);
     end;
 
   LoadOldCanvas;
