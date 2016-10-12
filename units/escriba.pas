@@ -189,7 +189,7 @@ begin
   while FileExistsUTF8(Filename) { *Converted from FileExists*  } do
     begin
       Inc(a1);
-      name := s1 + StringOfChar(#48, 3 - Length(IntToStr(a1))) + IntToStr(a1) + s2;
+      FileName := s1 + StringOfChar(#48, 3 - Length(IntToStr(a1))) + IntToStr(a1) + s2;
     end;
   //Memo := TMemo.Create(Self);
   //FText.Text := Memo.Text;
