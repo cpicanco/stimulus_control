@@ -330,6 +330,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
+      <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
       <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
