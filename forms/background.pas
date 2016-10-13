@@ -13,27 +13,21 @@ unit background;
 
 interface
 
-uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
-     Dialogs, ExtCtrls, LCLType, LCLIntf
-
-     ;
+uses
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs;
 
 type
 
-  { Tbkgnd }
+  { TBackground }
 
   TBackground = class(TForm)
-    procedure FormCreate(Sender: TObject);
   private
     FFullScreen : Boolean;
-    FOriginalBounds: TRect;
-    FOriginalWindowState: TWindowState;
-    FScreenBounds: TRect;
-
+    //FOriginalBounds: TRect;
+    //FOriginalWindowState: TWindowState;
+    //FScreenBounds: TRect;
   public
-
     procedure SetFullScreen(TurnOn : Boolean);
-
   end;
 
 var
@@ -41,19 +35,12 @@ var
 
 implementation
 
-{$R background.lfm}
+{$R *.lfm}
 
-{ Tbkgnd }
-
-procedure TBackground.FormCreate(Sender: TObject);
-begin
-  FFullScreen := False;
-end;
-
+{ TBackground }
 
 procedure TBackground.SetFullScreen(TurnOn: Boolean);
 begin
-
   if TurnOn then
     begin
       //fullscreen true
@@ -76,7 +63,7 @@ begin
       WindowState := wsNormal;
       {$ENDIF}
     end;
-    FFullScreen := TurnOn;
+  FFullScreen := TurnOn;
 end;
 
 end.
