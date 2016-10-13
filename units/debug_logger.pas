@@ -37,8 +37,10 @@ uses LCLIntf, FileUtil, LazFileUtils, SysUtils
      {$endif}
      ;
 
+{$ifdef DEBUG}
 var
   FileInfo : TSearchRec;
+{$endif}
 
 procedure DebugLn(msg: string);
 begin
