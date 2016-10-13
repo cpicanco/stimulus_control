@@ -22,10 +22,10 @@ uses
   ;
 
 function ReadProcessOutput(Output : TInputPipeStream) : TStringList;
-function GetCommitTag(UseTagsOption : Boolean = True) : TStringList;
+function GetCommitTag(UseTagsOption : Boolean) : TStringList;
 
 function CurrentVersion(CommitTag : TStringList) : string;
-function LastCommitShortCode(CommitTag : TStringList) : string;
+function LastCommitShortCode(IncludeLocalCommits: Boolean) : string;
 
 implementation
 
@@ -40,7 +40,7 @@ begin
     on E : Exception do
       begin
         Result := TStringList.Create;
-        Result[0] := 'v0.0.0.0-0-0000000';
+        Result.Append('v0.0.0.0-0-0000000');
         Exit;
       end;
   end;
@@ -49,6 +49,7 @@ begin
   try
     GitProcess.Executable := GitPath;
     GitProcess.Parameters.Append('describe');
+    GitProcess.Parameters.Append('--always');
     if UseTagsOption then GitProcess.Parameters.Append('--tags');
     GitProcess.Options := [poUsePipes];
     GitProcess.Execute;
@@ -97,7 +98,7 @@ end;
   CommitTag[0] :  inline output, e.g.: v0.0.0.0-0-0000000
   VersionLines[0] : version tag, e.g.: v0.0.0.0
   VersionLines[1] : commits since last tag
-  VersionLines[2] : leading 7 digit last commit code
+  VersionLines[2] : leading 7 digit last remote commit code
 }
 function CurrentVersion(CommitTag: TStringList): string;
 var VersionLines : TStringList;
@@ -108,7 +109,7 @@ begin
       begin
         StrictDelimiter := True;
         Delimiter := '-';
-        DelimitedText := CommitTag[0];
+        DelimitedText := CommitTag.Text;
       end;
     Result := #32 + VersionLines[0] + #32 + 'c' + VersionLines[1];
   finally
@@ -116,21 +117,26 @@ begin
   end;
 end;
 
-function LastCommitShortCode(CommitTag: TStringList): string;
+function LastCommitShortCode(IncludeLocalCommits: Boolean): string;
 var VersionLines : TStringList;
 begin
-  VersionLines := TStringList.Create;
-  try
-    with VersionLines do
-      begin
-        StrictDelimiter := True;
-        Delimiter := '-';
-        DelimitedText := CommitTag[0];
+  if IncludeLocalCommits then
+    Result := GetCommitTag(False).Text
+  else
+    begin
+      VersionLines := TStringList.Create;
+      try
+        with VersionLines do
+          begin
+            StrictDelimiter := True;
+            Delimiter := '-';
+            DelimitedText := GetCommitTag(True).Text;
+          end;
+        Result := VersionLines[2];
+      finally
+        VersionLines.Free;
       end;
-    Result := VersionLines[2];
-  finally
-    VersionLines.Free;
-  end;
+    end;
 end;
 
 end.
