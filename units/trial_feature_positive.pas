@@ -50,10 +50,10 @@ type
     CSQMISS : string;
 
     {
-      CSQ2 occurs as soon as the subject's response meets the response schedule, i.e., always contingent.
-      CSQ2 is only available for TSchRRRT instances, see units/schedules_main.
+      CSQ occurs as soon as the subject's response meets the response schedule, i.e., always contingent.
+      CSQ is only available for TSchRRRT instances, see units/schedules_main.
     }
-    CSQ2 : string;
+    CSQ : string;
 
   end;
 
@@ -114,8 +114,6 @@ end;
 procedure TFPE.TrialResult(Sender: TObject);
 begin
   //FDataSupport.StmDuration := GetCustomTick;
-  LogEvent('C');
-
   if FConsequenceFired then
     begin
       if FCurrTrial.response = 'Positiva' then  Result := T_HIT else Result := T_MISS;
@@ -129,7 +127,7 @@ begin
 
   if FCurrTrial.NextTrial = T_CRT then NextTrial := T_CRT
   else NextTrial := FCurrTrial.NextTrial;
-
+  LogEvent(Result);
   FCurrTrial.Result := Result;
 end;
 
@@ -144,6 +142,7 @@ procedure TFPE.Consequence(Sender: TObject);
 var
   LConsequence : TKey;
 begin
+  LogEvent(LeftStr(FDataSupport.CSQ, 4));
   if FConsequenceFired = False then FConsequenceFired := True;
   LConsequence := TKey.Create(Self);
   with LConsequence do
@@ -152,7 +151,7 @@ begin
       Parent:= Self;
       Loops := 0;
       Color := 255;
-      FullPath := RootMedia + FDataSupport.CSQ2;
+      FullPath := RootMedia + FDataSupport.CSQ;
     end;
   LConsequence.Play;
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
@@ -229,8 +228,8 @@ begin
   // allow user defined differential consequences
   // we expect something like:
 
-  // PositiveHIT, PositiveMISS, PositiveCSQ2
-  // NegativeHIT, NegativeMISS, NegativeCSQ2
+  // PositiveHIT, PositiveMISS, PositiveCSQ
+  // NegativeHIT, NegativeMISS, NegativeCSQ
 
   // Positive
   // NONE,MISS,HIT
@@ -249,15 +248,15 @@ begin
   FDataSupport.CSQMISS := Copy(s1, 0, pos(#44, s1) - 1);
   NextCommaDelimitedParameter;
 
-  FDataSupport.CSQ2 := Copy(s1, 0, pos(#44, s1) - 1);
+  FDataSupport.CSQ := Copy(s1, 0, pos(#44, s1) - 1);
 
   // Alias to a default media name.ext
   FCurrTrial.response := CfgTrial.SList.Values[_ExpectedResponse];
   if FCurrTrial.response = 'Positiva' then
-    if FDataSupport.CSQ2 = T_HIT then FDataSupport.CSQ2 := 'CSQ1.wav';
+    if FDataSupport.CSQ = T_HIT then FDataSupport.CSQ := 'CSQ1.wav';
 
   if FCurrTrial.response = 'Negativa' then
-    if FDataSupport.CSQ2 = T_MISS then FDataSupport.CSQ2 := 'CSQ2.wav';
+    if FDataSupport.CSQ = T_MISS then FDataSupport.CSQ := 'CSQ2.wav';
 
 
   FCurrTrial.Result := T_NONE;
