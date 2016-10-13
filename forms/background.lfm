@@ -1,13 +1,8 @@
-object bkgnd: Tbkgnd
-  Left = 486
+object Background: TBackground
+  Left = 741
   Height = 240
-  Top = 230
+  Top = 203
   Width = 320
-  BorderStyle = bsNone
-  Caption = 'Fundo'
-  Color = clWhite
-  DefaultMonitor = dmDesktop
-  OnCreate = FormCreate
+  Caption = 'Background'
   LCLVersion = '1.6.0.4'
-  WindowState = wsFullScreen
 end
