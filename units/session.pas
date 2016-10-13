@@ -11,8 +11,6 @@ unit session;
 
 {$mode objfpc}{$H+}
 
-{$DEFINE DEBUG}
-
 interface
 
 uses Classes, Controls, SysUtils, LCLIntf
@@ -114,6 +112,7 @@ uses
 resourcestring
   HSUBJECT_NAME      = 'Nome_Sujeito:';
   HSESSION_NAME      = 'Nome_Sessão:';
+  HFIRST_TIMESTAMP   = 'Primeira_Timestamp:';
   HBEGIN_TIME        = 'Início:';
   HEND_TIME          = 'Término:';
 //  HSESSION_CANCELED  = '----------Sessão Cancelada----------';
@@ -182,7 +181,8 @@ begin
 
   LHeader := HSUBJECT_NAME + #9 + FSubjName + LineEnding +
              HSESSION_NAME + #9 + FSessName + LineEnding +
-             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding + LineEnding;
+             HFIRST_TIMESTAMP + #9 + TimestampToStr(FGlobalContainer.TimeStart) + LineEnding +
+             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding + LineEnding;
 
   FFilename := FGlobalContainer.RootData + FFilename;
   CreateLogger(LGData, FFilename, LHeader);
@@ -214,9 +214,6 @@ end;
 procedure TSession.PupilRecordingStarted(Sender: TObject;
   AMultipart: TMPMessage);
 begin
-  {$ifdef DEBUG}
-    DebugLn(mt_Debug +  AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim);
-  {$endif}
   FGlobalContainer.RootData := AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim;
   Play;
 end;
@@ -227,6 +224,7 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Information + ARequest + #32 + AResponse);
   {$endif}
+  Write(AResponse);
 end;
 
 procedure TSession.SetBackGround(BackGround: TWinControl);
@@ -318,9 +316,11 @@ begin
 end;
 
 procedure TSession.Play(AFilename: String);
+var i : integer;
 begin
   FFilename := AFilename;
-  FGlobalContainer.TimeStart := TickCount;
+  FGlobalContainer.TimeStart := 0;
+  //FGlobalContainer.TimeStart := TickCount;
 
   if PupilClientEnabled then
     begin
@@ -333,7 +333,11 @@ begin
           Start;
           StartSubscriber(True);
           Subscribe(SUB_ALL_NOTIFICATIONS);
-          Request(REQ_SYNCHRONIZE_TIME+#32+TimestampToStr(FGlobalContainer.TimeStart));
+          //Request(REQ_SYNCHRONIZE_TIME+#32+TimestampToStr(TickCount - FGlobalContainer.TimeStart + Extended(0.000376039992485)),True);
+          //for i := 0 to 1000 do begin
+          //Request(REQ_TIMESTAMP, True);
+          //Write(#9+TimestampToStr(TickCount - FGlobalContainer.TimeStart)+#10);
+          //end;
           Request(REQ_SHOULD_START_RECORDING); // must be non-blocking
         end
     end
