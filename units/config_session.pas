@@ -162,7 +162,7 @@ resourcestring
   messLevel_04_M = 'Mensagem';
   DefName = 'No name';
   DefSubject = 'No subject';
-  DefAddress = 'localhost:5020';
+  DefAddress = '127.0.1.1:5020';
 
 implementation
 
