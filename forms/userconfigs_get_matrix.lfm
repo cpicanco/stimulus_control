@@ -10,11 +10,10 @@ object MatrixConfigForm: TMatrixConfigForm
   Caption = 'Gerar Matriz'
   ClientHeight = 244
   ClientWidth = 358
-  Color = clBtnFace
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
-  FormStyle = fsSystemStayOnTop
+  FormStyle = fsStayOnTop
   OnActivate = FormActivate
   OnCreate = FormCreate
   Position = poScreenCenter

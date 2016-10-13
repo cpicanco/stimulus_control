@@ -84,11 +84,12 @@ type
     FBackground: TForm;
     FCanDraw    : Boolean;
     FDrawCoordenates : TAleatorizator;
+    procedure SetBackground(AValue: TForm);
 
     //FEscriba : TEscriba;
     //FOnPosCfg: TNotifyEvent;
   public
-    property BackGround : TForm read FBackground write FBackground;
+    property BackGround : TForm read FBackground write SetBackground;
 
   end;
 
@@ -253,6 +254,13 @@ begin
       end;
 end;
 
+procedure TMatrixConfigForm.SetBackground(AValue: TForm);
+begin
+  if FBackground=AValue then Exit;
+  FBackground:=AValue;
+  FDrawCoordenates := TAleatorizator.Create(FBackground, lbCoordenates.Items);
+end;
+
 procedure TMatrixConfigForm.edtWidthChange(Sender: TObject);
 begin
   if (TEdit(Sender).ComponentIndex = edtWidth.ComponentIndex) then
@@ -331,7 +339,7 @@ end;
 
 procedure TMatrixConfigForm.FormActivate(Sender: TObject);
 begin
-  FDrawCoordenates := TAleatorizator.Create(Background, lbCoordenates.Items);
+
 end;
 
 procedure TMatrixConfigForm.FormCreate(Sender: TObject);
