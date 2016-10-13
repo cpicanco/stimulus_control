@@ -76,9 +76,9 @@ type
     private
     // fullscreen
       FFullScreen : Boolean;
-      FOriginalBounds : TRect;
-      FOriginalWindowState : TWindowState;
-      FScreenBounds : TRect;
+      //FOriginalBounds : TRect;
+      //FOriginalWindowState : TWindowState;
+      //FScreenBounds : TRect;
     // other
       FCanDraw : Boolean;
       FCurrentTrial : integer;
@@ -322,8 +322,8 @@ begin
       Show;
       SetFullScreen(True);
     end;
-  FrmMatrixConfig.BackGround := FrmBackground;
   FrmMatrixConfig.Show;
+  FrmMatrixConfig.BackGround := FrmBackground;
 end;
 
 procedure TMatrixForm.btnMinimizeTopTabClick(Sender: TObject);
