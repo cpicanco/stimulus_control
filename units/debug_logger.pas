@@ -32,7 +32,9 @@ const
 implementation
 
 uses LCLIntf, FileUtil, LazFileUtils, SysUtils
+     {$ifdef DEBUG}
      , debug_logger_thread
+     {$endif}
      ;
 
 var
@@ -41,7 +43,9 @@ var
 procedure DebugLn(msg: string);
 begin
   WriteLn(msg);
-  DebuglnThreadLog(msg);
+  {$ifdef DEBUG}
+    DebuglnThreadLog(msg);
+  {$endif}
 end;
 
 
