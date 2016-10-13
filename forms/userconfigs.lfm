@@ -3,10 +3,9 @@ object UserConfig: TUserConfig
   Height = 483
   Top = 88
   Width = 466
-  HorzScrollBar.Page = 466
-  VertScrollBar.Page = 271
+  HorzScrollBar.Page = 307
+  VertScrollBar.Page = 171
   AutoScroll = True
-  BiDiMode = bdRightToLeftNoAlign
   Caption = 'Configurar'
   ClientHeight = 483
   ClientWidth = 466
@@ -1644,20 +1643,14 @@ object UserConfig: TUserConfig
     TabOrder = 1
   end
   object pgRodar: TPageControl
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = Owner
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
-    AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 445
     Top = 0
     Width = 466
-    ActivePage = tbTrials
+    ActivePage = tbGeneral
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 2
     OnChange = pgRodarChange
     object tbGeneral: TTabSheet
@@ -1665,38 +1658,38 @@ object UserConfig: TUserConfig
       ClientHeight = 412
       ClientWidth = 460
       object leParticipant: TLabeledEdit
-        Left = 6
+        Left = 0
         Height = 25
-        Top = 72
-        Width = 455
+        Top = 75
+        Width = 460
         Anchors = [akTop, akLeft, akRight]
         EditLabel.AnchorSideLeft.Control = leParticipant
         EditLabel.AnchorSideRight.Control = leParticipant
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leParticipant
-        EditLabel.Left = 6
+        EditLabel.Left = 0
         EditLabel.Height = 15
-        EditLabel.Top = 54
-        EditLabel.Width = 455
+        EditLabel.Top = 57
+        EditLabel.Width = 460
         EditLabel.Caption = 'Participante'
         EditLabel.ParentColor = False
         TabOrder = 0
         Text = 'Participante1'
       end
       object leSessionName: TLabeledEdit
-        Left = 6
+        Left = 0
         Height = 25
-        Top = 21
-        Width = 455
+        Top = 24
+        Width = 460
         Anchors = [akTop, akLeft, akRight]
         EditLabel.AnchorSideLeft.Control = leSessionName
         EditLabel.AnchorSideRight.Control = leSessionName
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leSessionName
-        EditLabel.Left = 6
+        EditLabel.Left = 0
         EditLabel.Height = 15
-        EditLabel.Top = 3
-        EditLabel.Width = 455
+        EditLabel.Top = 6
+        EditLabel.Width = 460
         EditLabel.Caption = 'Nome da Sessão'
         EditLabel.ParentColor = False
         TabOrder = 1
@@ -1858,13 +1851,11 @@ object UserConfig: TUserConfig
         end
       end
       object btnTrialsDone: TButton
-        AnchorSideRight.Control = tbTrials
         AnchorSideRight.Side = asrBottom
-        AnchorSideBottom.Control = tbTrials
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 36
-        Top = 376
+        Height = 40
+        Top = 372
         Width = 460
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Escrever'
@@ -1876,28 +1867,25 @@ object UserConfig: TUserConfig
       Caption = 'Salvar'
       ClientHeight = 412
       ClientWidth = 460
+      object Memo1: TMemo
+        Left = 0
+        Height = 372
+        Top = 0
+        Width = 460
+        Align = alClient
+        BorderSpacing.Bottom = 40
+        TabOrder = 0
+      end
       object btnSave: TButton
-        AnchorSideLeft.Control = tbSave
-        AnchorSideRight.Control = tbSave
         AnchorSideRight.Side = asrBottom
-        AnchorSideBottom.Control = tbSave
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 25
-        Top = 389
-        Width = 462
+        Height = 40
+        Top = 372
+        Width = 460
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Salvar'
         OnClick = btnSaveClick
-        TabOrder = 0
-      end
-      object Memo1: TMemo
-        Left = 0
-        Height = 374
-        Top = 0
-        Width = 462
-        Align = alClient
-        BorderSpacing.Bottom = 40
         TabOrder = 1
       end
     end
@@ -1912,16 +1900,13 @@ object UserConfig: TUserConfig
         Left = 0
         Height = 25
         Top = 258
-        Width = 455
+        Width = 460
         Anchors = [akTop, akLeft, akRight]
-        BorderSpacing.Right = 5
         Caption = 'Arquivo alvo'
         OnClick = btnClick
         TabOrder = 0
       end
       object edtTarget: TEdit
-        AnchorSideLeft.Control = tbTools
-        AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 25
@@ -1957,14 +1942,11 @@ object UserConfig: TUserConfig
         Text = 'conteúdo'
       end
       object btnApply: TButton
-        AnchorSideLeft.Control = tbTools
-        AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
         Height = 33
-        Top = 371
-        Width = 460
-        Anchors = [akLeft, akRight, akBottom]
+        Top = 192
+        Width = 300
         Caption = 'Aplicar novas configurações ao arquivo alvo'
         OnClick = btnApplyClick
         TabOrder = 4
@@ -1996,6 +1978,7 @@ object UserConfig: TUserConfig
       Caption = 'Sobre o programa'
       ClientHeight = 412
       ClientWidth = 460
+      ParentBiDiMode = False
       object Image1: TImage
         Left = 265
         Height = 128
@@ -3654,9 +3637,9 @@ object UserConfig: TUserConfig
         AnchorSideBottom.Control = tbVersion
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 286
+        Height = 284
         Top = 128
-        Width = 462
+        Width = 460
         Align = alCustom
         Anchors = [akTop, akLeft, akRight, akBottom]
         ReadOnly = True

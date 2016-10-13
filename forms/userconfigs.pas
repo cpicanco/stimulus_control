@@ -23,12 +23,8 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
     , session
     , config_session
     , escriba
-    , regdata
     , constants
     , git_vertioning
-    {$ifdef DEBUG}
-    , debug_logger
-    {$endif}
     ;
 
 type
@@ -127,7 +123,7 @@ type
     FConfigs : TCfgSes;
     FAudioDevice : TBassAudioDevice;
     FEscriba : TEscriba;
-    FData : TRegData;
+    //FData : TRegData;
     function MeetCondition(aCol, aRow : integer): boolean;
     procedure CheckRepetitionCol(aCol : integer);
     procedure EndSession(Sender : TObject);
@@ -171,10 +167,15 @@ implementation
 
 {$R *.lfm}
 
-uses background, userconfigs_trial_mirrored, userconfigs_simple_discrimination_matrix;
+uses background, userconfigs_trial_mirrored, userconfigs_simple_discrimination_matrix
+     {$ifdef DEBUG}
+     , debug_logger
+     {$endif}
+     ;
 
 const
   CSESSION_SERVER = '127.0.1.1:5020';
+
 { TUserConfig }
 
 
@@ -1190,12 +1191,22 @@ begin
   StringGrid1.ColCount := 9;
   Caption := Application.Title;
   stAppTitle.Caption := Application.Title;
-  stVersion.Caption := CurrentVersion(GetCommitTag());
-  MemoAppInfo.Lines.Append('Stimulus Control App.');
-  MemoAppInfo.Lines.Append('Copyright (C) 2014-2016,  Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.');
-  MemoAppInfo.Lines.Append('');
-  MemoAppInfo.Lines.Append('Last Commit: ' + LastCommitShortCode(GetCommitTag()));
-  MemoAppInfo.Lines.Append('Contact: cpicanco@ufpa.br');
+  stVersion.Caption := CurrentVersion(GetCommitTag(True));
+  MemoAppInfo.Lines.Append(
+  'Stimulus Control' + LineEnding +
+  'Copyright (C) 2014-2016 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.' + LineEnding + LineEnding +
+  'The present file is distributed under the terms of the GNU General Public License (GPL v3.0).' + LineEnding + LineEnding +
+  'You should have received a copy of the GNU General Public License' + LineEnding +
+  'along with this program. If not, see <http://www.gnu.org/licenses/>.' + LineEnding +
+  'Stimulus Control' + LineEnding + LineEnding +
+  'Last Commit:' + LineEnding +
+  GetCommitTag(False).Text + LineEnding + LineEnding +
+  GetCommitTag(True).Text + LineEnding + LineEnding +
+  LastCommitShortCode(True) + LineEnding +
+  LastCommitShortCode(False) + LineEnding +
+  'cpicanco@ufpa.br'
+  );
+
   with StringGrid1 do
     begin
       Cells[0, 0] := rsTrials;
