@@ -482,7 +482,7 @@ begin
                 if Components[i] is TPanel then
                     TPanel(Components[i]).Top := TPanel(Sender).Top;
               end;
-              Invalidate;
+              //Invalidate;
           end;
     end;
 end;
