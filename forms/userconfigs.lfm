@@ -3,8 +3,8 @@ object UserConfig: TUserConfig
   Height = 483
   Top = 88
   Width = 466
-  HorzScrollBar.Page = 307
-  VertScrollBar.Page = 171
+  HorzScrollBar.Page = 333
+  VertScrollBar.Page = 229
   AutoScroll = True
   Caption = 'Configurar'
   ClientHeight = 483
@@ -1647,10 +1647,10 @@ object UserConfig: TUserConfig
     Height = 445
     Top = 0
     Width = 466
-    ActivePage = tbGeneral
+    ActivePage = tbVersion
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 0
+    TabIndex = 5
     TabOrder = 2
     OnChange = pgRodarChange
     object tbGeneral: TTabSheet

@@ -1197,14 +1197,8 @@ begin
   'Copyright (C) 2014-2016 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.' + LineEnding + LineEnding +
   'The present file is distributed under the terms of the GNU General Public License (GPL v3.0).' + LineEnding + LineEnding +
   'You should have received a copy of the GNU General Public License' + LineEnding +
-  'along with this program. If not, see <http://www.gnu.org/licenses/>.' + LineEnding +
-  'Stimulus Control' + LineEnding + LineEnding +
-  'Last Commit:' + LineEnding +
-  GetCommitTag(False).Text + LineEnding + LineEnding +
-  GetCommitTag(True).Text + LineEnding + LineEnding +
-  LastCommitShortCode(True) + LineEnding +
-  LastCommitShortCode(False) + LineEnding +
-  'cpicanco@ufpa.br'
+  'along with this program. If not, see <http://www.gnu.org/licenses/>.' + LineEnding + LineEnding +
+  'Last Commit:' + GetCommitTag(False).Text
   );
 
   with StringGrid1 do

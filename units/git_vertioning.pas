@@ -98,7 +98,7 @@ end;
   CommitTag[0] :  inline output, e.g.: v0.0.0.0-0-0000000
   VersionLines[0] : version tag, e.g.: v0.0.0.0
   VersionLines[1] : commits since last tag
-  VersionLines[2] : leading 7 digit last remote commit code
+  VersionLines[2] : leading 7 digit tag commit code
 }
 function CurrentVersion(CommitTag: TStringList): string;
 var VersionLines : TStringList;
