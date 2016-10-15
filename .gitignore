@@ -14,6 +14,7 @@ core
 *.lps
 *.map
 *.o
+*.obj
 *.or
 *.ppu
 *.res
