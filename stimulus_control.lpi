@@ -21,8 +21,8 @@
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará" FileDescription="Stimulus Control Application" InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control App" ProductVersion=""/>
     </VersionInfo>
     <BuildModes Count="4">
-      <Item1 Name="LinuxDebug" Default="True"/>
-      <Item2 Name="LinuxRelease">
+      <Item1 Name="Linux64Debug" Default="True"/>
+      <Item2 Name="Linux64Release">
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
@@ -30,7 +30,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
+            <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9"/>
             <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
@@ -59,7 +59,7 @@
           </Other>
         </CompilerOptions>
       </Item2>
-      <Item3 Name="WindowsDebug">
+      <Item3 Name="Windows64Debug">
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
@@ -67,11 +67,11 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser"/>
+            <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
-            <TargetOS Value="win32"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -80,11 +80,6 @@
             <Debugging>
               <StripSymbols Value="True"/>
             </Debugging>
-            <Options>
-              <Win32>
-                <GraphicApplication Value="True"/>
-              </Win32>
-            </Options>
           </Linking>
           <Other>
             <Verbosity>
@@ -94,7 +89,7 @@
           </Other>
         </CompilerOptions>
       </Item3>
-      <Item4 Name="WindowsRelease">
+      <Item4 Name="Windows64Release">
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
@@ -102,11 +97,11 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser"/>
+            <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
-            <TargetOS Value="win32"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -116,11 +111,6 @@
               <StripSymbols Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
-            <Options>
-              <Win32>
-                <GraphicApplication Value="True"/>
-              </Win32>
-            </Options>
           </Linking>
           <Other>
             <Verbosity>
@@ -140,10 +130,16 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="1">
+    <RequiredPackages Count="3">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="etpackage_dsgn"/>
       </Item1>
+      <Item2>
+        <PackageName Value="etpackage"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="LCL"/>
+      </Item3>
     </RequiredPackages>
     <Units Count="40">
       <Unit0>
@@ -330,7 +326,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
+      <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9"/>
       <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>

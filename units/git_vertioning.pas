@@ -33,27 +33,35 @@ function GetCommitTag(UseTagsOption: Boolean): TStringList;
 var
   GitProcess : TProcess;
   GitPath : string;
-begin
-  try
-    GitPath := FindDefaultExecutablePath('git');
-  except
-    on E : Exception do
-      begin
-        Result := TStringList.Create;
-        Result.Append('v0.0.0.0-0-0000000');
-        Exit;
-      end;
+  procedure EmptyResult;
+  begin
+    Result := TStringList.Create;
+    Result.Append('v0.0.0.0-0-0000000');
   end;
+
+begin
+
+  {$ifdef UNIX}
+    GitPath := FindDefaultExecutablePath('git');
+  {$endif}
+
+  {$ifdef WINDOWS}
+    GitPath := FindDefaultExecutablePath('git');
+  {$endif}
 
   GitProcess := TProcess.Create(nil);
   try
-    GitProcess.Executable := GitPath;
-    GitProcess.Parameters.Append('describe');
-    GitProcess.Parameters.Append('--always');
-    if UseTagsOption then GitProcess.Parameters.Append('--tags');
-    GitProcess.Options := [poUsePipes];
-    GitProcess.Execute;
-    Result := ReadProcessOutput(GitProcess.Output);
+    if not (GitPath = '') then
+      begin
+        GitProcess.Executable := GitPath;
+        GitProcess.Parameters.Append('describe');
+        GitProcess.Parameters.Append('--always');
+        if UseTagsOption then GitProcess.Parameters.Append('--tags');
+        GitProcess.Options := [poUsePipes];
+        GitProcess.Execute;
+        Result := ReadProcessOutput(GitProcess.Output);
+      end
+    else EmptyResult;
   finally
     GitProcess.Free;
   end;

@@ -19,15 +19,35 @@ unit timestamps_helpers;
 interface
 
 uses
-  Classes, SysUtils,  Linux, UnixType;
+  Classes, SysUtils
+{$ifdef UNIX}
+  ,Linux
+  ,UnixType
+{$endif}
+{$ifdef WINDOWS}
+  , epiktimer
+{$endif}
+  ;
 
   function GetCustomTick : Extended;
+{$ifdef UNIX}
   function GetMonotonicTime : timespec;
   function GetMonotonicTimeRaw : timespec;
   function GetClockResolution : string; // granularity
-
+{$endif}
 implementation
 
+{$ifdef WINDOWS}
+var
+  ET: TEpikTimer;
+
+function GetCustomTick: Extended;
+begin
+  Result := ET.Elapsed;
+end;
+{$endif}
+
+{$ifdef UNIX}
 function GetCustomTick: Extended;
 var
   tp: timespec;
@@ -38,6 +58,7 @@ begin
   b := tp.tv_nsec * 1e-9;
   Result := a+b;
 end;
+
 
 function GetMonotonicTime: timespec;
 var
@@ -62,6 +83,15 @@ begin
   clock_getres(CLOCK_MONOTONIC, @tp);
   Result := IntToStr(tp.tv_sec) + '.' + FloatToStr(tp.tv_nsec * 1e-9);
 end;
+{$endif}
 
+{$ifdef WINDOWS}
+initialization
+  ET := TEpikTimer.Create(nil);
+  ET.Start;
+
+finalization
+  ET.Free;
+{$endif}
 end.
 
