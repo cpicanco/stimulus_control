@@ -454,8 +454,8 @@ begin
             KName  + SessionName + KEnter +
             KSubject + SessionSubject + KEnter +
             KType  + SessionType + KEnter +
-            KRootMedia + GlobalContainer.RootMedia + KEnter +
-            KRootData  + GlobalContainer.RootData + KEnter +
+            KRootMedia + Media + KEnter +
+            KRootData  + Data + KEnter +
             KServer + SessionServer + KEnter +
             KNumBlc  + IntToStr(FNumBlc) + KEnter
             );
