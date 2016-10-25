@@ -15,7 +15,7 @@ interface
 
 uses Classes, SysUtils, LazFileUtils, Forms, Controls,
      Graphics, Dialogs, ExtCtrls, types, StdCtrls,
-     ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons
+     ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons, XMLPropStorage
 
     , draw_methods
     , bass_player
@@ -84,6 +84,7 @@ type
     tbGeneral: TTabSheet;
     tbStimuli: TTabSheet;
     tbTrials: TTabSheet;
+    XMLPropStorage1: TXMLPropStorage;
     procedure btnApplyClick(Sender: TObject);
     procedure btnCheckClick(Sender: TObject);
     procedure btnClientTestClick(Sender: TObject);
@@ -112,6 +113,8 @@ type
       sIndex, tIndex: Integer);
     procedure StringGrid1DrawCell(Sender: TObject; aCol, aRow: Integer;
       Rect: TRect; aState: TGridDrawState);
+    procedure XMLPropStorage1RestoreProperties(Sender: TObject);
+    procedure XMLPropStorage1SaveProperties(Sender: TObject);
   published
     procedure btnClick(Sender: TObject);
   private
@@ -198,6 +201,7 @@ begin
       btnGridType.Caption := rsFillTypeAxes;
 
       StringGrid1.ColCount := 9;
+      StringGrid1.RowCount := 2;
       with StringGrid1 do
         begin
           Cells[0, 0] := rsTrials;
@@ -219,6 +223,7 @@ begin
       btnGridType.Caption := rsFillTypeMatriz;
 
       StringGrid1.ColCount := 4;
+      StringGrid1.RowCount := 2;
       with StringGrid1 do
         begin
           Cells[0, 0] := rsTrials;
@@ -336,6 +341,17 @@ begin
   finally
     OldCanvas.Free;
   end;
+end;
+
+procedure TUserConfig.XMLPropStorage1RestoreProperties(Sender: TObject);
+begin
+  if FileExistsUTF8('stringgrid.csv') then
+    StringGrid1.LoadFromCSVFile('stringgrid.csv',',',True,0,False);
+end;
+
+procedure TUserConfig.XMLPropStorage1SaveProperties(Sender: TObject);
+begin
+  StringGrid1.SaveToCSVFile('stringgrid.csv');
 end;
 
 function TUserConfig.MeetCondition(aCol, aRow : integer): boolean;
@@ -1144,7 +1160,8 @@ begin
         FrmBresenhamLine.Free;
         ResetRepetionMatrix;
         FLastFocusedCol := -1;
-      end;
+      end
+    else FrmBresenhamLine.Free;
   end;
   {
     Example:
@@ -1165,21 +1182,21 @@ begin
       aCol := 0;
       FrmMatrix := TMatrixForm.Create(Application);
       if chkPlayOnSecondMonitor.Checked then
-          FrmMatrix.Left := Screen.Width + 1;
-
+        FrmMatrix.Left := Screen.Width + 1;
 
       if FrmMatrix.ShowModal = mrOk then
-          begin
-            for aTrial := Low(FrmMatrix.Trials) to High(FrmMatrix.Trials) do AddMatrixTrialToGrid;
+        begin
+          for aTrial := Low(FrmMatrix.Trials) to High(FrmMatrix.Trials) do AddMatrixTrialToGrid;
 
-            //FNumTrials := aRow - 1;
-            {$ifdef DEBUG}
-              DebugLn(mt_Information + FrmMatrix.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
-            {$endif}
-            FrmMatrix.Free;
-            ResetRepetionMatrix;
-            FLastFocusedCol := -1;
-          end;
+          //FNumTrials := aRow - 1;
+          {$ifdef DEBUG}
+            DebugLn(mt_Information + FrmMatrix.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
+          {$endif}
+          FrmMatrix.Free;
+          ResetRepetionMatrix;
+          FLastFocusedCol := -1;
+        end
+      else FrmMatrix.Free;
     end;
 end;
 
@@ -1188,7 +1205,7 @@ begin
   FAudioDevice := TBassAudioDevice.Create(WindowHandle);
   FrmBackground := TBackground.Create(Application);
   FLastFocusedCol := -1;
-  StringGrid1.ColCount := 9;
+  //StringGrid1.ColCount := 9;
   Caption := Application.Title;
   stAppTitle.Caption := Application.Title;
   stVersion.Caption := CurrentVersion(GetCommitTag(True));
@@ -1201,20 +1218,20 @@ begin
   'Last Commit: ' + GetCommitTag(False).Text
   );
 
-  with StringGrid1 do
-    begin
-      Cells[0, 0] := rsTrials;
-      Cells[1, 0] := rsAngle;
-      Cells[2, 0] := 'x0';
-      Cells[3, 0] := 'y0';
-      Cells[4, 0] := 'x1';
-      Cells[5, 0] := 'y1';
-      Cells[6, 0] := rsExpectedResponse;
-      Cells[7, 0] := rsSize;
-      Cells[8, 0] := rsSchedule;
-      //aRowCount := RowCount;
-      //aColCount := ColCount;
-    end;
+  //with StringGrid1 do
+  //  begin
+  //    Cells[0, 0] := rsTrials;
+  //    Cells[1, 0] := rsAngle;
+  //    Cells[2, 0] := 'x0';
+  //    Cells[3, 0] := 'y0';
+  //    Cells[4, 0] := 'x1';
+  //    Cells[5, 0] := 'y1';
+  //    Cells[6, 0] := rsExpectedResponse;
+  //    Cells[7, 0] := rsSize;
+  //    Cells[8, 0] := rsSchedule;
+  //    //aRowCount := RowCount;
+  //    //aColCount := ColCount;
+  //  end;
   Randomize;
   ResetRepetionMatrix;
 
