@@ -15,11 +15,6 @@ interface
 
 uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
      Dialogs, ExtCtrls, StdCtrls, Spin, ActnList
-
-     {$IFDEF LCLGTK2}
-     , gtk2, gdk2, glib2
-     {$ENDIF}
-
      , draw_methods
      ;
 
@@ -33,6 +28,8 @@ type
         Height : integer;
         Path : string;
     end;
+
+    TStmMatrix = array of array of TComparison;
 
     TTrial = record
         Id : integer;
@@ -53,7 +50,6 @@ type
       btnEditNodes1: TButton;
       btnMinimizeTopTab: TButton;
       btnOk: TButton;
-      btnGetMatrix: TButton;
       cbChooseGrid: TComboBox;
       cbPreview: TCheckBox;
       cbUseStimuliSet: TCheckBox;
@@ -64,9 +60,7 @@ type
       seTrials: TSpinEdit;
       seGapLength: TSpinEdit;
       PreviewTimer: TTimer;
-      procedure btnGetMatrixClick(Sender: TObject);
       procedure btnMinimizeTopTabClick(Sender: TObject);
-      procedure Button1Click(Sender: TObject);
       procedure Button2Click(Sender: TObject);
       procedure cbPreviewChange(Sender: TObject);
       procedure FormActivate(Sender: TObject);
@@ -82,11 +76,15 @@ type
     // other
       FCanDraw : Boolean;
       FCurrentTrial : integer;
+      FMonitor: integer;
       FTrials : TTrials;
+      function GetMatrix(AMonitor : integer) : TStmMatrix;
+      procedure SetMonitor(AValue: integer);
     public
-      procedure SetMatrix(MatrixCoordenates : TStrings);
+      procedure SetMatrix(AStmMatrix: TStmMatrix);
       procedure SetFullScreen(TurnOn : Boolean);
       property Trials : TTrials read FTrials write FTrials;
+      property MonitorToShow : integer read FMonitor write SetMonitor;
     end;
 
 var
@@ -96,36 +94,34 @@ implementation
 
 {$R *.lfm}
 
-uses userconfigs_get_matrix, background;
-
 { TMatrixForm }
 
 procedure TMatrixForm.FormActivate(Sender: TObject);
 begin
-    SetFullScreen(True);
-    FCurrentTrial := 0;
-    Randomize;
+  BorderStyle := bsNone;
+  WindowState := wsFullScreen;
+  Left := Screen.Monitors[MonitorToShow].Left;
+  FCurrentTrial := 0;
+  Randomize;
+  SetMatrix(GetMatrix(MonitorToShow));
 end;
 
 procedure TMatrixForm.FormKeyPress(Sender: TObject; var Key: char);
 begin
-    if key in [#32] then
-    begin
-      Panel1.Visible := not Panel1.Visible;
-      //gbAddRmvAxis.Visible := not gbAddRmvAxis.Visible;
-    end;
+  if key in [#32] then
+    Panel1.Visible := not Panel1.Visible;
 end;
 
 procedure TMatrixForm.FormPaint(Sender: TObject);
 var
-    i : integer;
-    OldCanvas : TCanvas;
-    aWidth, aHeight : integer;
-    aR : TRect;
-    aGapValues : string;
-    aGap : Boolean;
-    aGapDegree : integer;
-    aGapLength : integer;
+  i : integer;
+  OldCanvas : TCanvas;
+  aWidth, aHeight : integer;
+  aR : TRect;
+  aGapValues : string;
+  aGap : Boolean;
+  aGapDegree : integer;
+  aGapLength : integer;
 
   procedure NextValue(var S : string);
   begin
@@ -207,140 +203,111 @@ begin
   Invalidate;
 end;
 
-procedure TMatrixForm.SetMatrix(MatrixCoordenates : TStrings);
+function TMatrixForm.GetMatrix(AMonitor: integer): TStmMatrix;
 var
-    i, j, t : integer;
-    aTop, aLeft, aWidth, aHeight : integer;
-    {aGap,} aGapDegree, aGapLength : integer;
-    aPositiveTrial, inct : Boolean;
-    Coordenates : string;
-
-  procedure NextValue(var S : string);
-  begin
-    Delete( S, 1, pos( #32, S ) );
-    if Length( S ) > 0 then
-      while S[1] = #32 do
-        Delete( S, 1, 1 );
-  end;
-
-  procedure GetCoordenates(var CoordenateString : string);
-  var pos42 : integer;
-  begin
-    // ASCII, Decimals
-    // #32 (space)
-    // #42 ( * )
-
-    // delete #42 in the string
-    pos42 := Pos( #42, CoordenateString );
-    while pos42 <> 0  do
-      begin
-        Delete( CoordenateString, 1, pos42 -1 );
-        pos42 := Pos( #42, CoordenateString );
-      end;
-
-    // Assign values to local variables
-    aTop   := StrToIntDef( Copy( CoordenateString, 0, pos( #32, CoordenateString ) - 1), 0);
-    NextValue(CoordenateString);
-
-    aLeft  := StrToIntDef( Copy( CoordenateString, 0, pos( #32, CoordenateString ) - 1), 0);
-    NextValue(CoordenateString);
-
-    aWidth := StrToIntDef( Copy( CoordenateString, 0, pos( #32, CoordenateString ) - 1), 0);
-    NextValue(CoordenateString);
-
-    aHeight := StrToIntDef( CoordenateString, 0 );
-  end;
-
+  i,j,
+  LRowCount,LColCount,SHeight,SWidth,SYGap,SXGap,SLeft,STop: integer;
 begin
-  if MatrixCoordenates.Count > 0 then
+  SHeight := 150;
+  SWidth := 150;
+  SYGap := 100;
+  SXGap := 100;
+  SLeft := 0;
+  STop := 0;
+  LRowCount := 3;
+  LColCount := 3;
+  SetLength(Result, LRowCount,LColCount);
+  for i := Low(Result) to High(Result) do
     begin
-      t := 0;
-      inct := False;
-      FCanDraw := False;
-      // seTrials.Value default is 4, and 4 coordenates
-      // we are making a 32 trials session, 4 * 2 trials for each coordenate;
-      // times 2 cause we are making a go/no-go session, each positive trial must have a negative correlate
-      // here 36 positive, 36 negative
-      SetLength( FTrials, ( seTrials.Value * MatrixCoordenates.Count ) * 2 );
-
-      // set coordenates to memory
-      for i := Low( Trials ) to High( Trials ) do
+      SLeft := ((SWidth+SXGap)*i)+(Screen.Monitors[AMonitor].Width div 2)
+                  -(((SWidth+SXGap)*LColCount) div 2)+((SXGap) div 2);
+      for j:= Low(Result[i]) to High(Result[i]) do
         begin
-        SetLength( FTrials[i].Comps, MatrixCoordenates.Count );
-
-          for j := 0 to MatrixCoordenates.Count -1 do
-            begin
-              Coordenates := MatrixCoordenates.Strings[j];
-              GetCoordenates( Coordenates );
-              Trials[i].Id := i;
-              Trials[i].Comps[j].Top := aTop;
-              Trials[i].Comps[j].Left := aLeft;
-              Trials[i].Comps[j].Width := aWidth;
-              Trials[i].Comps[j].Height := aHeight;
-
-              { TODO 5 -oRafael -cFunctionality : Need to allow choosing different filepaths of media stimulus.
-              For now the "comp[i].path" is a string containing the following values of the circles:
-              'Gap GapDegree GapLength'. }
-              aPositiveTrial := ((i mod 2) = 0) and (j = t);
-              if aPositiveTrial then
-                begin
-                  // positive
-                  inct := True;
-                  aGapDegree := 1+Random(360);
-                  aGapLength := seGapLength.Value;
-                  Trials[i].Comps[j].Path := '1' + #32 + IntToStr(aGapDegree) + #32 + IntToStr(aGapLength) + #32;
-                end
-              else
-                begin
-                  // negative
-                  Trials[i].Comps[j].Path := '0' + #32 + '1' + #32 + '360' + #32;
-                  end;
-                if t = MatrixCoordenates.Count then t := 0;
-            end;
-          if inct then
-            begin
-              Inc(t);
-              Trials[i].Positive := True;
-              inct := False;
-            end
-          else Trials[i].Positive := False;
+          STop := ((SHeight+SYGap)*j)+(Screen.Monitors[AMonitor].Height div 2)
+               -(((SHeight+SYGap)*LRowCount) div 2)+(SYGap div 2);
+          Result[i][j].Left := SLeft;
+          Result[i][j].Top := STop;
+          Result[i][j].Width := SWidth;
+          Result[i][j].Height := SHeight;
         end;
     end;
-  FCanDraw := True;
-  Invalidate;
 end;
 
-procedure TMatrixForm.btnGetMatrixClick(Sender: TObject);
+procedure TMatrixForm.SetMonitor(AValue: integer);
 begin
-  //WindowState := wsMinimized;
-  Visible := False;
-  FrmMatrixConfig := TMatrixConfigForm.Create(Application);
-  with FrmBackground do
+  if FMonitor = AValue then Exit;
+  FMonitor := AValue;
+end;
+
+procedure TMatrixForm.SetMatrix(AStmMatrix : TStmMatrix);
+var
+  LCount,LTrial, LComp, i, j, t : integer;
+  {aGap,} aGapDegree, aGapLength : integer;
+  aPositiveTrial, inct : Boolean;
+begin
+  LCount := (High(AStmMatrix)+1)*(High(AStmMatrix[0])+1);
+  t := 0;
+  inct := False;
+  FCanDraw := False;
+  // seTrials.Value default is 4, and 4 coordenates
+  // we are making a 32 trials session, 4 * 2 trials for each coordenate;
+  // times 2 cause we are making a go/no-go session, each positive trial must have a negative correlate
+  // here 36 positive, 36 negative
+  SetLength( FTrials, ( seTrials.Value * LCount ) * 2 );
+
+  // set coordenates to memory
+  for LTrial := Low( Trials ) to High( Trials ) do
     begin
-      color := clBlack;
-      //WindowState := wsMaximized;
-      Show;
-      SetFullScreen(True);
+      SetLength( FTrials[LTrial].Comps, LCount );
+
+      LComp := 0;
+      for i := Low(AStmMatrix) to High(AStmMatrix) do
+        for j := Low(AStmMatrix[i]) to High(AStmMatrix[i]) do
+          begin
+            FTrials[LTrial].Comps[LComp].Left := AStmMatrix[i][j].Left;
+            FTrials[LTrial].Comps[LComp].Top := AStmMatrix[i][j].Top;
+            FTrials[LTrial].Comps[LComp].Width := AStmMatrix[i][j].Width;
+            FTrials[LTrial].Comps[LComp].Height := AStmMatrix[i][j].Height;
+            Inc(LComp);
+          end;
+
+      for LComp := 0 to LCount -1 do
+        begin
+          { TODO 5 -oRafael -cFunctionality : Need to allow choosing different filepaths of media stimulus.
+          For now the "comp[i].path" is a string containing the following values of the circles:
+          'Gap GapDegree GapLength'. }
+          aPositiveTrial := ((LTrial mod 2) = 0) and (LComp = t);
+          if aPositiveTrial then
+            begin
+              // positive
+              inct := True;
+              aGapDegree := 1+Random(360);
+              aGapLength := seGapLength.Value;
+              Trials[LTrial].Comps[LComp].Path := '1' + #32 + IntToStr(aGapDegree) + #32 + IntToStr(aGapLength) + #32;
+            end
+          else
+            begin
+              // negative
+              Trials[LTrial].Comps[LComp].Path := '0' + #32 + '1' + #32 + '360' + #32;
+              end;
+            if t = LCount then t := 0;
+        end;
+      if inct then
+        begin
+          Inc(t);
+          Trials[LTrial].Positive := True;
+          inct := False;
+        end
+      else Trials[LTrial].Positive := False;
     end;
-  FrmMatrixConfig.Show;
-  FrmMatrixConfig.BackGround := FrmBackground;
+
+  FCanDraw := True;
+  Invalidate;
 end;
 
 procedure TMatrixForm.btnMinimizeTopTabClick(Sender: TObject);
 begin
   Panel1.Visible := not Panel1.Visible;
-end;
-
-procedure TMatrixForm.Button1Click(Sender: TObject);
-var i : Integer;
-    //a : string;
-begin
-  for i := 0 To Length(Trials[FCurrentTrial].Comps) -1 do
-    begin
-      Showmessage(Trials[FCurrentTrial].Comps[i].Path);
-    end;
-
-  //Invalidate;
 end;
 
 procedure TMatrixForm.Button2Click(Sender: TObject);

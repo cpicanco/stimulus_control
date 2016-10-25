@@ -1786,6 +1786,7 @@ object UserConfig: TUserConfig
           Height = 24
           Top = 3
           Width = 24
+          OnChange = cbShowRepetitionsChange
           TabOrder = 1
         end
       end

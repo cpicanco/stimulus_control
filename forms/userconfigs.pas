@@ -98,6 +98,7 @@ type
     procedure btnRunClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
     procedure cbDrawTrialGroupChange(Sender: TObject);
+    procedure cbShowRepetitionsChange(Sender: TObject);
     procedure chkUseMediaChange(Sender: TObject);
     procedure FormActivate(Sender: TObject);
 
@@ -347,6 +348,7 @@ procedure TUserConfig.XMLPropStorage1RestoreProperties(Sender: TObject);
 begin
   if FileExistsUTF8('stringgrid.csv') then
     StringGrid1.LoadFromCSVFile('stringgrid.csv',',',True,0,False);
+  ResetRepetionMatrix;
 end;
 
 procedure TUserConfig.XMLPropStorage1SaveProperties(Sender: TObject);
@@ -1139,7 +1141,9 @@ begin
     aRow := 1;
     FrmBresenhamLine := TBresenhamLineForm.Create(Application);
     if chkPlayOnSecondMonitor.Checked then
-       FrmBresenhamLine.Left := Screen.Width + 1;
+      FrmBresenhamLine.MonitorToShow := 1
+    else
+      FrmBresenhamLine.MonitorToShow := 0;
 
     if FrmBresenhamLine.ShowModal = mrOk then
       begin
@@ -1182,7 +1186,9 @@ begin
       aCol := 0;
       FrmMatrix := TMatrixForm.Create(Application);
       if chkPlayOnSecondMonitor.Checked then
-        FrmMatrix.Left := Screen.Width + 1;
+        FrmMatrix.MonitorToShow := 1
+      else
+        FrmMatrix.MonitorToShow := 0;
 
       if FrmMatrix.ShowModal = mrOk then
         begin
@@ -1293,6 +1299,11 @@ end;
 procedure TUserConfig.cbDrawTrialGroupChange(Sender: TObject);
 begin
   Invalidate;
+end;
+
+procedure TUserConfig.cbShowRepetitionsChange(Sender: TObject);
+begin
+  ResetRepetionMatrix;
 end;
 
 procedure TUserConfig.btnClick(Sender: TObject);

@@ -124,6 +124,7 @@ procedure btnAddAxisClick(Sender: TObject);
     FCapturing : Boolean;
     FDrawEllipseC : Boolean;
     FBresenhamLine : TPoints;
+    FMonitorToShow: integer;
     FTrialsPerNode : TTrialsPerNode;
     FAngle : String;
     FLine : TPoints;
@@ -141,9 +142,11 @@ procedure btnAddAxisClick(Sender: TObject);
     function GetAngleFromPoints(p1, p2 : TPoint) : String;
     function GetPointFromAngle (aAngle : float) : TPoint;//standard or user defined distances?
     function GetCentralRect (aLeftBorderSpace, aTopBorderSpace, aRightBorderSpace, aBottomBorderSpace: integer) : TRect;
+    procedure SetMonitorToShow(AValue: integer);
   public
     procedure ToggleFullScreen;
     property Axis : TAxisList read FAxis;
+    property MonitorToShow : integer read FMonitorToShow write SetMonitorToShow;
   end;
 
 var
@@ -727,13 +730,20 @@ begin
     end;
 end;
 
+procedure TBresenhamLineForm.SetMonitorToShow(AValue: integer);
+begin
+  if FMonitorToShow = AValue then Exit;
+  FMonitorToShow := AValue;
+end;
+
 
 procedure TBresenhamLineForm.ToggleFullScreen;
 begin
   { DONE 1 -oRafael -cdev : Update fullscreen behavior }
   //BorderStyle := bsNone;
+  BorderStyle := bsNone;
   WindowState := wsFullScreen;
-  BoundsRect := Screen.MonitorFromWindow(Handle).BoundsRect;
+  Left := Screen.Monitors[MonitorToShow].Left;
 end;
 
 end.
