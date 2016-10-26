@@ -283,7 +283,7 @@ begin
     NameTr := '--------'
   else NameTr := FBlc.Trials[FCounterManager.CurrentTrial].Name;
 
-  NewData := FBlc.Name + #9 + CountBlc + #9 + CountTr + #9 + NumTr + #9 + NameTr;
+  NewData := CountBlc + #9 + FBlc.Name + #9 + CountTr + #9 + NumTr + #9 + NameTr;
 
   ITIData := FloatToStrF(FITIBegin - TimeStart, ffFixed,0,9) + #9 +
             FloatToStrF(FITIEND - TimeStart, ffFixed,0,9);
