@@ -42,6 +42,7 @@ type
     btnApply: TButton;
     btnExportStimulus: TButton;
     btnTrialsDone: TButton;
+    btnPrependTrial: TButton;
     chkPupilClient: TCheckBox;
     cbShowRepetitions: TCheckBox;
     btnGridType: TButton;
@@ -93,6 +94,7 @@ type
     procedure btnGridTypeClick(Sender: TObject);
     procedure btnNextGeneralClick(Sender: TObject);
     procedure btnNextStimuliClick(Sender: TObject);
+    procedure btnPrependTrialClick(Sender: TObject);
     procedure btnTrialsDoneClick(Sender: TObject);
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
@@ -171,7 +173,10 @@ implementation
 
 {$R *.lfm}
 
-uses background, userconfigs_trial_mirrored, userconfigs_simple_discrimination_matrix
+uses background
+     , userconfigs_trial_mirrored
+     , userconfigs_simple_discrimination_matrix
+     , ini_helpers
      {$ifdef DEBUG}
      , debug_logger
      {$endif}
@@ -567,75 +572,6 @@ var
 
   IniTarget,
   IniContent : TCIniFile;
-
-  {.
-   .
-   . For Bloc Sections first parameter is ignored, ex.:
-   .
-   . GetSection(0, 1, False); // Bloc 1
-   .
-   . For Trial Sections you can choose to pass the iBloc parameter or not, ex.:
-   .
-   . GetSection(1); // Trial 1, Bloc 1
-   . GetSection(1, 2); // Trial 1, Bloc 2
-   .
-   .}
-  function GetSection(iTrial: integer; iBloc : integer = 1; Trial : Boolean = True) : string;
-  var EndStr, Separator : string;
-  begin
-
-    Separator := #32 + '-' + #32;
-    EndStr := ']';
-
-    if Trial then
-      Result := '[Blc ' + IntToStr(iBloc) + Separator + 'T' + IntToStr(iTrial) + EndStr
-    else
-      Result := '[Blc ' + IntToStr(iBloc) + EndStr;
-  end;
-
-  function IncSection(aSection : string; iBloc : integer = 1; Trial : Boolean = True) : string;
-  var BeginStr, EndStr, Separator : string;
-    i : integer;
-  begin
-    Separator := #32 + '-' + #32;
-    if Trial then
-      BeginStr := '[Blc ' + IntToStr(iBloc) + Separator + 'T'
-    else
-      BeginStr := '[Blc ';
-    EndStr := ']';
-
-	  Delete(  aSection, Pos(BeginStr, aSection), Length(BeginStr)  );
-	  Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
-
-    i := StrToInt(aSection);
-    Inc(i);
-    Result := BeginStr + IntToStr(i) + EndStr;
-  end;
-
-
-  {
-  .
-  . If aSection is a Trial then Result is the trial number else Result is 0.
-  .
-  .}
-  function IsTrialSection(aSection : string) : integer;
-  var BeginStr, EndStr, Separator, iBloc : string;
-  begin
-    if Pos('T', aSection) <> 0 then
-      begin
-        Separator := #32 + '-' + #32;
-        iBloc := Copy(aSection, Pos('Blc', aSection) + 4, 1);
-        BeginStr := '[Blc ' + iBloc + Separator + 'T';
-        EndStr := ']';
-
-        Delete(  aSection, Pos(BeginStr, aSection), Length(BeginStr)  );
-        Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
-
-        Result := StrToInt(aSection);
-      end
-    else Result := 0;
-  end;
-
 begin
   if FileExists(edtTarget.Text) and FileExists(edtContent.Text) then
     begin
@@ -667,8 +603,7 @@ begin
 
           i := 1;
           // get old number of trials
-          s1:= IniTarget.ReadString('Blc' + #32 + IntToStr(i), 'NumTrials', '0 0') + #32;
-          NumTrials:= StrToIntDef(Copy(s1, 0, Pos(#32, s1) - 1), 0);
+          NumTrials:= GetNumTrials(IniTarget);
           //showmessage(inttostr(numtrials));
 
           // get old virtual trial value
@@ -703,22 +638,22 @@ begin
         end;
         // insert the content before the first trial
         s1 := NewFile.Text;
-        Insert(GetSection(0) + LineEnding + Content + LineEnding, s1, Pos(GetSection(1), NewFile.Text));
+        Insert(GetSection(0,1) + LineEnding + Content + LineEnding, s1, Pos(GetSection(1,1), NewFile.Text));
         NewFile.Text := s1;
         // loop incrementing trial section numbers
         for i := 0 to NumTrials -1 do
           begin
 
             // Make i + 1 turns to 0
-            line := NewFile.IndexOf(GetSection(i + 1));
+            line := NewFile.IndexOf(GetSection(i + 1,1));
             if line <> -1 then
               begin
-                NewFile[line] := GetSection(0);
+                NewFile[line] := GetSection(0,1);
               end;
 
             // Inc i
-            line := NewFile.IndexOf(GetSection(0));
-            NewFile[line] := GetSection(i + 1);
+            line := NewFile.IndexOf(GetSection(0,1));
+            NewFile[line] := GetSection(i + 1,1);
           end;
 
          NewFile.SaveToFile(edtTarget.Text + '.new');
@@ -818,6 +753,12 @@ end;
 procedure TUserConfig.btnNextStimuliClick(Sender: TObject);
 begin
   pgRodar.TabIndex := 2;
+end;
+
+procedure TUserConfig.btnPrependTrialClick(Sender: TObject);
+begin
+  // todo: edit configuration files, prepend
+  // (edtTarget.Text);
 end;
 
 procedure TUserConfig.btnTrialsDoneClick(Sender: TObject);
@@ -1314,7 +1255,7 @@ begin
       if Sender = btnTargetFile then
         edtTarget.Text := OpenDialog1.FileName;
       if Sender = btnContentFile then
-        edtContent.Text := OpenDialog1.FileName;;
+        edtContent.Text := OpenDialog1.FileName;
     end;
 end;
 

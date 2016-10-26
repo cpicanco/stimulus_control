@@ -3,8 +3,8 @@ object UserConfig: TUserConfig
   Height = 483
   Top = 88
   Width = 466
-  HorzScrollBar.Page = 397
-  VertScrollBar.Page = 269
+  HorzScrollBar.Page = 332
+  VertScrollBar.Page = 424
   AutoScroll = True
   Caption = 'Configurar'
   ClientHeight = 483
@@ -1648,10 +1648,10 @@ object UserConfig: TUserConfig
     Height = 445
     Top = 0
     Width = 466
-    ActivePage = tbTrials
+    ActivePage = tbTools
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 2
+    TabIndex = 4
     TabOrder = 2
     OnChange = pgRodarChange
     object tbGeneral: TTabSheet
@@ -1902,7 +1902,7 @@ object UserConfig: TUserConfig
         Left = 0
         Height = 25
         Top = 258
-        Width = 460
+        Width = 462
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Arquivo alvo'
         OnClick = btnClick
@@ -1911,7 +1911,7 @@ object UserConfig: TUserConfig
       object edtTarget: TEdit
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 25
+        Height = 27
         Top = 231
         Width = 460
         Anchors = [akTop, akLeft, akRight]
@@ -1925,7 +1925,7 @@ object UserConfig: TUserConfig
         Left = 0
         Height = 25
         Top = 330
-        Width = 460
+        Width = 462
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Novas configurações'
         OnClick = btnClick
@@ -1936,9 +1936,9 @@ object UserConfig: TUserConfig
         AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 25
+        Height = 27
         Top = 303
-        Width = 460
+        Width = 462
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 3
         Text = 'conteúdo'
@@ -1974,6 +1974,15 @@ object UserConfig: TUserConfig
         ParentShowHint = False
         ShowHint = True
         TabOrder = 6
+      end
+      object btnPrependTrial: TButton
+        Left = 0
+        Height = 25
+        Top = 168
+        Width = 328
+        Caption = 'Inserir Tentativa no InícioTrial'
+        OnClick = btnPrependTrialClick
+        TabOrder = 7
       end
     end
     object tbVersion: TTabSheet
