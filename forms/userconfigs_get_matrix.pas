@@ -199,11 +199,16 @@ begin
   for i := 0 to Application.ComponentCount -1 do
     if Application.Components[i].ClassName = 'TMatrixForm' then
       begin
-        TForm(Application.Components[i]).Visible := True;
+        with TForm(Application.Components[i]) do
+          begin
+            Visible := True;
+            WindowState := wsFullScreen;
+          end;
+
         Break;
       end;
-  if lbCoordenates.Items.Text <> '' then
-    TMatrixForm(Application.Components[i]).SetMatrix(lbCoordenates.Items);
+  //if lbCoordenates.Items.Text <> '' then
+  //  TMatrixForm(Application.Components[i]).SetMatrix(lbCoordenates.Items);
   FDrawCoordenates.ClearAll;
   Background.Hide;
   {$IFDEF WINDOWS}

@@ -19,8 +19,9 @@ uses
       , cmem
     {$ENDIF}
   //, heaptrc
+  ,
   {$ENDIF}
-  , Interfaces // this includes the LCL widgetset
+  Interfaces // this includes the LCL widgetset
   , Forms
 
   //Forms

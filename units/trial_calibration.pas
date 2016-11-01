@@ -45,6 +45,7 @@ type
     FBlocking,
     FShowDots : Boolean;
     FDataSupport : FDataSupport;
+    procedure StartPupilCalibration;
     procedure None(Sender: TObject);
     procedure PupilCalibrationSuccessful(Sender: TObject; AMultiPartMessage : TMPMessage);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -80,11 +81,14 @@ end;
 procedure TCLB.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (ssCtrl in Shift) and (key = 67) { c } then
-    begin
-      if GlobalContainer.PupilEnabled then
-        GlobalContainer.PupilClient.Request(REQ_SHOULD_START_CALIBRATION);
-      FrmBackground.Hide;
-    end;
+    if GlobalContainer.PupilEnabled then
+      StartPupilCalibration;
+end;
+
+procedure TCLB.StartPupilCalibration;
+begin
+  GlobalContainer.PupilClient.Request(REQ_SHOULD_START_CALIBRATION, True);
+  //FrmBackground.Hide;
 end;
 
 procedure TCLB.None(Sender: TObject);
@@ -107,6 +111,8 @@ end;
 procedure TCLB.TrialStart(Sender: TObject);
 begin
   FDataSupport.TrialBegin := TickCount;
+  if GlobalContainer.PupilEnabled then
+    StartPupilCalibration;
 end;
 
 procedure TCLB.TrialPaint;
@@ -195,11 +201,7 @@ begin
     end;
 
   if GlobalContainer.PupilEnabled then
-    with GlobalContainer.PupilClient do
-      begin
-      OnCalibrationSuccessful := @PupilCalibrationSuccessful;
-      Request(REQ_SHOULD_START_CALIBRATION);
-      end;
+    GlobalContainer.PupilClient.OnCalibrationSuccessful := @PupilCalibrationSuccessful;
 
   if Self.ClassType = TCLB then Config(Self);
 end;

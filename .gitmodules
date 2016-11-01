@@ -7,3 +7,6 @@
 [submodule "dependency/fpc_zyre"]
 	path = dependency/fpc_zyre
 	url = git@github.com:cpicanco/fpc_zyre.git
+[submodule "dependency/epiktimer"]
+	path = dependency/epiktimer
+	url = git@github.com:cpicanco/epiktimer.git

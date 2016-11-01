@@ -1,5 +1,5 @@
 object MatrixConfigForm: TMatrixConfigForm
-  Left = 791
+  Left = 666
   Height = 244
   Top = 138
   Width = 358
@@ -16,7 +16,7 @@ object MatrixConfigForm: TMatrixConfigForm
   FormStyle = fsStayOnTop
   OnActivate = FormActivate
   OnCreate = FormCreate
-  Position = poScreenCenter
+  Position = poOwnerFormCenter
   LCLVersion = '1.6.0.4'
   object grpMatrixRowCol: TGroupBox
     Left = 8
@@ -25,7 +25,7 @@ object MatrixConfigForm: TMatrixConfigForm
     Top = 8
     Width = 181
     Caption = 'Linhas X Colunas da Matriz'
-    ClientHeight = 35
+    ClientHeight = 34
     ClientWidth = 177
     ParentShowHint = False
     ShowHint = True
@@ -34,7 +34,7 @@ object MatrixConfigForm: TMatrixConfigForm
       Left = 43
       Height = 19
       Top = 6
-      Width = 8
+      Width = 9
       Caption = 'x'
       Font.Color = clBlack
       Font.Height = -16
@@ -44,7 +44,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtRow: TEdit
       Left = 1
-      Height = 23
+      Height = 24
       Hint = 'Linhas.'
       Top = 6
       Width = 36
@@ -58,7 +58,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtCol: TEdit
       Left = 57
-      Height = 23
+      Height = 24
       Hint = 'Colunas.'
       Top = 6
       Width = 36
@@ -72,10 +72,10 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object cbSquare: TCheckBox
       Left = 99
-      Height = 21
+      Height = 24
       Hint = 'Marque esta caixa para que o número de colunas permaneça igual ao número de linhas.'
       Top = 8
-      Width = 83
+      Width = 93
       Caption = 'Quadrada'
       OnClick = cbSquareClick
       TabOrder = 2
@@ -87,14 +87,14 @@ object MatrixConfigForm: TMatrixConfigForm
     Top = 64
     Width = 181
     Caption = 'Comprimento X Altura'
-    ClientHeight = 35
+    ClientHeight = 34
     ClientWidth = 177
     TabOrder = 1
     object lbl2: TLabel
       Left = 43
       Height = 19
       Top = 6
-      Width = 8
+      Width = 9
       Caption = 'x'
       Font.Color = clBlack
       Font.Height = -16
@@ -104,7 +104,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtWidth: TEdit
       Left = 1
-      Height = 23
+      Height = 24
       Hint = 'Comprimento do estímulo, em pixels.'
       Top = 6
       Width = 36
@@ -118,7 +118,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtHeight: TEdit
       Left = 57
-      Height = 23
+      Height = 24
       Hint = 'Altura, do estímulo, em pixels.'
       Top = 6
       Width = 36
@@ -132,10 +132,10 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object cbSSquare: TCheckBox
       Left = 99
-      Height = 21
+      Height = 24
       Hint = 'Marque esta caixa para que a altura permaneça igual ao comprimento.'
       Top = 8
-      Width = 84
+      Width = 94
       Caption = 'Quadrado'
       OnClick = cbSSquareClick
       ParentShowHint = False
@@ -160,14 +160,14 @@ object MatrixConfigForm: TMatrixConfigForm
     Top = 141
     Width = 159
     Caption = 'Definições Gerais'
-    ClientHeight = 55
+    ClientHeight = 54
     ClientWidth = 155
     TabOrder = 3
     object lblLeftTop: TLabel
       Left = 74
       Height = 19
       Top = 25
-      Width = 8
+      Width = 9
       Caption = 'x'
       Font.Color = clBlack
       Font.Height = -16
@@ -177,16 +177,16 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object chkCustomResolution: TCheckBox
       Left = 10
-      Height = 21
+      Height = 24
       Hint = 'Selecione esta opção para visualizar o tamanho real do estímulo.'#13#10'A resolução atual do monitor é utilizada como referência.'
       Top = 2
-      Width = 141
+      Width = 162
       Caption = 'Usar esta resolução:'
       TabOrder = 0
     end
     object edtScreenLeft: TEdit
       Left = 1
-      Height = 23
+      Height = 24
       Top = 25
       Width = 62
       OnEditingDone = edtScreenLeftEditingDone
@@ -195,7 +195,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtScreenTop: TEdit
       Left = 92
-      Height = 23
+      Height = 24
       Top = 25
       Width = 62
       OnEditingDone = edtScreenTopEditingDone
@@ -242,14 +242,14 @@ object MatrixConfigForm: TMatrixConfigForm
     Top = 120
     Width = 181
     Caption = 'Distância entre Estímulos'
-    ClientHeight = 76
+    ClientHeight = 75
     ClientWidth = 177
     TabOrder = 2
     object lbl1: TLabel
       Left = 43
       Height = 19
       Top = 6
-      Width = 8
+      Width = 9
       Caption = 'x'
       Font.Color = clBlack
       Font.Height = -16
@@ -259,7 +259,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtDisty: TEdit
       Left = 57
-      Height = 23
+      Height = 24
       Hint = 'Distância vertical, em pixels, entre a borda inferior de um estímulo e a superior de outro.'
       Top = 6
       Width = 36
@@ -273,7 +273,7 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object edtDistx: TEdit
       Left = 1
-      Height = 23
+      Height = 24
       Hint = 'Distância horizontal, em pixels, entre a borda direita de um estímulo e a esquerda de outro.'
       Top = 6
       Width = 36
@@ -287,10 +287,10 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object chkPlotEquallySpaced: TCheckBox
       Left = 99
-      Height = 21
+      Height = 24
       Hint = 'Igualar a distância vertical à horizontal.'
       Top = 30
-      Width = 64
+      Width = 72
       Caption = 'Igualar'
       OnClick = chkPlotEquallySpacedClick
       ParentShowHint = False
@@ -299,10 +299,10 @@ object MatrixConfigForm: TMatrixConfigForm
     end
     object chkPlotProportional: TCheckBox
       Left = 99
-      Height = 21
+      Height = 24
       Hint = 'Distribuir os estímulos no monitor de acordo com a resolução. Divide-se o comprimento pelo número de linhas e a altura pelo número de colunas.'
       Top = 8
-      Width = 77
+      Width = 90
       Caption = 'Distribuir'
       OnClick = chkPlotProportionalClick
       ParentShowHint = False

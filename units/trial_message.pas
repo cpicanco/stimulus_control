@@ -105,7 +105,8 @@ end;
 procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  EndTrial(Sender);
+  if Button = mbLeft then
+    EndTrial(Sender);
 end;
 
 procedure TMSG.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);

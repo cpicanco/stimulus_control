@@ -1,6 +1,8 @@
 core
 *.*~
 *.a
+*.csv
+*.xml
 *.bak
 *.bin
 *.dbg
@@ -14,6 +16,7 @@ core
 *.lps
 *.map
 *.o
+*.obj
 *.or
 *.ppu
 *.res

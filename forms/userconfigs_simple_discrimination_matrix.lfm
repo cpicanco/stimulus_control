@@ -1,11 +1,11 @@
 object MatrixForm: TMatrixForm
-  Left = 89
+  Left = 33
   Height = 243
   Top = 50
-  Width = 1189
+  Width = 991
   Caption = 'MatrixForm'
   ClientHeight = 243
-  ClientWidth = 1189
+  ClientWidth = 991
   Color = clWhite
   DefaultMonitor = dmDesktop
   OnActivate = FormActivate
@@ -16,14 +16,14 @@ object MatrixForm: TMatrixForm
     Left = 0
     Height = 160
     Top = 0
-    Width = 1189
+    Width = 991
     Align = alTop
     ClientHeight = 160
-    ClientWidth = 1189
+    ClientWidth = 991
     ParentColor = False
     TabOrder = 0
     object btnMinimizeTopTab: TButton
-      Left = 944
+      Left = 746
       Height = 56
       Top = 8
       Width = 118
@@ -33,7 +33,7 @@ object MatrixForm: TMatrixForm
       TabOrder = 0
     end
     object btnClose: TButton
-      Left = 1064
+      Left = 866
       Height = 56
       Top = 8
       Width = 118
@@ -44,9 +44,9 @@ object MatrixForm: TMatrixForm
     end
     object cbPreview: TCheckBox
       Left = 8
-      Height = 21
+      Height = 24
       Top = 128
-      Width = 68
+      Width = 79
       Caption = 'Preview'
       Checked = True
       OnChange = cbPreviewChange
@@ -59,7 +59,7 @@ object MatrixForm: TMatrixForm
       Top = 8
       Width = 141
       Caption = 'N° Tentativas'
-      ClientHeight = 32
+      ClientHeight = 30
       ClientWidth = 137
       TabOrder = 3
       object btnEditNodes: TButton
@@ -72,7 +72,7 @@ object MatrixForm: TMatrixForm
       end
       object seTrials: TSpinEdit
         Left = 2
-        Height = 25
+        Height = 27
         Top = 1
         Width = 71
         MaxValue = 2000
@@ -82,7 +82,7 @@ object MatrixForm: TMatrixForm
       end
     end
     object btnOk: TButton
-      Left = 944
+      Left = 746
       Height = 73
       Top = 79
       Width = 238
@@ -97,16 +97,16 @@ object MatrixForm: TMatrixForm
       Top = 8
       Width = 159
       Caption = 'Estímulos'
-      ClientHeight = 56
+      ClientHeight = 54
       ClientWidth = 155
       TabOrder = 5
       object cbUseStimuliSet: TCheckBox
         AnchorSideLeft.Control = cbChooseGrid
         AnchorSideBottom.Control = cbChooseGrid
         Left = 0
-        Height = 21
-        Top = 2
-        Width = 78
+        Height = 24
+        Top = -1
+        Width = 87
         Anchors = [akLeft, akBottom]
         BorderSpacing.Bottom = 1
         Caption = 'Conjunto'
@@ -116,9 +116,9 @@ object MatrixForm: TMatrixForm
         AnchorSideLeft.Control = cbUseStimuliSet
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = cbUseStimuliSet
-        Left = 91
+        Left = 100
         Height = 25
-        Top = 2
+        Top = -1
         Width = 54
         BorderSpacing.Left = 13
         Caption = 'Editar'
@@ -127,7 +127,7 @@ object MatrixForm: TMatrixForm
       object cbChooseGrid: TComboBox
         AnchorSideRight.Control = btnEditNodes1
         Left = 0
-        Height = 25
+        Height = 29
         Top = 24
         Width = 154
         Enabled = False
@@ -142,27 +142,18 @@ object MatrixForm: TMatrixForm
         Text = 'NA'
       end
     end
-    object btnGetMatrix: TButton
-      Left = 464
-      Height = 73
-      Top = 8
-      Width = 99
-      Caption = 'Gerar Matriz'
-      OnClick = btnGetMatrixClick
-      TabOrder = 6
-    end
     object gbGapLength: TGroupBox
       Left = 160
       Height = 49
       Top = 8
       Width = 141
       Caption = 'GapLength'
-      ClientHeight = 32
+      ClientHeight = 30
       ClientWidth = 137
-      TabOrder = 7
+      TabOrder = 6
       object seGapLength: TSpinEdit
         Left = 2
-        Height = 25
+        Height = 27
         Top = 1
         Width = 71
         MaxValue = 359
