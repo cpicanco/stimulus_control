@@ -102,8 +102,6 @@ type
     procedure cbDrawTrialGroupChange(Sender: TObject);
     procedure cbShowRepetitionsChange(Sender: TObject);
     procedure chkUseMediaChange(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
-
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
@@ -954,19 +952,19 @@ begin
   //Image2.Visible := chkUseMedia.Checked
 end;
 
-procedure TUserConfig.FormActivate(Sender: TObject);
-var i : integer;
-  function GetMonitorString(Monitor : TMonitor) : string;
-  begin
-    with Monitor do
-      Result := 'Monitor' + #32 + IntToStr(MonitorNum) + #32 + IntToStr(Width) + #32 + IntToStr(Height);
-  end;
-begin
-  WriteLn('Monitors');
-  with Screen do
-    for i := 0 to MonitorCount - 1 do
-        WriteLn(GetMonitorString(Monitors[i]));
-end;
+//procedure TUserConfig.FormActivate(Sender: TObject);
+//var i : integer;
+//  function GetMonitorString(Monitor : TMonitor) : string;
+//  begin
+//    with Monitor do
+//      Result := 'Monitor' + #32 + IntToStr(MonitorNum) + #32 + IntToStr(Width) + #32 + IntToStr(Height);
+//  end;
+//begin
+//  WriteLn('Monitors');
+//  with Screen do
+//    for i := 0 to MonitorCount - 1 do
+//        WriteLn(GetMonitorString(Monitors[i]));
+//end;
 
 
 procedure TUserConfig.btnGridTypeClick(Sender: TObject);
