@@ -10,3 +10,6 @@
 [submodule "dependency/epiktimer"]
 	path = dependency/epiktimer
 	url = git@github.com:cpicanco/epiktimer.git
+[submodule "dependency/travis-lazarus"]
+	path = dependency/travis-lazarus
+	url = https://github.com/nielsAD/travis-lazarus.git

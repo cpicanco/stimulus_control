@@ -1617,7 +1617,6 @@ object UserConfig: TUserConfig
     0000000000000000000000000000000000000000000000000000000000000000
     0000
   }
-  OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   ParentBiDiMode = False
