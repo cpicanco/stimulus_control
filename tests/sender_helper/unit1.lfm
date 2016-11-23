@@ -1,0 +1,19 @@
+object Form1: TForm1
+  Left = 330
+  Height = 240
+  Top = 165
+  Width = 320
+  Caption = 'Form1'
+  ClientHeight = 240
+  ClientWidth = 320
+  LCLVersion = '1.6.0.4'
+  object SendRequest: TButton
+    Left = 40
+    Height = 25
+    Top = 32
+    Width = 75
+    Caption = 'SendRequest'
+    OnClick = SendRequestClick
+    TabOrder = 0
+  end
+end
