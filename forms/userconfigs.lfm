@@ -3,8 +3,8 @@ object UserConfig: TUserConfig
   Height = 483
   Top = 88
   Width = 466
-  HorzScrollBar.Page = 332
-  VertScrollBar.Page = 424
+  HorzScrollBar.Page = 296
+  VertScrollBar.Page = 164
   AutoScroll = True
   Caption = 'Configurar'
   ClientHeight = 483
@@ -1622,7 +1622,7 @@ object UserConfig: TUserConfig
   ParentBiDiMode = False
   Position = poScreenCenter
   SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;pgRodar.TabIndex;piAxes.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piMatrix.Checked;piTrialGroup.Checked;piTrials.Checked;seCount.Value;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount'
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.6.2.0'
   object btnRun: TButton
     Left = 8
     Height = 25
@@ -1635,9 +1635,9 @@ object UserConfig: TUserConfig
   end
   object chkPlayOnSecondMonitor: TCheckBox
     Left = 80
-    Height = 24
-    Top = 451
-    Width = 112
+    Height = 19
+    Top = 456
+    Width = 89
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
     TabOrder = 1
@@ -1647,30 +1647,30 @@ object UserConfig: TUserConfig
     Height = 445
     Top = 0
     Width = 466
-    ActivePage = tbTools
+    ActivePage = tbGeneral
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 38
-    TabIndex = 4
+    TabIndex = 0
     TabOrder = 2
     OnChange = pgRodarChange
     object tbGeneral: TTabSheet
       Caption = 'Geral'
-      ClientHeight = 414
-      ClientWidth = 462
+      ClientHeight = 417
+      ClientWidth = 458
       object leParticipant: TLabeledEdit
         Left = 0
-        Height = 27
+        Height = 23
         Top = 75
-        Width = 462
+        Width = 458
         Anchors = [akTop, akLeft, akRight]
         EditLabel.AnchorSideLeft.Control = leParticipant
         EditLabel.AnchorSideRight.Control = leParticipant
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leParticipant
         EditLabel.Left = 0
-        EditLabel.Height = 17
-        EditLabel.Top = 55
-        EditLabel.Width = 462
+        EditLabel.Height = 15
+        EditLabel.Top = 57
+        EditLabel.Width = 458
         EditLabel.Caption = 'Participante'
         EditLabel.ParentColor = False
         TabOrder = 0
@@ -1678,18 +1678,18 @@ object UserConfig: TUserConfig
       end
       object leSessionName: TLabeledEdit
         Left = 0
-        Height = 27
+        Height = 23
         Top = 24
-        Width = 462
+        Width = 458
         Anchors = [akTop, akLeft, akRight]
         EditLabel.AnchorSideLeft.Control = leSessionName
         EditLabel.AnchorSideRight.Control = leSessionName
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leSessionName
         EditLabel.Left = 0
-        EditLabel.Height = 17
-        EditLabel.Top = 4
-        EditLabel.Width = 462
+        EditLabel.Height = 15
+        EditLabel.Top = 6
+        EditLabel.Width = 458
         EditLabel.Caption = 'Nome da Sessão'
         EditLabel.ParentColor = False
         TabOrder = 1
@@ -1698,6 +1698,7 @@ object UserConfig: TUserConfig
     end
     object tbStimuli: TTabSheet
       Caption = 'Estímulos'
+      TabVisible = False
     end
     object tbTrials: TTabSheet
       Caption = 'Tentativas'
@@ -1766,7 +1767,7 @@ object UserConfig: TUserConfig
         Top = 8
         Width = 142
         Caption = 'Mostrar Repetições'
-        ClientHeight = 32
+        ClientHeight = 31
         ClientWidth = 138
         TabOrder = 3
         object seCount: TSpinEdit
@@ -1829,7 +1830,7 @@ object UserConfig: TUserConfig
         Top = 8
         Width = 144
         Caption = 'Grupo de Tentativas'
-        ClientHeight = 32
+        ClientHeight = 31
         ClientWidth = 140
         TabOrder = 6
         object cbDrawTrialGroup: TCheckBox
@@ -1892,8 +1893,9 @@ object UserConfig: TUserConfig
     end
     object tbTools: TTabSheet
       Caption = 'Ferramentas'
-      ClientHeight = 414
-      ClientWidth = 462
+      ClientHeight = 417
+      ClientWidth = 458
+      TabVisible = False
       object btnTargetFile: TButton
         AnchorSideLeft.Control = tbTools
         AnchorSideRight.Control = tbTools
@@ -1901,7 +1903,7 @@ object UserConfig: TUserConfig
         Left = 0
         Height = 25
         Top = 258
-        Width = 462
+        Width = 458
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Arquivo alvo'
         OnClick = btnClick
@@ -1910,9 +1912,9 @@ object UserConfig: TUserConfig
       object edtTarget: TEdit
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 27
+        Height = 23
         Top = 231
-        Width = 460
+        Width = 456
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 1
         Text = 'alvo'
@@ -1924,7 +1926,7 @@ object UserConfig: TUserConfig
         Left = 0
         Height = 25
         Top = 330
-        Width = 462
+        Width = 458
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Novas configurações'
         OnClick = btnClick
@@ -1935,9 +1937,9 @@ object UserConfig: TUserConfig
         AnchorSideRight.Control = tbTools
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 27
+        Height = 23
         Top = 303
-        Width = 462
+        Width = 458
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 3
         Text = 'conteúdo'
@@ -3659,9 +3661,9 @@ object UserConfig: TUserConfig
   end
   object chkPupilClient: TCheckBox
     Left = 200
-    Height = 24
-    Top = 451
-    Width = 124
+    Height = 19
+    Top = 456
+    Width = 96
     Anchors = [akLeft, akBottom]
     Caption = 'Interface Pupil'
     TabOrder = 3

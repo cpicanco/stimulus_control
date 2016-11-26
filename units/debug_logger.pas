@@ -44,8 +44,8 @@ var
 
 procedure DebugLn(msg: string);
 begin
-  WriteLn(msg);
   {$ifdef DEBUG}
+    WriteLn(msg);
     DebuglnThreadLog(msg);
   {$endif}
 end;

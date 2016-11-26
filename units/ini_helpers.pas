@@ -13,8 +13,8 @@ uses
 function GetNumTrials(ASessionIniFile : TCIniFile) : integer;
 function GetSection(ATrial: integer; ABloc : integer) : string; overload;
 function GetSection(ABloc : integer) : string; overload;
-function IncSection(ASection : string; ABloc : integer) : string; overload;
-function IncSection(ABloc : integer) : string; overload;
+//function IncSection(ASection : string; ABloc : integer) : string; overload;
+//function IncSection(ABloc : integer) : string; overload;
 function IsTrialSection(aSection : string) : integer;
 
 implementation
@@ -28,8 +28,8 @@ function GetNumTrials(ASessionIniFile: TCIniFile): integer;
 var
   s1 : string;
 begin
-  s1:= ASessionIniFile.ReadString(_Blc + #32 + IntToStr(i), _NumTrials, '0 0') + #32;
-  Result := StrToIntDef(Copy(s1, 0, Pos(#32, s1) - 1), 0);
+  //s1:= ASessionIniFile.ReadString(_Blc + #32 + IntToStr(i), _NumTrials, '0 0') + #32;
+  //Result := StrToIntDef(Copy(s1, 0, Pos(#32, s1) - 1), 0);
 end;
 
 {.
@@ -47,33 +47,33 @@ function GetSection(ABloc: integer): string;
 begin
   Result := BegStr + IntToStr(ABloc) + EndStr;
 end;
-
-function IncSection(aSection : string; iBloc : integer) : string;
-var
-  i : integer;
-  BegStrT : string;
-begin
-  BegStrT := BegStr + IntToStr(ABloc) + Separator + 'T';
-  Delete(  aSection, Pos(BegStrT, aSection), Length(BegStrT)  );
-  Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
-
-  i := StrToInt(aSection);
-  Inc(i);
-  Result := BegStrT + IntToStr(i) + EndStr;
-end;
-
-function IncSection(ABloc: integer): string;
-var
-  i : integer;
-begin
-  Delete(  aSection, Pos(BegStr, aSection), Length(BegStr)  );
-  Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
-
-  i := StrToInt(aSection);
-  Inc(i);
-  Result := BegStr + IntToStr(i) + EndStr;
-end;
-
+//
+//function IncSection(aSection : string; iBloc : integer) : string;
+//var
+//  i : integer;
+//  BegStrT : string;
+//begin
+//  BegStrT := BegStr + IntToStr(ABloc) + Separator + 'T';
+//  Delete(  aSection, Pos(BegStrT, aSection), Length(BegStrT)  );
+//  Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
+//
+//  i := StrToInt(aSection);
+//  Inc(i);
+//  Result := BegStrT + IntToStr(i) + EndStr;
+//end;
+//
+//function IncSection(ABloc: integer): string;
+//var
+//  i : integer;
+//begin
+//  Delete(  aSection, Pos(BegStr, aSection), Length(BegStr)  );
+//  Delete(  aSection, Pos(EndStr, aSection), Length(EndStr)  );
+//
+//  i := StrToInt(aSection);
+//  Inc(i);
+//  Result := BegStr + IntToStr(i) + EndStr;
+//end;
+//
 {
 .
 . If aSection is a Trial then Result is the trial number else Result is 0.
