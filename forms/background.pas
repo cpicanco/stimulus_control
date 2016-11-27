@@ -45,7 +45,8 @@ begin
     begin
       //fullscreen true
       {$IFDEF MSWINDOWS}
-      // to do
+      BorderStyle:=bsNone;
+      WindowState := wsFullScreen;
       {$ENDIF}
 
       {$IFDEF LINUX}
@@ -56,7 +57,8 @@ begin
     begin
       //fullscreen false
       {$IFDEF MSWINDOWS}
-      // to do
+      BorderStyle:=bsDialog;
+      WindowState := wsNormal;
       {$ENDIF}
 
       {$IFDEF LINUX}

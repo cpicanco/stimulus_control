@@ -21,7 +21,7 @@ Kind=	SIMPLE
 NumComp = 2
 
 C1Bnd=500 388 200 100
-C1Stm=A1.bmp 0 200
+C1Stm=A2.bmp 0 200
 C1Sch=CRF
 C1IET=CSQ1.wav 0 -1 1
 C1Msg=A1 - 9
@@ -51,7 +51,7 @@ C1Res=HIT
 C1Nxt=0
 
 C2Bnd=334 388 100 100
-C2Stm=A1.bmp 0 200
+C2Stm=A2.bmp 0 200
 C2Sch=CRF
 C2IET=MISS
 C2Msg=A1 - 9

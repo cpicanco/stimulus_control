@@ -178,7 +178,10 @@ begin
       FAudioChannel.Play;
     except
       on E:Exception do
-        WriteLn('TKey Could not play audio.');
+         {$IFDEF DEBUG}
+         WriteLn('TKey Could not play audio.')
+         {$ENDIF}
+        ;
     end;
 end;
 
@@ -330,7 +333,9 @@ var
     except
       on E : Exception do
         begin
+          {$IFDEF DEBUG}
           WriteLn('TKey.SetFileName: ' + E.Message);
+          {$ENDIF}
           Application.Terminate;
         end;
     end;
