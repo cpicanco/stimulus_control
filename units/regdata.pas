@@ -31,6 +31,7 @@ type
     constructor Create(AOwner: TComponent; AFileName: String); reintroduce;
     destructor Destroy; override;
     procedure SaveData(AData: string);
+    procedure CloseAndOpen;
     procedure AppendF;
     procedure AssignFFile;
     procedure CloseFFile;
@@ -56,7 +57,7 @@ implementation
 procedure TRegData.Close;
 begin
   if FFilename <> '' then
-    if TextRec(FFile).Mode = 55218 then // file is opened read/write
+    if TextRec(FFile).Mode = 55218 then // file is opened either read or write
       begin
         CloseFile(FFile);
       end
@@ -116,6 +117,12 @@ end;
 procedure TRegData.SaveData(AData: string);
 begin
   Write(FFile, AData);
+end;
+
+procedure TRegData.CloseAndOpen;
+begin
+  Flush(FFile);
+  Append(FFile);
 end;
 
 procedure TRegData.AppendF;
