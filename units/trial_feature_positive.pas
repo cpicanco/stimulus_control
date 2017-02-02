@@ -29,7 +29,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
 type
 
-  { TMRD }
+  { TDataSupport }
 
   TDataSupport = record
     Responses : integer;
@@ -64,7 +64,7 @@ type
     FConsequenceFired : Boolean;
     FCurrTrial: TCurrentTrial;
     FDataSupport : TDataSupport;
-    FFirstResp : Boolean;
+    //FFirstResp : Boolean;
     FNumComp : integer;
     FSchedule : TSchMan;
     FUseMedia : Boolean;
@@ -116,12 +116,20 @@ begin
   //FDataSupport.StmDuration := GetCustomTick;
   if FConsequenceFired then
     begin
-      if FCurrTrial.response = 'Positiva' then  Result := T_HIT else Result := T_MISS;
+      case UpperCase(FCurrTrial.response) of
+        'POSITIVA': Result := T_HIT;
+        'INDIFERENTE': Result := T_NONE;
+        else Result := T_MISS;
+      end;
       IETConsequence := FDataSupport.CSQHIT;
     end
   else
     begin
-      if FCurrTrial.response = 'Negativa' then  Result := T_HIT else Result := T_MISS;
+      case UpperCase(FCurrTrial.response) of
+        'NEGATIVA': Result := T_HIT;
+        'INDIFERENTE': Result := T_NONE;
+        else Result := T_MISS;
+      end;
       IETConsequence := FDataSupport.CSQMISS;
     end;
 
