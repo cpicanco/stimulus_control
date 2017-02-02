@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2016 Carlos Rafael Fernandes PicanÁo, Universidade Federal do Par·.
+  Copyright (C) 2014-2017 Carlos Rafael Fernandes Pican√ßo, Universidade Federal do Par√°.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -80,8 +80,8 @@ type
     FDistribuir : Boolean;
     fH          : Integer; // Altura do Monitor
     fW          : Integer; // Comprimento do Monitor
-    Distx       : Integer; // Dist‚ncia horizontal;
-    Disty       : Integer; // Dist‚ncia vertical entre estÌmulos;
+    Distx       : Integer; // Dist√¢ncia horizontal;
+    Disty       : Integer; // Dist√¢ncia vertical entre est√≠mulos;
     sH          : Integer; // Altura do S
     sW          : Integer; // Comprimento do S
     ni          : Integer; // n Linhas
@@ -562,8 +562,8 @@ begin
 
   if FDistribuir = False then
     begin
-      Disty    := Abs (StrToInt (SDisty)); //Dist‚ncia vertical entre estÌmulos;
-      Distx    := Abs (StrToInt (SDistx)); //Dist‚ncia horizontal;
+      Disty    := Abs (StrToInt (SDisty)); //Dist√¢ncia vertical entre est√≠mulos;
+      Distx    := Abs (StrToInt (SDistx)); //Dist√¢ncia horizontal;
     end
   else
     begin

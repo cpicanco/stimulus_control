@@ -4,5 +4,5 @@ object Background: TBackground
   Top = 203
   Width = 320
   Caption = 'Background'
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.6.2.0'
 end
