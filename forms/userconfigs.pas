@@ -854,7 +854,7 @@ begin
 
               SList.BeginUpdate;
               SList.Values[_BkGnd] := IntToStr (clWhite);
-              SList.Values[_Cursor] := IntToStr (crDefault);
+              SList.Values[_Cursor] := IntToStr (crNone);
               SList.Values[_UseMedia] := BoolToStr(False, '1','0');
               SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
               SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
@@ -913,11 +913,11 @@ begin
               Name := StringGrid1.Cells[2, aTrial + 1] + #32 + IntToStr(Id);
 
               SList.BeginUpdate;
-              SList.Values[_BkGnd] := IntToStr (clWhite);
-              SList.Values[_Cursor] := IntToStr (crDefault);
+              SList.Values[_BkGnd] := IntToStr(clWhite);
+              SList.Values[_Cursor] := IntToStr(crNone);
               // SList.Values[_UseMedia] := BoolToStr(False, '1','0');
               SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
-              SList.Values[_LimitedHold] := '4000';
+              SList.Values[_LimitedHold] := '2500';
               SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
               SList.Values[_ExpectedResponse] := StringGrid1.Cells[2, aTrial + 1];
               SList.Values[_Trial + _cIET] := StringGrid1.Cells[3, aTrial + 1];   // configure the IETConsenquence
