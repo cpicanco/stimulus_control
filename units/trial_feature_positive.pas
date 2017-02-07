@@ -25,6 +25,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
     , draw_methods
     , schedules_main
     , response_key
+    , bass_player
     ;
 
 type
@@ -133,8 +134,13 @@ begin
       IETConsequence := FDataSupport.CSQMISS;
     end;
 
-  if FCurrTrial.NextTrial = T_CRT then NextTrial := T_CRT
-  else NextTrial := FCurrTrial.NextTrial;
+  case NextTrial of
+    T_CRT:NextTrial := T_CRT;
+    'IF_HIT_JUMP_NEXT_TRIAL':
+        if Result = T_HIT then
+          NextTrial := IntToStr(GlobalContainer.CounterManager.CurrentTrial+3);
+  end;
+
   LogEvent(Result);
   FCurrTrial.Result := Result;
 end;
@@ -148,20 +154,20 @@ end;
 
 procedure TFPE.Consequence(Sender: TObject);
 var
-  LConsequence : TKey;
+  LConsequence : TBassStream;
 begin
   LogEvent(LeftStr(FDataSupport.CSQ, 4));
   if FConsequenceFired = False then FConsequenceFired := True;
-  LConsequence := TKey.Create(Self);
-  with LConsequence do
-    begin
-      Cursor:= Self.Cursor;
-      Parent:= Self;
-      Loops := 0;
-      Color := 255;
-      FullPath := RootMedia + FDataSupport.CSQ;
-    end;
-  LConsequence.Play;
+  Writeln(RootMedia + FDataSupport.CSQ);
+  case FDataSupport.CSQ of
+    T_HIT : LConsequence := TBassStream.Create(RootMedia+'CSQ1.wav');
+    T_MISS : LConsequence := TBassStream.Create(RootMedia+'CSQ2.wav');
+    else LConsequence := TBassStream.Create(RootMedia+FDataSupport.CSQ);
+  end;
+
+  if FileExists(RootMedia+FDataSupport.CSQ) then
+    LConsequence.Play;
+
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
 
@@ -260,10 +266,10 @@ begin
 
   // Alias to a default media name.ext
   FCurrTrial.response := CfgTrial.SList.Values[_ExpectedResponse];
-  if FCurrTrial.response = 'Positiva' then
+  if UpperCase(FCurrTrial.response) = 'POSITIVA' then
     if FDataSupport.CSQ = T_HIT then FDataSupport.CSQ := 'CSQ1.wav';
 
-  if FCurrTrial.response = 'Negativa' then
+  if UpperCase(FCurrTrial.response) = 'NEGATIVA' then
     if FDataSupport.CSQ = T_MISS then FDataSupport.CSQ := 'CSQ2.wav';
 
 

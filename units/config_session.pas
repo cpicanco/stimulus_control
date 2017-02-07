@@ -15,6 +15,7 @@ interface
 
 uses Classes, ComCtrls, IniFiles, SysUtils,  Dialogs, Forms
     , pupil_communication
+    , countermanager
     ;
 
 type
@@ -27,6 +28,7 @@ type
   TGlobalContainer = class //(TObject)
     PupilClient: TPupilCommunication;
     PupilEnabled : Boolean;
+    CounterManager : TCounterManager;
     RootData: string;
     RootMedia: string;
     TimeStart : Extended;

@@ -263,6 +263,7 @@ begin
   FSubjName := FConfigs.SessionSubject;
   FServerAddress := FConfigs.SessionServer;
   FGlobalContainer := FConfigs.GlobalContainer;
+  FGlobalContainer.CounterManager := FManager;
   PupilClientEnabled := FGlobalContainer.PupilEnabled;
 end;
 
