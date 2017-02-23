@@ -172,6 +172,7 @@ const
 
   { Trial Kinds }
 
+  T_MSQ = 'MSQ';
   T_DZT = 'DZT';
   T_CLB = 'CLB';
   T_FPE = 'FPE';
