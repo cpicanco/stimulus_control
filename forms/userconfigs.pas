@@ -44,14 +44,15 @@ type
     btnTrialsDone: TButton;
     btnPrependTrial: TButton;
     chkPupilClient: TCheckBox;
-    cbShowRepetitions: TCheckBox;
+    chkShowRepetitions: TCheckBox;
     btnGridType: TButton;
-    cbDrawTrialGroup: TCheckBox;
+    chkDrawTrialGroup: TCheckBox;
     chkPlayOnSecondMonitor: TCheckBox;
     edtTrialGroup: TEdit;
     edtTarget: TEdit;
     edtContent: TEdit;
     gbRepetitions: TGroupBox;
+    gbRepetitionsBlocks: TGroupBox;
     gbTrialGroup: TGroupBox;
     Image1: TImage;
     leParticipant: TLabeledEdit;
@@ -59,8 +60,8 @@ type
     leSessionName: TLabeledEdit;
     Memo1: TMemo;
     MemoAppInfo: TMemo;
+    piTrialsWithConstraints: TMenuItem;
     PanelHeader: TPanel;
-    piTrialGroup: TMenuItem;
     piFillEven: TMenuItem;
     piFillOdd: TMenuItem;
     piFillAll: TMenuItem;
@@ -76,6 +77,7 @@ type
     pmFillCondition: TPopupMenu;
     SaveDialog1: TSaveDialog;
     seCount: TSpinEdit;
+    seBlocksCount: TSpinEdit;
     stAppTitle: TStaticText;
     stVersion: TStaticText;
     StringGrid1: TStringGrid;
@@ -99,8 +101,8 @@ type
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
-    procedure cbDrawTrialGroupChange(Sender: TObject);
-    procedure cbShowRepetitionsChange(Sender: TObject);
+    procedure chkDrawTrialGroupChange(Sender: TObject);
+    procedure chkShowRepetitionsChange(Sender: TObject);
     procedure chkUseMediaChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -129,6 +131,8 @@ type
     FEscriba : TEscriba;
     //FData : TRegData;
     function MeetCondition(aCol, aRow : integer): boolean;
+    function SaneConstraints: Boolean;
+    function RepetitionBlocksMeetsConstraints(ALowRow,AHighRow:integer) : Boolean;
     procedure CheckRepetitionCol(aCol : integer);
     procedure EndSession(Sender : TObject);
     procedure RandTrialOrder(BeginRow, EndRow : integer);
@@ -165,7 +169,7 @@ resourcestring
   rsRandomizeTrials = 'Randomizar ordem das tentativas';
   rsRandomizeResponses = 'Randomizar respostas';
   rsRandomizeGroupTrial = 'Randomizar em grupos ordem das tentativas';
-
+  rsRandomizeTrialsWithConstraints = 'Randomizar ordem das tentativas com restrições.';
 
 implementation
 
@@ -239,14 +243,15 @@ begin
       ResetRepetionMatrix;
     end;
 
+  // Randomize Buttom
   if TMenuItem(Sender) = piTrials then
       btnRandomize.Hint := rsRandomizeTrials;
 
-  if TMenuItem(Sender) = piTrialGroup then
-      btnRandomize.Hint := rsRandomizeGroupTrial;
-
   if TMenuItem(Sender) = piExpectedResponse then
       btnRandomize.Hint := rsRandomizeResponses;
+
+  if TMenuItem(Sender) = piTrialsWithConstraints then
+      btnRandomize.Hint := rsRandomizeTrialsWithConstraints;
 
   TMenuItem(Sender).Checked := True;
 end;
@@ -264,7 +269,7 @@ begin
     begin
       FLastFocusedCol := StringGrid1.Col;
       leFillValue.EditLabel.Caption := StringGrid1.Cells[StringGrid1.Col,0];
-      if cbShowRepetitions.Checked then CheckRepetitionCol(StringGrid1.Col);
+      if chkShowRepetitions.Checked then CheckRepetitionCol(StringGrid1.Col);
     end;
 end;
 
@@ -274,7 +279,7 @@ begin
   if not IsColumn then
     begin
       ResetRepetionMatrix;
-      if (FLastFocusedCol <> -1) and cbShowRepetitions.Checked then CheckRepetitionCol(FLastFocusedCol);
+      if (FLastFocusedCol <> -1) and chkShowRepetitions.Checked then CheckRepetitionCol(FLastFocusedCol);
     end;
 end;
 
@@ -319,7 +324,7 @@ begin
             LoadOldCanvas;
           end;
 
-  if cbDrawTrialGroup.Checked then
+  if chkDrawTrialGroup.Checked then
     begin
       StringGrid1.Canvas.Pen.Color := clBlue;
       aInc := StrToInt(edtTrialGroup.Text);
@@ -376,6 +381,50 @@ begin
   if piFillEven.Checked then
     if (StrToIntDef(StringGrid1.Cells[0, aRow], 1) mod 2) = 0 then
       Result := piFillEven.Checked;
+end;
+
+function TUserConfig.SaneConstraints: Boolean;
+begin
+  Result := True;
+end;
+
+function TUserConfig.RepetitionBlocksMeetsConstraints(ALowRow, AHighRow: integer): Boolean;
+var
+  LRow, LCol,
+  LCount,
+  LBlockSize, LMaxBlocksAllowed, LBlockCount: integer;
+begin
+  Result := False;
+  LBlockSize := seCount.Value;
+  LMaxBlocksAllowed := seBlocksCount.Value;
+  LBlockCount := 0;
+  LCol := FLastFocusedCol;
+
+  LCount := 1;
+  for LRow := ALowRow to AHighRow do
+    begin
+      if (StringGrid1.Cells[LCol, LRow] = StringGrid1.Cells[LCol, LRow + 1]) then
+        begin
+          // repetition count
+          Inc(LCount);
+
+          // constraint 1
+          if LCount > LBlockSize then
+            Exit;
+
+          // block count
+          if LCount = LBlockSize then
+            Inc(LBlockCount);
+
+          // constraint 2
+          if LBlockCount > LMaxBlocksAllowed then
+            Exit;
+        end
+      else
+        LCount := 1;
+
+    end;
+  Result := True;
 end;
 
 {
@@ -458,41 +507,35 @@ end;
 
 procedure TUserConfig.CheckRepetitionCol(aCol : integer);
 var
-  aRowCount, aRow, i,
-  aBeginRow, aEndRow, Count : integer;
-  LastLine, Reset : Boolean;
+  LRowCount, LRow, i,
+  LBeginRow, LEndRow, LCount : integer;
+  LReset : Boolean;
 
 begin
-  Count := 1;
-  Reset := True;
-  LastLine := False;
+  LCount := 1;
+  LReset := True;
+  LRowCount := StringGrid1.RowCount;
 
-  aRowCount := StringGrid1.RowCount;
-
-  for aRow := 1 to aRowCount -2 do
+  for LRow := 1 to LRowCount -2 do
     begin
-      if aRow = aRowCount -2 then LastLine := True;
-
-      if Reset then
+      if LReset then
         begin
-          aBeginRow := aRow;
-          Reset := False;
+          LBeginRow := LRow;
+          LReset := False;
         end;
 
-      if StringGrid1.Cells[aCol, aRow] = StringGrid1.Cells[aCol, aRow + 1] then
+      if StringGrid1.Cells[aCol, LRow] = StringGrid1.Cells[aCol, LRow + 1] then
         begin
-          Inc(Count);
-          aEndRow := aRow + 1;
-          if LastLine then
-            if Count >= seCount.Value then
-              for i := aBeginRow to aEndRow do FRepetitionMatrix[aCol, i] := True;
+          Inc(LCount);
+          LEndRow := LRow + 1;
+          if LCount >= seCount.Value then
+            for i := LBeginRow to LEndRow do
+              FRepetitionMatrix[aCol, i] := True;
         end
       else
         begin
-          if Count >= seCount.Value then
-            for i := aBeginRow to aEndRow do FRepetitionMatrix[aCol, i] := True;
-          Count := 1;
-          Reset := True;
+          LCount := 1;
+          LReset := True;
         end;
     end;
   Invalidate;
@@ -507,41 +550,54 @@ end;
 
 procedure TUserConfig.btnRandomizeClick(Sender: TObject);
 var
-  aRow,
-  BeginRow, EndRow: integer;
+  LRow,
+  LBeginRow, LEndRow: integer;
+  procedure RandomTrialGroup(AWithConstraints : Boolean);
+  begin
+    LRow {increment} := StrToInt(edtTrialGroup.Text);
+    LBeginRow := 1;
+    LEndRow :=  LRow {increment} + 1;
+    while LEndRow <= StringGrid1.RowCount - 1 do
+      begin
+        if AWithConstraints then
+          repeat
+            RandTrialOrder(LBeginRow, LEndRow -1);
+          until RepetitionBlocksMeetsConstraints(LBeginRow,LEndRow -2)
+        else
+          RandTrialOrder(LBeginRow, LEndRow -1);
+        Inc(LBeginRow, LRow {increment});
+        Inc(LEndRow, LRow {increment});
+      end;
+    ResetRepetionMatrix;
+    CheckRepetitionCol(FLastFocusedCol);
+  end;
 
 begin
-  {$ifdef DEBUG}
-    DebugLn(mt_Information + 'btnRandomizeClick');
-  {$endif}
-
-  if piTrials.Checked then
+  if (FLastFocusedCol <> -1) then
     begin
-      RandTrialOrder(1, StringGrid1.RowCount -1);
-    end;
-
-  if piTrialGroup.Checked then
-    begin
-      aRow {increment} := StrToInt(edtTrialGroup.Text);
-      BeginRow := 1;
-      EndRow :=  aRow {increment} + 1;
-      while EndRow <= StringGrid1.RowCount - 1 do
+      if chkDrawTrialGroup.Checked then
         begin
-          RandTrialOrder(BeginRow, EndRow -1);
-          Inc(BeginRow, aRow {increment});
-          Inc(EndRow, aRow {increment});
+          RandomTrialGroup(piTrialsWithConstraints.Checked);
+          Exit;
         end;
-    end;
 
-  if piExpectedResponse.Checked then
-    begin
-      with StringGrid1 do
-        for aRow := 1 to RowCount -1 do
-          Cells[6, aRow] := IntToStr(Round(Random * 1))
-    end;
+      if piTrials.Checked then
+        RandTrialOrder(1, StringGrid1.RowCount -1);
 
-  ResetRepetionMatrix;
-  if FLastFocusedCol <> -1 then CheckRepetitionCol(FLastFocusedCol);
+      if piTrialsWithConstraints.Checked and SaneConstraints then
+        repeat
+          RandTrialOrder(1, StringGrid1.RowCount -1);
+        until RepetitionBlocksMeetsConstraints(1,StringGrid1.RowCount -2);
+
+      if piExpectedResponse.Checked then
+        with StringGrid1 do
+          for LRow := 1 to RowCount -1 do
+            Cells[6, LRow] := IntToStr(Round(Random * 1));
+
+      ResetRepetionMatrix;
+      CheckRepetitionCol(FLastFocusedCol);
+    end
+  else ShowMessage('Escolha o alvo da randomização clicando sobre uma célula de uma coluna.');
 end;
 
 procedure TUserConfig.btnCheckClick(Sender: TObject);
@@ -1235,12 +1291,12 @@ begin
     FEscriba.SaveMemoTextToTxt(SaveDialog1.FileName);
 end;
 
-procedure TUserConfig.cbDrawTrialGroupChange(Sender: TObject);
+procedure TUserConfig.chkDrawTrialGroupChange(Sender: TObject);
 begin
   Invalidate;
 end;
 
-procedure TUserConfig.cbShowRepetitionsChange(Sender: TObject);
+procedure TUserConfig.chkShowRepetitionsChange(Sender: TObject);
 begin
   ResetRepetionMatrix;
 end;
