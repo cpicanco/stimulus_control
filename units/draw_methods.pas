@@ -19,7 +19,7 @@ type
 
   TPoints = array of TPoint;
 
-function IsPointInPolygon(AX, AY: Integer; APolygon: array of TPoint): Boolean;
+function PointInPolygon(AX, AY: Integer; APolygon: array of TPoint): Boolean;
 function GetInnerRect(R : TRect; AWidth, AHeight:integer) : TRect;
 function BresenhamLine(x0, x1, y0, y1 : integer): TPoints;
 procedure CenteredMarker(Canvas: TCanvas; Width, Height, size: integer);
@@ -31,7 +31,7 @@ procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
 
 implementation
 
-function IsPointInPolygon(AX, AY: Integer; APolygon: array of TPoint): Boolean;
+function PointInPolygon(AX, AY: Integer; APolygon: array of TPoint): Boolean;
 //  The function will return True if the point x,y is inside the polygon, or
 //  False if it is not.
 //

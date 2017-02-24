@@ -7,7 +7,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit response_key;  // media_key may be a good name
+unit response_key;  // media_key may be a better name
 
 {$mode objfpc}{$H+}
 
@@ -34,7 +34,7 @@ type
 
   TKey = class(TCustomControl)
   private
-    FAudioChannel : TBassChannel;
+    FAudioPlayer : TBassStream;
     FSchMan: TSchMan;
 
     FBitMap: TBitMap;
@@ -110,7 +110,7 @@ begin
       Stop;
       FreeAndNil(FMedia);
     end;}
-  if Assigned(FAudioChannel) then FAudioChannel.Free;
+  //if Assigned(FAudioPlayer) then FAudioPlayer.Free;
   if Assigned(FBitMap) then FBitMap.Free;
   //if Assigned(FGifImage) then FreeAndNil (FGifImage);
 
@@ -174,15 +174,7 @@ end;
 procedure TKey.Play;
 begin
   if FKind.stmAudio then
-    try
-      FAudioChannel.Play;
-    except
-      on E:Exception do
-         {$IFDEF DEBUG}
-         WriteLn('TKey Could not play audio.')
-         {$ENDIF}
-        ;
-    end;
+    FAudioPlayer.Play;
 end;
 
 procedure TKey.Stop;
@@ -328,17 +320,7 @@ var
   begin
     Result := False;
     s2 := path;
-    try
-      FAudioChannel := TBassChannel.LoadFromFile(s2, FLoopNumber);
-    except
-      on E : Exception do
-        begin
-          {$IFDEF DEBUG}
-          WriteLn('TKey.SetFileName: ' + E.Message);
-          {$ENDIF}
-          Application.Terminate;
-        end;
-    end;
+    FAudioPlayer := TBassStream.Create(s2);
     SetKind (True, TImage.stmNone);
     Result := True;
   end;

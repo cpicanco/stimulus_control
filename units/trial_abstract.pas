@@ -355,9 +355,6 @@ begin
   // image of the mouse cursor
   if TestMode then Cursor:= 0
   else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
-
-  // Initialize randomness generator
-  Randomize;
 end;
 
 procedure TTrial.AddToClockList(AClockStart: TThreadMethod);

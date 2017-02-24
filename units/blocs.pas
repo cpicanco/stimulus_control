@@ -29,6 +29,7 @@ uses Classes, Controls, LCLIntf, LCLType,
         , trial_calibration
         , trial_matching
         , trial_dizzy_timers
+        , trial_move_square
      ;
 
 type
@@ -209,6 +210,7 @@ begin
     begin
 
       case FBlc.Trials[IndTrial].Kind of
+        T_MSQ : FTrial := TMSQ.Create(FBackGround);
         T_DZT : FTrial := TDZT.Create(FBackGround);
         T_CLB : FTrial := TCLB.Create(FBackGround);
         T_FPE : FTrial := TFPE.Create(FBackGround);

@@ -38,15 +38,39 @@ type
       FLoops: integer;
       FSample : HSAMPLE;
     public
-      constructor LoadFromFile(FileName : AnsiString); overload;
-      constructor LoadFromFile(FileName : AnsiString; Loops : integer); overload;
-      destructor Stop;
+      constructor Create(FileName : AnsiString); overload;
+      constructor Create(FileName : AnsiString; Loops : integer); overload;
+      destructor Destroy;
       procedure Play;
       //procedure Pause; virtual; abstract;
       property Loops : integer read FLoops write FLoops;
   end;
 
+  { TBassStream }
+
+  TBassStream = class
+    private
+      FSample : HSAMPLE;
+    public
+      constructor Create(FileName : AnsiString); overload;
+      procedure Play;
+  end;
+
 implementation
+
+{ TBassStream }
+
+constructor TBassStream.Create(FileName: AnsiString);
+begin
+  FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, 0);
+end;
+
+procedure TBassStream.Play;
+begin
+  BASS_ChannelPlay(FSample, FALSE);
+  // while BASS_ChannelIsActive(FSample) = BASS_ACTIVE_PLAYING do Application.ProcessMessages;
+  Free;
+end;
 
 { TBassAudioDevice }
 
@@ -86,23 +110,23 @@ end;
   { TBassChannel }
 
 // on response_key create, if an audio extension was found
-constructor TBassChannel.LoadFromFile(FileName: AnsiString);
-var
-  aLength, aMax, aFlags: DWORD;
-  aOffSet : QWORD;
-begin
+constructor TBassChannel.Create(FileName: AnsiString);
+  var
+    aLength, aMax, aFlags: DWORD;
+    aOffSet : QWORD;
+  begin
 
-  aOffSet := 0;
-  aLength := 0;
-  aMax := 1;
-  aFlags := 0;
+    aOffSet := 0;
+    aLength := 0;
+    aMax := 1;
+    aFlags := 0;
 
-  FSample := BASS_SampleLoad( False, PAnsiChar(FileName), aOffSet, aLength, aMax, aFlags );
-  if FSample <> 0 then
-    FChannel := BASS_SampleGetChannel(FSample, False);
-end;
+    FSample := BASS_SampleLoad( False, PAnsiChar(FileName), aOffSet, aLength, aMax, aFlags );
+    if FSample <> 0 then
+      FChannel := BASS_SampleGetChannel(FSample, False);
+  end;
 
-constructor TBassChannel.LoadFromFile(FileName: AnsiString; Loops: integer);
+constructor TBassChannel.Create(FileName: AnsiString; Loops: integer);
 var
   aLength, aMax, aFlags: DWORD;
   aOffSet : QWORD;
@@ -119,8 +143,9 @@ begin
     FChannel := BASS_SampleGetChannel(FSample, False);
 end;
 
-destructor TBassChannel.Stop;
+destructor TBassChannel.Destroy;
 begin
+  BASS_SampleFree(FSample);
   BASS_ChannelStop(FChannel);
 end;
 
@@ -133,10 +158,9 @@ begin
 
   for i:= 0 to aLoops do
     begin
-      BASS_ChannelPlay (FChannel, True);
-      //while BASS_ChannelIsActive(FChannel) = BASS_ACTIVE_PLAYING do Application.ProcessMessages;
+      BASS_ChannelPlay(FChannel, True);
+      // while BASS_ChannelIsActive(FChannel) = BASS_ACTIVE_PLAYING do Application.ProcessMessages;
     end;
-
 end;
 
 end.
