@@ -60,7 +60,7 @@ begin
       ListBox1.Items.Append('');
       ListBox2.Items.Append('');
     end;
-  WriteLn(GetResolution);
+  //WriteLn(GetResolution);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -86,7 +86,7 @@ begin
       a := tp[i+1].tv_sec + (tp[i+1].tv_nsec * 1e-9);
       b := tp[i].tv_sec + (tp[i].tv_nsec * 1e-9);
       ListBox2.Items[i + 1] := FloatToStrF(a-b, ffFixed, 0, 9);
-      WriteLn(ListBox2.Items[i])
+      //WriteLn(ListBox2.Items[i])
     end;
 end;
 
