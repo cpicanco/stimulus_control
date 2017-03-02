@@ -19,6 +19,7 @@ uses LCLIntf, LCLType, SysUtils, Variants, Classes,
     , Dialogs
     , bass_player
     , schedules_main
+    , config_session_global_container
     ;
 
 type
@@ -51,17 +52,20 @@ type
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
     FOnEndMedia: TNotifyEvent;
+    procedure AutoDestroy(Sender: TObject);
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
     procedure KeyMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-public
+      Shift: TShiftState; X, Y: Integer);
+  public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Paint; override;
     procedure Play;
     procedure Stop;
     procedure FullScreen;
+    procedure Centralize(AControl : TControl = nil);
+    procedure AutoDestroyIn(AInterval : integer);
     property Schedule : TSchMan read FSchMan;
     property Edge : TColor read FEdge write FEdge;
     property EditMode: Boolean read FEditMode write FEditMode;
@@ -90,7 +94,6 @@ begin
   Height:= 45;
   Width:= 45;
   EditMode := False;
-  Color:= clRed;
   Edge:= clInactiveCaption;
   OnMouseDown := @KeyMouseDown;
 
@@ -131,6 +134,35 @@ begin
       FMedia.fullScreen := True;
     end;  }
   Invalidate;
+end;
+
+procedure TKey.Centralize(AControl: TControl);
+var
+  LMonitor : Byte;
+  LWidth,LHeight:integer;
+begin
+  if Assigned(AControl) then
+    begin
+      LWidth :=  AControl.Width;
+      LHeight := AControl.Height;
+    end
+  else
+    begin
+      if Assigned(GGlobalContainer) then
+        LMonitor := GGlobalContainer.MonitorToShow
+      else
+        LMonitor := 0;
+      LWidth :=  Screen.Monitors[LMonitor].Width;
+      LHeight := Screen.Monitors[LMonitor].Height;
+    end;
+  Left := (LWidth  div 2) - (Width  div 2);
+  Top  := (LHeight div 2) - (Height div 2);
+end;
+
+procedure TKey.AutoDestroyIn(AInterval: integer);
+begin
+  FSchMan.Kind := 'FT '+IntToStr(AInterval);
+  FSchMan.OnConsequence:=@AutoDestroy;
 end;
 
 procedure TKey.Paint;
@@ -190,6 +222,8 @@ var
 
   procedure CreateBitmap;
   begin
+    if Assigned(FStimulus) then
+      FStimulus.Free;
     FStimulus := TBitmap.Create;
     FStimulus.Width:=Width;
     FStimulus.Height:=Height;
@@ -342,6 +376,7 @@ var
   //  Result := True;
   //end;
 begin
+  if FFileName = Path then Exit;
   FFileName := '';
   if FileExistsUTF8(Path) then
     begin
@@ -367,7 +402,7 @@ begin
               // the user can place an image file with the same name as the audio file inside rootmedia
               // we load the image here
               s1:= Path;
-              s1 := ExtractFileNameOnly();
+              Delete(s1, pos(Copy(Path,Length(Path)- 3,4),s1), 4);
 
               if FileExists(s1 + '.BMP') then
                 Load_BMP(s1 + '.BMP',True);
@@ -386,6 +421,11 @@ begin
       FFileName := Path;
       Invalidate;
     end;
+end;
+
+procedure TKey.AutoDestroy(Sender: TObject);
+begin
+  Free;
 end;
 
 procedure TKey.KeyMouseDown(Sender: TObject; Button: TMouseButton;

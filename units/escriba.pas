@@ -43,7 +43,7 @@ type
         procedure UpDateMemoPos;
         procedure WriteMain;
         procedure WriteBlc;
-        procedure WriteTrial;
+        procedure WriteTrial(WithDefaultHead:Boolean = True);
         procedure WriteKind (kind : string);
         procedure WriteComp;
         procedure WritePos;
@@ -59,7 +59,7 @@ type
         procedure SetVariables;
         procedure SetMain;
         procedure SetBlc (n : Integer; Write : Boolean);
-        procedure SetTrial (n : integer);
+        procedure SetTrial (n : integer;WithDefaultHead:Boolean=True);
         procedure SetComp (n : Integer);
         procedure SetK(CanWrite : Boolean);
         procedure SetPositions (ArrayofPositions : array of TCoordenates);
@@ -160,7 +160,7 @@ begin
   FMemo := Memo;
 end;
 
-procedure TEscriba.SaveTextToTXT(Name : String);
+procedure TEscriba.SaveTextToTXT(Name: string);
 var a1: integer;s1,s2: string;// Memo : TMemo;
 begin
   ForceDirectoriesUTF8(ExtractFilePath(Name)); { *Converted from ForceDirectories*  }
@@ -258,10 +258,10 @@ begin
   WriteToMemo;
 end;
 
-procedure TEscriba.SetTrial(n: integer);
+procedure TEscriba.SetTrial(n: integer; WithDefaultHead: Boolean);
 begin
   FIndTrial := n;
-  WriteTrial;
+  WriteTrial(WithDefaultHead);
   WriteToMemo;
 end;
 
@@ -357,6 +357,28 @@ end;
 procedure TEscriba.WriteKind(kind: string);
 var i : Integer; NumComp: String;
 begin
+  if kind = T_GNG then
+    begin
+      NumComp:='0';
+      FText.Add(
+                GetBlcTrial(FIndBlc + 1, FIndTrial + 1) + KEnter + KEnter +
+                KName +
+                    FBlcs[FIndBlc].Trials[FIndTrial].Name + KEnter +
+                KKind +
+                    FBlcs[FIndBlc].Trials[FIndTrial].Kind + Kenter +
+                KLimitedHold +
+                    FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_LimitedHold] + KEnter +
+                KSchedule +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Schedule] + KEnter +
+                KConsequence +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Consequence] + KEnter +
+                _Comp +'1'+KStm +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Comp +'1'+_cStm] + KEnter +
+                _Comp +'1'+KBnd +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Comp +'1'+_cBnd] + KEnter
+                );
+
+    end;
 
   if kind = T_FPE then
     begin
@@ -442,7 +464,8 @@ begin
                   FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Samp + _cMsg] + KEnter + KEnter +
                 KNumComp + NumComp + KEnter
                 );
-      for i := 0 to StrToInt (NumComp) - 1 do SetComp (i);
+      if StrToInt(NumComp) > 0 then
+        for i := 0 to StrToInt (NumComp) - 1 do SetComp (i);
       if FWriteK then WriteSupportKeyboard;
     end;
 end;
@@ -502,9 +525,10 @@ begin
             );
 end;
 
-procedure TEscriba.WriteTrial;
+procedure TEscriba.WriteTrial(WithDefaultHead: Boolean);
 begin
-  FText.Add(
+  if WithDefaultHead then
+    FText.Add(
             GetBlcTrial(FIndBlc + 1, FIndTrial + 1) + KEnter + KEnter +
             KName +
               FBlcs[FIndBlc].Trials[FIndTrial].Name + KEnter +

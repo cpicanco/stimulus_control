@@ -1,0 +1,37 @@
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+ServerAddress=	127.0.1.1:5020
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	1000
+NumTrials=	2 1
+
+[Blc 1 - T1]
+
+Name=	Positiva 1
+Kind=	GNG
+LimitedHold=	2000
+Schedule=	CRF
+Consequece=	Positiva
+C1Stm=	A1.bmp
+C1Bnd=	300
+
+[Blc 1 - T2]
+
+Name=	Negativa 2
+Kind=	GNG
+LimitedHold=	2000
+Schedule=	CRF
+Consequece=	Negativa
+C1Stm=	A2.bmp
+C1Bnd=	300
+

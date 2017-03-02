@@ -1,4 +1,4 @@
-object UserConfig: TUserConfig
+object FormUserConfig: TFormUserConfig
   Left = 359
   Height = 508
   Top = 88
@@ -1621,7 +1621,7 @@ object UserConfig: TUserConfig
   OnDestroy = FormDestroy
   ParentBiDiMode = False
   Position = poScreenCenter
-  SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;pgRodar.TabIndex;piAxes.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piMatrix.Checked;piTrialGroup.Checked;piTrials.Checked;seCount.Value;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount'
+  SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;pgRodar.TabIndex;piAxes.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piMatrix.Checked;piTrialGroup.Checked;piTrials.Checked;seCount.Value;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;piTrialsWithConstraints.Checked;piGo_NoGo.Checked'
   LCLVersion = '1.6.2.0'
   object btnRun: TButton
     Left = 8
@@ -3749,6 +3749,13 @@ object UserConfig: TUserConfig
     end
     object piMatrix: TMenuItem
       Caption = 'Matriz'
+      GroupIndex = 1
+      RadioItem = True
+      ShowAlwaysCheckable = True
+      OnClick = piClick
+    end
+    object piGo_NoGo: TMenuItem
+      Caption = 'Go No-Go'
       GroupIndex = 1
       RadioItem = True
       ShowAlwaysCheckable = True

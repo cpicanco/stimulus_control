@@ -53,6 +53,7 @@ const
   _CustomNxtValue = 'CustomNxtValue';
   _Kind = 'Kind';
   _LimitedHold = 'LimitedHold';
+  _Consequence = 'Consequence';
 
   // MRD
   _UseMedia = 'UseMedia';
@@ -151,6 +152,7 @@ const
   KcGap = 'Gap=' + #9;                 //boolean
   KcGap_Degree = 'GapDegree=' + #9;
   KcGap_Length = 'GapLength=' + #9;
+  KConsequence = 'Consequence=' +#9;
 
   KBnd = 'Bnd=' + #9;
   KStm = 'Stm=' + #9;
@@ -172,6 +174,7 @@ const
 
   { Trial Kinds }
 
+  T_GNG = 'GNG';
   T_MSQ = 'MSQ';
   T_DZT = 'DZT';
   T_CLB = 'CLB';
