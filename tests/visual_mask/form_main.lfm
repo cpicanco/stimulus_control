@@ -1,0 +1,11 @@
+object Form1: TForm1
+  Left = 470
+  Height = 240
+  Top = 74
+  Width = 320
+  Caption = 'Form1'
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '1.6.2.0'
+  WindowState = wsFullScreen
+end

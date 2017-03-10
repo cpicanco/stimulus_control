@@ -28,7 +28,12 @@ procedure DrawCustomEllipse(Canvas: TCanvas; AOuterR, AInnerR: TRect; gap: Boole
 procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect; gap: Boolean; gap_degree, gap_length: integer);
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
+
+procedure RandomMask(AMask:TBitmap;AMinIntensity,AMaxIntensity:Byte;
+  AWidth: integer= 50;AHeight:integer= 30);
+
 procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
+
 
 implementation
 
@@ -102,14 +107,15 @@ function BresenhamLine(x0, x1, y0, y1: integer): TPoints;
 var
     dx, dy, sx, sy, err, err2 : integer;
 begin
-   dx := abs(x1-x0);
-   dy := abs(y1-y0);
-   if x0 < x1 then sx := 1 else sx := -1;
-   if y0 < y1 then sy := 1 else sy := -1;
-   err := dx-dy;
+  SetLength(Result,0);
+  dx := abs(x1-x0);
+  dy := abs(y1-y0);
+  if x0 < x1 then sx := 1 else sx := -1;
+  if y0 < y1 then sy := 1 else sy := -1;
+  err := dx-dy;
 
-   while True do
-   begin
+  while True do
+    begin
      //Plot(x0,y0);
      SetLength(Result, Length(Result) + 1);
      Result[High(Result)] := Point(x0, y0);
@@ -117,16 +123,16 @@ begin
 
      err2 := 2*err;
      if err2 > -dy then
-     begin
-       err := err - dy;
-       x0 := x0 + sx;
-     end;
+       begin
+         err := err - dy;
+         x0 := x0 + sx;
+       end;
      if err2 < dx then
-     begin
-       err := err + dx;
-       y0 := y0 + sy;
-     end;
-   end;
+       begin
+         err := err + dx;
+         y0 := y0 + sy;
+       end;
+  end;
 end;
 
 procedure TopBottomLine(Canvas: TCanvas; aControl: TControl);
@@ -148,6 +154,22 @@ begin
         end;
       Line(p1, p2);
     end;
+end;
+
+procedure RandomMask(AMask: TBitmap; AMinIntensity, AMaxIntensity: Byte;
+  AWidth: integer; AHeight: integer);
+var
+  LC: Byte;
+  i, j: Integer;
+begin
+  AMask.Height := AHeight;
+  AMask.Width := AWidth;
+  for i := 0 to AMask.Height do
+    for j := 0 to AMask.Width do
+      begin
+        LC := Random(AMaxIntensity-AMinIntensity+1)+AMinIntensity;
+        AMask.Canvas.Pixels[j,i] := RGBToColor(LC,LC,LC);
+      end;
 end;
 
 procedure CenteredMarker(Canvas: TCanvas; Width, Height, size: integer);
