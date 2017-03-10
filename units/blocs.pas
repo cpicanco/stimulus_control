@@ -341,7 +341,7 @@ var s0, s1, s2, s3, s4 : string;
 
   procedure SetValuesToStrings (var as1, as2, as3, as4 : string);
   var
-      Values : string;
+    Values : string;
   begin
     Values := '';
     if FTrial.IETConsequence = T_HIT then
