@@ -25,6 +25,7 @@ function BresenhamLine(x0, x1, y0, y1 : integer): TPoints;
 procedure CenteredMarker(Canvas: TCanvas; Width, Height, size: integer);
 procedure DrawCenteredCircle (Canvas : TCanvas; Width, Height, Size : integer);
 procedure DrawCustomEllipse(Canvas: TCanvas; AOuterR, AInnerR: TRect; gap: Boolean; gap_degree, gap_length: integer);
+procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect; gap: Boolean; gap_degree, gap_length: integer);
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
 procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
@@ -225,6 +226,24 @@ begin
     end;
 end;
 
+procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect; gap: Boolean;
+  gap_degree, gap_length: integer);
+begin
+  with Canvas do
+    begin
+      Pen.Width := 5;
+      Pen.Color:= clMoneyGreen;
+      Pen.Mode := pmCopy;
+      Brush.Style := bsClear;
+      Ellipse(AR);
+      if gap then
+        begin
+          Pen.Mode := pmWhite;
+          Arc(AR.Left,AR.Top,AR.Right-1,AR.Bottom-1, gap_degree, gap_length);
+        end;
+      Pen.Width := 1;
+    end;
+end;
 
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 var plusX : integer;

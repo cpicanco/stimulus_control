@@ -311,10 +311,23 @@ const
 
 begin
   i := FIndComp + 1;
-  aComp := GetComparison (i);
+  aComp := GetComparison(i);
 
   case GetTrialType(FBlcs[FIndBlc].Trials[FIndTrial].Kind) of
-    MirroredStimuli..FeaturePositive:
+
+    FeaturePositive:
+                      FText.Add(
+                        aComp + KBnd +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cBnd] + KEnter +
+                        aComp + KcGap +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cGap] + KEnter +
+                        aComp + KcGap_Degree +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cGap_Degree] + KEnter +
+                        aComp + KcGap_Length +
+                          FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cGap_Length] + KEnter
+                        );
+
+    MirroredStimuli:
                       FText.Add(
                         aComp + KBnd +
                           FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[aComp + _cBnd] + KEnter +
@@ -385,22 +398,18 @@ begin
       NumComp := IntToStr(FBlcs[FIndBlc].Trials[FIndTrial].NumComp);
       FText.Add(
                 KNumComp + NumComp + KEnter +
-                KUseMedia +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_UseMedia] + KEnter +
                 KShowStarter +
                   FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_ShowStarter] + KEnter +
                 KLimitedHold +
-                    FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_LimitedHold] + KEnter +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_LimitedHold] + KEnter +
                 KSchedule +
                   FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Schedule] + KEnter +
-                KExpectedResponse +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_ExpectedResponse] + KEnter +
-                _Trial + KIET +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Trial + _cIET] + KEnter +
+                KContingency +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_Contingency] + KEnter +
                 KNextTrial +
                   FBlcs[FIndBlc].Trials[FIndTrial].SList.Values[_NextTrial] + KEnter
                 );
-      for i := 0 to StrToInt (NumComp) - 1 do SetComp (i);
+      for i := 0 to StrToInt(NumComp) - 1 do SetComp(i);
     end;
 
   if kind = T_MRD then

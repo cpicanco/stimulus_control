@@ -66,7 +66,7 @@ type
     piFillEven: TMenuItem;
     piFillOdd: TMenuItem;
     piFillAll: TMenuItem;
-    piMatrix: TMenuItem;
+    piFPE: TMenuItem;
     piAxes: TMenuItem;
     OpenDialog1: TOpenDialog;
     piTrials: TMenuItem;
@@ -161,14 +161,12 @@ resourcestring
   rsNegative = 'Negativa';
   rsStimulus = 'Figura';
   rsLimitedHold = 'Tempo/Estímulo';
-  rsDefaultPositiveCsq = 'NONE,MISS,HIT,';
-  rsDefaultNegativeCsq = 'NONE,HIT,MISS,';
   rsSize = 'Tamanho';
   rsDefBlc = 'Bloco 1';
   rsEndSession = 'Fim.';
   rsSchedule = 'Esquema';
   rsFillTypeAxes = 'Eixos';
-  rsFillTypeMatriz = 'Matriz';
+  rsFillTypeMatriz = 'FP/FN';
   rsFillTypeGoNoGo = 'Go/No-Go';
   rsRandomizeTrials = 'Randomizar ordem das tentativas';
   rsRandomizeResponses = 'Randomizar respostas';
@@ -179,10 +177,10 @@ implementation
 
 {$R *.lfm}
 
-uses background
+uses background, strutils
      , config_session_global_container
      , userconfigs_trial_mirrored
-     , userconfigs_simple_discrimination_matrix
+     , userconfigs_feature_positive
      , userconfigs_go_nogo
      , ini_helpers
      {$ifdef DEBUG}
@@ -210,10 +208,9 @@ end;
 
 procedure TFormUserConfig.piClick(Sender: TObject);
 begin
-  StringGrid1.Clean;
-
   if (TMenuItem(Sender) = piAxes) and (btnGridType.Caption <> rsFillTypeAxes) then
     begin
+      StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeAxes;
 
       StringGrid1.ColCount := 9;
@@ -234,18 +231,17 @@ begin
       ResetRepetionMatrix;
     end;
 
-  if (TMenuItem(Sender) = piMatrix) and (btnGridType.Caption <> rsFillTypeMatriz) then
+  if (TMenuItem(Sender) = piFPE) and (btnGridType.Caption <> rsFillTypeMatriz) then
     begin
+      StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeMatriz;
 
-      StringGrid1.ColCount := 4;
+      StringGrid1.ColCount := 2;
       StringGrid1.RowCount := 2;
       with StringGrid1 do
         begin
           Cells[0, 0] := rsTrials;
-          Cells[1, 0] := rsSchedule;
-          Cells[2, 0] := rsContingency;
-          Cells[3, 0] := rsConsequence;
+          Cells[1, 0] := rsContingency;
         end;
 
       ResetRepetionMatrix;
@@ -253,6 +249,7 @@ begin
 
   if (TMenuItem(Sender) = piGo_NoGo) and (btnGridType.Caption <> rsFillTypeGoNoGo) then
     begin
+      StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeGoNoGo;
 
       StringGrid1.ColCount := 6;
@@ -848,7 +845,6 @@ end;
 procedure TFormUserConfig.btnTrialsDoneClick(Sender: TObject);
 var
   aTrial, aStm, aBlc, aNumTrials : integer;
-  aHStm : integer;
   aValues : string;
   T : TCfgTrial;
   B : TCfgBlc;
@@ -962,13 +958,13 @@ begin
         end;
     end;
 
-  if piMatrix.Checked then
+  if piFPE.Checked then
     begin
       aBlc := 0;
 
       FEscriba.SessionName := leSessionName.Text;
       FEscriba.SessionSubject := leParticipant.Text;
-      FEscriba.Blcs[aBlc].ITI := 1000;
+      FEscriba.Blcs[aBlc].ITI := 2300;
       FEscriba.SessionType  := 'CIC';
       FEscriba.Data := 'Data';
       FEscriba.Media:= 'Media';
@@ -996,30 +992,24 @@ begin
               Id := aTrial + 1;
               Kind := T_FPE;
               NumComp := GetNumComp;
-              Name := StringGrid1.Cells[2, aTrial + 1] + #32 + IntToStr(Id);
+              Name := StringGrid1.Cells[1, aTrial + 1] + #32 + IntToStr(Id);
 
               SList.BeginUpdate;
               SList.Values[_BkGnd] := IntToStr(clWhite);
               SList.Values[_Cursor] := IntToStr(crNone);
-              // SList.Values[_UseMedia] := BoolToStr(False, '1','0');
-              SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
-              SList.Values[_LimitedHold] := '2500';
-              SList.Values[_Schedule] := StringGrid1.Cells[1, aTrial + 1];
-              SList.Values[_ExpectedResponse] := StringGrid1.Cells[2, aTrial + 1];
-              SList.Values[_Trial + _cIET] := StringGrid1.Cells[3, aTrial + 1];   // configure the IETConsenquence
+              SList.Values[_ShowStarter] := BoolToStr(False, '1','0');
+              SList.Values[_LimitedHold] := '1700';
+              SList.Values[_Schedule] := 'CRF';
+              SList.Values[_Contingency] := StringGrid1.Cells[1, aTrial + 1];
               SList.Values[_NextTrial] := '0';
 
-              aHStm := GetNumComp;
-              for aStm := 0 to aHStm do
+              for aStm := 1 to NumComp do
                 begin
-                  SList.Values[_Comp + IntToStr(aStm) + _cBnd] := StringGrid1.Cells[aStm + 4 + (aHStm -1), aTrial + 1];
-                  aValues :=  StringGrid1.Cells[aStm + 3, aTrial + 1] + #32;
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap] := Copy( aValues, 0, pos( #32, aValues ) - 1);
-                  NextValue(aValues);
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := Copy( aValues, 0, pos( #32, aValues ) - 1);
-                  NextValue(aValues);
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := Copy( aValues, 0, pos( #32, aValues ) - 1);
-
+                  SList.Values[_Comp + IntToStr(aStm) + _cBnd] := StringGrid1.Cells[aStm + 1 + NumComp, aTrial + 1];
+                  aValues :=  StringGrid1.Cells[aStm + 1, aTrial + 1] + #32;
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap] := ExtractDelimited(1,aValues,[#32]);
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := ExtractDelimited(2,aValues,[#32]);
+                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := ExtractDelimited(3,aValues,[#32]);
                 end;
               SList.EndUpdate;
             end;
@@ -1142,50 +1132,43 @@ var
   procedure AddMatrixTrialToGrid;
   var
     aComp, LowComp, HighComp : integer;
-    aContingency, aConsequence, aPosition : string;
+    aContingency, aPosition : string;
 
   begin
-    if FrmMatrix.Trials[aTrial].Positive then
-      begin
-        aContingency := rsPositive;
-        aConsequence := rsDefaultPositiveCsq;
-      end
+    if FormFPE.Trials[aTrial].Positive then
+      aContingency := rsPositive
     else
-      begin
-        aContingency := rsNegative;
-        aConsequence := rsDefaultNegativeCsq;
-      end;
+      aContingency := rsNegative;
+
 
     with StringGrid1 do
       begin
         if (aRow + 1) > RowCount then RowCount := aRow + 1;
         Cells[0, aRow] := IntToStr(aRow);    //Trial Number
-        Cells[1, aRow] := 'FR 3 0';
-        Cells[2, aRow] := aContingency;
-        Cells[3, aRow] := aConsequence;
-        aCol := 4;
+        Cells[1, aRow] := aContingency;
+        aCol := 2;
 
-        LowComp := Low(FrmMatrix.Trials[aTrial].Comps);
-        HighComp := High(FrmMatrix.Trials[aTrial].Comps);
+        LowComp := Low(FormFPE.Trials[aTrial].Comps);
+        HighComp := High(FormFPE.Trials[aTrial].Comps);
         //ShowMessage(IntToStr(LowComp) + ' ' + IntToStr(HighComp));
         for aComp := LowComp to HighComp do
           begin
             if (aCol + 1) > ColCount then ColCount := aCol + 1;
             Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1);
-            Cells[aCol, aRow] := FrmMatrix.Trials[aTrial].Comps[aComp].Path;
+            Cells[aCol, aRow] := FormFPE.Trials[aTrial].Comps[aComp].Path;
             Inc(aCol);
           end;
 
-        LowComp := Low(FrmMatrix.Trials[aTrial].Comps);
-        HighComp := High(FrmMatrix.Trials[aTrial].Comps);
+        LowComp := Low(FormFPE.Trials[aTrial].Comps);
+        HighComp := High(FormFPE.Trials[aTrial].Comps);
         for aComp := LowComp to HighComp do
           begin
             if (aCol + 1) > ColCount then ColCount := aCol + 1;
             Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1) + rsPosition;
-            aPosition := IntToStr(FrmMatrix.Trials[aTrial].Comps[aComp].Top) + #32 +
-                         IntToStr(FrmMatrix.Trials[aTrial].Comps[aComp].Left) + #32 +
-                         IntToStr(FrmMatrix.Trials[aTrial].Comps[aComp].Width) + #32 +
-                         IntToStr(FrmMatrix.Trials[aTrial].Comps[aComp].Height);
+            aPosition := IntToStr(FormFPE.Trials[aTrial].Comps[aComp].Top) + #32 +
+                         IntToStr(FormFPE.Trials[aTrial].Comps[aComp].Left) + #32 +
+                         IntToStr(FormFPE.Trials[aTrial].Comps[aComp].Width) + #32 +
+                         IntToStr(FormFPE.Trials[aTrial].Comps[aComp].Height);
 
             Cells[aCol, aRow] := aPosition;
             Inc(aCol);
@@ -1275,29 +1258,29 @@ begin
     ______________________________
 
   }
-  if piMatrix.Checked then
+  if piFPE.Checked then
     begin
       aRow := 1;
       aCol := 0;
-      FrmMatrix := TMatrixForm.Create(Application);
+      FormFPE := TFormFPE.Create(Application);
       if chkPlayOnSecondMonitor.Checked then
-        FrmMatrix.MonitorToShow := 1
+        FormFPE.MonitorToShow := 1
       else
-        FrmMatrix.MonitorToShow := 0;
+        FormFPE.MonitorToShow := 0;
 
-      if FrmMatrix.ShowModal = mrOk then
+      if FormFPE.ShowModal = mrOk then
         begin
-          for aTrial := Low(FrmMatrix.Trials) to High(FrmMatrix.Trials) do AddMatrixTrialToGrid;
+          for aTrial := Low(FormFPE.Trials) to High(FormFPE.Trials) do AddMatrixTrialToGrid;
 
           //FNumTrials := aRow - 1;
           {$ifdef DEBUG}
-            DebugLn(mt_Information + FrmMatrix.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
+            DebugLn(mt_Information + FormFPE.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
           {$endif}
-          FrmMatrix.Free;
+          FormFPE.Free;
           ResetRepetionMatrix;
           FLastFocusedCol := -1;
         end
-      else FrmMatrix.Free;
+      else FormFPE.Free;
     end;
 
   if piGo_NoGo.Checked then
@@ -1389,7 +1372,7 @@ begin
       if chkPlayOnSecondMonitor.Checked then
          FrmBackground.Left := Screen.Width + 1;
 
-      FSession := TSession.Create(nil);
+      FSession := TSession.Create(FrmBackground);
       FConfigs := TCfgSes.Create(FSession);
       if chkPlayOnSecondMonitor.Checked then
         FConfigs.GlobalContainer.MonitorToShow := 1

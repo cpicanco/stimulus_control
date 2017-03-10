@@ -82,6 +82,10 @@ const
   _ShowDots = 'ShowDots';
   _Blocking = 'Blocking';
 
+  // FPE
+  _DrawingType = 'DrawingType';
+  _Contingency = 'Contingency';
+
   // SIMPLE
   _NumComp = 'NumComp';   // number of stimuli on screen / comparisons
   _cBnd = 'Bnd';          // top left width height
@@ -143,6 +147,7 @@ const
   KPrompt = 'Prompt=' + #9;
 
   KUseMedia = 'UseMedia=' + #9;  //boolean
+  KContingency = 'Contingency=' + #9;
   KShowStarter = 'Starter=' + #9; //boolean
   KAngle = 'Angle=' + #9;
   KExpectedResponse = 'Response=' + #9;
