@@ -5,5 +5,7 @@ object Background: TBackground
   Top = 203
   Width = 320
   Caption = 'Background'
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   LCLVersion = '1.6.2.0'
 end
