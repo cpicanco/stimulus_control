@@ -13,7 +13,7 @@ unit draw_methods; //helpers
 
 interface
 
-uses Graphics, SysUtils, Classes, Controls;
+uses Graphics, SysUtils, Classes, Controls, math;
 
 type
 
@@ -28,11 +28,10 @@ procedure DrawCustomEllipse(Canvas: TCanvas; AOuterR, AInnerR: TRect; gap: Boole
 procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect; gap: Boolean; gap_degree, gap_length: integer);
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
+procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
 
 procedure RandomMask(AMask:TBitmap;AMinIntensity,AMaxIntensity:Byte;
   AWidth: integer= 50;AHeight:integer= 30);
-
-procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
 
 
 implementation
@@ -167,8 +166,9 @@ begin
   for i := 0 to AMask.Height do
     for j := 0 to AMask.Width do
       begin
-        LC := Random(AMaxIntensity-AMinIntensity+1)+AMinIntensity;
-        AMask.Canvas.Pixels[j,i] := RGBToColor(LC,LC,LC);
+        //LC := Random(AMaxIntensity-AMinIntensity+1)+AMinIntensity;
+        LC := RandomRange(10,20);
+        AMask.Canvas.Pixels[j,i] := RGBToColor(192+LC,220+LC,192+LC);
       end;
 end;
 
@@ -208,6 +208,7 @@ begin
   with Canvas do
     begin
       Pen.Width := 2;
+      Pen.EndCap:=pecFlat;
       Pen.Mode := pmBlack;
       Ellipse(AOuterR);
 
@@ -224,6 +225,25 @@ begin
 
       Pen.Width := 1;
       Pen.Mode := pmCopy;
+    end;
+end;
+
+procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect; gap: Boolean;
+  gap_degree, gap_length: integer);
+begin
+  with Canvas do
+    begin
+      Pen.Width := 8;
+      Pen.EndCap:=pecFlat;
+      Pen.Color:= clMoneyGreen;
+      Pen.Mode := pmCopy;
+      Brush.Style := bsClear;
+      Brush.Color:=clWhite;
+      //Ellipse(AR);
+      if gap then
+        Arc(AR.Left,AR.Top,AR.Right,AR.Bottom, gap_degree*16, (360-gap_length)*28)
+      else
+        Arc(AR.Left,AR.Top,AR.Right,AR.Bottom, 0, 360*16);
     end;
 end;
 
@@ -244,25 +264,6 @@ begin
 
       Brush.Style:= bsSolid;
       Pen.Mode := pmCopy;
-      Pen.Width := 1;
-    end;
-end;
-
-procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect; gap: Boolean;
-  gap_degree, gap_length: integer);
-begin
-  with Canvas do
-    begin
-      Pen.Width := 5;
-      Pen.Color:= clMoneyGreen;
-      Pen.Mode := pmCopy;
-      Brush.Style := bsClear;
-      Ellipse(AR);
-      if gap then
-        begin
-          Pen.Mode := pmWhite;
-          Arc(AR.Left,AR.Top,AR.Right-1,AR.Bottom-1, gap_degree, gap_length);
-        end;
       Pen.Width := 1;
     end;
 end;
