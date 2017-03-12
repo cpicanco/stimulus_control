@@ -162,6 +162,7 @@ begin
     begin
       OldCanvas := TCanvas.Create;
       SaveOldCanvas;
+
       try
         //DrawCircle(Canvas, 300, 300, 100, True, 50, 5 );
         if RadioGroupGrids.ItemIndex <> -1 then
@@ -250,20 +251,22 @@ var
   LP : TPoint;
   LR : TRect;
   LW, LH,
-  LSLeft, LSTop, LSCount, i, LSSize: Integer;
+  LSLeft, LSTop, LSCount, i, LSSize, LBorderSize: Integer;
 begin
-  LSSize := 150;
+  LBorderSize := 50;
+  LSSize := 100;
   LW := Screen.Monitors[AMonitor].Width;
   LH := Screen.Monitors[AMonitor].Height;
-  LR := GetCentralRect(LW,LH,LSSize div 2);
+  LR := GetCentralRect(LW,LH,(LSSize+LBorderSize) div 2);
+  //LR := GetCentralRect(LW,LH,LSSize);
 
   LSCount := 9;
   SetLength(Result,LSCount);
   for i := 0 to LSCount -1 do
     begin
       LP := GetPointFromAngle(i*(360/LSCount),LR);
-      LSLeft:= LP.X-(LSSize div 2);
-      LSTop := LP.Y-(LSSize div 2);
+      LSLeft:= LP.X-LSSize+LBorderSize;
+      LSTop := LP.Y-LSSize+LBorderSize;
       Result[i].Left := LSLeft;
       Result[i].Top := LSTop;
       Result[i].Width := LSSize;
