@@ -13,7 +13,7 @@ unit trial_feature_positive;
 
 interface
 
-uses LCLIntf, LCLType, Controls, Classes, SysUtils
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls, Graphics
 
     //, counter
     , dialogs
@@ -71,7 +71,7 @@ type
     //FFirstResp : Boolean;
     FNumComp : integer;
     FSchedule : TSchMan;
-    FUseMedia : Boolean;
+    FForeground : TBitmap;
     procedure TrialPaint;
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
@@ -81,17 +81,16 @@ type
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected { TTrial }
     procedure WriteData(Sender: TObject); override;
-    procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
-
   end;
 
 implementation
 
-uses constants, timestamps;
+uses background, strutils, constants, timestamps;
 
 { TFPE }
 
@@ -103,7 +102,6 @@ begin
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
   OnTrialPaint := @TrialPaint;
-
   Header :=  Header +
              'StmBegin' + #9 +
              '_Latency' + #9 +
@@ -112,7 +110,14 @@ begin
              'ExpcResp' + #9 +
              '__Result';
 
+  FForeGround := TBitmap.Create;
   FDataSupport.Responses:= 0;
+end;
+
+destructor TFPE.Destroy;
+begin
+  FForeGround.Free;
+  inherited Destroy;
 end;
 
 procedure TFPE.TrialResult(Sender: TObject);
@@ -191,47 +196,17 @@ end;
 
 
 procedure TFPE.TrialPaint;
-var i : integer;
 begin
-  for i := Low(FCurrTrial.C) to High(FCurrTrial.C) do
-    with FCurrTrial.C[i] do
-      case FFPEDrawingType of
-        fpeClearCircles:
-          DrawCustomEllipse(Canvas, OuterRect, gap, gap_degree, gap_length);
-        fpeFullOuterInnerCircles:
-          DrawCustomEllipse(Canvas, OuterRect, InnerRect, gap, gap_degree, gap_length);
-      end;
+  Canvas.Draw(0,0,FForeground);
 end;
 
 procedure TFPE.Play(ACorrection: Boolean);
 var
   s1: string;
-  LOuterR : TRect;
-  a1, LWidth, LHeight : Integer;
-
-  procedure NextCommaDelimitedParameter;
-  begin
-    Delete(s1, 1, pos(#44, s1));
-    if Length(s1) > 0 then while s1[1] = #44 do Delete(s1, 1, 1);
-  end;
-
-  {
-  procedure KeyConfig(var aKey : TKey);
-  begin
-    with aKey do
-      begin
-        BoundsRect := R;
-        //Color := StrToIntDef(sColor, $0000FF ); //clRed
-        //HowManyLoops:= StrToIntDef(sLoop, 0);
-        //FullPath:= sName;
-        Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
-        //Visible := False;
-      end;
-  end;
-}
+  LOuterR , LR: TRect;
+  i, LWidth, LHeight : Integer;
 begin
   inherited Play(ACorrection);
-
   FFPEDrawingType := TFPEDrawingType(StrToIntDef(CfgTrial.SList.Values[_DrawingType], 0));
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
   SetLength(FCurrTrial.C, FNumComp);
@@ -283,34 +258,56 @@ begin
 
   FCurrTrial.Result := T_NONE;
 
-  for a1 := 0 to FNumComp -1 do
+  for i := 0 to FNumComp -1 do
     begin
-        s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd];
-
-        LOuterR.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        LOuterR.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        LWidth := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 100);
+        s1:= CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd];
+        LOuterR.Top:= StrToInt(ExtractDelimited(1,s1,[#32]));
+        LOuterR.Left:= StrToInt(ExtractDelimited(2,s1,[#32]));
+        LWidth := StrToInt(ExtractDelimited(3,s1,[#32]));
         LOuterR.Right := LOuterR.Left + LWidth;
-        NextSpaceDelimitedParameter(s1);
-
-        LHeight := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), LWidth);
+        LHeight := StrToInt(ExtractDelimited(4,s1,[#32]));
         LOuterR.Bottom := LOuterR.Top + LHeight;
 
-        with FCurrTrial.C[a1] do
+        with FCurrTrial.C[i] do
           begin
             OuterRect := LOuterR;
             case FFPEDrawingType of
               fpeClearCircles: {do nothing};
               fpeFullOuterInnerCircles:InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
             end;
-            gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
-            gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Degree], 1+Random(360));
-            gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Length], 5 );
+            gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(i+1) + _cGap], False );
+            gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], 1+Random(360));
+            gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 );
           end;
+      end;
+
+  if not FrmBackground.DrawMask then
+    FrmBackground.DrawMask:=True;
+  FrmBackground.UpdateMask;
+
+  FForeground := TBitmap.Create;
+  FForeground.Width:= Width;
+  FForeground.Height:= Height;
+  FForeground.TransparentColor:=clFuchsia;
+  FForeground.Transparent:=True;
+  LR := Rect(0,0,Width, Height);
+  with FForeground.Canvas do
+    begin
+      // Transparent part of foreground
+      Pen.Color:=clFuchsia;
+      Brush.Style:=bsSolid;
+      Brush.Color:=clFuchsia;
+      Rectangle(LR);
+    end;
+
+  // FForeground do not change, we need to draw only once
+  for i := Low(FCurrTrial.C) to High(FCurrTrial.C) do
+    with FCurrTrial.C[i] do
+      case FFPEDrawingType of
+        fpeClearCircles:
+          DrawCustomEllipse(FForeground.Canvas, OuterRect, gap, gap_degree, gap_length);
+        fpeFullOuterInnerCircles:
+          DrawCustomEllipse(FForeground.Canvas, OuterRect, InnerRect, gap, gap_degree, gap_length);
       end;
 
   if Self.ClassType = TFPE then Config(Self);
@@ -318,13 +315,6 @@ end;
 
 procedure TFPE.TrialStart(Sender: TObject);
 begin
-  {
-  if FUseMedia then
-    begin
-      // not implemented yet
-    end;
-  }
-
   FConsequenceFired := False;
   FDataSupport.Latency := TimeStart;
   FDataSupport.StmBegin := TickCount;
@@ -348,11 +338,6 @@ begin
            FCurrTrial.Result;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
-end;
-
-procedure TFPE.Paint;
-begin
-  inherited Paint;
 end;
 
 procedure TFPE.Response(Sender: TObject);

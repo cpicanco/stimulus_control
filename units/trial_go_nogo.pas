@@ -275,7 +275,7 @@ begin
       FullPath:= LName;
       //Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
       Visible := False;
-      Parent := Self;
+      Parent := TCustomControl(Parent);
     end;
 
   FSchedule := TSchMan.Create(Self);

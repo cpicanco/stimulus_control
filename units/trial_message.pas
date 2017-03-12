@@ -78,7 +78,7 @@ begin
     WordWrap := True;
     Font.Name := 'TimesNewRoman';
     OnMouseUp := @MessageMouseUp;
-    Parent := Self;
+    Parent := TCustomControl(AOwner);
   end;
 
   FMessagePrompt := TLabel.Create(Self);
@@ -89,7 +89,7 @@ begin
     Font.Name := 'TimesNewRoman';
     Font.Size := 14;
     OnMouseUp := @MessageMouseUp;
-    Parent := Self;
+    Parent := TCustomControl(AOwner);
   end;
 
   Header := Header +

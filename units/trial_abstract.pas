@@ -29,7 +29,7 @@ type
 
   { TTrial }
 
-  TTrial = class(TCustomControl)
+  TTrial = class(TGraphicControl)
   private
     FGlobalContainer: TGlobalContainer;
     FCfgTrial: TCfgTrial;
@@ -51,7 +51,6 @@ type
 
   { events }
 
-
     FOnBeginCorrection: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
@@ -67,6 +66,8 @@ type
     FOnTrialPaint: TPaintEvent;
     FOnTrialStart: TNotifyEvent;
     FOnTrialWriteData: TNotifyEvent;
+    FOldKeyUp : TKeyEvent;
+    FOldKeyDown: TKeyEvent;
     function GetRootMedia: string;
     function GetTestMode: Boolean;
     function GetTimeStart: Extended;
@@ -288,9 +289,18 @@ end;
 constructor TTrial.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnKeyUp := @TrialKeyUp;
-  OnKeyDown := @TrialKeyDown;
-
+  if AOwner is TCustomControl then
+    begin
+    with TCustomControl(AOwner) do
+      begin
+        FOldKeyUp := OnKeyUp;
+        FOldKeyDown := OnKeyDown;
+        OnKeyUp := @TrialKeyUp;
+        OnKeyDown := @TrialKeyDown;
+      end;
+    end
+  else
+    raise Exception.Create('AOwner of TTrial must be a TCustomControl');
   //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
   FLimitedHold := 0;
   FClock := TTimer.Create(Self);
@@ -318,6 +328,12 @@ begin
   //    FClock.Terminate;
   //    FClock := nil;
   //  end;
+  if Parent is TCustomControl then
+    with TCustomControl(Parent) do
+      begin
+        OnKeyDown := FOldKeyDown;
+        OnKeyUp := FOldKeyUp;
+      end;
   inherited Destroy;
 end;
 

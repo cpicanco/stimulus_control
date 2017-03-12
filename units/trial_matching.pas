@@ -51,10 +51,10 @@ type
     procedure SampleConsequence(Sender: TObject);
     procedure SampleResponse(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
-    procedure TrialStart(Sender: TObject);
     procedure VisibleSample(AValue: Boolean);
   protected
     // TTrial
+    procedure TrialStart(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -89,7 +89,7 @@ begin
   with FSample do begin
     Key:= TKey.Create(Self);
     Key.Cursor:= Self.Cursor;
-    Key.Parent:= Self;
+    Key.Parent:= TCustomControl(Parent);
     Key.OnConsequence:= @SampleConsequence;
     Key.OnResponse:= @SampleResponse;
 

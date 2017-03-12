@@ -23,7 +23,6 @@ uses LCLIntf, LCLType, SysUtils, Variants, Classes,
     ;
 
 type
-
   TImage = (stmNone, stmPicture, stmAnimation, stmVideo);
 
   TKind = record
@@ -33,7 +32,7 @@ type
 
   { TKey }
 
-  TKey = class(TCustomControl)
+  TKey = class(TGraphicControl)
   private
     FAudioPlayer : TBassStream;
     FSchMan: TSchMan;

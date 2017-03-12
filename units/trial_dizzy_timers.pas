@@ -152,7 +152,7 @@ begin
   LConsequence := TKey.Create(Self);
   with LConsequence do
     begin
-      Parent:= Self;
+      Parent:= TCustomControl(Parent);
       Loops := 0;
       FullPath := RootMedia + FConsequence;
       Play;

@@ -242,7 +242,7 @@ begin
           FTrial.Visible := False;
           FTrial.Play(FIsCorrection);
           FTrial.Visible := True;
-          FTrial.SetFocus;
+          //todo: FTrial.SetFocus;
         end else
           EndBlc(Self);
 

@@ -118,14 +118,14 @@ begin
   for I := 0 to FNumComp-1 do
     with FComparisons[I] do
       begin
-        Key := TKey.Create(Self);
+        Key := TKey.Create(Parent);
         Key.Tag := I;
         Key.Cursor := Self.Cursor;
         Key.OnConsequence := @Consequence;
         Key.OnResponse := @Response;
         Key.Schedule.Kind := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cSch];
         AddToClockList(Key.Schedule);
-        Key.Parent := Self;
+        Key.Parent := TCustomControl(Parent);
 
         s1 := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cBnd] + #32;
         R.Top := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
