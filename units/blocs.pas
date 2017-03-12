@@ -46,9 +46,6 @@ type
   private
     function GetTimeStart: Extended;
   private
-    //FOnBeginTrial: TNotifyEvent;
-    //FClientThread : TZMQThread;
-
     FNextBlc: String;
     FSaveData: TDataProcedure;
     FSaveTData: TDataProcedure;
@@ -240,7 +237,6 @@ begin
           FTrial.OnHit := @Hit;
           FTrial.OnMiss := @Miss;
           FTrial.OnNone := @None;
-
           FTrial.Parent := FBackGround;
           // dependencies above
           FTrial.Visible := False;
@@ -374,7 +370,6 @@ var s0, s1, s2, s3, s4 : string;
     as4:= Copy(s0, 0, pos(#32, s0)-1);
   end;
 begin
-
   s1 := '';
   s2 := '';
   s3 := '';
@@ -485,9 +480,7 @@ begin
 
   HasTimeOut := FTrial.TimeOut > 0;
   if HasTimeOut then
-    begin
-      if FBackGround is TForm then TForm(FBackGround).Color:= 0;
-    end
+    FBackGround.Color:= 0
   else FTrial.TimeOut := -1;
 
   if FTestMode then
@@ -615,7 +608,7 @@ begin
       {$endif}
       FTimerTO.Enabled := False;
 
-      if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
+      FBackGround.Color:= FBlc.BkGnd;
 
       if (FTimerITI.Interval > 0) then
         begin
