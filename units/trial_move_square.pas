@@ -47,6 +47,7 @@ type
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -182,6 +183,16 @@ begin
 
   Header := 'StmBegin' + #9 +
             '__StmEnd' + #9 ;
+end;
+
+destructor TMSQ.Destroy;
+begin
+  if GlobalContainer.PupilEnabled then
+    begin
+      GlobalContainer.PupilClient.UnSubscribe('surface');
+      GlobalContainer.PupilClient.OnMultiPartMessageReceived := nil;
+    end;
+  inherited Destroy;
 end;
 
 procedure TMSQ.Play(ACorrection: Boolean);
