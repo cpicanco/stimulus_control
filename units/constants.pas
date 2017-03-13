@@ -53,6 +53,7 @@ const
   _CustomNxtValue = 'CustomNxtValue';
   _Kind = 'Kind';
   _LimitedHold = 'LimitedHold';
+  _Consequence = 'Consequence';
 
   // MRD
   _UseMedia = 'UseMedia';
@@ -80,6 +81,10 @@ const
   // TCLB
   _ShowDots = 'ShowDots';
   _Blocking = 'Blocking';
+
+  // FPE
+  _DrawingType = 'DrawingType';
+  _Contingency = 'Contingency';
 
   // SIMPLE
   _NumComp = 'NumComp';   // number of stimuli on screen / comparisons
@@ -142,6 +147,7 @@ const
   KPrompt = 'Prompt=' + #9;
 
   KUseMedia = 'UseMedia=' + #9;  //boolean
+  KContingency = 'Contingency=' + #9;
   KShowStarter = 'Starter=' + #9; //boolean
   KAngle = 'Angle=' + #9;
   KExpectedResponse = 'Response=' + #9;
@@ -151,6 +157,7 @@ const
   KcGap = 'Gap=' + #9;                 //boolean
   KcGap_Degree = 'GapDegree=' + #9;
   KcGap_Length = 'GapLength=' + #9;
+  KConsequence = 'Consequence=' +#9;
 
   KBnd = 'Bnd=' + #9;
   KStm = 'Stm=' + #9;
@@ -172,6 +179,7 @@ const
 
   { Trial Kinds }
 
+  T_GNG = 'GNG';
   T_MSQ = 'MSQ';
   T_DZT = 'DZT';
   T_CLB = 'CLB';

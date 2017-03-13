@@ -13,7 +13,7 @@ unit trial_feature_positive;
 
 interface
 
-uses LCLIntf, LCLType, Controls, Classes, SysUtils
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls, Graphics
 
     //, counter
     , dialogs
@@ -32,6 +32,8 @@ type
 
   { TDataSupport }
 
+  TFPEDrawingType = (fpeClearCircles, fpeFullOuterInnerCircles);
+
   TDataSupport = record
     Responses : integer;
     Latency,
@@ -46,7 +48,7 @@ type
 
     {
       CSQMISS occurs at the trial ending, after the trial is destroyed, see units/blocs.pas IETconsequence,
-      so it mey not be always contingent to the subject's response
+      so it may not be always contingent to the subject's response
     }
     CSQMISS : string;
 
@@ -62,13 +64,14 @@ type
 
   TFPE = Class(TTrial)
   private
+    FFPEDrawingType : TFPEDrawingType;
     FConsequenceFired : Boolean;
     FCurrTrial: TCurrentTrial;
     FDataSupport : TDataSupport;
     //FFirstResp : Boolean;
     FNumComp : integer;
     FSchedule : TSchMan;
-    FUseMedia : Boolean;
+    FForeground : TBitmap;
     procedure TrialPaint;
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
@@ -78,17 +81,16 @@ type
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected { TTrial }
     procedure WriteData(Sender: TObject); override;
-    procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
-
   end;
 
 implementation
 
-uses constants, timestamps;
+uses background, strutils, constants, timestamps;
 
 { TFPE }
 
@@ -100,7 +102,6 @@ begin
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
   OnTrialPaint := @TrialPaint;
-
   Header :=  Header +
              'StmBegin' + #9 +
              '_Latency' + #9 +
@@ -109,29 +110,36 @@ begin
              'ExpcResp' + #9 +
              '__Result';
 
+  FForeGround := TBitmap.Create;
   FDataSupport.Responses:= 0;
+end;
+
+destructor TFPE.Destroy;
+begin
+  FForeGround.Free;
+  inherited Destroy;
 end;
 
 procedure TFPE.TrialResult(Sender: TObject);
 begin
   //FDataSupport.StmDuration := GetCustomTick;
   if FConsequenceFired then
-    begin
-      case UpperCase(FCurrTrial.response) of
-        'POSITIVA': Result := T_HIT;
-        'INDIFERENTE': Result := T_NONE;
-        else Result := T_MISS;
-      end;
-      IETConsequence := FDataSupport.CSQHIT;
-    end
-  else
-    begin
-      case UpperCase(FCurrTrial.response) of
-        'NEGATIVA': Result := T_HIT;
-        'INDIFERENTE': Result := T_NONE;
-        else Result := T_MISS;
-      end;
-      IETConsequence := FDataSupport.CSQMISS;
+    case UpperCase(FCurrTrial.response) of
+      'POSITIVA':
+        begin
+          Result := T_HIT;
+          IETConsequence := T_HIT;
+        end;
+      'NEGATIVA':
+        begin
+          Result := T_MISS;
+          IETConsequence := T_MISS;
+        end;
+      else
+        begin
+          Result := T_NONE;
+          IETConsequence := T_NONE;
+        end;
     end;
 
   case NextTrial of
@@ -154,19 +162,24 @@ end;
 
 procedure TFPE.Consequence(Sender: TObject);
 var
-  LConsequence : TBassStream;
+  LSound : TBassStream;
+  LSoundFile : string;
 begin
-  LogEvent(LeftStr(FDataSupport.CSQ, 4));
+  LogEvent('C');
   if FConsequenceFired = False then FConsequenceFired := True;
-  Writeln(RootMedia + FDataSupport.CSQ);
+  LSoundFile := '';
+
   case FDataSupport.CSQ of
-    T_HIT : LConsequence := TBassStream.Create(RootMedia+'CSQ1.wav');
-    T_MISS : LConsequence := TBassStream.Create(RootMedia+'CSQ2.wav');
-    else LConsequence := TBassStream.Create(RootMedia+FDataSupport.CSQ);
+    T_HIT  : LSoundFile := RootMedia+'CSQ1.wav';
+    T_MISS : LSoundFile := RootMedia+'CSQ2.wav';
+    else     LSoundFile := RootMedia+FDataSupport.CSQ;
   end;
 
-  if FileExists(RootMedia+FDataSupport.CSQ) then
-    LConsequence.Play;
+  if FileExists(LSoundFile) then
+    begin
+      LSound := TBassStream.Create(LSoundFile);
+      LSound.Play;
+    end;
 
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
@@ -183,52 +196,20 @@ end;
 
 
 procedure TFPE.TrialPaint;
-var i : integer;
 begin
-  if not FUseMedia then
-    for i := Low(FCurrTrial.C) to High(FCurrTrial.C) do
-      with FCurrTrial.C[i] do
-        DrawCustomEllipse(Canvas, OuterRect, InnerRect, gap, gap_degree, gap_length);
+  Canvas.Draw(0,0,FForeground);
 end;
 
 procedure TFPE.Play(ACorrection: Boolean);
 var
   s1: string;
-  LOuterR : TRect;
-  a1, LWidth, LHeight : Integer;
-
-  procedure NextCommaDelimitedParameter;
-  begin
-    Delete(s1, 1, pos(#44, s1));
-    if Length(s1) > 0 then while s1[1] = #44 do Delete(s1, 1, 1);
-  end;
-
-  {
-  procedure KeyConfig(var aKey : TKey);
-  begin
-    with aKey do
-      begin
-        BoundsRect := R;
-        //Color := StrToIntDef(sColor, $0000FF ); //clRed
-        //HowManyLoops:= StrToIntDef(sLoop, 0);
-        //FullPath:= sName;
-        Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
-        //Visible := False;
-      end;
-  end;
-}
+  LOuterR , LR: TRect;
+  i, LWidth, LHeight : Integer;
 begin
   inherited Play(ACorrection);
-
-  FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
+  FFPEDrawingType := TFPEDrawingType(StrToIntDef(CfgTrial.SList.Values[_DrawingType], 0));
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
-
-  if FUseMedia then
-    // not implemented yet
-  else
-    begin
-      SetLength(FCurrTrial.C, FNumComp);
-    end;
+  SetLength(FCurrTrial.C, FNumComp);
 
   FSchedule := TSchMan.Create(self);
   with FSchedule do
@@ -239,84 +220,94 @@ begin
       Enabled := False;
     end;
   AddToClockList(FSchedule);
+
+  // Use alias as defaults
+  FCurrTrial.response := CfgTrial.SList.Values[_Contingency];
+  //if UpperCase(FCurrTrial.Response) = 'POSITIVA' then
+  //  begin
+  //    FDataSupport.CSQHIT := 'HIT';
+  //    FDataSupport.CSQMISS := 'NONE';
+  //    // FDataSupport.CSQ := 'NONE';
+  //  end;
+  //
+  //if UpperCase(FCurrTrial.Response) = 'NEGATIVA' then
+  //  begin
+  //    FDataSupport.CSQHIT := 'NONE';
+  //    FDataSupport.CSQMISS := 'MISS';
+  //    // FDataSupport.CSQ := 'NONE';
+  //  end;
+
   // allow user defined differential consequences
-  // we expect something like:
-
-  // PositiveHIT, PositiveMISS, PositiveCSQ
-  // NegativeHIT, NegativeMISS, NegativeCSQ
-
-  // Positive
-  // NONE,MISS,HIT
-
-  // Negative
-  // NONE,HIT,MISS
-
-  // Custom
-  // S1.wav 0 -1 1000,S2.wav 0 -1 1000, S3.wav 0 -1 1000,
-
-  s1 := CfgTrial.SList.Values[_Trial + _cIET] + #44;
-
-  FDataSupport.CSQHIT := Copy(s1, 0, pos(#44, s1) - 1);
-  NextCommaDelimitedParameter;
-
-  FDataSupport.CSQMISS := Copy(s1, 0, pos(#44, s1) - 1);
-  NextCommaDelimitedParameter;
-
-  FDataSupport.CSQ := Copy(s1, 0, pos(#44, s1) - 1);
-
-  // Alias to a default media name.ext
-  FCurrTrial.response := CfgTrial.SList.Values[_ExpectedResponse];
-  if UpperCase(FCurrTrial.response) = 'POSITIVA' then
-    if FDataSupport.CSQ = T_HIT then FDataSupport.CSQ := 'CSQ1.wav';
-
-  if UpperCase(FCurrTrial.response) = 'NEGATIVA' then
-    if FDataSupport.CSQ = T_MISS then FDataSupport.CSQ := 'CSQ2.wav';
-
+  //s1 := CfgTrial.SList.Values[_Trial + _cIET] + #44;
+  //
+  //FDataSupport.CSQHIT := Copy(s1, 0, pos(#44, s1) - 1);
+  //NextCommaDelimitedParameter;
+  //
+  //FDataSupport.CSQMISS := Copy(s1, 0, pos(#44, s1) - 1);
+  //NextCommaDelimitedParameter;
+  //
+  //FDataSupport.CSQ := Copy(s1, 0, pos(#44, s1) - 1);
+  //
+  //// Alias to a default media name.ext
+  //FCurrTrial.response := CfgTrial.SList.Values[_Consequence];
+  //if UpperCase(FCurrTrial.response) = 'POSITIVA' then
+  //  if FDataSupport.CSQ = T_HIT then FDataSupport.CSQ := 'CSQ1.wav';
+  //
+  //if UpperCase(FCurrTrial.response) = 'NEGATIVA' then
+  //  if FDataSupport.CSQ = T_MISS then FDataSupport.CSQ := 'CSQ2.wav';
 
   FCurrTrial.Result := T_NONE;
 
-  for a1 := 0 to FNumComp -1 do
+  for i := 0 to FNumComp -1 do
     begin
-        s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cBnd];
-
-        LOuterR.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        LOuterR.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        LWidth := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 100);
+        s1:= CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd];
+        LOuterR.Top:= StrToInt(ExtractDelimited(1,s1,[#32]));
+        LOuterR.Left:= StrToInt(ExtractDelimited(2,s1,[#32]));
+        LWidth := StrToInt(ExtractDelimited(3,s1,[#32]));
         LOuterR.Right := LOuterR.Left + LWidth;
-        NextSpaceDelimitedParameter(s1);
-
-        LHeight := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), LWidth);
+        LHeight := StrToInt(ExtractDelimited(4,s1,[#32]));
         LOuterR.Bottom := LOuterR.Top + LHeight;
 
-       if FUseMedia then //allow mouse input
-         begin
-           //not implemented yet
-           {s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
-
-           sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
-           NextSpaceDelimitedParameter(s1);
-
-           sLoop := Copy(s1, 0, pos(#32, s1)-1);
-           NextSpaceDelimitedParameter(s1);
-
-           sColor := s1;
-
-           if a1 = 0 then KeyConfig(FKey1) else KeyConfig(FKey2)}
-
-         end
-       else  // keyboard input only
-          with FCurrTrial.C[a1] do
-            begin
-              OuterRect := LOuterR;
-              InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
-              gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
-              gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Degree], 1+Random(360));
-              gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(a1 + 1) + _cGap_Length], 5 );
+        with FCurrTrial.C[i] do
+          begin
+            OuterRect := LOuterR;
+            case FFPEDrawingType of
+              fpeClearCircles: {do nothing};
+              fpeFullOuterInnerCircles:InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
             end;
+            gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(i+1) + _cGap], False );
+            gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], 1+Random(360));
+            gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 );
+          end;
+      end;
+
+  if not FrmBackground.DrawMask then
+    FrmBackground.DrawMask:=True;
+  FrmBackground.UpdateMask;
+
+  FForeground := TBitmap.Create;
+  FForeground.Width:= Width;
+  FForeground.Height:= Height;
+  FForeground.TransparentColor:=clFuchsia;
+  FForeground.Transparent:=True;
+  LR := Rect(0,0,Width, Height);
+  with FForeground.Canvas do
+    begin
+      // Transparent part of foreground
+      Pen.Color:=clFuchsia;
+      Brush.Style:=bsSolid;
+      Brush.Color:=clFuchsia;
+      Rectangle(LR);
+    end;
+
+  // FForeground do not change, we need to draw only once
+  for i := Low(FCurrTrial.C) to High(FCurrTrial.C) do
+    with FCurrTrial.C[i] do
+      case FFPEDrawingType of
+        fpeClearCircles:
+          DrawCustomEllipse(FForeground.Canvas, OuterRect, gap, gap_degree, gap_length);
+        fpeFullOuterInnerCircles:
+          DrawCustomEllipse(FForeground.Canvas, OuterRect, InnerRect, gap, gap_degree, gap_length);
       end;
 
   if Self.ClassType = TFPE then Config(Self);
@@ -324,13 +315,6 @@ end;
 
 procedure TFPE.TrialStart(Sender: TObject);
 begin
-  {
-  if FUseMedia then
-    begin
-      // not implemented yet
-    end;
-  }
-
   FConsequenceFired := False;
   FDataSupport.Latency := TimeStart;
   FDataSupport.StmBegin := TickCount;
@@ -354,11 +338,6 @@ begin
            FCurrTrial.Result;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
-end;
-
-procedure TFPE.Paint;
-begin
-  inherited Paint;
 end;
 
 procedure TFPE.Response(Sender: TObject);

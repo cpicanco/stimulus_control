@@ -5,6 +5,7 @@
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
+      <AutoCreateForms Value="False"/>
       <Title Value="stimulus_control"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
@@ -17,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <RevisionNr Value="1"/>
-      <BuildNr Value="2"/>
+      <BuildNr Value="3"/>
       <Language Value="0416"/>
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará" FileDescription="Stimulus Control Application" InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control App" ProductVersion=""/>
     </VersionInfo>
@@ -31,7 +32,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9"/>
+            <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
             <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
@@ -147,7 +148,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="40">
+    <Units Count="44">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -166,7 +167,7 @@
       <Unit3>
         <Filename Value="forms/userconfigs.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="UserConfig"/>
+        <ComponentName Value="FormUserConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit3>
@@ -210,7 +211,7 @@
         <IsPartOfProject Value="True"/>
       </Unit12>
       <Unit13>
-        <Filename Value="units/trial_feature_positive.pas"/>
+        <Filename Value="units/trial_go_nogo.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
@@ -226,9 +227,9 @@
         <IsPartOfProject Value="True"/>
       </Unit16>
       <Unit17>
-        <Filename Value="forms/userconfigs_simple_discrimination_matrix.pas"/>
+        <Filename Value="forms/userconfigs_go_nogo.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="MatrixForm"/>
+        <ComponentName Value="FormGo_NoGo"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit17>
@@ -323,6 +324,25 @@
         <Filename Value="units/timestamps_helpers.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit39>
+      <Unit40>
+        <Filename Value="forms/userconfigs_stimuli_sets.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormStimuliSets"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="units/config_session_global_container.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="units/grid_helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="units/bass_player_callbacks.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit43>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -332,7 +352,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9"/>
+      <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
       <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>

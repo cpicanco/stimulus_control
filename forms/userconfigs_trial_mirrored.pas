@@ -16,6 +16,7 @@ interface
 uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
      Dialogs, StdCtrls, Spin, Grids, ExtCtrls
 
+     , grid_helpers
      , draw_methods
      , math
      ;
@@ -119,17 +120,15 @@ procedure btnAddAxisClick(Sender: TObject);
     FMirroredLine : TPoints;
     FAxis : TAxisList;
     //fullscreen
-    FFullScreen : Boolean;
-    FOriginalBounds: TRect;
-    FOriginalWindowState: TWindowState;
-    FScreenBounds: TRect;
+    //FFullScreen : Boolean;
+    //FOriginalBounds: TRect;
+    //FOriginalWindowState: TWindowState;
+    //FScreenBounds: TRect;
     procedure RefreshLine;
     procedure CentralizeStm;
     function GetLine(aBresenhamLine : TPoints) : TPoints;
     function GetMirroredLine(aLine : TPoints) : TPoints;
     function GetAngleFromPoints(p1, p2 : TPoint) : String;
-    function GetPointFromAngle (aAngle : float) : TPoint;//standard or user defined distances?
-    function GetCentralRect (aLeftBorderSpace, aTopBorderSpace, aRightBorderSpace, aBottomBorderSpace: integer) : TRect;
     procedure SetMonitorToShow(AValue: integer);
   public
     procedure ToggleFullScreen;
@@ -429,8 +428,8 @@ begin
   i := (seSize.value div 2) + seBorder.Value;
   case cbChooseGrid.ItemIndex of
     0 : FCentralRect := Rect(0, 0, aWidth, aHeight);
-    1 : FCentralRect := GetCentralRect(0, 0, 0, 0);
-    2 : FCentralRect := GetCentralRect(i, i, i, i);
+    1 : FCentralRect := GetCentralRect(aWidth,aHeight,0, 0, 0, 0);
+    2 : FCentralRect := GetCentralRect(aWidth,aHeight,i, i, i, i);
   end;
 
   SetLength(FGrid, 360 div 5);
@@ -439,7 +438,7 @@ begin
   for i := Low(FGrid) to High (FGrid) do
     begin
       FGridNames[i]:= FloatToStr(aDegree);
-      FGrid[i] := GetPointFromAngle(aDegree);
+      FGrid[i] := GetPointFromAngle(aDegree,FCentralRect);
       aDegree := aDegree + 5;
     end;
   RefreshLine;
@@ -667,55 +666,6 @@ function TBresenhamLineForm.GetAngleFromPoints(p1, p2: TPoint): String;
   end;
 begin
   Result := FloatToStrF(AngleOfLine(p1,p2), ffFixed, 8, 2);
-end;
-
-function TBresenhamLineForm.GetPointFromAngle(aAngle: float): TPoint;
-var Distance : float;
-begin
-  //http://math.stackexchange.com/questions/143932/calculate-point-given-x-y-angle-and-distance
-  //0 on the right, clock increment
-  //if aAngle = 0 then
-  Distance :=  ((FCentralRect.Right - FCentralRect.Left)/ 2);
-  Result.X :=  Round((Distance * cos(DegtoRad(aAngle))) + x0.value);
-  Result.Y :=  Round((Distance * sin(DegtoRad(aAngle))) + y0.value);
-end;
-
-function TBresenhamLineForm.GetCentralRect(aLeftBorderSpace, aTopBorderSpace,
-  aRightBorderSpace, aBottomBorderSpace: integer): TRect;
-  var
-    aWidth, aHeight,
-    side : integer;
-begin
-  aWidth := Screen.MonitorFromWindow(Handle).Width;
-  aHeight := Screen.MonitorFromWindow(Handle).Height;
-
-  if aHeight > aWidth then
-    begin
-      side := aWidth;
-      Result := Rect( (0 + aLeftBorderSpace),
-                      (0  + (aHeight div 2) - (side div 2) +  aTopBorderSpace),
-                      (side - aRightBorderSpace),
-                      (side + (aHeight div 2) - (side div 2) +  - aBottomBorderSpace)
-                    );
-    end
-  else if aHeight < aWidth then
-    begin
-      side := aHeight;
-      Result := Rect( (0 + (aWidth div 2) - (side div 2) + aLeftBorderSpace),
-                      (0 + aTopBorderSpace),
-                      (side + (aWidth div 2) - (side div 2) - aRightBorderSpace),
-                      (side - aBottomBorderSpace)
-                    );
-    end
-  else if aHeight = aWidth then
-    begin
-      side := aHeight;
-      Result := Rect( (0 + aLeftBorderSpace),
-                      (0 + aTopBorderSpace),
-                      (side - aRightBorderSpace),
-                      (side - aBottomBorderSpace)
-                    );
-    end;
 end;
 
 procedure TBresenhamLineForm.SetMonitorToShow(AValue: integer);

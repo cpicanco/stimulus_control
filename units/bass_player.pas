@@ -13,7 +13,11 @@ unit bass_player;
 
 interface
 
-uses LCLType, Classes, SysUtils, Forms, BASS;
+uses LCLType, Classes, SysUtils, Forms
+  , BASS
+  ;
+
+ // http://www.un4seen.com/doc/#bass/
 
 type
 
@@ -40,36 +44,49 @@ type
     public
       constructor Create(FileName : AnsiString); overload;
       constructor Create(FileName : AnsiString; Loops : integer); overload;
-      destructor Destroy;
+      destructor Destroy;override;
       procedure Play;
       //procedure Pause; virtual; abstract;
       property Loops : integer read FLoops write FLoops;
   end;
 
   { TBassStream }
+  PBassStream = ^TBassStream;
 
   TBassStream = class
     private
       FSample : HSAMPLE;
+      FSyncProcedure: SYNCPROC;
+      procedure SetSyncProcedure(AValue: SYNCPROC);
     public
       constructor Create(FileName : AnsiString); overload;
       procedure Play;
+      property SyncProcedure : SYNCPROC read FSyncProcedure write SetSyncProcedure;
   end;
+
 
 implementation
 
 { TBassStream }
 
+procedure TBassStream.SetSyncProcedure(AValue: SYNCPROC);
+begin
+  if FSyncProcedure=AValue then Exit;
+    FSyncProcedure:=AValue;
+
+  if Assigned(FSyncProcedure) then
+    BASS_ChannelSetSync(FSample, BASS_SYNC_END, 0, SyncProcedure, nil);
+end;
+
 constructor TBassStream.Create(FileName: AnsiString);
 begin
-  FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, 0);
+  FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, BASS_STREAM_AUTOFREE);
 end;
 
 procedure TBassStream.Play;
 begin
   BASS_ChannelPlay(FSample, FALSE);
-  // while BASS_ChannelIsActive(FSample) = BASS_ACTIVE_PLAYING do Application.ProcessMessages;
-  Free;
+  Free; // don't hurry, it is safe :)
 end;
 
 { TBassAudioDevice }
@@ -147,20 +164,17 @@ destructor TBassChannel.Destroy;
 begin
   BASS_SampleFree(FSample);
   BASS_ChannelStop(FChannel);
+  inherited Destroy;
 end;
 
 procedure TBassChannel.Play;
 var  i, aLoops : integer;
 begin
-
   if FLoops > 0 then aLoops := FLoops
   else aLoops := 0;
 
   for i:= 0 to aLoops do
-    begin
-      BASS_ChannelPlay(FChannel, True);
-      // while BASS_ChannelIsActive(FChannel) = BASS_ACTIVE_PLAYING do Application.ProcessMessages;
-    end;
+    BASS_ChannelPlay(FChannel, True);
 end;
 
 end.

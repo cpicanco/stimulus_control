@@ -1,9 +1,9 @@
-object MatrixForm: TMatrixForm
-  Left = 33
+object FormFPE: TFormFPE
+  Left = 139
   Height = 243
-  Top = 50
+  Top = 164
   Width = 991
-  Caption = 'MatrixForm'
+  Caption = 'FormFPE'
   ClientHeight = 243
   ClientWidth = 991
   Color = clWhite
@@ -11,7 +11,7 @@ object MatrixForm: TMatrixForm
   OnActivate = FormActivate
   OnKeyPress = FormKeyPress
   OnPaint = FormPaint
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.6.2.0'
   object Panel1: TPanel
     Left = 0
     Height = 160
@@ -42,26 +42,15 @@ object MatrixForm: TMatrixForm
       ModalResult = 11
       TabOrder = 1
     end
-    object cbPreview: TCheckBox
-      Left = 8
-      Height = 24
-      Top = 128
-      Width = 79
-      Caption = 'Preview'
-      Checked = True
-      OnChange = cbPreviewChange
-      State = cbChecked
-      TabOrder = 2
-    end
     object gbTrials: TGroupBox
       Left = 8
       Height = 49
       Top = 8
       Width = 141
       Caption = 'N° Tentativas'
-      ClientHeight = 30
+      ClientHeight = 32
       ClientWidth = 137
-      TabOrder = 3
+      TabOrder = 2
       object btnEditNodes: TButton
         Left = 76
         Height = 25
@@ -72,7 +61,7 @@ object MatrixForm: TMatrixForm
       end
       object seTrials: TSpinEdit
         Left = 2
-        Height = 27
+        Height = 25
         Top = 1
         Width = 71
         MaxValue = 2000
@@ -89,7 +78,7 @@ object MatrixForm: TMatrixForm
       Anchors = [akTop, akRight]
       Caption = 'Adicionar à Lista'
       ModalResult = 1
-      TabOrder = 4
+      TabOrder = 3
     end
     object gbStimuli: TGroupBox
       Left = 304
@@ -97,49 +86,19 @@ object MatrixForm: TMatrixForm
       Top = 8
       Width = 159
       Caption = 'Estímulos'
-      ClientHeight = 54
+      ClientHeight = 56
       ClientWidth = 155
-      TabOrder = 5
-      object cbUseStimuliSet: TCheckBox
-        AnchorSideLeft.Control = cbChooseGrid
-        AnchorSideBottom.Control = cbChooseGrid
-        Left = 0
-        Height = 24
-        Top = -1
-        Width = 87
-        Anchors = [akLeft, akBottom]
-        BorderSpacing.Bottom = 1
-        Caption = 'Conjunto'
-        TabOrder = 0
-      end
+      TabOrder = 4
       object btnEditNodes1: TButton
-        AnchorSideLeft.Control = cbUseStimuliSet
         AnchorSideLeft.Side = asrBottom
-        AnchorSideTop.Control = cbUseStimuliSet
-        Left = 100
+        Left = 0
         Height = 25
-        Top = -1
+        Top = 2
         Width = 54
         BorderSpacing.Left = 13
         Caption = 'Editar'
-        TabOrder = 1
-      end
-      object cbChooseGrid: TComboBox
-        AnchorSideRight.Control = btnEditNodes1
-        Left = 0
-        Height = 29
-        Top = 24
-        Width = 154
-        Enabled = False
-        ItemHeight = 0
-        ItemIndex = 0
-        Items.Strings = (
-          'NA'
-          'Ângulos'
-          'Ângulos (C)'
-        )
-        TabOrder = 2
-        Text = 'NA'
+        OnClick = btnEditNodes1Click
+        TabOrder = 0
       end
     end
     object gbGapLength: TGroupBox
@@ -148,12 +107,12 @@ object MatrixForm: TMatrixForm
       Top = 8
       Width = 141
       Caption = 'GapLength'
-      ClientHeight = 30
+      ClientHeight = 32
       ClientWidth = 137
-      TabOrder = 6
+      TabOrder = 5
       object seGapLength: TSpinEdit
         Left = 2
-        Height = 27
+        Height = 25
         Top = 1
         Width = 71
         MaxValue = 359
@@ -161,6 +120,52 @@ object MatrixForm: TMatrixForm
         TabOrder = 0
         Value = 10
       end
+    end
+    object RadioGroupGrids: TRadioGroup
+      Left = 8
+      Height = 80
+      Top = 64
+      Width = 97
+      AutoFill = True
+      Caption = 'Grade'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 1
+      ClientHeight = 63
+      ClientWidth = 93
+      ItemIndex = 1
+      Items.Strings = (
+        'Matrix'
+        'Círculo'
+      )
+      TabOrder = 6
+    end
+    object RadioGroupEffect: TRadioGroup
+      Left = 128
+      Height = 80
+      Top = 64
+      Width = 97
+      AutoFill = True
+      Caption = 'Efeito'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 1
+      ClientHeight = 63
+      ClientWidth = 93
+      ItemIndex = 0
+      Items.Strings = (
+        'Positivo'
+        'Negativo'
+      )
+      TabOrder = 7
     end
   end
   object PreviewTimer: TTimer

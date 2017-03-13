@@ -317,7 +317,6 @@ begin
 end;
 
 procedure TSession.Play(AFilename: String);
-var i : integer;
 begin
   FFilename := AFilename;
   FGlobalContainer.TimeStart := 0;

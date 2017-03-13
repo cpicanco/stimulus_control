@@ -129,94 +129,94 @@ end;
 
 procedure TForm1.LCLVLCPlayerBackward(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'Backward');
+  //WriteLn(Sender.ClassName,#32,'Backward');
 end;
 
 procedure TForm1.LCLVLCPlayerBuffering(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'Buffering');
+  //WriteLn(Sender.ClassName,#32,'Buffering');
 end;
 
 procedure TForm1.LCLVLCPlayerEOF(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'End of File');
+  //WriteLn(Sender.ClassName,#32,'End of File');
 end;
 
 procedure TForm1.LCLVLCPlayerError(Sender: TObject; const AError: string);
 begin
-  WriteLn(Sender.ClassName,#32,'Error', #32,AError);
+  //WriteLn(Sender.ClassName,#32,'Error', #32,AError);
 end;
 
 procedure TForm1.LCLVLCPlayerForward(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'Forward');
+  //WriteLn(Sender.ClassName,#32,'Forward');
 end;
 
 procedure TForm1.LCLVLCPlayerLengthChanged(Sender: TObject;const time: TDateTime);
 begin
-  WriteLn(Sender.ClassName,#32,'LengthChanged', #32,time);
+  //WriteLn(Sender.ClassName,#32,'LengthChanged', #32,time);
 end;
 
 procedure TForm1.LCLVLCPlayerMediaChanged(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'MediaChanged');
+  //WriteLn(Sender.ClassName,#32,'MediaChanged');
 end;
 
 procedure TForm1.LCLVLCPlayerNothingSpecial(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'NothingSpecial');
+  //WriteLn(Sender.ClassName,#32,'NothingSpecial');
 end;
 
 procedure TForm1.LCLVLCPlayerOpening(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'Opening');
+  //WriteLn(Sender.ClassName,#32,'Opening');
 end;
 
 procedure TForm1.LCLVLCPlayerPausableChanged(Sender: TObject;const AValue: Boolean);
 begin
-  WriteLn(Sender.ClassName,#32,'PausableChanged', #32,AValue);
+  //WriteLn(Sender.ClassName,#32,'PausableChanged', #32,AValue);
 end;
 
 procedure TForm1.LCLVLCPlayerPause(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'Pause');
+  //WriteLn(Sender.ClassName,#32,'Pause');
 end;
 
 procedure TForm1.LCLVLCPlayerPlaying(Sender: TObject);
 begin
-  WriteLn('SIZE',#32,LCLVLCPlayer1.VideoWidth,#32, LCLVLCPlayer1.VideoHeight);
-  WriteLn(Sender.ClassName,#32,'Playing');
+  //WriteLn('SIZE',#32,LCLVLCPlayer1.VideoWidth,#32, LCLVLCPlayer1.VideoHeight);
+  //WriteLn(Sender.ClassName,#32,'Playing');
 end;
 
 procedure TForm1.LCLVLCPlayerPositionChanged(Sender: TObject; const APos: Double
   );
 begin
-  WriteLn(Sender.ClassName,#32,'PositionChanged', #32,APos);
+  //WriteLn(Sender.ClassName,#32,'PositionChanged', #32,APos);
 end;
 
 procedure TForm1.LCLVLCPlayerSeekableChanged(Sender: TObject; const AValue: Boolean);
 begin
-  WriteLn(Sender.ClassName,#32,'SeekableChanged', #32,AValue);
+  //WriteLn(Sender.ClassName,#32,'SeekableChanged', #32,AValue);
 end;
 
 procedure TForm1.LCLVLCPlayerSnapshot(Sender: TObject; const AfileName: string);
 begin
-  WriteLn(Sender.ClassName,#32,'Snapshot', #32,AfileName);
+  //WriteLn(Sender.ClassName,#32,'Snapshot', #32,AfileName);
 end;
 
 procedure TForm1.LCLVLCPlayerStop(Sender: TObject);
 begin
-  WriteLn(Sender.ClassName,#32,'Stop');
+  //WriteLn(Sender.ClassName,#32,'Stop');
 end;
 
 procedure TForm1.LCLVLCPlayerTimeChanged(Sender: TObject; const time: TDateTime);
 begin
-  WriteLn(Sender.ClassName,#32,'TimeChanged', #32,time);
+  //WriteLn(Sender.ClassName,#32,'TimeChanged', #32,time);
 end;
 
 procedure TForm1.LCLVLCPlayerTitleChanged(Sender: TObject; const ATitle: Integer);
 begin
-  WriteLn(Sender.ClassName,#32,'TitleChanged', #32,ATitle);
+  //WriteLn(Sender.ClassName,#32,'TitleChanged', #32,ATitle);
 end;
 
 end.

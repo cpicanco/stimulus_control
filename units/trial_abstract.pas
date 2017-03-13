@@ -13,7 +13,7 @@ unit trial_abstract;
 
 interface
 
-uses LCLIntf, LCLType, Controls, Classes, SysUtils, LCLProc
+uses LCLIntf, LCLType, Controls, ExtCtrls, Classes, SysUtils, LCLProc
 
   , schedules_main
   , config_session
@@ -29,11 +29,11 @@ type
 
   { TTrial }
 
-  TTrial = class(TCustomControl)
+  TTrial = class(TGraphicControl)
   private
     FGlobalContainer: TGlobalContainer;
     FCfgTrial: TCfgTrial;
-    FClockThread : TClockThread;
+    FClock : TTimer;
     FCounterManager : TCounterManager;
     FLogEvent: TDataProcedure;
     FClockList : array of TThreadMethod;
@@ -51,7 +51,6 @@ type
 
   { events }
 
-
     FOnBeginCorrection: TNotifyEvent;
     FOnBkGndResponse: TNotifyEvent;
     FOnConsequence: TNotifyEvent;
@@ -67,6 +66,8 @@ type
     FOnTrialPaint: TPaintEvent;
     FOnTrialStart: TNotifyEvent;
     FOnTrialWriteData: TNotifyEvent;
+    FOldKeyUp : TKeyEvent;
+    FOldKeyDown: TKeyEvent;
     function GetRootMedia: string;
     function GetTestMode: Boolean;
     function GetTimeStart: Extended;
@@ -202,7 +203,7 @@ begin
       Result := T_NONE;
       IETConsequence := T_NONE;
       NextTrial := T_END;
-      RTLeventSetEvent(FClockThread.RTLEvent); // EndTrial(Self);
+      FClock.Enabled := False;
       Exit;
     end;
 
@@ -212,7 +213,7 @@ begin
       Result := T_NONE;
       IETConsequence := T_NONE;
       NextTrial := '0';
-      RTLeventSetEvent(FClockThread.RTLEvent); // EndTrial(Self);
+      FClock.Enabled := False;  // EndTrial(Self);
       Exit;
     end;
 
@@ -245,12 +246,15 @@ begin
     DebugLn(mt_Debug + 'TTrial.EndTrial1');
   {$endif}
   if FLimitedHold = 0 then
-    if Assigned(FClockThread) then
-      RTLeventSetEvent(FClockThread.RTLEvent);
+    if Assigned(FClock) then
+      FClock.Enabled := False;
 end;
 
 procedure TTrial.EndTrialThread(Sender: TObject);
 begin
+  FClock.OnStopTimer := nil;
+  FClock.Enabled := False;
+
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.EndTrial2');
   {$endif}
@@ -285,14 +289,24 @@ end;
 constructor TTrial.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  OnKeyUp := @TrialKeyUp;
-  OnKeyDown := @TrialKeyDown;
-
+  if AOwner is TCustomControl then
+    begin
+    with TCustomControl(AOwner) do
+      begin
+        FOldKeyUp := OnKeyUp;
+        FOldKeyDown := OnKeyDown;
+        OnKeyUp := @TrialKeyUp;
+        OnKeyDown := @TrialKeyDown;
+      end;
+    end
+  else
+    raise Exception.Create('AOwner of TTrial must be a TCustomControl');
   //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
   FLimitedHold := 0;
-  FClockThread := TClockThread.Create(True);
-  FClockThread.OnTimer := @EndTrialThread;
-  AddToClockList(@FClockThread.Start);
+  FClock := TTimer.Create(Self);
+  FClock.Enabled := False;
+  FClock.OnTimer := @EndTrialThread;
+  FClock.OnStopTimer := @EndTrialThread;
 
   HeaderTimestamps := 'Time' + #9 +
                       'Bloc__Id' + #9 +
@@ -307,13 +321,19 @@ begin
     DebugLn(mt_Debug + 'TTrial.Destroy:FNextTrial:' + FNextTrial);
   {$endif}
 
-  if Assigned(FClockThread) then
-    begin
-      FClockThread.OnTimer := nil;
-      FClockThread.Enabled := False;
-      FClockThread.Terminate;
-      FClockThread := nil;
-    end;
+  //if Assigned(FClock) then
+  //  begin
+  //    FClock.OnTimer := nil;
+  //    FClock.Enabled := False;
+  //    FClock.Terminate;
+  //    FClock := nil;
+  //  end;
+  if Parent is TCustomControl then
+    with TCustomControl(Parent) do
+      begin
+        OnKeyDown := FOldKeyDown;
+        OnKeyUp := FOldKeyUp;
+      end;
   inherited Destroy;
 end;
 
@@ -345,7 +365,7 @@ begin
 
   // Trial will last LimitedHold ms if LimitedHold > 0
   FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
-  FClockThread.Interval := FLimitedHold;
+  FClock.Interval := FLimitedHold;
 
   // Present a dot at the screen center. A key response is required before trialstart
   FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
@@ -373,6 +393,7 @@ procedure TTrial.StartClockList;
 var
   i : integer;
 begin
+  FClock.Enabled := True;
   for i := 0 to Length(FClockList) -1 do
     TThreadMethod(FClockList[i]);
   SetLength(FClockList, 0);

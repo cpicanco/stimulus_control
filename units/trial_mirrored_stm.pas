@@ -38,8 +38,8 @@ type
     FDataSupport : TDataSupport;
     FCircles: TCurrentTrial;
     FSchedule : TSchMan;
-    FKey1 : TKey;
-    FKey2 : TKey;
+    //FKey1 : TKey;
+    //FKey2 : TKey;
     FFirstResp : Boolean;
     FUseMedia : Boolean;
     procedure Consequence(Sender: TObject);
@@ -129,7 +129,7 @@ end;
 
 procedure TMRD.Play(ACorrection: Boolean);
 var
-  s1, sName, sLoop, sColor{, sGap, sGapDegree, sGapLength} : string;
+  s1{, sName, sLoop, sColor, sGap, sGapDegree, sGapLength} : string;
   LOuterR : TRect;
   a1, LWidth, LHeight : Integer;
 

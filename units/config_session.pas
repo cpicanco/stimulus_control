@@ -33,6 +33,7 @@ type
     RootMedia: string;
     TimeStart : Extended;
     TestMode : Boolean;
+    MonitorToShow : Byte;
   end;
 
   TCircle = record
@@ -168,7 +169,7 @@ resourcestring
 
 implementation
 
-uses constants;
+uses constants, config_session_global_container;
 { TCfgSes }
 
 function TCfgSes.GetCfgBlc(Ind: Integer): TCfgBlc;
@@ -191,13 +192,14 @@ constructor TCfgSes.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FGlobalContainer:= TGlobalContainer.Create;
+  GGlobalContainer := FGlobalContainer;
   FLoaded := False;
 end;
 
 destructor TCfgSes.Destroy;
 var a1, a2 : Integer;
 begin
-  FGlobalContainer.Destroy;
+  FGlobalContainer.Free;
   if Length(FBlcs) > 0 then
     for a1:= Low(FBlcs) to High(FBlcs) do
       begin

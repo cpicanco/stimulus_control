@@ -30,6 +30,7 @@ uses Classes, Controls, LCLIntf, LCLType,
         , trial_matching
         , trial_dizzy_timers
         , trial_move_square
+        , trial_go_nogo
      ;
 
 type
@@ -45,9 +46,6 @@ type
   private
     function GetTimeStart: Extended;
   private
-    //FOnBeginTrial: TNotifyEvent;
-    //FClientThread : TZMQThread;
-
     FNextBlc: String;
     FSaveData: TDataProcedure;
     FSaveTData: TDataProcedure;
@@ -210,6 +208,7 @@ begin
     begin
 
       case FBlc.Trials[IndTrial].Kind of
+        T_GNG : FTrial := TGNG.Create(FBackGround);
         T_MSQ : FTrial := TMSQ.Create(FBackGround);
         T_DZT : FTrial := TDZT.Create(FBackGround);
         T_CLB : FTrial := TCLB.Create(FBackGround);
@@ -238,13 +237,12 @@ begin
           FTrial.OnHit := @Hit;
           FTrial.OnMiss := @Miss;
           FTrial.OnNone := @None;
-
           FTrial.Parent := FBackGround;
           // dependencies above
           FTrial.Visible := False;
           FTrial.Play(FIsCorrection);
           FTrial.Visible := True;
-          FTrial.SetFocus;
+          //todo: FTrial.SetFocus;
         end else
           EndBlc(Self);
 
@@ -339,7 +337,7 @@ var s0, s1, s2, s3, s4 : string;
 
   procedure SetValuesToStrings (var as1, as2, as3, as4 : string);
   var
-      Values : string;
+    Values : string;
   begin
     Values := '';
     if FTrial.IETConsequence = T_HIT then
@@ -372,7 +370,6 @@ var s0, s1, s2, s3, s4 : string;
     as4:= Copy(s0, 0, pos(#32, s0)-1);
   end;
 begin
-
   s1 := '';
   s2 := '';
   s3 := '';
@@ -483,9 +480,7 @@ begin
 
   HasTimeOut := FTrial.TimeOut > 0;
   if HasTimeOut then
-    begin
-      if FBackGround is TForm then TForm(FBackGround).Color:= 0;
-    end
+    FBackGround.Color:= 0
   else FTrial.TimeOut := -1;
 
   if FTestMode then
@@ -613,7 +608,7 @@ begin
       {$endif}
       FTimerTO.Enabled := False;
 
-      if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
+      FBackGround.Color:= FBlc.BkGnd;
 
       if (FTimerITI.Interval > 0) then
         begin
