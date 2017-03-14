@@ -69,7 +69,6 @@ type
     procedure UpdateTimer2(Sender: TObject);
   protected { TTrial }
     procedure WriteData(Sender: TObject); override;
-    procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -149,10 +148,10 @@ end;
 procedure TDZT.Consequence(Sender: TObject);
 var LConsequence : TKey;
 begin
-  LConsequence := TKey.Create(Self);
+  LConsequence := TKey.Create(Parent);
   with LConsequence do
     begin
-      Parent:= TCustomControl(Parent);
+      Parent:= TCustomControl(Owner);
       Loops := 0;
       FullPath := RootMedia + FConsequence;
       Play;
@@ -443,11 +442,6 @@ begin
           Format('%-*.*d', [4, 8, FDataSupport.Responses]);
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
-end;
-
-procedure TDZT.Paint;
-begin
-  inherited Paint;
 end;
 
 procedure TDZT.Response(Sender: TObject);

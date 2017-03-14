@@ -50,7 +50,6 @@ type
     procedure TrialPaint;
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
-    procedure Paint; override;
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -244,12 +243,6 @@ begin
   FCircles.Result := Result;
   WriteData(Sender);
 end;
-
-procedure TMRD.Paint;
-begin
-  inherited Paint;
-end;
-
 
 procedure TMRD.Response(Sender: TObject);
 var LTickCount : Extended;

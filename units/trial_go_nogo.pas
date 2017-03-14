@@ -83,7 +83,6 @@ type
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected { TTrial }
     procedure WriteData(Sender: TObject); override;
-    procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(ACorrection : Boolean); override;
@@ -196,16 +195,19 @@ begin
 
   if FileExists(LPopUpFile) then
     begin
-      LPopUp := TKey.Create(Self.Parent);
-      LPopUp.Top := FStimulus.Top;
-      LPopUp.Left := FStimulus.Left+FStimulus.Width+5;
-      LPopUp.Width := 200;
-      LPopUp.Height := 200;
-      LPopUp.Color := $FFFFFF;
-      LPopUp.FullPath := LPopUpFile;
-      LPopUp.Parent := Self.Parent;
-      LPopUp.Show;
-      LPopUp.AutoDestroyIn(1000);
+      LPopUp := TKey.Create(Parent);
+      with LPopUp do
+        begin
+          Top := 0;
+          Left := 0;
+          Width := 200;
+          Height := 200;
+          FullPath := LPopUpFile;
+          Parent := TCustomControl(Owner);
+          Show;
+          AutoDestroyIn(1000);
+        end;
+
     end;
 
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
@@ -265,7 +267,7 @@ begin
   NextSpaceDelimitedParameter(s1);
   LHeight := Copy(s1, 0, pos(#32, s1)-1);
 
-  FStimulus := TKey.Create(Self);
+  FStimulus := TKey.Create(Parent);
   with FStimulus do
     begin
       Width := StrToIntDef(LWidth,300);
@@ -275,7 +277,7 @@ begin
       FullPath:= LName;
       //Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
       Visible := False;
-      Parent := TCustomControl(Parent);
+      Parent := TCustomControl(Owner);
     end;
 
   FSchedule := TSchMan.Create(Self);
@@ -310,8 +312,8 @@ end;
 
 procedure TGNG.TrialStart(Sender: TObject);
 begin
-  FStimulus.Visible:=True;
   FStimulus.Centralize;
+  FStimulus.Show;
   FConsequenceFired := False;
   FDataSupport.Latency := TimeStart;
   FDataSupport.StmBegin := TickCount;
@@ -335,11 +337,6 @@ begin
            FCurrTrial.Result;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
-end;
-
-procedure TGNG.Paint;
-begin
-  inherited Paint;
 end;
 
 procedure TGNG.Response(Sender: TObject);

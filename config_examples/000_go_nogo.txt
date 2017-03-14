@@ -1,4 +1,4 @@
-[Main]
+﻿[Main]
 
 Name=	Sessão1
 Subject=	Participante1
@@ -21,7 +21,7 @@ Name=	Positiva 1
 Kind=	GNG
 LimitedHold=	2000
 Schedule=	CRF
-Consequece=	Positiva
+Consequence=	Positiva
 C1Stm=	A1.bmp
 C1Bnd=	300
 
@@ -31,7 +31,7 @@ Name=	Negativa 2
 Kind=	GNG
 LimitedHold=	2000
 Schedule=	CRF
-Consequece=	Negativa
+Consequence=	Negativa
 C1Stm=	A2.bmp
 C1Bnd=	300
 

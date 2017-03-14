@@ -68,7 +68,7 @@ begin
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
 
-  FMessage := TLabel.Create(Self);
+  FMessage := TLabel.Create(AOwner);
   with FMessage do begin
     Visible := False;
     Cursor := -1;
@@ -81,7 +81,7 @@ begin
     Parent := TCustomControl(AOwner);
   end;
 
-  FMessagePrompt := TLabel.Create(Self);
+  FMessagePrompt := TLabel.Create(AOwner);
   with FMessagePrompt do begin
     Visible := False;
     Cursor := -1;

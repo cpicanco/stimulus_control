@@ -87,7 +87,7 @@ var
 begin
   inherited Play(ACorrection);
   with FSample do begin
-    Key:= TKey.Create(Self);
+    Key:= TKey.Create(Parent);
     Key.Cursor:= Self.Cursor;
     Key.Parent:= TCustomControl(Parent);
     Key.OnConsequence:= @SampleConsequence;
