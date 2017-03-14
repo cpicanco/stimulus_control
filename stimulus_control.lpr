@@ -91,7 +91,7 @@ begin
 
   {$ifdef DEBUG}
     DebugLn(mt_Information + 'Debug Logger initialized');
-    {$ifdef WINDOWS}
+    {$ifdef WIN32}
       DebugLn(mt_Information + 'Inp32(0):' + IntToStr(Inp32(0)));
     {$endif}
   {$endif}
