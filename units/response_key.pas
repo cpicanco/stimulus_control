@@ -182,17 +182,9 @@ procedure TKey.Paint;
                    Caption);
         end;
     end;
-
-    procedure PaintStimulus;
-    begin
-      with Canvas do
-        StretchDraw(Rect(0, 0, Width, Height), FStimulus);
-
-    end;
-
 begin
   case FKind.stmImage of
-    stmPicture:PaintStimulus;
+    stmPicture:Canvas.StretchDraw(ClientRect, FStimulus);
     //stmAnimation:PaintGIF;
     stmNone:PaintKey(Color);
     stmVideo:;
@@ -286,7 +278,7 @@ var
       CreateBitmap;
       LPNG := TPortableNetworkGraphic.Create;
       LPNG.LoadFromFile(AFilename);
-      FStimulus.LoadFromBitmapHandles(LPNG.BitmapHandle,LPNG.MaskHandle);
+      FStimulus.Assign(LPNG);
       FStimulus.Transparent:=True;
       FStimulus.TransparentColor:=clFuchsia;
       LPNG.Free;
