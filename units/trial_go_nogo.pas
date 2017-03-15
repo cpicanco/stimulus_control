@@ -276,7 +276,6 @@ begin
       Loops:= StrToIntDef(LLoop, 0);
       FullPath:= LName;
       //Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
-      Visible := False;
       Parent := TCustomControl(Owner);
     end;
 
