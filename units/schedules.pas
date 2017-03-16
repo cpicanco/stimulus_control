@@ -155,14 +155,16 @@ end;
 procedure TSchRR.DoResponse;
 begin
   Response;
-  if FResponseCounter = FRatio then Consequence;
+  if FResponseCounter = FRatio then
+    Consequence;
 end;
 
 procedure TSchRR.Reset;
 begin
   FResponseCounter := 0;
   FRatio := FResponseRatio - FRatioVariation + Random((2 * FRatioVariation) + 1);
-  if FRatio < 1 then FRatio := FResponseRatio;
+  if FRatio < 1 then
+    FRatio := FResponseRatio;
 end;
 
 { TSchRI }
@@ -193,7 +195,8 @@ end;
 procedure TSchRI.DoResponse;
 begin
   Response;
-  if FFlagClock then Consequence;
+  if FFlagClock then
+    Consequence;
 end;
 
 procedure TSchRI.Reset;
@@ -206,7 +209,8 @@ procedure TSchRI.UpdateInterval;
 var NewInterval : integer;
 begin
   NewInterval := FTimeInterval - FIntervalVariation + Random((2 * FIntervalVariation) + 1);
-  if NewInterval < 1 then FInterval := FTimeInterval
+  if NewInterval < 1 then
+    FInterval := FTimeInterval
   else FInterval := NewInterval;
 
   FClockThread.Interval := FInterval;
@@ -251,7 +255,8 @@ procedure TSchRT.UpdateInterval;
 var NewInterval : integer;
 begin
   NewInterval := FTimeInterval - FIntervalVariation + Random((2 * FIntervalVariation) + 1);
-  if NewInterval < 1 then FInterval := FTimeInterval
+  if NewInterval < 1 then
+    FInterval := FTimeInterval
   else FInterval := NewInterval;
 
   FClockThread.Interval := FInterval;
@@ -287,7 +292,8 @@ end;
 procedure TSchDRH.DoResponse;
 begin
   Response;
-  if FResponseCounter = FRatio then Consequence;
+  if FResponseCounter = FRatio then
+    Consequence;
 end;
 
 procedure TSchDRH.Reset;
@@ -322,7 +328,8 @@ end;
 procedure TSchDRL.DoResponse;
 begin
   Response;
-  if FFlagClock then Consequence
+  if FFlagClock then
+    Consequence
   else Reset;
 end;
 
@@ -345,14 +352,16 @@ end;
 
 function TAbsSch.GetTimeEnabled: Boolean;
 begin
-  if Assigned(FClockThread) then Result := FClockThread.Enabled
+  if Assigned(FClockThread) then
+    Result := FClockThread.Enabled
   else Result := False;
 end;
 
 procedure TAbsSch.Response;
 begin
   Inc(FResponseCounter);
-  if Assigned(OnResponse) then OnResponse(Self);
+  if Assigned(OnResponse) then
+    OnResponse(Self);
 end;
 
 procedure TAbsSch.Pass;
@@ -362,7 +371,8 @@ end;
 
 function TAbsSch.GetStartMethod: TThreadMethod;
 begin
-  if Assigned(FClockThread) then Result := @FClockThread.Start
+  if Assigned(FClockThread) then
+    Result := @FClockThread.Start
   else Result := @Self.Pass;
 end;
 
