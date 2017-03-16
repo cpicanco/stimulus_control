@@ -41,7 +41,6 @@ type
     procedure TrialStart(Sender: TObject);
   protected
     procedure WriteData(Sender: TObject); override;
-    procedure Paint; override;
     //procedure ThreadClock(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -78,7 +77,7 @@ begin
     WordWrap := True;
     Font.Name := 'TimesNewRoman';
     OnMouseUp := @MessageMouseUp;
-    Parent := TCustomControl(Self.Parent);
+    Parent := TCustomControl(AOwner);
   end;
 
   FMessagePrompt := TLabel.Create(Self);
@@ -89,7 +88,7 @@ begin
     Font.Name := 'TimesNewRoman';
     Font.Size := 14;
     OnMouseUp := @MessageMouseUp;
-    Parent := TCustomControl(Self.Parent);
+    Parent := TCustomControl(AOwner);
   end;
 
   Header := Header +
@@ -176,11 +175,6 @@ begin
 
   Data := Data + aStart + #9 + aDuration + #9 + FMessage.Caption;
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
-end;
-
-procedure TMSG.Paint;
-begin
-  inherited Paint;
 end;
 
 end.
