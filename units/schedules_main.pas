@@ -36,6 +36,7 @@ type
     procedure SetKind(Kind: String);
   public
     procedure DoResponse;
+    procedure StartClock;
     function StartMethod : TThreadMethod;
     property Enabled : Boolean read GetTimeEnabled write SetTimeEnabled;
     property Kind: string read FKind write SetKind;
@@ -176,6 +177,14 @@ procedure TSchMan.DoResponse;
 begin
   if FAbsSchLoaded then
     FAbsSch.DoResponse;
+end;
+
+procedure TSchMan.StartClock;
+var
+  LStart : TThreadMethod;
+begin
+  LStart := StartMethod;
+  TThreadMethod(LStart);
 end;
 
 function TSchMan.StartMethod : TThreadMethod;
