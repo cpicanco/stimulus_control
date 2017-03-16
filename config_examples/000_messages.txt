@@ -17,59 +17,54 @@ NumTrials=	20 1
 [Blc 1 - T1]
 Name=	M1
 Kind=	MSG
-LimitedHold= 500
-Msg=	This is a test 1
+LimitedHold= 100
+Msg=	This is a test. 100 ms.
 
 [Blc 1 - T2]
 Name= M2
 Kind= MSG
-LimitedHold= 500
-Msg=  This is a test 2
+LimitedHold= 200
+Msg=  This is a test. 200 ms.
 
 [Blc 1 - T3]
 Name= M3
 Kind= MSG
-LimitedHold= 500
-Msg=  This is a test 3
+LimitedHold= 300
+Msg=  This is a test. 300 ms.
 
 [Blc 1 - T4]
 Name= M4
 Kind= MSG
-LimitedHold= 500
-Msg=  This is a test 4
+LimitedHold= 400
+Msg=  This is a test. 400 ms.
 
 [Blc 1 - T5]
 Name= M5
 Kind= MSG
 LimitedHold= 500
-Msg=  This is a test 5
+Msg=  This is a test. 500 ms.
 
 [Blc 1 - T6]
 Name= M6
 Kind= MSG
 Prompt= True
-Msg=  This is a test 6
+Msg=  This is a test 6. Press space bar.
 
 [Blc 1 - T7]
 Name= M7
 Kind= MSG
-LimitedHold= 500
-Msg=  This is a test 7
+LimitedHold= 1000
+Msg=  This is a test 7. Next message has a starter. Press space bar. 
 
 [Blc 1 - T8]
 Name= M8
 Kind= MSG
 Starter= True
-Msg=  This is a test 8
+Msg=  This is a test 8. Starter removed. Press space bar.
 
 [Blc 1 - T9]
 Name= M9
 Kind= MSG
 Starter= True
 LimitedHold= 500
-Msg=  This is a test 9
-
-[Blc 1 - T10]
-Name= M10
-Kind= MSG
-Msg=  This is a test 10
+Msg= End.
