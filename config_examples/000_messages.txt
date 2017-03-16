@@ -12,59 +12,45 @@ NumBlc=	1
 Name=	Bloco 1
 BkGnd=	16777215
 ITI=	200
-NumTrials=	20 1
+NumTrials=	7 1
 
 [Blc 1 - T1]
 Name=	M1
 Kind=	MSG
-LimitedHold= 100
-Msg=	This is a test. 100 ms.
+LimitedHold=	500
+Msg=	This is 500 ms message.
 
 [Blc 1 - T2]
-Name= M2
-Kind= MSG
-LimitedHold= 200
-Msg=  This is a test. 200 ms.
+Name=	M2
+Kind=	MSG
+LimitedHold=	1000
+Msg=	This is 1000 ms message.
 
 [Blc 1 - T3]
-Name= M3
-Kind= MSG
-LimitedHold= 300
-Msg=  This is a test. 300 ms.
+Name=	M6
+Kind=	MSG
+Msg=	This is a message that requires a click or a keyboard key (space) to proceed.
 
 [Blc 1 - T4]
-Name= M4
-Kind= MSG
-LimitedHold= 400
-Msg=  This is a test. 400 ms.
+Name=	M6
+Kind=	MSG
+Prompt=	True
+Msg=	This is a message that has a prompt description at the bootom.
 
 [Blc 1 - T5]
-Name= M5
-Kind= MSG
-LimitedHold= 500
-Msg=  This is a test. 500 ms.
+Name=	M7
+Kind=	MSG
+LimitedHold=	4000
+Msg=	Next message has a starter. It requires a keyboard key (space) to proceed.
 
 [Blc 1 - T6]
-Name= M6
-Kind= MSG
-Prompt= True
-Msg=  This is a test 6. Press space bar.
+Name=	M8
+Kind=	MSG
+Starter=	True
+Msg=	Starter removed. Press space bar.
 
 [Blc 1 - T7]
-Name= M7
-Kind= MSG
-LimitedHold= 1000
-Msg=  This is a test 7. Next message has a starter. Press space bar. 
-
-[Blc 1 - T8]
-Name= M8
-Kind= MSG
-Starter= True
-Msg=  This is a test 8. Starter removed. Press space bar.
-
-[Blc 1 - T9]
-Name= M9
-Kind= MSG
-Starter= True
-LimitedHold= 500
-Msg= End.
+Name=	M9
+Kind=	MSG
+LimitedHold=	500
+Msg=	End.
