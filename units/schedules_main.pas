@@ -46,21 +46,16 @@ type
 
 implementation
 
-{$ifdef DEBUG}
-  uses debug_logger;
-{$endif}
-
+uses
+  strutils, constants
+  {$ifdef DEBUG}
+  debug_logger
+  {$endif}
+  ;
 procedure TSchMan.SetKind(Kind: String);
 var
-  aSchedule,
-  Parameter1, Parameter2 : String;
-  //Parameter3, Parameter4 : String;
-
-  procedure NextSpaceDelimitedParamater;
-  begin
-    Delete(Kind, 1, pos(#32, Kind));
-    if Length(Kind) > 0 then While Kind[1] = ' ' do Delete(Kind, 1, 1);
-  end;
+  LKind, LParameter1, LParameter2
+  {, LParameter3, LParameter4} : String;
 
 begin
   if FAbsSchLoaded then
@@ -69,70 +64,69 @@ begin
       FAbsSchLoaded := Assigned(FAbsSch);
     end;
 
-  Kind := Kind + #32;
-  aSchedule := Copy(Kind, 0, Pos(#32, Kind) - 1);
+  LKind := ExtractDelimited(1,Kind,[#32]);
+  LParameter1 := ExtractDelimited(2,Kind,[#32]);
+  LParameter2 := ExtractDelimited(3,Kind,[#32]); ;
+  //LParameter3 := ExtractDelimited(4,Kind,[#32]);
+  //LParameter4 := ExtractDelimited(5,Kind,[#32]);
 
-  NextSpaceDelimitedParamater;
-  Parameter1 := Copy(Kind, 0, Pos(#32, Kind) - 1);
+  LKind:=UpperCase(LKind);
+  case LKind of
+    T_CRF:
+      begin
+        FAbsSch:= TSchRR.Create(Self);
+        FAbsSch.Parameter1 := 1;
+        FAbsSch.Parameter2 := 0;
+      end;
 
-  NextSpaceDelimitedParamater;
-  Parameter2 := Copy(Kind, 0, Pos(#32, Kind) - 1);
+    T_EXT:
+      begin
+        FAbsSch:= TSchRR.Create(Self);
+        FAbsSch.Parameter1 := MaxInt;
+        FAbsSch.Parameter2 := 0;
+      end;
 
-  //NextSpaceDelimitedParamater;
-  //Parameter3 := Copy(Kind, 0, Pos(#32, Kind) - 1);
+    T_FR,T_FI,T_FT:
+      begin
+        case LKind of
+          T_FR: FAbsSch:= TSchRR.Create(Self);
+          T_FI: FAbsSch:= TSchRI.Create(Self);
+          T_FT: FAbsSch:= TSchRT.Create(Self);
+        end;
+        FAbsSch.Parameter1 := StrToIntDef(LParameter1 , 0);
+        FAbsSch.Parameter2 := 0;
+      end;
 
-  //NextSpaceDelimitedParamater;
-  //Parameter4 := Copy(Kind, 0, Pos(#32, Kind) - 1);
+    T_RR,T_RI,T_RT,
+    T_VR,T_VI,T_VT:
+      begin
+        case LKind of
+          T_VR, T_RR : FAbsSch:= TSchRR.Create(Self);
+          T_VI, T_RI : FAbsSch:= TSchRI.Create(Self);
+          T_VT, T_RT : FAbsSch:= TSchRT.Create(Self);
+        end;
+        FAbsSch.Parameter1 := StrToIntDef(LParameter1, 0);
+        FAbsSch.Parameter2 := StrToIntDef(LParameter2, 0);
+      end;
 
-  if aSchedule = 'CRF' then
-    begin
-      FAbsSch:= TSchRR.Create(Self);
-      FAbsSch.Parameter1 := 1;
-      FAbsSch.Parameter2 := 0;
-    end;
+    T_DRL:
+      begin
+        FAbsSch:= TSchDRL.Create(Self);
+        FAbsSch.Parameter1 := StrToIntDef(LParameter1, 0);
+        //FAbsSch.Parameter2 := StrToIntDef(LParameter2, 0);
+      end;
 
-  if aSchedule = 'EXT' then
-    begin
-      FAbsSch:= TSchRR.Create(Self);
-      FAbsSch.Parameter1 := MaxInt;
-      FAbsSch.Parameter2 := 0;
-    end;
-
-  if (aSchedule = 'FR') or (aSchedule = 'FI') or (aSchedule = 'FT') then
-    begin
-      if aSchedule = 'FR' then FAbsSch:= TSchRR.Create(Self);
-      if aSchedule = 'FI' then FAbsSch:= TSchRI.Create(Self);
-      if aSchedule = 'FT' then FAbsSch:= TSchRT.Create(Self);
-
-      FAbsSch.Parameter1 := StrToIntDef(Parameter1 , 0);
-      FAbsSch.Parameter2 := 0;
-    end;
-
-  if (aSchedule = 'VR') or (aSchedule = 'VI') or (aSchedule = 'VT') then
-    begin
-      if aSchedule = 'VR' then FAbsSch:= TSchRR.Create(Self);
-      if aSchedule = 'VI' then FAbsSch:= TSchRI.Create(Self);
-      if aSchedule = 'VT' then FAbsSch:= TSchRT.Create(Self);
-
-      FAbsSch.Parameter1 := StrToIntDef(Parameter1, 0);
-      FAbsSch.Parameter2 := StrToIntDef(Parameter2, 0);
-    end;
-
-  if aSchedule = 'DRL' then
-    begin
-      FAbsSch:= TSchDRL.Create(Self);
-      FAbsSch.Parameter1 := StrToIntDef(Parameter1, 0);
-      //FAbsSch.Parameter2 := StrToIntDef(Parameter2, 0);
-    end;
-
-  if aSchedule = 'DRH' then
-    begin
-      FAbsSch:= TSchDRH.Create(Self);
-      FAbsSch.Parameter1 := StrToIntDef(Parameter1, 0);
-      FAbsSch.Parameter2 := StrToIntDef(Parameter2, 0);
-      //FAbsSch.Parameter3 := StrToIntDef(Parameter3, 0);
-      //FAbsSch.Parameter4 := StrToIntDef(Parameter4, 0);
-    end;
+    T_DRH:
+      begin
+        FAbsSch:= TSchDRH.Create(Self);
+        FAbsSch.Parameter1 := StrToIntDef(LParameter1, 0);
+        FAbsSch.Parameter2 := StrToIntDef(LParameter2, 0);
+        //FAbsSch.Parameter3 := StrToIntDef(LParameter3, 0);
+        //FAbsSch.Parameter4 := StrToIntDef(LParameter4, 0);
+      end;
+    else
+      raise Exception.Create('Esquema desconhecido.');
+  end;
 
   FAbsSchLoaded := Assigned(FAbsSch);
   {$ifdef DEBUG}
@@ -151,13 +145,14 @@ begin
       FAbsSch.OnResponse := @Response;
       FAbsSch.AssignParameters;
       FAbsSch.Reset;
-      FKind := aSchedule;
+      FKind := LKind;
     end;
 end;
 
 procedure TSchMan.Consequence(Sender: TObject);
 begin
-  if Assigned(OnConsequence) then FOnConsequence(Self);
+  if Assigned(OnConsequence) then
+    FOnConsequence(Self);
 end;
 
 function TSchMan.GetTimeEnabled: Boolean;
@@ -167,7 +162,8 @@ end;
 
 procedure TSchMan.Response(Sender: TObject);
 begin
-  if Assigned(OnResponse) then FOnResponse (Self);
+  if Assigned(OnResponse) then
+    FOnResponse(Self);
 end;
 
 procedure TSchMan.SetTimeEnabled(AValue: Boolean);
@@ -178,7 +174,8 @@ end;
 
 procedure TSchMan.DoResponse;
 begin
-  if FAbsSchLoaded then FAbsSch.DoResponse;
+  if FAbsSchLoaded then
+    FAbsSch.DoResponse;
 end;
 
 function TSchMan.StartMethod : TThreadMethod;
