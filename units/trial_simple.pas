@@ -70,8 +70,6 @@ type
     procedure ComparisonMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure Hide; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -100,24 +98,6 @@ begin
 
 end;
 
-destructor TSimpl.Destroy;
-var i : integer;
-begin
-  for i := 0 to High(FComparisons) do
-    FComparisons[i].Key.Free;
-  inherited Destroy;
-end;
-
-procedure TSimpl.Hide;
-var i : integer;
-begin
-  inherited Hide;
-  for i := 0 to High(FComparisons) do
-    FComparisons[i].Key.Hide;
-
-end;
-
-
 procedure TSimpl.Dispenser(Csq: Byte; Usb: string);
 begin
   //PLP.OutPortOn (Csq);
@@ -137,14 +117,14 @@ begin
   for I := 0 to FNumComp-1 do
     with FComparisons[I] do
       begin
-        Key := TKey.Create(Parent);
+        Key := TKey.Create(Self);
         Key.Tag := I;
         Key.Cursor := Self.Cursor;
         Key.OnConsequence := @Consequence;
         Key.OnResponse := @Response;
         Key.Schedule.Kind := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cSch];
         AddToClockList(Key.Schedule);
-        Key.Parent := TCustomControl(Parent);
+        Key.Parent := TCustomControl(Self.Parent);
 
         s1 := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cBnd] + #32;
         R.Top := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);

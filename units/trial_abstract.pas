@@ -380,8 +380,13 @@ begin
 end;
 
 procedure TTrial.Hide;
+var
+  i : integer;
 begin
   inherited Hide;
+  for i := 0 to ComponentCount -1 do
+    if Components[i] is TControl then
+      TControl(Components[i]).Hide;
 end;
 
 procedure TTrial.AddToClockList(AClockStart: TThreadMethod);

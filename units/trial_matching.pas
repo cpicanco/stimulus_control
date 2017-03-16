@@ -58,7 +58,6 @@ type
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -80,13 +79,6 @@ begin
             Header;
 end;
 
-destructor TMTS.Destroy;
-begin
-  FSample.Key.Free;
-  inherited Destroy;
-end;
-
-
 procedure TMTS.Play(ACorrection : Boolean);
 var
   s1: string;
@@ -94,11 +86,15 @@ var
 begin
   inherited Play(ACorrection);
   with FSample do begin
-    Key:= TKey.Create(Parent);
+
+    // Owner is TGraphicControl
+    Key:= TKey.Create(Self);
     Key.Cursor:= Self.Cursor;
-    Key.Parent:= TCustomControl(Parent);
     Key.OnConsequence:= @SampleConsequence;
     Key.OnResponse:= @SampleResponse;
+
+    // Parent is TCustomControl/TForm
+    Key.Parent:= TCustomControl(Self.Parent);
 
     // BND
     s1:= CfgTrial.SList.Values[_Samp + _cBnd];

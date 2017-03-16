@@ -81,12 +81,11 @@ type
     procedure TrialStart(Sender: TObject);
     procedure TrialResult(Sender: TObject);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-  protected { TTrial }
+  protected
+    { TTrial }
     procedure WriteData(Sender: TObject); override;
   public
-    procedure Hide;override;
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy;override;
     procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
 
@@ -116,12 +115,6 @@ begin
              '__Result';
 
   FDataSupport.Responses:= 0;
-end;
-
-destructor TGNG.Destroy;
-begin
-  FStimulus.Free;
-  inherited Destroy;
 end;
 
 procedure TGNG.TrialResult(Sender: TObject);
@@ -274,7 +267,7 @@ begin
   NextSpaceDelimitedParameter(s1);
   LHeight := Copy(s1, 0, pos(#32, s1)-1);
 
-  FStimulus := TKey.Create(Parent);
+  FStimulus := TKey.Create(Self);
   with FStimulus do
     begin
       Width := StrToIntDef(LWidth,300);
@@ -283,7 +276,7 @@ begin
       Loops:= StrToIntDef(LLoop, 0);
       FullPath:= LName;
       //Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
-      Parent := TCustomControl(Owner);
+      Parent := TCustomControl(Self.Parent);
     end;
 
   FSchedule := TSchedule.Create(Self);
@@ -343,12 +336,6 @@ begin
            FCurrTrial.Result;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
-end;
-
-procedure TGNG.Hide;
-begin
-  FStimulus.Hide;
-  inherited Hide;
 end;
 
 procedure TGNG.Response(Sender: TObject);

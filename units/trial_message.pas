@@ -45,8 +45,6 @@ type
     //procedure ThreadClock(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure Hide;override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -70,7 +68,7 @@ begin
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
 
-  FMessage := TLabel.Create(AOwner);
+  FMessage := TLabel.Create(Self);
   with FMessage do begin
     Visible := False;
     Cursor := -1;
@@ -80,10 +78,10 @@ begin
     WordWrap := True;
     Font.Name := 'TimesNewRoman';
     OnMouseUp := @MessageMouseUp;
-    Parent := TCustomControl(AOwner);
+    Parent := TCustomControl(Self.Parent);
   end;
 
-  FMessagePrompt := TLabel.Create(AOwner);
+  FMessagePrompt := TLabel.Create(Self);
   with FMessagePrompt do begin
     Visible := False;
     Cursor := -1;
@@ -91,7 +89,7 @@ begin
     Font.Name := 'TimesNewRoman';
     Font.Size := 14;
     OnMouseUp := @MessageMouseUp;
-    Parent := TCustomControl(AOwner);
+    Parent := TCustomControl(Self.Parent);
   end;
 
   Header := Header +
@@ -102,20 +100,6 @@ begin
   Result := T_NONE;
   IETConsequence := T_NONE;
   Result := T_NONE;
-end;
-
-destructor TMSG.Destroy;
-begin
-  FMessage.Free;
-  FMessagePrompt.Free;
-  inherited Destroy;
-end;
-
-procedure TMSG.Hide;
-begin
-  inherited Hide;
-  FMessage.Hide;
-  FMessagePrompt.Hide;
 end;
 
 procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;
