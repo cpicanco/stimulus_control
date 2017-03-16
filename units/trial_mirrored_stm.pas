@@ -37,7 +37,7 @@ type
   private
     FDataSupport : TDataSupport;
     FCircles: TCurrentTrial;
-    FSchedule : TSchMan;
+    FSchedule : TSchedule;
     //FKey1 : TKey;
     //FKey2 : TKey;
     FFirstResp : Boolean;
@@ -152,7 +152,7 @@ begin
   if not FUseMedia then
     SetLength(FCircles.C, 2);
 
-  FSchedule := TSchMan.Create(self);
+  FSchedule := TSchedule.Create(self);
   with FSchedule do
     begin
       OnConsequence := @Consequence;

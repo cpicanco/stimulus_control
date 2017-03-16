@@ -101,7 +101,7 @@ type
       procedure ClockStatus(msg : string);
     {$endif}
     procedure AddToClockList(AClockStart : TThreadMethod); overload;
-    procedure AddToClockList(ASchedule: TSchMan); overload;
+    procedure AddToClockList(ASchedule: TSchedule); overload;
     procedure EndTrial(Sender: TObject);
     procedure LogEvent(ACode: string);
     procedure Config(Sender: TObject);
@@ -419,7 +419,7 @@ begin
            ACode + LineEnding)
 end;
 
-procedure TTrial.AddToClockList(ASchedule: TSchMan);
+procedure TTrial.AddToClockList(ASchedule: TSchedule);
 begin
   if ASchedule.Loaded then
     AddToClockList(ASchedule.StartMethod)

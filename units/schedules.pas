@@ -14,8 +14,7 @@ unit schedules;
 interface
 
 uses Classes, SysUtils
-
-    , custom_timer
+    , schedules_abstract
     {$ifdef DEBUG}
     , debug_logger
     {$endif}
@@ -23,92 +22,65 @@ uses Classes, SysUtils
 
 type
 
-  { TAbsSch }
+  { TRatioSchedule }
 
-  TAbsSch = class(TComponent)
-  private
-    FClockThread : TClockThread;
-    FOnConsequence  : TNotifyEvent;
-    FOnResponse  : TNotifyEvent;
-    FParameter1  : integer;
-    FParameter2 : integer;
-    FParameter3  : integer;
-    FParameter4 : integer;
-    FResponseCounter : integer;
-    function GetTimeEnabled: Boolean;
-    function GetStartMethod : TThreadMethod;
-    procedure Consequence;
-    procedure Response;
-    procedure Pass;
-    procedure SetTimeEnabled(AValue: Boolean);
-  {$ifdef DEBUG}
-  strict protected
-    procedure DebugStatus(DebugMessage : string);
-  {$endif}
-  public
-    destructor Destroy; override;
-    procedure AssignParameters; virtual; abstract;
-    procedure DoResponse; virtual; abstract;
-    procedure Reset; virtual; abstract;
-    property TimeEnabled : Boolean read GetTimeEnabled write SetTimeEnabled;
-    property StartMethod : TThreadMethod read GetStartMethod;
-    property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
-    property OnResponse : TNotifyEvent read FOnResponse write FOnResponse;
-    property Parameter1 : Integer read FParameter1 write FParameter1;
-    property Parameter2 : Integer read FParameter2 write FParameter2;
-    property Parameter3 : Integer read FParameter3 write FParameter3;
-    property Parameter4 : Integer read FParameter4 write FParameter4;
-  end;
-
-  { TSchRR }
-
-  TSchRR = class(TAbsSch)
+  // Allow fixed and pseudo-random ratios.
+  TRatioSchedule = class(TSchedules)
   private
     FResponseRatio,
     FRatioVariation,
     FRatio : Integer;
+  protected
+    procedure SetParameter1(AValue:integer); override;
+    procedure SetParameter2(AValue:integer); override;
   public
-    procedure AssignParameters; override;
     procedure DoResponse; override;
     procedure Reset; override;
   end;
 
-  { TSchRI }
+  { TIntervalSchedule }
 
-  TSchRI = class(TAbsSch)
+  // Allow fixed and pseudo-random intervals.
+  TIntervalSchedule = class(TSchedules)
   private
     FFlagClock: Boolean;
     FTimeInterval,
     FIntervalVariation,
     FInterval: Integer;
     procedure UpdateInterval;
+  protected
+    procedure SetParameter1(AValue:integer); override;
+    procedure SetParameter2(AValue:integer); override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure AssignParameters; override;
     procedure Clock(Sender : TObject);
     procedure DoResponse; override;
     procedure Reset; override;
   end;
 
-  { TSchRT }
+  { TTimeSchedule }
 
-  TSchRT = class(TAbsSch)
+  // Allow fixed and pseudo-random times.
+  TTimeSchedule = class(TSchedules)
   private
     FTimeInterval,
     FIntervalVariation,
     FInterval: Integer;
     procedure UpdateInterval;
+  protected
+    procedure SetParameter1(AValue:integer); override;
+    procedure SetParameter2(AValue:integer); override;
   public
     constructor Create(AOwner : TComponent); override;
-    procedure AssignParameters; override;
     procedure Clock(Sender : TObject);
     procedure DoResponse; override;
     procedure Reset; override;
   end;
 
-  { TSchDRH }
+  { TDRHSchedule }
 
-  TSchDRH = class(TAbsSch)
+  // Differential Reinforcement of High Rates.
+  TDRHSchedule = class(TSchedules)
   private
     //FResponseRatio,
     //FRatioVariation,
@@ -116,25 +88,29 @@ type
     //FIntervalVariation,
     FRatio,
     FInterval : Integer;
+  protected
+    procedure SetParameter1(AValue:integer); override;
+    procedure SetParameter2(AValue:integer); override;
   public
     constructor Create(AOwner : TComponent); override;
-    procedure AssignParameters; override;
     procedure Clock(Sender : TObject);
     procedure DoResponse; override;
     procedure Reset; override;
   end;
 
-  { TSchDRL }
+  { TDRLSchedule }
 
-  TSchDRL = class(TAbsSch)
+  // Differential Reinforcement of Low Rates.
+  TDRLSchedule = class(TSchedules)
   private
     FInterval : Integer;
     //FIntervalVariation : integer;
     //FTimeInterval : integer;
     FFlagClock : Boolean;
+  protected
+    procedure SetParameter1(AValue:integer); override;
   public
     constructor Create(AOwner : TComponent); override;
-    procedure AssignParameters; override;
     procedure Clock(Sender : TObject);
     procedure DoResponse; override;
     procedure Reset; override;
@@ -143,36 +119,39 @@ type
 
 implementation
 
-{ TSchRR }
+{ TRatioSchedule }
 
-procedure TSchRR.AssignParameters;
+procedure TRatioSchedule.SetParameter1(AValue: integer);
 begin
-  FResponseRatio := FParameter1;
-  FRatioVariation := FParameter2;
+  FResponseRatio := AValue;
 end;
 
+procedure TRatioSchedule.SetParameter2(AValue: integer);
+begin
+  FRatioVariation := AValue;
+end;
 
-procedure TSchRR.DoResponse;
+procedure TRatioSchedule.DoResponse;
 begin
   Response;
-  if FResponseCounter = FRatio then
+  if Responses = FRatio then
     Consequence;
 end;
 
-procedure TSchRR.Reset;
+procedure TRatioSchedule.Reset;
 begin
-  FResponseCounter := 0;
-  FRatio := FResponseRatio - FRatioVariation + Random((2 * FRatioVariation) + 1);
+  ResetResponses;
+  FRatio := RandomAmplitude(FResponseRatio,FRatioVariation);
   if FRatio < 1 then
     FRatio := FResponseRatio;
 end;
 
-{ TSchRI }
+{ TIntervalSchedule }
 
-constructor TSchRI.Create(AOwner: TComponent);
+constructor TIntervalSchedule.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FClockThread := TClockThread.Create(True);
+  CreateClock;
   FClockThread.OnTimer := @Clock;
   {$ifdef DEBUG}
     FClockThread.OnDebugStatus := @DebugStatus;
@@ -180,133 +159,150 @@ begin
   FFlagClock := False;
 end;
 
-procedure TSchRI.AssignParameters;
-begin
-  FTimeInterval := FParameter1;
-  FIntervalVariation := FParameter2;
-end;
-
-procedure TSchRI.Clock(Sender : TObject);
+procedure TIntervalSchedule.Clock(Sender : TObject);
 begin
   FClockThread.Enabled := False;
   FFlagClock := True;
 end;
 
-procedure TSchRI.DoResponse;
+procedure TIntervalSchedule.DoResponse;
 begin
   Response;
   if FFlagClock then
     Consequence;
 end;
 
-procedure TSchRI.Reset;
+procedure TIntervalSchedule.Reset;
 begin
   FFlagClock:= False;
   UpdateInterval;
 end;
 
-procedure TSchRI.UpdateInterval;
-var NewInterval : integer;
+procedure TIntervalSchedule.UpdateInterval;
+var LNewInterval : integer;
 begin
-  NewInterval := FTimeInterval - FIntervalVariation + Random((2 * FIntervalVariation) + 1);
-  if NewInterval < 1 then
+  LNewInterval:=RandomAmplitude(FTimeInterval,FIntervalVariation);
+  if LNewInterval < 1 then
     FInterval := FTimeInterval
-  else FInterval := NewInterval;
+  else FInterval := LNewInterval;
 
   FClockThread.Interval := FInterval;
   FClockThread.Enabled := True;
 end;
 
+procedure TIntervalSchedule.SetParameter1(AValue: integer);
+begin
+  FTimeInterval := AValue;
+end;
 
-{ TSchRT }
+procedure TIntervalSchedule.SetParameter2(AValue: integer);
+begin
+  FIntervalVariation := AValue;
+end;
 
-constructor TSchRT.Create(AOwner: TComponent);
+
+{ TTimeSchedule }
+
+constructor TTimeSchedule.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FClockThread := TClockThread.Create(True);
+  CreateClock;
   FClockThread.OnTimer := @Clock;
   {$ifdef DEBUG}
     FClockThread.OnDebugStatus := @DebugStatus;
   {$endif}
 end;
 
-procedure TSchRT.AssignParameters;
-begin
-  FTimeInterval := FParameter1;
-  FIntervalVariation := FParameter2;
-end;
-
-procedure TSchRT.Clock(Sender : TObject);
+procedure TTimeSchedule.Clock(Sender : TObject);
 begin
   Consequence;
 end;
 
-procedure TSchRT.DoResponse;
+procedure TTimeSchedule.DoResponse;
 begin
   Response;
 end;
 
-procedure TSchRT.Reset;
+procedure TTimeSchedule.Reset;
 begin
   UpdateInterval;
 end;
 
-procedure TSchRT.UpdateInterval;
-var NewInterval : integer;
+procedure TTimeSchedule.UpdateInterval;
+var LNewInterval : integer;
 begin
-  NewInterval := FTimeInterval - FIntervalVariation + Random((2 * FIntervalVariation) + 1);
-  if NewInterval < 1 then
+  LNewInterval:=RandomAmplitude(FTimeInterval,FIntervalVariation);
+  if LNewInterval < 1 then
     FInterval := FTimeInterval
-  else FInterval := NewInterval;
+  else FInterval := LNewInterval;
 
   FClockThread.Interval := FInterval;
 end;
 
-{ TSchDRH }
+procedure TTimeSchedule.SetParameter1(AValue: integer);
+begin
+  FTimeInterval := AValue;
+end;
 
-constructor TSchDRH.Create(AOwner: TComponent);
+procedure TTimeSchedule.SetParameter2(AValue: integer);
+begin
+  FIntervalVariation := AValue;
+end;
+
+{ TDRHSchedule }
+
+procedure TDRHSchedule.SetParameter1(AValue: integer);
+begin
+  FRatio := AValue;
+  //FRatioVariation := Parameter3;
+end;
+
+procedure TDRHSchedule.SetParameter2(AValue: integer);
+begin
+  FInterval := AValue;
+  FClockThread.Interval := FInterval;
+  //FIntervalVariation := Parameter4;
+end;
+
+constructor TDRHSchedule.Create(AOwner: TComponent);
 begin
   inherited Create (AOwner);
-  FClockThread := TClockThread.Create(True);
+  CreateClock;
   FClockThread.OnTimer := @Clock;
   {$ifdef DEBUG}
     FClockThread.OnDebugStatus := @DebugStatus;
   {$endif}
 end;
 
-procedure TSchDRH.AssignParameters;
+procedure TDRHSchedule.Clock(Sender : TObject);
 begin
-  FRatio := Parameter1;
-  FInterval := Parameter2;
-  //FRatioVariation := Parameter3;
-  //FIntervalVariation := Parameter4;
-
-  FClockThread.Interval := FInterval;
+  ResetResponses;
 end;
 
-procedure TSchDRH.Clock(Sender : TObject);
-begin
-  FResponseCounter := 0;
-end;
-
-procedure TSchDRH.DoResponse;
+procedure TDRHSchedule.DoResponse;
 begin
   Response;
-  if FResponseCounter = FRatio then
+  if Responses = FRatio then
     Consequence;
 end;
 
-procedure TSchDRH.Reset;
+procedure TDRHSchedule.Reset;
 begin
-  FResponseCounter := 0;
+  ResetResponses;
 end;
 
-{ TSchDRL }
+{ TDRLSchedule }
 
-constructor TSchDRL.Create(AOwner: TComponent);
+procedure TDRLSchedule.SetParameter1(AValue: integer);
+begin
+  FInterval := AValue;
+  FClockThread.Interval := FInterval;
+end;
+
+constructor TDRLSchedule.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FClockThread := TClockThread.Create(True);
+  CreateClock;
   FClockThread.OnTimer := @Clock;
   {$ifdef DEBUG}
     FClockThread.OnDebugStatus := @DebugStatus;
@@ -314,18 +310,12 @@ begin
   FFlagClock := False;
 end;
 
-procedure TSchDRL.AssignParameters;
-begin
-  FInterval := Parameter1;
-  FClockThread.Interval := FInterval;
-end;
-
-procedure TSchDRL.Clock(Sender : TObject);
+procedure TDRLSchedule.Clock(Sender : TObject);
 begin
   FFlagClock := True;
 end;
 
-procedure TSchDRL.DoResponse;
+procedure TDRLSchedule.DoResponse;
 begin
   Response;
   if FFlagClock then
@@ -333,75 +323,11 @@ begin
   else Reset;
 end;
 
-procedure TSchDRL.Reset;
+procedure TDRLSchedule.Reset;
 begin
   FClockThread.Reset;
   FFlagClock:= False;
 end;
-
-{ TAbsSch }
-
-procedure TAbsSch.Consequence;
-begin
-  Reset;
-  if Assigned(OnConsequence) then
-    begin
-      FOnConsequence(Self);
-    end;
-end;
-
-function TAbsSch.GetTimeEnabled: Boolean;
-begin
-  if Assigned(FClockThread) then
-    Result := FClockThread.Enabled
-  else Result := False;
-end;
-
-procedure TAbsSch.Response;
-begin
-  Inc(FResponseCounter);
-  if Assigned(OnResponse) then
-    OnResponse(Self);
-end;
-
-procedure TAbsSch.Pass;
-begin
-  // do nothing
-end;
-
-function TAbsSch.GetStartMethod: TThreadMethod;
-begin
-  if Assigned(FClockThread) then
-    Result := @FClockThread.Start
-  else Result := @Self.Pass;
-end;
-
-procedure TAbsSch.SetTimeEnabled(AValue: Boolean);
-begin
-  if Assigned(FClockThread) then
-    begin
-      if FClockThread.Enabled = AValue then Exit;
-      FClockThread.Enabled := AValue;
-    end;
-end;
-
-{$ifdef DEBUG}
-procedure TAbsSch.DebugStatus(DebugMessage : string);
-begin
-  DebugLn(DebugMessage);
-end;
-{$endif}
-
-destructor TAbsSch.Destroy;
-begin
-  if Assigned(FClockThread) then
-    begin
-      FClockThread.Enabled := False;
-      FClockThread.Terminate;
-    end;
-  inherited Destroy;
-end;
-
 
 
 end.

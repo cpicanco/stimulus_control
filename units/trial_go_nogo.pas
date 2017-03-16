@@ -73,7 +73,7 @@ type
     FDataSupport : TDataSupport;
     FStimulus : TKey;
 
-    FSchedule : TSchMan;
+    FSchedule : TSchedule;
     procedure TrialPaint;
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
@@ -207,7 +207,6 @@ begin
           Show;
           AutoDestroyIn(1000);
         end;
-
     end;
 
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
@@ -279,7 +278,7 @@ begin
       Parent := TCustomControl(Owner);
     end;
 
-  FSchedule := TSchMan.Create(Self);
+  FSchedule := TSchedule.Create(Self);
   with FSchedule do
     begin
       OnConsequence := @Consequence;

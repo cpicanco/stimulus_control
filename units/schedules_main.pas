@@ -14,18 +14,18 @@ unit schedules_main;
 interface
 
 uses Classes, SysUtils
-
      , schedules
+     , schedules_abstract
      ;
 
 type
 
-  { TSchMan }
+  { TSchedule }
 
-  TSchMan = class(TComponent)
+  TSchedule = class(TComponent)
   private
-    FAbsSch: TAbsSch;
-    FAbsSchLoaded: Boolean;
+    FSchedule: TSchedules;
+    FScheduleLoaded: Boolean;
     FKind: string;
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
@@ -40,7 +40,7 @@ type
     function StartMethod : TThreadMethod;
     property Enabled : Boolean read GetTimeEnabled write SetTimeEnabled;
     property Kind: string read FKind write SetKind;
-    property Loaded : Boolean read FAbsSchLoaded;
+    property Loaded : Boolean read FScheduleLoaded;
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
   end;
@@ -53,16 +53,16 @@ uses
   debug_logger
   {$endif}
   ;
-procedure TSchMan.SetKind(Kind: String);
+procedure TSchedule.SetKind(Kind: String);
 var
   LKind, LParameter1, LParameter2
   {, LParameter3, LParameter4} : String;
 
 begin
-  if FAbsSchLoaded then
+  if FScheduleLoaded then
     begin
-      FreeAndNil(FAbsSch);
-      FAbsSchLoaded := Assigned(FAbsSch);
+      FreeAndNil(FSchedule);
+      FScheduleLoaded := Assigned(FSchedule);
     end;
 
   LKind := ExtractDelimited(1,Kind,[#32]);
@@ -75,111 +75,110 @@ begin
   case LKind of
     T_CRF:
       begin
-        FAbsSch:= TSchRR.Create(Self);
-        FAbsSch.Parameter1 := 1;
-        FAbsSch.Parameter2 := 0;
+        FSchedule:= TRatioSchedule.Create(Self);
+        FSchedule.Parameter1 := 1;
+        FSchedule.Parameter2 := 0;
       end;
 
     T_EXT:
       begin
-        FAbsSch:= TSchRR.Create(Self);
-        FAbsSch.Parameter1 := MaxInt;
-        FAbsSch.Parameter2 := 0;
+        FSchedule:= TRatioSchedule.Create(Self);
+        FSchedule.Parameter1 := MaxInt;
+        FSchedule.Parameter2 := 0;
       end;
 
     T_FR,T_FI,T_FT:
       begin
         case LKind of
-          T_FR: FAbsSch:= TSchRR.Create(Self);
-          T_FI: FAbsSch:= TSchRI.Create(Self);
-          T_FT: FAbsSch:= TSchRT.Create(Self);
+          T_FR: FSchedule:= TRatioSchedule.Create(Self);
+          T_FI: FSchedule:= TIntervalSchedule.Create(Self);
+          T_FT: FSchedule:= TTimeSchedule.Create(Self);
         end;
-        FAbsSch.Parameter1 := StrToIntDef(LParameter1 , 0);
-        FAbsSch.Parameter2 := 0;
+        FSchedule.Parameter1 := StrToIntDef(LParameter1 , 0);
+        FSchedule.Parameter2 := 0;
       end;
 
     T_RR,T_RI,T_RT,
     T_VR,T_VI,T_VT:
       begin
         case LKind of
-          T_VR, T_RR : FAbsSch:= TSchRR.Create(Self);
-          T_VI, T_RI : FAbsSch:= TSchRI.Create(Self);
-          T_VT, T_RT : FAbsSch:= TSchRT.Create(Self);
+          T_VR, T_RR : FSchedule:= TRatioSchedule.Create(Self);
+          T_VI, T_RI : FSchedule:= TIntervalSchedule.Create(Self);
+          T_VT, T_RT : FSchedule:= TTimeSchedule.Create(Self);
         end;
-        FAbsSch.Parameter1 := StrToIntDef(LParameter1, 0);
-        FAbsSch.Parameter2 := StrToIntDef(LParameter2, 0);
+        FSchedule.Parameter1 := StrToIntDef(LParameter1, 0);
+        FSchedule.Parameter2 := StrToIntDef(LParameter2, 0);
       end;
 
     T_DRL:
       begin
-        FAbsSch:= TSchDRL.Create(Self);
-        FAbsSch.Parameter1 := StrToIntDef(LParameter1, 0);
-        //FAbsSch.Parameter2 := StrToIntDef(LParameter2, 0);
+        FSchedule:= TDRLSchedule.Create(Self);
+        FSchedule.Parameter1 := StrToIntDef(LParameter1, 0);
+        //FSchedule.Parameter2 := StrToIntDef(LParameter2, 0);
       end;
 
     T_DRH:
       begin
-        FAbsSch:= TSchDRH.Create(Self);
-        FAbsSch.Parameter1 := StrToIntDef(LParameter1, 0);
-        FAbsSch.Parameter2 := StrToIntDef(LParameter2, 0);
-        //FAbsSch.Parameter3 := StrToIntDef(LParameter3, 0);
-        //FAbsSch.Parameter4 := StrToIntDef(LParameter4, 0);
+        FSchedule:= TDRHSchedule.Create(Self);
+        FSchedule.Parameter1 := StrToIntDef(LParameter1, 0);
+        FSchedule.Parameter2 := StrToIntDef(LParameter2, 0);
+        //FSchedule.Parameter3 := StrToIntDef(LParameter3, 0);
+        //FSchedule.Parameter4 := StrToIntDef(LParameter4, 0);
       end;
     else
-      raise Exception.Create('Esquema desconhecido.');
+      raise Exception.Create('Esquema desconhecido: '+ Kind);
   end;
 
-  FAbsSchLoaded := Assigned(FAbsSch);
+  FScheduleLoaded := Assigned(FSchedule);
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'FAbsSchLoaded:'+ BoolToStr(FAbsSchLoaded, 'True', 'False') );
   {$endif}
 
-  if FAbsSchLoaded then
+  if FScheduleLoaded then
     begin
       {$ifdef DEBUG}
-        DebugLn(mt_Debug + 'Schedule:' + aSchedule + #32 +
+        DebugLn(mt_Debug + 'Schedule:' + LKind + #32 +
           Parameter1  + #32 + Parameter2  + #32
           //+ Parameter3 + #32 + Parameter4
           );
       {$endif}
-      FAbsSch.OnConsequence := @Consequence;
-      FAbsSch.OnResponse := @Response;
-      FAbsSch.AssignParameters;
-      FAbsSch.Reset;
+      FSchedule.OnConsequence := @Consequence;
+      FSchedule.OnResponse := @Response;
+      FSchedule.Reset;
       FKind := LKind;
     end;
 end;
 
-procedure TSchMan.Consequence(Sender: TObject);
+procedure TSchedule.Consequence(Sender: TObject);
 begin
   if Assigned(OnConsequence) then
     FOnConsequence(Self);
 end;
 
-function TSchMan.GetTimeEnabled: Boolean;
+function TSchedule.GetTimeEnabled: Boolean;
 begin
-  Result := FAbsSch.TimeEnabled;
+  Result := FSchedule.TimeEnabled;
 end;
 
-procedure TSchMan.Response(Sender: TObject);
+procedure TSchedule.Response(Sender: TObject);
 begin
   if Assigned(OnResponse) then
     FOnResponse(Self);
 end;
 
-procedure TSchMan.SetTimeEnabled(AValue: Boolean);
+procedure TSchedule.SetTimeEnabled(AValue: Boolean);
 begin
-  if FAbsSch.TimeEnabled = AValue then Exit;
-  FAbsSch.TimeEnabled := AValue;
+  if FSchedule.TimeEnabled = AValue then Exit;
+  FSchedule.TimeEnabled := AValue;
 end;
 
-procedure TSchMan.DoResponse;
+procedure TSchedule.DoResponse;
 begin
-  if FAbsSchLoaded then
-    FAbsSch.DoResponse;
+  if FScheduleLoaded then
+    FSchedule.DoResponse;
 end;
 
-procedure TSchMan.StartClock;
+procedure TSchedule.StartClock;
 var
   LStart : TThreadMethod;
 begin
@@ -187,9 +186,9 @@ begin
   TThreadMethod(LStart);
 end;
 
-function TSchMan.StartMethod : TThreadMethod;
+function TSchedule.StartMethod : TThreadMethod;
 begin
-  Result := FAbsSch.StartMethod;
+  Result := FSchedule.StartMethod;
 end;
 
 end.

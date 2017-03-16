@@ -24,7 +24,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls, Graphics
     //, client
     , draw_methods
     , schedules_main
-    , response_key
+    //, response_key
     , bass_player
     ;
 
@@ -70,7 +70,7 @@ type
     FDataSupport : TDataSupport;
     //FFirstResp : Boolean;
     FNumComp : integer;
-    FSchedule : TSchMan;
+    FSchedule : TSchedule;
     FForeground : TBitmap;
     procedure TrialPaint;
     procedure Consequence(Sender: TObject);
@@ -211,7 +211,7 @@ begin
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
   SetLength(FCurrTrial.C, FNumComp);
 
-  FSchedule := TSchMan.Create(self);
+  FSchedule := TSchedule.Create(self);
   with FSchedule do
     begin
       OnConsequence := @Consequence;

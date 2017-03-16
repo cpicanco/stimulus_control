@@ -35,7 +35,7 @@ type
   TKey = class(TGraphicControl)
   private
     FAudioPlayer : TBassStream;
-    FSchMan: TSchMan;
+    FSchedule: TSchedule;
     FStimulus: TBitmap;
     //FGifImage: TJvGIFAnimator;
     //FMedia : TWindowsMediaPlayer;
@@ -65,7 +65,7 @@ type
     procedure FullScreen;
     procedure Centralize(AControl : TControl = nil);
     procedure AutoDestroyIn(AInterval : integer);
-    property Schedule : TSchMan read FSchMan;
+    property Schedule : TSchedule read FSchedule;
     property Edge : TColor read FEdge write FEdge;
     property EditMode: Boolean read FEditMode write FEditMode;
     property FullPath: string read FFileName write SetFileName;
@@ -96,8 +96,8 @@ begin
   Edge:= clInactiveCaption;
   OnMouseDown := @KeyMouseDown;
 
-  FSchMan := TSchMan.Create(self);
-  with FSchMan do
+  FSchedule := TSchedule.Create(Self);
+  with FSchedule do
     begin
       OnConsequence:= @Consequence;
       OnResponse:= @Response;
@@ -160,8 +160,9 @@ end;
 
 procedure TKey.AutoDestroyIn(AInterval: integer);
 begin
-  FSchMan.Kind := 'FT '+IntToStr(AInterval);
-  FSchMan.OnConsequence:=@AutoDestroy;
+  FSchedule.Kind := 'FT '+IntToStr(AInterval);
+  FSchedule.OnConsequence:=@AutoDestroy;
+  FSchedule.StartClock;
 end;
 
 procedure TKey.Paint;
@@ -424,13 +425,13 @@ procedure TKey.KeyMouseDown(Sender: TObject; Button: TMouseButton;
 begin
   Inc(FResponseCount);
   FLastResponseLog := IntToStr(X + Left) + #9 + IntToStr(Y + Top);
-  FSchMan.DoResponse;
+  FSchedule.DoResponse;
 end;
 
 //******
 //**  **
 //******
-// Sender is irrelevant at this point, TKey needs to send its info to TTrial decendents.
+// Sender is irrelevant at this point, TKey needs to send its info to TTrial descendents.
 //******
 //**  **
 //******

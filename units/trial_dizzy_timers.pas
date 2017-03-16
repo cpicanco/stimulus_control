@@ -54,7 +54,7 @@ type
     FCycles : integer;
     FDataSupport : TDataSupport;
     FDizzyTimer : TDizzyTimer;
-    FSchedule : TSchMan;
+    FSchedule : TSchedule;
     FStimuli : array of TRect;
     function GetCycles: integer;
     function RandomInRange(AFrom, ATo : integer):integer;
@@ -291,7 +291,7 @@ begin
 
   // self
   FDizzyTimer.Schedule := CfgTrial.SList.Values[_Schedule];
-  FSchedule := TSchMan.Create(self);
+  FSchedule := TSchedule.Create(self);
   with FSchedule do
     begin
       OnConsequence := @Consequence;
