@@ -84,7 +84,9 @@ type
   protected { TTrial }
     procedure WriteData(Sender: TObject); override;
   public
+    procedure Hide;override;
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy;override;
     procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
 
@@ -114,6 +116,12 @@ begin
              '__Result';
 
   FDataSupport.Responses:= 0;
+end;
+
+destructor TGNG.Destroy;
+begin
+  FStimulus.Free;
+  inherited Destroy;
 end;
 
 procedure TGNG.TrialResult(Sender: TObject);
@@ -198,8 +206,8 @@ begin
       LPopUp := TKey.Create(Parent);
       with LPopUp do
         begin
-          Top := 0;
-          Left := 0;
+          Top := FStimulus.Top;
+          Left := FStimulus.Left+FStimulus.Width+5;
           Width := 200;
           Height := 200;
           FullPath := LPopUpFile;
@@ -335,6 +343,12 @@ begin
            FCurrTrial.Result;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+end;
+
+procedure TGNG.Hide;
+begin
+  FStimulus.Hide;
+  inherited Hide;
 end;
 
 procedure TGNG.Response(Sender: TObject);

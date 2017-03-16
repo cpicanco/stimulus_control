@@ -116,6 +116,7 @@ type
     constructor Create (AOwner : TComponent); override;
     destructor Destroy; override;
     procedure Play(ACorrection: Boolean); virtual;
+    procedure Hide;virtual;
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
     property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property Data: string read FData write FData;
@@ -247,7 +248,8 @@ begin
   {$endif}
   if FLimitedHold = 0 then
     if Assigned(FClock) then
-      FClock.Enabled := False;
+      //FClock.Enabled := False;
+      EndTrialThread(Sender);
 end;
 
 procedure TTrial.EndTrialThread(Sender: TObject);
@@ -375,6 +377,11 @@ begin
   // image of the mouse cursor
   if TestMode then Cursor:= 0
   else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
+end;
+
+procedure TTrial.Hide;
+begin
+  inherited Hide;
 end;
 
 procedure TTrial.AddToClockList(AClockStart: TThreadMethod);

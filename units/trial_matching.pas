@@ -58,6 +58,7 @@ type
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -77,6 +78,12 @@ begin
             'Atr.Mod.' + #9 +
             'Frq.Mod.' + #9 + #9 + #9 +
             Header;
+end;
+
+destructor TMTS.Destroy;
+begin
+  FSample.Key.Free;
+  inherited Destroy;
 end;
 
 

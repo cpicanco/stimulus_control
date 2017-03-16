@@ -200,7 +200,7 @@ begin
       FTrial := nil;
     end;
 
-  if FBackGround is TForm then TForm(FBackGround).Color:= FBlc.BkGnd;
+  FBackGround.Color:= FBlc.BkGnd;
 
   IndTrial := FCounterManager.CurrentTrial;
   if IndTrial = 0 then FFirstTrialBegin := TickCount;
@@ -493,7 +493,7 @@ begin
 
   FITIBegin := TickCount;
 
-  //FTrial.Hide;
+  FTrial.Hide;
 
   {$ifdef DEBUG}
     DebugLn(mt_Debug + '[Blc - ' + FBlc.Name + ' T - ' + IntToStr(FCounterManager.CurrentTrial)+ ']');

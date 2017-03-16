@@ -45,6 +45,8 @@ type
     //procedure ThreadClock(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Hide;override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -100,6 +102,20 @@ begin
   Result := T_NONE;
   IETConsequence := T_NONE;
   Result := T_NONE;
+end;
+
+destructor TMSG.Destroy;
+begin
+  FMessage.Free;
+  FMessagePrompt.Free;
+  inherited Destroy;
+end;
+
+procedure TMSG.Hide;
+begin
+  inherited Hide;
+  FMessage.Hide;
+  FMessagePrompt.Hide;
 end;
 
 procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;

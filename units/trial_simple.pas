@@ -70,6 +70,8 @@ type
     procedure ComparisonMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure Hide; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -95,6 +97,23 @@ begin
   HeaderTimestamps := HeaderTimestamps + #9 +
                       'Lft.Cmp.' + #9 +
                       'Top.Cmp.';              // top left of all clicks
+
+end;
+
+destructor TSimpl.Destroy;
+var i : integer;
+begin
+  for i := 0 to High(FComparisons) do
+    FComparisons[i].Key.Free;
+  inherited Destroy;
+end;
+
+procedure TSimpl.Hide;
+var i : integer;
+begin
+  inherited Hide;
+  for i := 0 to High(FComparisons) do
+    FComparisons[i].Key.Hide;
 
 end;
 
