@@ -493,7 +493,7 @@ begin
 
   FITIBegin := TickCount;
 
-  FTrial.Hide;
+  //FTrial.Hide;
 
   {$ifdef DEBUG}
     DebugLn(mt_Debug + '[Blc - ' + FBlc.Name + ' T - ' + IntToStr(FCounterManager.CurrentTrial)+ ']');
