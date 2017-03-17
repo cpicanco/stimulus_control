@@ -117,6 +117,7 @@ type
     destructor Destroy; override;
     procedure Play(ACorrection: Boolean); virtual;
     procedure Hide;virtual;
+    procedure SetFocus;virtual;
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
     property CounterManager : TCounterManager read FCounterManager write FCounterManager;
     property Data: string read FData write FData;
@@ -260,6 +261,7 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.EndTrial2');
   {$endif}
+
   LogEvent('TE');
   FResponseEnabled:= False;
   Hide;
@@ -293,16 +295,19 @@ begin
   inherited Create(AOwner);
   if AOwner is TCustomControl then
     begin
-    with TCustomControl(AOwner) do
-      begin
-        FOldKeyUp := OnKeyUp;
-        FOldKeyDown := OnKeyDown;
-        OnKeyUp := @TrialKeyUp;
-        OnKeyDown := @TrialKeyDown;
-      end;
+      Align := alClient;
+      with TCustomControl(AOwner) do
+        begin
+          FOldKeyUp := OnKeyUp;
+          FOldKeyDown := OnKeyDown;
+          OnKeyUp := @TrialKeyUp;
+          OnKeyDown := @TrialKeyDown;
+        end;
+      Parent := TWinControl(AOwner);
     end
   else
-    raise Exception.Create('AOwner of TTrial must be a TCustomControl');
+    raise Exception.Create('AOwner of TTrial must be a TCustomControl.');
+
   //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
   FLimitedHold := 0;
   FClock := TTimer.Create(Self);
@@ -341,6 +346,8 @@ end;
 
 procedure TTrial.Play(ACorrection: Boolean);
 begin
+  Hide;
+
   // avoid responses while loading configurations
   FResponseEnabled := False;
 
@@ -384,9 +391,15 @@ var
   i : integer;
 begin
   inherited Hide;
-  for i := 0 to ComponentCount -1 do
-    if Components[i] is TControl then
-      TControl(Components[i]).Hide;
+  if ComponentCount > 0 then
+    for i := 0 to ComponentCount -1 do
+      if Components[i] is TControl then
+        TControl(Components[i]).Hide;
+end;
+
+procedure TTrial.SetFocus;
+begin
+  TCustomControl(Parent).SetFocus;
 end;
 
 procedure TTrial.AddToClockList(AClockStart: TThreadMethod);
@@ -417,6 +430,8 @@ begin
   StartClockList;
   Invalidate;
   FResponseEnabled := True;
+  Show;
+  SetFocus;
   if FIsCorrection then
     if Assigned (OnBeginCorrection) then OnBeginCorrection(Sender);
   if Assigned(OnTrialStart) then OnTrialStart(Sender);

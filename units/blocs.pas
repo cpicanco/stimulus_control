@@ -229,7 +229,6 @@ begin
           FTrial.CfgTrial := FBlc.Trials[IndTrial];
           FTrial.SaveTData := SaveTData;
           //FTrial.DoubleBuffered := True;
-          FTrial.Align := AlClient;
           FTrial.OnTrialEnd := @EndTrial;
           FTrial.OnTrialWriteData := @WriteTrialData;
           FTrial.OnStmResponse := @StmResponse;
@@ -237,13 +236,7 @@ begin
           FTrial.OnHit := @Hit;
           FTrial.OnMiss := @Miss;
           FTrial.OnNone := @None;
-          FTrial.Parent := FBackGround;
-          // dependencies above
-          FTrial.Visible := False;
           FTrial.Play(FIsCorrection);
-          FTrial.Visible := True;
-          FBackGround.SetFocus;
-          //todo: FTrial.SetFocus;
         end else
           EndBlc(Self);
 
