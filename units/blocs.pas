@@ -334,25 +334,15 @@ var s0, s1, s2, s3, s4 : string;
     Values : string;
   begin
     Values := '';
-    if FTrial.IETConsequence = T_HIT then
-      begin
-        // FileName, HowManyLoops, Color, MediaDuration
-        Values := 'CSQ1.wav 1 255 1';
 
-      end
-    else
-      if FTrial.IETConsequence = T_MISS then
-        begin
-          // FileName, HowManyLoops, Color, MediaDuration
-          Values := 'CSQ2.wav 1 0 1';
-
-        end
+    // Values := FileName, HowManyLoops, Color, MediaDuration
+    case FTrial.IETConsequence of
+      T_HIT  : Values := 'CSQ1.wav 1 255 1';
+      T_MISS : Values := 'CSQ2.wav 1 0 1';
+      T_NONE : Values := 'NONE -1 -1 -1';
       else
-        if FTrial.IETConsequence = T_NONE then
-          begin
-            Values := 'NONE -1 -1 -1';
-          end
-      else Values := FTrial.IETConsequence;
+        Values := FTrial.IETConsequence;
+    end;
 
     s0 := Values + #32;
     as1:= FTrial.RootMedia + Copy(s0, 0, pos(#32, s0)-1);
@@ -418,10 +408,10 @@ begin
    //or ((FCfgBlc.CrtConsecutiveMiss > 0) and (FCfgBlc.CrtConsecutiveMiss = FCounterManager.BlcCscMisses.Counter))
    or ((FTrial.NextTrial = IntToStr(FBlc.CrtMaxTrials)) and (FBlc.CrtMaxTrials > 0))
   then
-      begin
-        if Assigned(OnCriteria) then FOnCriteria(Sender);
-        FCounterManager.CurrentTrial := FBlc.NumTrials
-      end;
+    begin
+      if Assigned(OnCriteria) then FOnCriteria(Sender);
+      FCounterManager.CurrentTrial := FBlc.NumTrials
+    end;
 
 
   { FileName, HowManyLoops, Color, MediaDuration }
