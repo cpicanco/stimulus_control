@@ -16,11 +16,16 @@ interface
 uses
   Classes, SysUtils
   , BASS
-  , background
   ;
+
+var
+  GMessageTrialAudioWasPlayed : Boolean;
 
 // hello world callback
 procedure EndOfFileCallBack(AHandle: HSYNC; Channel, Data: DWORD; User: Pointer);{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
+
+// hack
+procedure EndOfMessageTrialAudio(AHandle: HSYNC; Channel, Data: DWORD; User: Pointer);{$IFDEF MSWINDOWS}stdcall{$ELSE}cdecl{$ENDIF};
 
 implementation
 
@@ -32,9 +37,23 @@ end;
 {$ELSE}
 procedure EndOfFileCallBack(AHandle: HSYNC; Channel, Data: DWORD; User: Pointer); cdecl;
 begin
-  FrmBackground.DrawMask := True;
+  // todo
 end;
 {$ENDIF}
+
+
+{$IFDEF MSWINDOWS}
+procedure EndOfMessageTrialAudio(AHandle: HSYNC; Channel, Data: DWORD; User: Pointer); stdcall;
+begin
+  GMessageTrialAudioWasPlayed := True;
+end;
+{$ELSE}
+procedure EndOfMessageTrialAudio(AHandle: HSYNC; Channel, Data: DWORD; User: Pointer); cdecl;
+begin
+  GMessageTrialAudioWasPlayed := True;
+end;
+{$ENDIF}
+
 
 end.
 

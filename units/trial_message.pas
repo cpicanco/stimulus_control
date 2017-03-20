@@ -17,6 +17,7 @@ uses  LCLIntf, LCLType, Controls,
       Classes, SysUtils, StdCtrls, Graphics
 
      , trial_abstract
+     , bass_player
      ;
 
 type
@@ -30,8 +31,13 @@ type
 
   { TMSG }
 
-  TMSG = class(TTrial)
+  TMessageStyle  = (msgDefault,msgAudio);
+
+  TMessageTrial = class(TTrial)
   private
+    FAudio : TBassStream;
+    FAudioPlaying : Boolean;
+    FMessageStyle : TMessageStyle;
     FDataSupport : TDataSupport;
     FMessagePrompt,
     FMessage : TLabel;
@@ -44,6 +50,7 @@ type
     //procedure ThreadClock(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy;override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -54,13 +61,15 @@ resourcestring
 implementation
 
 uses
-  constants, timestamps
+  constants
+  , timestamps
+  , bass_player_callbacks
   {$ifdef DEBUG}
   , debug_logger
   {$endif}
   ;
 
-constructor TMSG.Create(AOwner: TComponent);
+constructor TMessageTrial.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -99,22 +108,45 @@ begin
   Result := T_NONE;
   IETConsequence := T_NONE;
   Result := T_NONE;
+
+  GMessageTrialAudioWasPlayed := False;
+  FAudioPlaying := False;
+  FAudio := nil;
 end;
 
-procedure TMSG.MessageMouseUp(Sender: TObject; Button: TMouseButton;
+destructor TMessageTrial.Destroy;
+begin
+  if Assigned(FAudio) then
+    FAudio.Free;
+  inherited Destroy;
+end;
+
+procedure TMessageTrial.MessageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   if Button = mbLeft then
     EndTrial(Sender);
 end;
 
-procedure TMSG.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TMessageTrial.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if Key = 32 then
-    EndTrial(Sender);
+    case FMessageStyle of
+      msgDefault:
+        EndTrial(Sender);
+      msgAudio:
+        if GMessageTrialAudioWasPlayed then
+          EndTrial(Sender)
+        else
+          if not FAudioPlaying then
+            begin
+              FAudioPlaying:=True;
+              FAudio.Play;
+            end;
+    end;
 end;
 
-procedure TMSG.TrialBeforeEnd(Sender: TObject);
+procedure TMessageTrial.TrialBeforeEnd(Sender: TObject);
 begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TMSG.BeforeEndTrial:'+ TObject(Sender).ClassName);
@@ -123,12 +155,33 @@ begin
   WriteData(Self);
 end;
 
-procedure TMSG.Play(ACorrection : Boolean);
+procedure TMessageTrial.Play(ACorrection : Boolean);
 var
   LFontColor : Integer;
+  LAudioFile : string;
 begin
   inherited Play(ACorrection);
   LFontColor :=  StrToIntDef(CfgTrial.SList.Values[_MsgFontColor], $000000);
+  FMessageStyle := TMessageStyle(Ord(StrToIntDef(CfgTrial.SList.Values[_Style], 0)));
+
+  if FMessageStyle = msgAudio then
+    begin
+      LAudioFile := CfgTrial.SList.Values[_cStm];
+      case LAudioFile of
+        T_HIT  : LAudioFile := RootMedia+'CSQ1.wav';
+        T_MISS : LAudioFile := RootMedia+'CSQ2.wav';
+        else
+          LAudioFile := RootMedia+LAudioFile;
+      end;
+
+      if FileExists(LAudioFile) then
+        begin
+          FAudio := TBassStream.Create(LAudioFile);
+          FAudio.SyncProcedure := @EndOfMessageTrialAudio;
+        end
+      else
+        raise Exception.Create('File does not exist: '+LAudioFile);
+    end;
 
   with FMessage do
     begin
@@ -146,10 +199,10 @@ begin
       Enabled := StrToBoolDef(CfgTrial.SList.Values[_Prompt], False);
     end;
 
-  if Self.ClassType = TMSG then Config(Self);
+  if Self.ClassType = TMessageTrial then Config(Self);
 end;
 
-procedure TMSG.TrialStart(Sender: TObject);
+procedure TMessageTrial.TrialStart(Sender: TObject);
 begin
   with FMessage do
     begin
@@ -166,7 +219,7 @@ begin
   FDataSupport.TrialBegin := TickCount;
 end;
 
-procedure TMSG.WriteData(Sender: TObject);
+procedure TMessageTrial.WriteData(Sender: TObject);
 var aStart, aDuration : string;
 begin
   inherited WriteData(Sender);

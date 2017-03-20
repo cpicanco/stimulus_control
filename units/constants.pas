@@ -73,6 +73,7 @@ const
   _MsgFontSize = 'MsgFontSize';
   _MsgFontColor = 'MsgFontColor';
   _Prompt = 'Prompt';
+  _Style = 'Style';
 
   // MTS
   _Delayed = 'Delayed';

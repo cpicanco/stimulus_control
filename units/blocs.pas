@@ -214,7 +214,7 @@ begin
         T_CLB : FTrial := TCLB.Create(FBackGround);
         T_FPE : FTrial := TFPE.Create(FBackGround);
         T_MRD : FTrial := TMRD.Create(FBackGround);
-        T_MSG : FTrial := TMSG.Create(FBackGround);
+        T_MSG : FTrial := TMessageTrial.Create(FBackGround);
         T_MTS : FTrial := TMTS.Create(FBackGround);
         T_Simple : FTrial := TSimpl.Create(FBackGround);
       end;
