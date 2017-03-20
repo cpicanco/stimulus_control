@@ -1200,6 +1200,11 @@ var
   end;
 
 begin
+  GGlobalContainer := TGlobalContainer.Create;
+  if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
+    GGlobalContainer.MonitorToShow := 1
+  else
+    GGlobalContainer.MonitorToShow := 0;
   {
     Example:
 
@@ -1218,11 +1223,7 @@ begin
   begin
     aRow := 1;
     FrmBresenhamLine := TBresenhamLineForm.Create(Application);
-    if chkPlayOnSecondMonitor.Checked then
-      FrmBresenhamLine.MonitorToShow := 1
-    else
-      FrmBresenhamLine.MonitorToShow := 0;
-
+    FrmBresenhamLine.MonitorToShow := GGlobalContainer.MonitorToShow;
     if FrmBresenhamLine.ShowModal = mrOk then
       begin
         for aRepeat := 0 to FrmBresenhamLine.seRepeat.Value -1 do
@@ -1263,11 +1264,7 @@ begin
       aRow := 1;
       aCol := 0;
       FormFPE := TFormFPE.Create(Application);
-      if chkPlayOnSecondMonitor.Checked then
-        FormFPE.MonitorToShow := 1
-      else
-        FormFPE.MonitorToShow := 0;
-
+      FormFPE.MonitorToShow := GGlobalContainer.MonitorToShow;
       if FormFPE.ShowModal = mrOk then
         begin
           for aTrial := Low(FormFPE.Trials) to High(FormFPE.Trials) do AddMatrixTrialToGrid;
@@ -1286,19 +1283,9 @@ begin
   if piGo_NoGo.Checked then
     begin
       aRow := 1;
-      GGlobalContainer := TGlobalContainer.Create;
-      FormGo_NoGo := TFormGo_NoGo.Create(Application);
-      if chkPlayOnSecondMonitor.Checked then
-        begin
-          GGlobalContainer.MonitorToShow := 1;
-          FormGo_NoGo.MonitorToShow := GGlobalContainer.MonitorToShow;
-        end
-      else
-        begin
-          GGlobalContainer.MonitorToShow := 0;
-          FormGo_NoGo.MonitorToShow := GGlobalContainer.MonitorToShow;
-        end;
 
+      FormGo_NoGo := TFormGo_NoGo.Create(Application);
+      FormGo_NoGo.MonitorToShow := GGlobalContainer.MonitorToShow;
       if FormGo_NoGo.ShowModal = mrOK then
         begin
           for aTrial := Low(FormGo_NoGo.Trials) to High(FormGo_NoGo.Trials) do AddGoNoGoTrialsToGrid;
@@ -1307,9 +1294,8 @@ begin
           ResetRepetionMatrix;
           FLastFocusedCol := -1;
         end;
-
-      GGlobalContainer.Free;
     end;
+  GGlobalContainer.Free;
 end;
 
 procedure TFormUserConfig.FormCreate(Sender: TObject);
@@ -1369,13 +1355,14 @@ begin
     begin
       FrmBackground.Show;
       FrmBackground.SetFullScreen(True);
-      if chkPlayOnSecondMonitor.Checked then
-         FrmBackground.Left := Screen.Width + 1;
 
       FSession := TSession.Create(FrmBackground);
       FConfigs := TCfgSes.Create(FSession);
-      if chkPlayOnSecondMonitor.Checked then
-        FConfigs.GlobalContainer.MonitorToShow := 1
+      if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
+        begin
+          FConfigs.GlobalContainer.MonitorToShow := 1;
+          FrmBackground.Left := Screen.Width + 1;
+        end
       else
         FConfigs.GlobalContainer.MonitorToShow := 0;
 
