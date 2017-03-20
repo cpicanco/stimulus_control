@@ -896,6 +896,7 @@ var
   end;
 
 begin
+  Memo1.Clear;
   aNumTrials := StringGrid1.RowCount -1;
   FEscriba.SessionServer := CSESSION_SERVER;
   if piAxes.Checked then
