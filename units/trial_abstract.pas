@@ -411,7 +411,7 @@ end;
 procedure TTrial.BeginStarter;
 begin
   FResponseEnabled:= True;
-  Invalidate;
+  Show;
 end;
 
 procedure TTrial.StartClockList;
@@ -428,7 +428,6 @@ procedure TTrial.StartTrial(Sender: TObject);
 begin
   LogEvent('TS');
   StartClockList;
-  Invalidate;
   FResponseEnabled := True;
   Show;
   SetFocus;
