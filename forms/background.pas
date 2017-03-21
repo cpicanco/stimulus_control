@@ -78,7 +78,7 @@ begin
   FTimer.Interval := 100;
   FTimer.OnTimer := @UpdateMask;
   FBitmap := TBitmap.Create;
-  RandomMask(FBitmap,0,0);
+  RandomMask(FBitmap);
 end;
 
 procedure TBackground.FormDestroy(Sender: TObject);
@@ -110,7 +110,7 @@ end;
 
 procedure TBackground.UpdateMask(Sender: TObject);
 begin
-  RandomMask(FBitmap,0,0);
+  RandomMask(FBitmap);
   Invalidate;
 end;
 
