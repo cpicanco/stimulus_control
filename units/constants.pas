@@ -13,8 +13,6 @@ unit constants;
 
 interface
 
-procedure NextSpaceDelimitedParameter(var ASDP : string);
-
 const
   // Posições
   _Positions = 'Positions';
@@ -224,11 +222,6 @@ resourcestring
 
 implementation
 
-procedure NextSpaceDelimitedParameter(var ASDP: string);
-begin
-  Delete(ASDP, 1, pos(#32, ASDP));
-  if Length(ASDP) > 0 then while ASDP[1] = #32 do Delete(ASDP, 1, 1);
-end;
 
 end.
 

@@ -63,7 +63,7 @@ type
 
 implementation
 
-uses constants, timestamps;
+uses strutils, constants, timestamps;
 
 constructor TMTS.Create(AOwner: TComponent);
 begin
@@ -98,22 +98,17 @@ begin
 
     // BND
     s1:= CfgTrial.SList.Values[_Samp + _cBnd];
-    R.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-    NextSpaceDelimitedParameter(s1);
-    R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-    NextSpaceDelimitedParameter(s1);
-    R.Right:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-    NextSpaceDelimitedParameter(s1);
-    R.Bottom:= StrToIntDef(s1, 0);
+    R.Top:= StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
+    R.Left:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
+    R.Right:= StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
+    R.Bottom:= StrToIntDef(ExtractDelimited(4,s1,[#32]),100);
     Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
     // STM
     s1:= CfgTrial.SList.Values[_Samp + _cStm] + #32;
-    Key.FullPath:= RootMedia + Copy(s1, 0, pos(#32, s1)-1);
-    NextSpaceDelimitedParameter(s1);
-    Key.Loops:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-    NextSpaceDelimitedParameter(s1);
-    Key.Color := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), $0000FF);
+    Key.FullPath:= RootMedia + ExtractDelimited(1,s1,[#32]);
+    Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
+    Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]),$0000FF);
 
     // SCH
     Key.Schedule.Kind:= CfgTrial.SList.Values[_Samp + _cSch];

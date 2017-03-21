@@ -169,7 +169,7 @@ resourcestring
 
 implementation
 
-uses constants, config_session_global_container;
+uses strutils, constants, config_session_global_container;
 { TCfgSes }
 
 function TCfgSes.GetCfgBlc(Ind: Integer): TCfgBlc;
@@ -368,10 +368,10 @@ begin
                     with FPositions[a4] do
                       begin
                         Index := a4 + 1;
-                        Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); NextSpaceDelimitedParameter(s1);
-                        Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); NextSpaceDelimitedParameter(s1);
-                        Width:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); NextSpaceDelimitedParameter(s1);
-                        Height:= StrToIntDef(s1, 0);
+                        Top:= StrToInt(ExtractDelimited(1,s1,[#32]));
+                        Left:= StrToInt(ExtractDelimited(2,s1,[#32]));
+                        Width:= StrToInt(ExtractDelimited(3,s1,[#32]));
+                        Height:= StrToInt(ExtractDelimited(4,s1,[#32]));
                       end;
                   end;
                 ListCreate;

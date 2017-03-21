@@ -62,6 +62,7 @@ implementation
 
 uses
   timestamps
+  , strutils
 {$ifdef DEBUG}
   , debug_logger
   , dialogs
@@ -167,17 +168,11 @@ begin
     begin
         s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
 
-        LOuterR.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        LOuterR.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        LWidth := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 100);
+        LOuterR.Left:= StrToIntDef(ExtractDelimited(1,s1,[#32]), 0);
+        LOuterR.Top:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
+        LWidth := StrToIntDef(ExtractDelimited(3,s1,[#32]), 100);
         LOuterR.Right := LOuterR.Left + LWidth;
-        NextSpaceDelimitedParameter(s1);
-
-        LHeight := StrToIntDef(Copy(s1, 0, pos(#32, s1) - 1), 100);
+        LHeight := StrToIntDef(ExtractDelimited(4,s1,[#32]), 100);
         LOuterR.Bottom := LOuterR.Top + LHeight;
 
        if FUseMedia then

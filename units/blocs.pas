@@ -137,7 +137,7 @@ type
 
 implementation
 
-uses constants, timestamps
+uses strutils, constants, timestamps
      {$ifdef DEBUG}
      , debug_logger
      {$endif}
@@ -345,13 +345,10 @@ var s0, s1, s2, s3, s4 : string;
     end;
 
     s0 := Values + #32;
-    as1:= FTrial.RootMedia + Copy(s0, 0, pos(#32, s0)-1);
-    NextSpaceDelimitedParameter(s0);
-    as2:= Copy(s0, 0, pos(#32, s0)-1);
-    NextSpaceDelimitedParameter(s0);
-    as3:= Copy(s0, 0, pos(#32, s0)-1);
-    NextSpaceDelimitedParameter(s0);
-    as4:= Copy(s0, 0, pos(#32, s0)-1);
+    as1:= FTrial.RootMedia + ExtractDelimited(1,s1,[#32]);
+    as2:= ExtractDelimited(2,s1,[#32]);
+    as3:= ExtractDelimited(3,s1,[#32]);
+    as4:= ExtractDelimited(4,s1,[#32]);
   end;
 begin
   s1 := '';

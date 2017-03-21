@@ -93,7 +93,7 @@ type
 
 implementation
 
-uses constants, timestamps;
+uses strutils, constants, timestamps;
 
 { TGNG }
 
@@ -256,16 +256,13 @@ begin
     C1Stm=A1.png
   }
   s1:= CfgTrial.SList.Values[_Comp + IntToStr(1) +_cStm] + #32;
-  LName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
-  NextSpaceDelimitedParameter(s1);
-  LColor := Copy(s1, 0, pos(#32, s1)-1);
-  NextSpaceDelimitedParameter(s1);
+  LName := RootMedia + ExtractDelimited(1,s1,[#32]);
+  LColor := ExtractDelimited(2,s1,[#32]);
   LLoop := s1;
 
   s1:= CfgTrial.SList.Values[_Comp + IntToStr(1) +_cBnd] + #32;
-  LWidth := Copy(s1, 0, pos(#32, s1)-1);
-  NextSpaceDelimitedParameter(s1);
-  LHeight := Copy(s1, 0, pos(#32, s1)-1);
+  LWidth := ExtractDelimited(1,s1,[#32]);
+  LHeight := ExtractDelimited(2,s1,[#32]);
 
   FStimulus := TKey.Create(Self);
   with FStimulus do

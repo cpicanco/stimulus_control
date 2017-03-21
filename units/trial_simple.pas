@@ -75,7 +75,7 @@ type
 
 implementation
 
-uses constants, timestamps;
+uses strutils, constants, timestamps;
 
 constructor TSimpl.Create(AOwner: TComponent);
 begin
@@ -127,26 +127,16 @@ begin
         Key.Parent := TCustomControl(Self.Parent);
 
         s1 := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cBnd] + #32;
-        R.Top := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        R.Left := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        R.Bottom := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        R.Right := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+        R.Top := StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
+        R.Left := StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
+        R.Bottom := StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
+        R.Right := StrToIntDef(ExtractDelimited(4,s1,[#32]),100);
         Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
         s1 := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cStm] + #32;
-        Key.FullPath := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
-        NextSpaceDelimitedParameter(s1);
-
-        Key.Loops:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        Key.Color := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), $0000FF); //clRed
+        Key.FullPath := RootMedia + ExtractDelimited(1,s1,[#32]);
+        Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
+        Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]), $0000FF); //clRed
 
         Csq := StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cCsq], 0);
         //Usb := CfgTrial.SList.Values[_Comp+IntToStr(I+1)+_cUsb];

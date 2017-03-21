@@ -13,7 +13,7 @@ unit draw_methods; //helpers
 
 interface
 
-uses Graphics, SysUtils, Classes, Controls, math;
+uses Graphics, SysUtils, Classes, Controls;
 
 type
 
@@ -30,11 +30,12 @@ procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
 procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
 
-procedure RandomMask(AMask:TBitmap;AMinIntensity,AMaxIntensity:Byte;
-  AWidth: integer= 50;AHeight:integer= 30);
+procedure RandomMask(AMask:TBitmap;{AMinIntensity,AMaxIntensity:Byte;} AWidth: integer= 50;AHeight:integer= 30);
 
 
 implementation
+
+uses math;
 
 function PointInPolygon(AX, AY: Integer; APolygon: array of TPoint): Boolean;
 //  The function will return True if the point x,y is inside the polygon, or
@@ -155,8 +156,7 @@ begin
     end;
 end;
 
-procedure RandomMask(AMask: TBitmap; AMinIntensity, AMaxIntensity: Byte;
-  AWidth: integer; AHeight: integer);
+procedure RandomMask(AMask: TBitmap; {AMinIntensity, AMaxIntensity: Byte;} AWidth: integer; AHeight: integer);
 var
   LC: Byte;
   i, j: Integer;

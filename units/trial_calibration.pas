@@ -64,7 +64,7 @@ type
 
 implementation
 
-uses constants, timestamps, background;
+uses strutils, constants, timestamps, background;
 
 { TCLB }
 
@@ -190,13 +190,9 @@ begin
       for i := Low(FDataSupport.Dots) to High(FDataSupport.Dots) do
         begin
           s1 := CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
-          FDataSupport.Dots[i].Y := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0); // top, left, width, height
-          NextSpaceDelimitedParameter(s1);
-
-          FDataSupport.Dots[i].X := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-          NextSpaceDelimitedParameter(s1);
-
-          FDataSupport.Dots[i].Size := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
+          FDataSupport.Dots[i].Y := StrToIntDef(ExtractDelimited(1,s1,[#32]), 0); // top, left, width, height
+          FDataSupport.Dots[i].X := StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
+          FDataSupport.Dots[i].Size := StrToIntDef(ExtractDelimited(3,s1,[#32]), 0);
         end;
     end;
 

@@ -79,7 +79,7 @@ type
 
 implementation
 
-uses constants, timestamps
+uses strutils, constants, timestamps
      {$ifdef DEBUG}
      , debug_logger
      , dialogs
@@ -310,16 +310,10 @@ begin
       Color1 := True;
       Color2 := True;
 
-      Min := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-      NextSpaceDelimitedParameter(s1);
-
-      Max := StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-      NextSpaceDelimitedParameter(s1);
-
-      Version := Copy(s1, 0, pos(#32, s1)-1);
-      NextSpaceDelimitedParameter(s1);
-
-      Mode := Copy(s1, 0, pos(#32, s1)-1);
+      Min := StrToIntDef(ExtractDelimited(1,s1,[#32]), 0);
+      Max := StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
+      Version := ExtractDelimited(3,s1,[#32]);
+      Mode := ExtractDelimited(4,s1,[#32]);
       Mode := UpperCase(Mode);
 
       Main := RandomInRange(Min, Max);
@@ -364,16 +358,10 @@ begin
     begin
         s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd] + #32;
 
-        R.Top:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        R.Left:= StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 0);
-        NextSpaceDelimitedParameter(s1);
-
-        R.Bottom := R.Top + StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 100);
-        NextSpaceDelimitedParameter(s1);
-
-        R.Right := R.Left + StrToIntDef(Copy(s1, 0, pos(#32, s1)-1), 100);
+        R.Top:= StrToIntDef(ExtractDelimited(1,s1,[#32]), 0);
+        R.Left:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
+        R.Bottom := R.Top + StrToIntDef(ExtractDelimited(3,s1,[#32]), 100);
+        R.Right := R.Left + StrToIntDef(ExtractDelimited(4,s1,[#32]), 100);
 
         {$ifdef DEBUG}
           DebugLn(mt_Debug + 'R' + IntToStr(a1+1) + ':' +
