@@ -32,53 +32,74 @@ type
 
   { TDataSupport }
 
-  TFPEDrawingType = (fpeClearCircles, fpeFullOuterInnerCircles);
+  TFPEDrawing = (fpeClearCircles, fpeFullOuterInnerCircles);
+
+  TFPEStyles = (
+    {
+      Limited hold > 0 is assumed.
+      Play HIT or MISS sounds OnConsequence.
+      Sounds OnConsequence are always contiguous to TSchedule.OnConsequence triggered by responses.
+    }
+    fpePlayGoSounds,
+
+    {
+      Limited hold > 0 is assumed.
+      Play HIT or MISS sounds OnBeforeEndTrial.
+      Sounds OnBeforeEndTrial may not be contiguous to TSchedule.OnConsequence triggered by responses.
+    }
+    fpePlayNoGoSounds,
+
+    {
+      Limited hold > 0 is assumed.
+      If a sound would be presented OnConsequence, it is presented OnBeforeTrial instead.
+    }
+    fpePlayGoSoundsOnBeforeEnd
+
+  );
+
+  TFPEStyle = set of TFPEStyles;
 
   TDataSupport = record
     Responses : integer;
     Latency,
     StmBegin,
     StmEnd : Extended;
-
-    {
-      CSQHIT occurs at the trial ending, after the trial is destroyed, see units/blocs.pas IETconsequence,
-      so it may not be always contingent to the subject's response
-    }
-    CSQHIT : string;
-
-    {
-      CSQMISS occurs at the trial ending, after the trial is destroyed, see units/blocs.pas IETconsequence,
-      so it may not be always contingent to the subject's response
-    }
-    CSQMISS : string;
-
-    {
-      CSQ occurs as soon as the subject's response meets the response schedule, i.e., always contingent.
-      CSQ is only available for TSchRRRT instances, see units/schedules_main.
-    }
-    CSQ : string;
-
   end;
 
   { TFPE }
 
+
+  {
+   Implements a specific type of GO/NO-GO trial.
+   Implements feature positive and feature negative displays.
+  }
   TFPE = Class(TTrial)
   private
-    FFPEDrawingType : TFPEDrawingType;
+    {
+      True = GO
+      False = NO-GO
+    }
     FConsequenceFired : Boolean;
-    FCurrTrial: TCurrentTrial;
+    FStyle : TFPEStyle;
+    FContingency : string;
     FDataSupport : TDataSupport;
-    //FFirstResp : Boolean;
-    FNumComp : integer;
-    FSchedule : TSchedule;
     FForeground : TBitmap;
-    procedure TrialPaint;
+    FFeaturesToDraw : TFPEDrawing;
+    FSchedule : TSchedule;
+    FSound : TBassStream;
+
+    // go
     procedure Consequence(Sender: TObject);
+    procedure DrawForeground(ACircles: array of TCircle; AFeaturesToDraw: TFPEDrawing);
+    procedure PlaySound;
     procedure Response(Sender: TObject);
+
+    // no-go
     procedure TrialBeforeEnd(Sender: TObject);
-    procedure TrialStart(Sender: TObject);
-    procedure TrialResult(Sender: TObject);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialPaint;
+    procedure TrialResult(Sender: TObject);
+    procedure TrialStart(Sender: TObject);
   protected { TTrial }
     procedure WriteData(Sender: TObject); override;
   public
@@ -113,11 +134,15 @@ begin
 
   FForeGround := TBitmap.Create;
   FDataSupport.Responses:= 0;
+  FContingency := '';
+  FForeground := TBitmap.Create;
 end;
 
 destructor TFPE.Destroy;
 begin
   FForeGround.Free;
+  if Assigned(FSound) then
+    FSound.Free;
   inherited Destroy;
 end;
 
@@ -129,64 +154,54 @@ end;
 
 procedure TFPE.TrialResult(Sender: TObject);
 begin
-  //FDataSupport.StmDuration := GetCustomTick;
-  if FConsequenceFired then
-    case UpperCase(FCurrTrial.response) of
-      'POSITIVA':
-        begin
-          Result := T_HIT;
-          IETConsequence := T_HIT;
-        end;
-      'NEGATIVA':
-        begin
-          Result := T_MISS;
-          IETConsequence := T_MISS;
-        end;
+  if Result = T_NONE then
+    begin
+      if FConsequenceFired then
+        case UpperCase(FContingency) of
+          'POSITIVA': Result := T_HIT;
+          'NEGATIVA': Result := T_MISS;
+        end
       else
-        begin
-          Result := T_NONE;
-          IETConsequence := T_NONE;
+        case UpperCase(FContingency) of
+          'POSITIVA': Result := T_MISS;
+          'NEGATIVA': Result := T_HIT;
         end;
+
+      case NextTrial of
+        T_CRT:NextTrial := T_CRT;
+        'IF_HIT_JUMP_NEXT_TRIAL':
+            if Result = T_HIT then
+              NextTrial := IntToStr(CounterManager.CurrentTrial+3);
+      end;
     end;
-
-  case NextTrial of
-    T_CRT:NextTrial := T_CRT;
-    'IF_HIT_JUMP_NEXT_TRIAL':
-        if Result = T_HIT then
-          NextTrial := IntToStr(GlobalContainer.CounterManager.CurrentTrial+3);
-  end;
-
-  LogEvent(Result);
-  FCurrTrial.Result := Result;
 end;
 
 procedure TFPE.TrialBeforeEnd(Sender: TObject);
 begin
   FDataSupport.StmEnd := TickCount;
   TrialResult(Sender);
+  if fpePlayNoGoSounds in FStyle then
+    if fpePlayGoSoundsOnBeforeEnd in FStyle then
+      PlaySound
+    else
+      if not FConsequenceFired then
+        PlaySound;
+
+  LogEvent(Result);
   WriteData(Sender);
 end;
 
 procedure TFPE.Consequence(Sender: TObject);
-var
-  LSound : TBassStream;
-  LSoundFile : string;
 begin
   LogEvent('C');
   if FConsequenceFired = False then FConsequenceFired := True;
-  LSoundFile := '';
+  TrialResult(Sender);
 
-  case FDataSupport.CSQ of
-    T_HIT  : LSoundFile := RootMedia+'CSQ1.wav';
-    T_MISS : LSoundFile := RootMedia+'CSQ2.wav';
-    else     LSoundFile := RootMedia+FDataSupport.CSQ;
-  end;
-
-  if FileExists(LSoundFile) then
-    begin
-      LSound := TBassStream.Create(LSoundFile);
-      LSound.Play;
-    end;
+  if fpePlayGoSoundsOnBeforeEnd in FStyle then
+    // do nothing
+  else
+    if fpePlayGoSounds in FStyle then
+      PlaySound;
 
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
@@ -195,103 +210,40 @@ procedure TFPE.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if Key = 32 then
     begin
-      //if FUseMedia then ... not implemented yet
       LogEvent('R');
       FSchedule.DoResponse;
     end;
 end;
-
 
 procedure TFPE.TrialPaint;
 begin
   Canvas.Draw(0,0,FForeground);
 end;
 
-procedure TFPE.Play(ACorrection: Boolean);
+procedure TFPE.PlaySound(InBeforeEndTrial: Boolean);
 var
-  s1: string;
-  LOuterR , LR: TRect;
-  i, LWidth, LHeight : Integer;
+  LSoundFile : string;
 begin
-  inherited Play(ACorrection);
-  FFPEDrawingType := TFPEDrawingType(StrToIntDef(CfgTrial.SList.Values[_DrawingType], 0));
-  FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
-  SetLength(FCurrTrial.C, FNumComp);
+  case Result of
+    T_HIT  : LSoundFile := RootMedia+'CSQ1.wav';
+    T_MISS : LSoundFile := RootMedia+'CSQ2.wav';
+  end;
 
-  FSchedule := TSchedule.Create(self);
-  with FSchedule do
+  if FileExists(LSoundFile) then
     begin
-      OnConsequence := @Consequence;
-      OnResponse:= @Response;
-      Kind := CfgTrial.SList.Values[_Schedule];
-      Enabled := False;
+      if Assigned(FSound) then
+        FSound.Free
+      else
+        FSound := TBassStream.Create(LSoundFile);
+      FSound.Play;
     end;
-  AddToClockList(FSchedule);
+end;
 
-  // Use alias as defaults
-  FCurrTrial.response := CfgTrial.SList.Values[_Contingency];
-  //if UpperCase(FCurrTrial.Response) = 'POSITIVA' then
-  //  begin
-  //    FDataSupport.CSQHIT := 'HIT';
-  //    FDataSupport.CSQMISS := 'NONE';
-  //    // FDataSupport.CSQ := 'NONE';
-  //  end;
-  //
-  //if UpperCase(FCurrTrial.Response) = 'NEGATIVA' then
-  //  begin
-  //    FDataSupport.CSQHIT := 'NONE';
-  //    FDataSupport.CSQMISS := 'MISS';
-  //    // FDataSupport.CSQ := 'NONE';
-  //  end;
-
-  // allow user defined differential consequences
-  //s1 := CfgTrial.SList.Values[_Trial + _cIET] + #44;
-  //
-  //FDataSupport.CSQHIT := Copy(s1, 0, pos(#44, s1) - 1);
-  //NextCommaDelimitedParameter;
-  //
-  //FDataSupport.CSQMISS := Copy(s1, 0, pos(#44, s1) - 1);
-  //NextCommaDelimitedParameter;
-  //
-  //FDataSupport.CSQ := Copy(s1, 0, pos(#44, s1) - 1);
-  //
-  //// Alias to a default media name.ext
-  //FCurrTrial.response := CfgTrial.SList.Values[_Consequence];
-  //if UpperCase(FCurrTrial.response) = 'POSITIVA' then
-  //  if FDataSupport.CSQ = T_HIT then FDataSupport.CSQ := 'CSQ1.wav';
-  //
-  //if UpperCase(FCurrTrial.response) = 'NEGATIVA' then
-  //  if FDataSupport.CSQ = T_MISS then FDataSupport.CSQ := 'CSQ2.wav';
-
-  FCurrTrial.Result := T_NONE;
-
-  for i := 0 to FNumComp -1 do
-    begin
-        s1:= CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd];
-        LOuterR.Top:= StrToInt(ExtractDelimited(1,s1,[#32]));
-        LOuterR.Left:= StrToInt(ExtractDelimited(2,s1,[#32]));
-        LWidth := StrToInt(ExtractDelimited(3,s1,[#32]));
-        LOuterR.Right := LOuterR.Left + LWidth;
-        LHeight := StrToInt(ExtractDelimited(4,s1,[#32]));
-        LOuterR.Bottom := LOuterR.Top + LHeight;
-
-        with FCurrTrial.C[i] do
-          begin
-            OuterRect := LOuterR;
-            case FFPEDrawingType of
-              fpeClearCircles: {do nothing};
-              fpeFullOuterInnerCircles:InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
-            end;
-            gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(i+1) + _cGap], False );
-            gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], 1+Random(360));
-            gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 );
-          end;
-      end;
-
-  if not TBackground(Self.Parent).DrawMask then
-    TBackground(Self.Parent).DrawMask:=True;
-
-  FForeground := TBitmap.Create;
+procedure TFPE.DrawForeground(ACircles: array of TCircle;
+  AFeaturesToDraw: TFPEDrawing);
+var
+  i : integer;
+begin
   FForeground.Width:= Width;
   FForeground.Height:= Height;
   FForeground.TransparentColor:=clFuchsia;
@@ -307,14 +259,69 @@ begin
     end;
 
   // FForeground do not change, we need to draw only once
-  for i := Low(FCurrTrial.C) to High(FCurrTrial.C) do
-    with FCurrTrial.C[i] do
-      case FFPEDrawingType of
+  for i := Low(ACircles) to High(ACircles) do
+    with ACircles[i] do
+      case AFeaturesToDraw of
         fpeClearCircles:
           DrawCustomEllipse(FForeground.Canvas, OuterRect, gap, gap_degree, gap_length);
         fpeFullOuterInnerCircles:
           DrawCustomEllipse(FForeground.Canvas, OuterRect, InnerRect, gap, gap_degree, gap_length);
       end;
+end;
+
+procedure TFPE.Play(ACorrection: Boolean);
+var
+  s1: string;
+  LOuterR , LR: TRect;
+  i, LWidth, LHeight, LNumComp : Integer;
+  LCircles : array of TCircle;
+begin
+  inherited Play(ACorrection);
+  FFeaturesToDraw := TFPEDrawing(StrToIntDef(CfgTrial.SList.Values[_DrawingType], 0));
+  FStyle := TFPEStyle(StrToIntDef(CfgTrial.SList.Values[_Style], 0));
+
+  FSchedule := TSchedule.Create(self);
+  with FSchedule do
+    begin
+      OnConsequence := @Consequence;
+      OnResponse:= @Response;
+      Kind := CfgTrial.SList.Values[_Schedule];
+      Enabled := False;
+    end;
+  AddToClockList(FSchedule);
+
+  // Use alias as defaults
+  FContingency := CfgTrial.SList.Values[_Contingency];
+
+  LNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
+  SetLength(LCircles, LNumComp);
+  for i := 0 to LNumComp -1 do
+    begin
+        s1:= CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd];
+        LOuterR.Top:= StrToInt(ExtractDelimited(1,s1,[#32]));
+        LOuterR.Left:= StrToInt(ExtractDelimited(2,s1,[#32]));
+        LWidth := StrToInt(ExtractDelimited(3,s1,[#32]));
+        LOuterR.Right := LOuterR.Left + LWidth;
+        LHeight := StrToInt(ExtractDelimited(4,s1,[#32]));
+        LOuterR.Bottom := LOuterR.Top + LHeight;
+
+        with LCircles[i] do
+          begin
+            OuterRect := LOuterR;
+            case FFPEDrawingType of
+              fpeClearCircles: {do nothing};
+              fpeFullOuterInnerCircles:InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
+            end;
+            gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(i+1) + _cGap], False );
+            gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], 1+Random(360));
+            gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 );
+          end;
+      end;
+
+  if not TBackground(Self.Parent).DrawMask then
+    TBackground(Self.Parent).DrawMask:=True;
+
+  DrawForeground(LCircles, FFeaturesToDraw);
 
   if Self.ClassType = TFPE then Config(Self);
 end;
@@ -326,7 +333,7 @@ begin
   FDataSupport.StmBegin := TickCount;
 end;
 
-procedure TFPE.WriteData(Sender: TObject);  //
+procedure TFPE.WriteData(Sender: TObject);
 var LLatency : string;
 begin
   inherited WriteData(Sender);
@@ -340,8 +347,8 @@ begin
            LLatency + #9 +
            TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
-           FCurrTrial.response + #9 +
-           FCurrTrial.Result;
+           FContingency + #9 +
+           Result;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
@@ -350,12 +357,7 @@ procedure TFPE.Response(Sender: TObject);
 begin
   Inc(FDataSupport.Responses);
   if FDataSupport.Latency = TimeStart then
-      FDataSupport.Latency := TickCount;
-
-  // not implemented yet
-  //if FUseMedia then
-  //  if Sender is TKey then TKey(Sender).IncCounterResponse
-  //    else;
+    FDataSupport.Latency := TickCount;
 
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
