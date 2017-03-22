@@ -51,6 +51,7 @@ type
     NextTrial : string;
     angle : Extended; // angle from "userconfigs_trial_mirrored" form,
     response : string;
+    Contingency : string;
     Result : string;
   end;
 

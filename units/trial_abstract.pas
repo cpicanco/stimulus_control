@@ -358,10 +358,10 @@ begin
   NextTrial := CfgTrial.SList.Values[_NextTrial];
 
   // will the trial count as MISS, HIT or NONE?
-  Result := 'NONE';
+  Result := T_NONE;
 
   // what will happen during the inter trial interval?
-  IETConsequence := 'NONE';
+  IETConsequence := T_NONE;
 
   // is it a correction trial?
   if ACorrection then
