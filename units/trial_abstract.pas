@@ -346,7 +346,7 @@ end;
 
 procedure TTrial.Play(ACorrection: Boolean);
 begin
-  Hide;
+  //Hide;
 
   // avoid responses while loading configurations
   FResponseEnabled := False;

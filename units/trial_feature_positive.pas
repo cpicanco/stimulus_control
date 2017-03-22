@@ -84,6 +84,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Hide;override;
     procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
   end;
@@ -118,6 +119,12 @@ destructor TFPE.Destroy;
 begin
   FForeGround.Free;
   inherited Destroy;
+end;
+
+procedure TFPE.Hide;
+begin
+  inherited Hide;
+  TBackground(Self.Parent).UpdateMask;
 end;
 
 procedure TFPE.TrialResult(Sender: TObject);
@@ -281,9 +288,8 @@ begin
           end;
       end;
 
-  if not FrmBackground.DrawMask then
-    FrmBackground.DrawMask:=True;
-  FrmBackground.UpdateMask;
+  if not TBackground(Self.Parent).DrawMask then
+    TBackground(Self.Parent).DrawMask:=True;
 
   FForeground := TBitmap.Create;
   FForeground.Width:= Width;

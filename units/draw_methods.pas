@@ -30,12 +30,16 @@ procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
 procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
 
-procedure RandomMask(AMask:TBitmap;{AMinIntensity,AMaxIntensity:Byte;} AWidth: integer= 50;AHeight:integer= 30);
+procedure RandomMask(AMask:TBitmap; AWidth: integer= 50;AHeight:integer= 30);
 
 
 implementation
 
 uses math;
+
+const
+  GM = 180;
+  GS = 175;
 
 function PointInPolygon(AX, AY: Integer; APolygon: array of TPoint): Boolean;
 //  The function will return True if the point x,y is inside the polygon, or
@@ -156,7 +160,7 @@ begin
     end;
 end;
 
-procedure RandomMask(AMask: TBitmap; {AMinIntensity, AMaxIntensity: Byte;} AWidth: integer; AHeight: integer);
+procedure RandomMask(AMask: TBitmap; AWidth: integer; AHeight: integer);
 var
   LC: Byte;
   i, j: Integer;
@@ -167,8 +171,8 @@ begin
     for j := 0 to AMask.Width do
       begin
         //LC := Random(AMaxIntensity-AMinIntensity+1)+AMinIntensity;
-        LC := RandomRange(10,20);
-        AMask.Canvas.Pixels[j,i] := RGBToColor(192+LC,220+LC,192+LC);
+        LC := RandomRange(10,21);
+        AMask.Canvas.Pixels[j,i] := RGBToColor(GM+LC,GM+LC,GM+LC);
       end;
 end;
 
@@ -235,7 +239,7 @@ begin
     begin
       Pen.Width := 8;
       Pen.EndCap:=pecFlat;
-      Pen.Color:= clMoneyGreen;
+      Pen.Color:= RGBToColor(GS,GS,GS);
       Pen.Mode := pmCopy;
       Brush.Style := bsClear;
       Brush.Color:=clWhite;
