@@ -194,6 +194,9 @@ end;
 procedure TBlc.PlayTrial;
 var IndTrial : integer;
 begin
+  if Assigned(FIETMedia) then
+    FIETMedia.Free;
+
   if Assigned(FTrial) then
     begin
       FTrial.Free;

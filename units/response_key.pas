@@ -111,7 +111,7 @@ begin
       Stop;
       FreeAndNil(FMedia);
     end;}
-  //if Assigned(FAudioPlayer) then FAudioPlayer.Free;
+  if Assigned(FAudioPlayer) then FAudioPlayer.Free;
   if Assigned(FStimulus) then FStimulus.Free;
   //if Assigned(FGifImage) then FreeAndNil (FGifImage);
 

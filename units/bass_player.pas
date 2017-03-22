@@ -86,7 +86,6 @@ end;
 procedure TBassStream.Play;
 begin
   BASS_ChannelPlay(FSample, FALSE);
-  Free; // don't hurry, it is safe :)
 end;
 
 { TBassAudioDevice }
