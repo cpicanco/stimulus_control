@@ -257,7 +257,6 @@ procedure TTrial.EndTrialThread(Sender: TObject);
 begin
   FClock.OnStopTimer := nil;
   FClock.Enabled := False;
-
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.EndTrial2');
   {$endif}
@@ -266,7 +265,12 @@ begin
   FResponseEnabled:= False;
   Hide;
   if Assigned(OnTrialBeforeEnd) then OnTrialBeforeEnd(Sender);
-
+  if Parent is TCustomControl then
+    with TCustomControl(Parent) do
+      begin
+        OnKeyDown := FOldKeyDown;
+        OnKeyUp := FOldKeyUp;
+      end;
   case Result of
     T_HIT : if Assigned(OnHit) then OnHit(Sender);
     T_MISS: if Assigned(OnMiss) then OnMiss(Sender);
@@ -335,12 +339,6 @@ begin
   //    FClock.Terminate;
   //    FClock := nil;
   //  end;
-  if Parent is TCustomControl then
-    with TCustomControl(Parent) do
-      begin
-        OnKeyDown := FOldKeyDown;
-        OnKeyUp := FOldKeyUp;
-      end;
   inherited Destroy;
 end;
 

@@ -45,6 +45,7 @@ type
   TBlc = class(TComponent)
   private
     function GetTimeStart: Extended;
+    procedure LogEvent(ACode : string);
   private
     FNextBlc: String;
     FSaveData: TDataProcedure;
@@ -103,11 +104,11 @@ type
     procedure EndBlc(Sender: TObject);
     procedure EndTrial(Sender: TObject);
     procedure IETConsequence(Sender: TObject);
+    procedure IETKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure IETResponse(Sender: TObject);
     procedure StmResponse(Sender: TObject);
     procedure TrialTerminate(Sender: TObject);
     procedure WriteTrialData(Sender: TObject);
-
     procedure Hit(Sender: TObject);
     procedure Miss(Sender: TObject);
     procedure None(Sender: TObject);
@@ -181,7 +182,7 @@ begin
   FBlc:= ACfgBlc;
   FCounterManager := AManager;
   FGlobalContainer:= AGlobalContainer;
-
+  FBackGround.OnKeyUp:=@IETKeyUp;
   FLastTrialHeader:= '';
   FIsCorrection := False;
 
@@ -649,6 +650,15 @@ begin
   Result := FGlobalContainer.TimeStart
 end;
 
+procedure TBlc.LogEvent(ACode: string);
+begin
+  SaveTData(TimestampToStr(TickCount - TimeStart) + #9 +
+           IntToStr(FCounterManager.CurrentBlc+1) + #9 +
+           IntToStr(FCounterManager.CurrentTrial+1) + #9 +
+           IntToStr(FCounterManager.Trials+1) + #9 + // Current trial cycle
+           'ITI' + #32 + ACode + LineEnding)
+end;
+
 procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
 //var
 //  MediaPath : string;
@@ -716,6 +726,12 @@ end;
 procedure TBlc.IETResponse(Sender: TObject);
 begin
   BkGndResponse(Sender);
+end;
+
+procedure TBlc.IETKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if key = 32 then
+    LogEvent('R');
 end;
 
 procedure TBlc.Miss(Sender: TObject);
