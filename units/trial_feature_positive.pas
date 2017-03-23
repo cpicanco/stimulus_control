@@ -180,12 +180,17 @@ procedure TFPE.TrialBeforeEnd(Sender: TObject);
 begin
   FDataSupport.StmEnd := TickCount;
   TrialResult(Sender);
-  if fpePlayNoGoSounds in FStyle then
-    if fpePlayGoSoundsOnBeforeEnd in FStyle then
-      PlaySound
-    else
-      if not FConsequenceFired then
+  if fpePlayGoSoundsOnBeforeEnd in FStyle then
+    begin
+      if FConsequenceFired then
         PlaySound;
+    end
+  else
+    begin
+      if fpePlayNoGoSounds in FStyle then
+        if not FConsequenceFired then
+          PlaySound;
+    end;
 
   LogEvent(Result);
   WriteData(Sender);
@@ -220,7 +225,7 @@ begin
   Canvas.Draw(0,0,FForeground);
 end;
 
-procedure TFPE.PlaySound(InBeforeEndTrial: Boolean);
+procedure TFPE.PlaySound;
 var
   LSoundFile : string;
 begin
@@ -243,6 +248,7 @@ procedure TFPE.DrawForeground(ACircles: array of TCircle;
   AFeaturesToDraw: TFPEDrawing);
 var
   i : integer;
+  LR : TRect;
 begin
   FForeground.Width:= Width;
   FForeground.Height:= Height;
@@ -272,7 +278,7 @@ end;
 procedure TFPE.Play(ACorrection: Boolean);
 var
   s1: string;
-  LOuterR , LR: TRect;
+  LOuterR : TRect;
   i, LWidth, LHeight, LNumComp : Integer;
   LCircles : array of TCircle;
 
@@ -281,7 +287,7 @@ var
     case UpperCase(S) of
       'GO': Result := fpePlayGoSounds;
       'NOGO': Result := fpePlayNoGoSounds;
-      'GO_END': Result := fpePlayGoSoundsOnBeforeEnd;
+      'END': Result := fpePlayGoSoundsOnBeforeEnd;
     end;
   end;
 
@@ -291,8 +297,8 @@ begin
 
   FStyle := [];
   s1 := CfgTrial.SList.Values[_Style];
-  for i := 1 to WordCount(s1,#32) do
-    FStyle += StringToStyle(ExtractDelimited(i,s1,[#32]));
+  for i := 1 to WordCount(s1,[#32]) do
+    FStyle += [StringToStyle(ExtractDelimited(i,s1,[#32]))];
 
   if FStyle = [] then
     FStyle := [fpePlayGoSounds,fpePlayGoSoundsOnBeforeEnd];
@@ -325,7 +331,7 @@ begin
         with LCircles[i] do
           begin
             OuterRect := LOuterR;
-            case FFPEDrawingType of
+            case FFeaturesToDraw of
               fpeClearCircles: {do nothing};
               fpeFullOuterInnerCircles:InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
             end;
