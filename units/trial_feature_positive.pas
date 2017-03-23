@@ -198,7 +198,6 @@ end;
 
 procedure TFPE.Consequence(Sender: TObject);
 begin
-  LogEvent('C');
   if FConsequenceFired = False then FConsequenceFired := True;
   TrialResult(Sender);
 
@@ -236,6 +235,7 @@ begin
 
   if FileExists(LSoundFile) then
     begin
+      LogEvent('C');
       if Assigned(FSound) then
         FSound.Free
       else
