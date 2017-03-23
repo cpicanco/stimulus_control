@@ -275,10 +275,27 @@ var
   LOuterR , LR: TRect;
   i, LWidth, LHeight, LNumComp : Integer;
   LCircles : array of TCircle;
+
+  function StringToStyle(S : string) : TFPEStyles;
+  begin
+    case UpperCase(S) of
+      'GO': Result := fpePlayGoSounds;
+      'NOGO': Result := fpePlayNoGoSounds;
+      'GO_END': Result := fpePlayGoSoundsOnBeforeEnd;
+    end;
+  end;
+
 begin
   inherited Play(ACorrection);
   FFeaturesToDraw := TFPEDrawing(StrToIntDef(CfgTrial.SList.Values[_DrawingType], 0));
-  FStyle := TFPEStyle(StrToIntDef(CfgTrial.SList.Values[_Style], 0));
+
+  FStyle := [];
+  s1 := CfgTrial.SList.Values[_Style];
+  for i := 1 to WordCount(s1,#32) do
+    FStyle += StringToStyle(ExtractDelimited(i,s1,[#32]));
+
+  if FStyle = [] then
+    FStyle := [fpePlayGoSounds,fpePlayGoSoundsOnBeforeEnd];
 
   FSchedule := TSchedule.Create(self);
   with FSchedule do
