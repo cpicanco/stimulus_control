@@ -135,6 +135,16 @@ begin
               Manager.OnEndBlc(Sender)
             else
               Manager.CurrentBlc := Configs.NumBlc;
+
+    T_CND:
+      begin
+        if FCrtReached then
+          Manager.CurrentBlc := Configs.CurrentBlc.NextBlocOnCriteria
+        else
+          Manager.CurrentBlc := Configs.CurrentBlc.NextBlocOnNotCriteria;
+        Manager.OnEndBlc(Sender);
+      end;
+
   end;
 
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
@@ -303,6 +313,11 @@ end;
 procedure TSession.Criteria(Sender: TObject);
 begin
   FCrtReached := True;
+  case Configs.SessionType of
+    T_CIC, T_CRT:
+      Manager.CurrentTrial := Configs.Blcs[Manager.CurrentBlc].NumTrials;
+    T_CND: ; // todo: ask julia what should happen when the critera is reached
+  end;
 end;
 
 destructor TSession.Destroy;

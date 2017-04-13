@@ -37,6 +37,8 @@ const
   _CrtConsecutiveHit  = 'ConsecutiveHitCriterion';
   _CrtConsecutiveMiss = 'ConsecutiveMissCriterion';
   _CrtMaxTrials = 'MaxTrialCriterion';
+  _NextBlocOnCriteria = 'NextBlocOnCriteria';
+  _NextBlocOnNotCriteria = 'NextBlocOnNotCriteria';
   _CsqCriterion = 'CsqCriterion';
   _DefNextBlc = 'DefNextBlc';
   _MaxCorrection = 'MaxCorrection';
@@ -172,6 +174,7 @@ const
   { Session Parameters }
   T_CIC = 'CIC';
   T_CRT = 'CRT';
+  T_CND = 'CND';
 
   { General Parameters }
   T_END = 'END';

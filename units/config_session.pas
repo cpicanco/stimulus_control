@@ -81,7 +81,8 @@ type
     CrtMaxTrials : Integer;
     CrtKCsqHit : Integer;
     Trials: TVetCfgTrial;
-
+    NextBlocOnCriteria : integer;
+    NextBlocOnNotCriteria : integer;
     //VetCrtBlc: array of TCrtBlc;
   end;
 
@@ -119,6 +120,7 @@ type
     FSessionType : string;
     FSessionServer : string;
     function GetCfgBlc(Ind: Integer): TCfgBlc;
+    function GetCurrentBlc: TCfgBlc;
     function GetPupilEnabled: Boolean;
     procedure SetPupilEnabled(AValue: Boolean);
   protected
@@ -145,6 +147,7 @@ type
     property SessionServer : string read FSessionServer write FSessionServer;
     property Filename : string read FFilename;
   public
+    property CurrentBlc : TCfgBlc read GetCurrentBlc; // helper
     property Blcs : TVetCfgBlc read FBlcs write FBlcs;
     property Blc[I: Integer]: TCfgBlc read GetCfgBlc;
     property IsLoaded : Boolean read FLoaded write FLoaded;
@@ -176,6 +179,11 @@ uses strutils, constants, config_session_global_container;
 function TCfgSes.GetCfgBlc(Ind: Integer): TCfgBlc;
 begin
   Result:= FBlcs[Ind];
+end;
+
+function TCfgSes.GetCurrentBlc: TCfgBlc;
+begin
+  Result := GetCfgBlc(FGlobalContainer.CounterManager.CurrentBlc);
 end;
 
 function TCfgSes.GetPupilEnabled: Boolean;
@@ -319,7 +327,8 @@ begin
                 CrtConsecutiveMiss := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtConsecutiveMiss, -1);
                 CrtMaxTrials:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtMaxTrials, -1);
                 CrtKCsqHit := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CsqCriterion, -1);
-
+                NextBlocOnCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnCriteria, -1);
+                NextBlocOnNotCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnNotCriteria, -1);
                 s1:= ReadString(_Blc + #32 + IntToStr(a1+1), _NumTrials, '0 0');
                 NumTrials:= StrToIntDef(Copy(s1, 0, pos(' ', s1)-1), 0);
                 Delete(s1, 1, pos(' ', s1)); If Length(s1)>0 then While s1[1]=' ' do Delete(s1, 1, 1);

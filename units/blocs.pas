@@ -410,8 +410,8 @@ begin
    or ((FTrial.NextTrial = IntToStr(FBlc.CrtMaxTrials)) and (FBlc.CrtMaxTrials > 0))
   then
     begin
+      //FCounterManager.CurrentTrial := FBlc.NumTrials;
       if Assigned(OnCriteria) then FOnCriteria(Sender);
-      FCounterManager.CurrentTrial := FBlc.NumTrials
     end;
 
 
