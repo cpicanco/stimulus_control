@@ -1,0 +1,24 @@
+object Form1: TForm1
+  Left = 437
+  Height = 240
+  Top = 263
+  Width = 320
+  Caption = 'Form1'
+  ClientHeight = 240
+  ClientWidth = 320
+  OnCreate = FormCreate
+  LCLVersion = '1.6.4.0'
+  object LvlGraphControl1: TLvlGraphControl
+    Left = 45
+    Height = 165
+    Top = 38
+    Width = 227
+    NodeStyle.Shape = lgnsEllipse
+    NodeStyle.DefaultImageIndex = -1
+    NodeStyle.Coloring = lgncRGB
+    ParentColor = True
+    ParentShowHint = False
+    TabOrder = 0
+    TabStop = False
+  end
+end
