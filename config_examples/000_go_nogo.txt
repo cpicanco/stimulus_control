@@ -6,7 +6,7 @@ Type=	CIC
 RootMedia=	Media
 RootData=	Data
 ServerAddress=	127.0.1.1:5020
-NumBlc=	1
+NumBlc=	2
 
 [Blc 1]
 
@@ -14,6 +14,7 @@ Name=	Bloco 1
 BkGnd=	16777215
 ITI=	1000
 NumTrials=	2 1
+Counter= Performance
 
 [Blc 1 - T1]
 
@@ -35,3 +36,30 @@ Consequence=	Negativa
 C1Stm=	A2.bmp
 C1Bnd=	300
 
+[Blc 2]
+
+Name=	Bloco 2
+BkGnd=	16777215
+ITI=	1000
+NumTrials=	2 1
+Counter= Performance
+
+[Blc 2 - T1]
+
+Name=	Positiva 1
+Kind=	GNG
+LimitedHold=	2000
+Schedule=	CRF
+Consequence=	Positiva
+C1Stm=	A1.bmp
+C1Bnd=	300
+
+[Blc 2 - T2]
+
+Name=	Negativa 2
+Kind=	GNG
+LimitedHold=	2000
+Schedule=	CRF
+Consequence=	Negativa
+C1Stm=	A2.bmp
+C1Bnd=	300
