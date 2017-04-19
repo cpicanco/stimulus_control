@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="10"/>
+    <Version Value="9"/>
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
@@ -31,11 +31,23 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9"/>
+            <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
             <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
+          <Parsing>
+            <SyntaxOptions>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
           <CodeGeneration>
+            <Checks>
+              <IOChecks Value="True"/>
+              <RangeChecks Value="True"/>
+              <OverflowChecks Value="True"/>
+              <StackChecks Value="True"/>
+            </Checks>
+            <VerifyObjMethodCallValidity Value="True"/>
             <TargetOS Value="linux"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
@@ -147,7 +159,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="45">
+    <Units Count="47">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -256,7 +268,7 @@
         <IsPartOfProject Value="True"/>
       </Unit22>
       <Unit23>
-        <Filename Value="units/trial_calibration.pas"/>
+        <Filename Value="units/trial_performance_review.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit23>
       <Unit24>
@@ -346,6 +358,14 @@
         <Filename Value="units/schedules_abstract.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit44>
+      <Unit45>
+        <Filename Value="units/trial_helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit45>
+      <Unit46>
+        <Filename Value="units/counter_performance_review.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit46>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -355,7 +375,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9"/>
+      <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
       <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
