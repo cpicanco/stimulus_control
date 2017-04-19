@@ -20,6 +20,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, LazFileUtils
     , config_session
     //, countermanager
     , trial_abstract
+    , trial_helpers
     //, custom_timer
     //, client
     , schedules_main
@@ -29,63 +30,32 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, LazFileUtils
 
 type
 
-  { TDataSupport }
-
-  TDataSupport = record
-    Responses : integer;
-    Latency,
-    StmBegin,
-    StmEnd : Extended;
-
-    {
-      CSQHIT occurs at the trial ending, after the trial is destroyed, see units/blocs.pas IETconsequence,
-      so it may not be always contingent to the subject's response
-    }
-    CSQHIT : string;
-
-    {
-      CSQMISS occurs at the trial ending, after the trial is destroyed, see units/blocs.pas IETconsequence,
-      so it mey not be always contingent to the subject's response
-    }
-    CSQMISS : string;
-
-    {
-      CSQ occurs as soon as the subject's response meets the response schedule, i.e., always contingent.
-      CSQ is only available for TSchRRRT instances, see units/schedules_main.
-    }
-    CSQ : string;
-
-  end;
-
-  TGNGCurrTrial = record
-    i : integer;
-    NextTrial : string;
-    Response : string;
-    Result : string;
-  end;
-
   { TGNG }
 
   TGNG = Class(TTrial)
   private
+    FGoNoGoStyle : TGoNoGoStyle;
     FConsequenceFired : Boolean;
-    FCurrTrial: TGNGCurrTrial;
     FDataSupport : TDataSupport;
     FStimulus : TKey;
-
+    FSound : TBassStream;
+    FPopUpTime : integer;
     FSchedule : TSchedule;
+    FContingency : string;
     procedure TrialPaint;
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialStart(Sender: TObject);
     procedure TrialResult(Sender: TObject);
+    procedure PlayConsequence;
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     { TTrial }
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
 
@@ -96,7 +66,6 @@ implementation
 uses strutils, constants, timestamps;
 
 { TGNG }
-
 
 constructor TGNG.Create(AOwner: TComponent);
 begin
@@ -115,62 +84,48 @@ begin
              '__Result';
 
   FDataSupport.Responses:= 0;
+  FContingency := '';
+end;
+
+destructor TGNG.Destroy;
+begin
+  if Assigned(FSound) then
+    FSound.Free;
+  inherited Destroy;
 end;
 
 procedure TGNG.TrialResult(Sender: TObject);
 begin
-  //FDataSupport.StmDuration := GetCustomTick;
-  if FConsequenceFired then
+  if Result = T_NONE then
     begin
-      case UpperCase(FCurrTrial.Response) of
-        'POSITIVA': Result := T_HIT;
-        'INDIFERENTE': Result := T_NONE;
-        else Result := T_MISS;
+      if FConsequenceFired then
+        case UpperCase(FContingency) of
+          'POSITIVA': Result := T_HIT;
+          'NEGATIVA': Result := T_MISS;
+        end
+      else
+        case UpperCase(FContingency) of
+          'POSITIVA': Result := T_MISS;
+          'NEGATIVA': Result := T_HIT;
+        end;
+
+      case NextTrial of
+        T_CRT:NextTrial := T_CRT;
+        'IF_HIT_JUMP_NEXT_TRIAL':
+            if Result = T_HIT then
+              NextTrial := IntToStr(CounterManager.CurrentTrial+3);
       end;
-      IETConsequence := FDataSupport.CSQHIT;
-    end
-  else
-    begin
-      case UpperCase(FCurrTrial.Response) of
-        'NEGATIVA': Result := T_HIT;
-        'INDIFERENTE': Result := T_NONE;
-        else Result := T_MISS;
-      end;
-      IETConsequence := FDataSupport.CSQMISS;
     end;
-
-  case NextTrial of
-    T_CRT:NextTrial := T_CRT;
-    'IF_HIT_JUMP_NEXT_TRIAL':
-        if Result = T_HIT then
-          NextTrial := IntToStr(GlobalContainer.CounterManager.CurrentTrial+3);
-  end;
-
-  LogEvent(Result);
-  FCurrTrial.Result := Result;
 end;
 
-procedure TGNG.TrialBeforeEnd(Sender: TObject);
-begin
-  FDataSupport.StmEnd := TickCount;
-  TrialResult(Sender);
-  WriteData(Sender);
-end;
-
-procedure TGNG.Consequence(Sender: TObject);
+procedure TGNG.PlayConsequence;
 var
-  LSound : TBassStream;
   LSoundFile : string;
   LPopUp : TKey;
   LPopUpFile : string;
 begin
-  LogEvent(LeftStr(FDataSupport.CSQ, 4));
-  if FConsequenceFired = False then FConsequenceFired := True;
-  LPopUpFile := '';
-  LSoundFile := '';
-
-  case FDataSupport.CSQ of
-    T_HIT :
+  case Result of
+    T_HIT  :
       begin
         LSoundFile := RootMedia+'CSQ1.wav';
         LPopUpFile := RootMedia+'CSQ1.png';
@@ -180,18 +135,22 @@ begin
         LSoundFile := RootMedia+'CSQ2.wav';
         LPopUpFile := RootMedia+'CSQ2.png';
       end;
-    else
-      begin
-        LSoundFile := RootMedia+FDataSupport.CSQ;
-        LPopUpFile := ExtractFileNameOnly(RootMedia+FDataSupport.CSQ);
-        LPopUpFile := RootMedia+LPopUpFile+'.png';
-      end
+    //else
+    //  begin
+    //    LSoundFile := RootMedia+FDataSupport.CSQ;
+    //    LPopUpFile := ExtractFileNameOnly(RootMedia+FDataSupport.CSQ);
+    //    LPopUpFile := RootMedia+LPopUpFile+'.png';
+    //  end
   end;
 
   if FileExists(LSoundFile) then
     begin
-      LSound := TBassStream.Create(LSoundFile);
-      LSound.Play;
+      LogEvent('C');
+      if Assigned(FSound) then
+        FSound.Free
+      else
+        FSound := TBassStream.Create(LSoundFile);
+      FSound.Play;
     end;
 
   if FileExists(LPopUpFile) then
@@ -206,9 +165,41 @@ begin
           FullPath := LPopUpFile;
           Parent := TCustomControl(Owner);
           Show;
-          AutoDestroyIn(1000);
+          AutoDestroyIn(FPopUpTime);
         end;
     end;
+end;
+
+procedure TGNG.TrialBeforeEnd(Sender: TObject);
+begin
+  FDataSupport.StmEnd := TickCount;
+  TrialResult(Sender);
+  if gngPlayGoOnBeforeEnd in FGoNoGoStyle then
+    begin
+      if FConsequenceFired then
+        PlayConsequence;
+    end
+  else
+    begin
+      if gngPlayNoGo in FGoNoGoStyle then
+        if not FConsequenceFired then
+          PlayConsequence;
+    end;
+
+  LogEvent(Result);
+  WriteData(Sender);
+end;
+
+procedure TGNG.Consequence(Sender: TObject);
+begin
+  if FConsequenceFired = False then FConsequenceFired := True;
+  TrialResult(Sender);
+
+  if gngPlayGoOnBeforeEnd in FGoNoGoStyle then
+    // do nothing
+  else
+    if gngPlayGo in FGoNoGoStyle then
+      PlayConsequence;
 
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
@@ -233,12 +224,9 @@ var
   s1
   , LColor
   , LLoop
-  , LName, LWidth, LHeight: string;
-  procedure NextCommaDelimitedParameter;
-  begin
-    Delete(s1, 1, pos(#44, s1));
-    if Length(s1) > 0 then while s1[1] = #44 do Delete(s1, 1, 1);
-  end;
+  , LName, LWidth, LHeight
+  , LPopUpTime : string;
+  i : integer;
 begin
   inherited Play(ACorrection);
   {
@@ -248,6 +236,8 @@ begin
     Kind=	GNG
     Cursor=	-1
 
+    Style= GO NOGO
+    PopUpTime= 1000
     LimitedHold=	2000
     Schedule=	FR 3 0
     Consequence=	Positiva
@@ -255,6 +245,18 @@ begin
 
     C1Stm=A1.png
   }
+  FGoNoGoStyle := [];
+  s1 := CfgTrial.SList.Values[_Style];
+  for i := 1 to WordCount(s1,[#32]) do
+    FGoNoGoStyle += [StringToStyle(ExtractDelimited(i,s1,[#32]))];
+
+  if FGoNoGoStyle = [] then
+    FGoNoGoStyle := [gngPlayGo,gngPlayNoGo];
+
+  s1 := CfgTrial.SList.Values[_PopUpTime] + #32;
+  LPopUpTime := ExtractDelimited(1,s1,[#32]);
+  FPopUpTime := StrToIntDef(LPopUpTime,1000);
+
   s1:= CfgTrial.SList.Values[_Comp + IntToStr(1) +_cStm] + #32;
   LName := RootMedia + ExtractDelimited(1,s1,[#32]);
   LColor := ExtractDelimited(2,s1,[#32]);
@@ -286,23 +288,7 @@ begin
     end;
   AddToClockList(FSchedule);
 
-  FCurrTrial.response := CfgTrial.SList.Values[_Consequence];
-  if UpperCase(FCurrTrial.Response) = 'POSITIVA' then
-    begin
-      FDataSupport.CSQHIT := 'NONE';
-      FDataSupport.CSQMISS := 'MISS';
-      FDataSupport.CSQ := 'HIT';
-    end;
-
-  if UpperCase(FCurrTrial.Response) = 'NEGATIVA' then
-    begin
-      FDataSupport.CSQHIT := 'NONE';
-      FDataSupport.CSQMISS := 'HIT';
-      FDataSupport.CSQ := 'MISS';
-    end;
-
-  FCurrTrial.Result := T_NONE;
-
+  FContingency := CfgTrial.SList.Values[_Consequence];
   if Self.ClassType = TGNG then Config(Self);
 end;
 
@@ -329,8 +315,8 @@ begin
            LLatency + #9 +
            TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
-           FCurrTrial.Response + #9 +
-           FCurrTrial.Result;
+           FContingency + #9 +
+           Result;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
@@ -339,7 +325,7 @@ procedure TGNG.Response(Sender: TObject);
 begin
   Inc(FDataSupport.Responses);
   if FDataSupport.Latency = TimeStart then
-      FDataSupport.Latency := TickCount;
+    FDataSupport.Latency := TickCount;
 
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);

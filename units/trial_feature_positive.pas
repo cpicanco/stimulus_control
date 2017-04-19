@@ -20,6 +20,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls, Graphics
     , config_session
     //, countermanager
     , trial_abstract
+    , trial_helpers
     //, custom_timer
     //, client
     , draw_methods
@@ -30,41 +31,8 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls, Graphics
 
 type
 
-  { TDataSupport }
-
   TFPEDrawing = (fpeClearCircles, fpeFullOuterInnerCircles);
 
-  TFPEStyles = (
-    {
-      Limited hold > 0 is assumed.
-      Play HIT or MISS sounds OnConsequence.
-      Sounds OnConsequence are always contiguous to TSchedule.OnConsequence triggered by responses.
-    }
-    fpePlayGoSounds,
-
-    {
-      Limited hold > 0 is assumed.
-      Play HIT or MISS sounds OnBeforeEndTrial.
-      Sounds OnBeforeEndTrial may not be contiguous to TSchedule.OnConsequence triggered by responses.
-    }
-    fpePlayNoGoSounds,
-
-    {
-      Limited hold > 0 is assumed.
-      If a sound would be presented OnConsequence, it is presented OnBeforeTrial instead.
-    }
-    fpePlayGoSoundsOnBeforeEnd
-
-  );
-
-  TFPEStyle = set of TFPEStyles;
-
-  TDataSupport = record
-    Responses : integer;
-    Latency,
-    StmBegin,
-    StmEnd : Extended;
-  end;
 
   { TFPE }
 
@@ -80,7 +48,7 @@ type
       False = NO-GO
     }
     FConsequenceFired : Boolean;
-    FStyle : TFPEStyle;
+    FStyle : TGoNoGoStyle;
     FContingency : string;
     FDataSupport : TDataSupport;
     FForeground : TBitmap;
@@ -180,14 +148,14 @@ procedure TFPE.TrialBeforeEnd(Sender: TObject);
 begin
   FDataSupport.StmEnd := TickCount;
   TrialResult(Sender);
-  if fpePlayGoSoundsOnBeforeEnd in FStyle then
+  if gngPlayGoOnBeforeEnd in FStyle then
     begin
       if FConsequenceFired then
         PlaySound;
     end
   else
     begin
-      if fpePlayNoGoSounds in FStyle then
+      if gngPlayNoGo in FStyle then
         if not FConsequenceFired then
           PlaySound;
     end;
@@ -201,10 +169,10 @@ begin
   if FConsequenceFired = False then FConsequenceFired := True;
   TrialResult(Sender);
 
-  if fpePlayGoSoundsOnBeforeEnd in FStyle then
+  if gngPlayGoOnBeforeEnd in FStyle then
     // do nothing
   else
-    if fpePlayGoSounds in FStyle then
+    if gngPlayGo in FStyle then
       PlaySound;
 
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
@@ -282,15 +250,6 @@ var
   i, LWidth, LHeight, LNumComp : Integer;
   LCircles : array of TCircle;
 
-  function StringToStyle(S : string) : TFPEStyles;
-  begin
-    case UpperCase(S) of
-      'GO': Result := fpePlayGoSounds;
-      'NOGO': Result := fpePlayNoGoSounds;
-      'END': Result := fpePlayGoSoundsOnBeforeEnd;
-    end;
-  end;
-
 begin
   inherited Play(ACorrection);
   FFeaturesToDraw := TFPEDrawing(StrToIntDef(CfgTrial.SList.Values[_DrawingType], 0));
@@ -301,7 +260,7 @@ begin
     FStyle += [StringToStyle(ExtractDelimited(i,s1,[#32]))];
 
   if FStyle = [] then
-    FStyle := [fpePlayGoSounds,fpePlayGoSoundsOnBeforeEnd];
+    FStyle := [gngPlayGo,gngPlayGoOnBeforeEnd];
 
   FSchedule := TSchedule.Create(self);
   with FSchedule do
