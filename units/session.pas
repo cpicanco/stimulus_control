@@ -315,7 +315,7 @@ begin
   FCrtReached := True;
   case Configs.SessionType of
     T_CIC, T_CRT:
-      Manager.CurrentTrial := Configs.Blcs[Manager.CurrentBlc].NumTrials;
+      Manager.CurrentTrial := Configs.CurrentBlc.NumTrials;
     T_CND: ; // todo: ask julia what should happen when the critera is reached
   end;
 end;

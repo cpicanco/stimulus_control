@@ -43,6 +43,7 @@ const
   _DefNextBlc = 'DefNextBlc';
   _MaxCorrection = 'MaxCorrection';
   _ITI = 'ITI';
+  _Counter = 'Counter';
 
   // Blc and Trial
   _BkGnd = 'BkGnd';
@@ -86,6 +87,9 @@ const
   // FPE
   _DrawingType = 'DrawingType';
   _Contingency = 'Contingency';
+
+  // GNG
+  _PopUpTime = 'ConsequenceTime';
 
   // SIMPLE
   _NumComp = 'NumComp';   // number of stimuli on screen / comparisons

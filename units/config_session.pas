@@ -69,7 +69,7 @@ type
     Name: string;
     ITI: Integer;
     BkGnd: Integer;
-
+    Counter : string;
     NumTrials: Integer;
     VirtualTrialValue: Integer;
 
@@ -329,6 +329,8 @@ begin
                 CrtKCsqHit := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CsqCriterion, -1);
                 NextBlocOnCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnCriteria, -1);
                 NextBlocOnNotCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnNotCriteria, -1);
+                Counter:= ReadString(_Blc + #32 + IntToStr(a1+1), _Counter, 'NONE');
+
                 s1:= ReadString(_Blc + #32 + IntToStr(a1+1), _NumTrials, '0 0');
                 NumTrials:= StrToIntDef(Copy(s1, 0, pos(' ', s1)-1), 0);
                 Delete(s1, 1, pos(' ', s1)); If Length(s1)>0 then While s1[1]=' ' do Delete(s1, 1, 1);

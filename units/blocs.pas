@@ -20,7 +20,6 @@ uses Classes, Controls, LCLIntf, LCLType,
      , config_session
      , response_key
      , countermanager
-     , custom_timer
      , trial_abstract
         , trial_message
         , trial_simple
@@ -31,6 +30,7 @@ uses Classes, Controls, LCLIntf, LCLType,
         , trial_dizzy_timers
         , trial_move_square
         , trial_go_nogo
+        , trial_performance_review
      ;
 
 type
@@ -67,7 +67,7 @@ type
     FITIEnd : Extended;
 
     // Clock System
-    FTimer : TClockThread;
+    FTimer : TTimer;
     FTimerCsq : TFakeTimer;
     FTimerITI: TFakeTimer;
     FTimerTO : TFakeTimer;
@@ -100,8 +100,9 @@ type
     //procedure ShowCounterPlease (Kind : String);
     // events
     procedure BkGndResponse(Sender: TObject);
-    procedure ClockThread(Sender: TObject);
+    procedure InterTrialIntervals(Sender: TObject);
     procedure EndBlc(Sender: TObject);
+    procedure EndBlcAndFreeTrial(Sender: TObject);
     procedure EndTrial(Sender: TObject);
     procedure IETConsequence(Sender: TObject);
     procedure IETKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -161,19 +162,14 @@ begin
     Enabled := False;
   end;
 
-  FTimer := TClockThread.Create(True);
-  FTimer.OnTimer := @ClockThread;
-  {$ifdef DEBUG}
-    FTimer.OnDebugStatus := @DebugStatus;
-  {$endif}
+  FTimer := TTimer.Create(Self);
+  FTimer.OnTimer := @InterTrialIntervals;
   FTimer.Enabled := False;
-  FTimer.Start;
 end;
 
 destructor TBlc.Destroy;
 begin
   FTimer.Enabled := False;
-  FTimer.Terminate;
   inherited Destroy;
 end;
 
@@ -245,15 +241,16 @@ begin
           EndBlc(Self);
 
       FIsCorrection := False;
-    end else
-      begin
-        if Assigned(FTrial) then
-          begin
-            FTrial.Free;
-            FTrial := nil;
-          end;
-        EndBlc(Self);
-      end;
+    end
+  else
+    begin
+      if Assigned(FTrial) then
+        begin
+          FTrial.Free;
+          FTrial := nil;
+        end;
+      EndBlc(Self);
+    end;
 end;
 
 //todo: rewrite WriteTrialData
@@ -277,9 +274,13 @@ begin
   NumTr:= IntToStr(FCounterManager.CurrentTrial + 1);
 
   // Fill Empty Names
-  if FBlc.Trials[FCounterManager.CurrentTrial].Name = '' then
-    NameTr := '--------'
-  else NameTr := FBlc.Trials[FCounterManager.CurrentTrial].Name;
+  if Sender is TPerformanceReview then
+    NameTr := 'Performance Counter'
+  else
+    if FBlc.Trials[FCounterManager.CurrentTrial].Name = '' then
+      NameTr := '--------'
+    else
+      NameTr := FBlc.Trials[FCounterManager.CurrentTrial].Name;
 
   NewData := CountBlc + #9 + FBlc.Name + #9 + CountTr + #9 + NumTr + #9 + NameTr;
 
@@ -555,7 +556,7 @@ begin
 {$endif}
 end;
 
-procedure TBlc.ClockThread(Sender: TObject);
+procedure TBlc.InterTrialIntervals(Sender: TObject);
 begin
   if FTimerCsq.Enabled then
     begin
@@ -635,6 +636,36 @@ end;
 procedure TBlc.EndBlc(Sender: TObject);
 begin
   SaveData(LineEnding);
+  case UpperCase(FBlc.Counter) of
+    // go to next bloc
+    'NONE' : if Assigned(OnEndBlc) then FOnEndBlc(Sender);
+
+    // show performance counters and go to the next bloc on key press
+    'PERFORMANCE' :
+      begin
+        if Assigned(FTrial) then
+          begin
+            FTrial.Free;
+            FTrial := nil;
+          end;
+        FTrial := TPerformanceReview.Create(FBackGround);
+        FTrial.GlobalContainer := FGlobalContainer;
+        FTrial.CounterManager := FCounterManager;
+        FTrial.SaveTData := SaveTData;
+        FTrial.OnTrialEnd := @EndBlcAndFreeTrial;
+        FTrial.OnTrialWriteData := @WriteTrialData;
+        FTrial.Play;
+      end;
+  end;
+end;
+
+procedure TBlc.EndBlcAndFreeTrial(Sender: TObject);
+begin
+  if Assigned(FTrial) then
+    begin
+      FTrial.Free;
+      FTrial := nil;
+    end;
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
 end;
 

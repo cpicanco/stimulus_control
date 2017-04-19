@@ -115,7 +115,7 @@ type
   public
     constructor Create (AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure Play(ACorrection: Boolean); virtual;
+    procedure Play(ACorrection: Boolean=False); virtual;
     procedure Hide;virtual;
     procedure SetFocus;virtual;
     property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
@@ -274,7 +274,7 @@ begin
   case Result of
     T_HIT : if Assigned(OnHit) then OnHit(Sender);
     T_MISS: if Assigned(OnMiss) then OnMiss(Sender);
-    T_NONE: if Assigned(OnNone) then OnMiss(Sender);
+    T_NONE: if Assigned(OnNone) then OnNone(Sender);
   end;
 
   if FIsCorrection then
@@ -297,6 +297,14 @@ end;
 constructor TTrial.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FResponseEnabled := False;
+  FShowStarter := False;
+  NextTrial := '0';
+  Result := T_NONE;
+  IETConsequence := T_NONE;
+  Color := 0;
+  Cursor:= -1;
+
   if AOwner is TCustomControl then
     begin
       Align := alClient;
@@ -315,6 +323,7 @@ begin
   //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
   FLimitedHold := 0;
   FClock := TTimer.Create(Self);
+  FClock.Interval := FLimitedHold;
   FClock.Enabled := False;
   FClock.OnTimer := @EndTrialThread;
   FClock.OnStopTimer := @EndTrialThread;
@@ -416,7 +425,8 @@ procedure TTrial.StartClockList;
 var
   i : integer;
 begin
-  FClock.Enabled := True;
+  if FClock.Interval > 0 then
+    FClock.Enabled := True;
   for i := 0 to Length(FClockList) -1 do
     TThreadMethod(FClockList[i]);
   SetLength(FClockList, 0);
