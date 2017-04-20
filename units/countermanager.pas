@@ -318,6 +318,7 @@ begin
   FBlcCscNones := 0;
   FBlcHighCscNones := 0;
   FCurrentTrial := 0;
+  FBlcRepetitions:=0;
 
   Inc(FCurrentBlc);
 end;
