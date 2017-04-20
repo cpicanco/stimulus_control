@@ -34,12 +34,12 @@ const
 
   // Blc
   _NumTrials = 'NumTrials';
-  _CrtHitPorcentage = 'HitPorcentage';
+  _CrtHitPorcentage = 'Criteria.HitPorcentage';
   _CrtConsecutiveHit  = 'ConsecutiveHitCriterion';
   _CrtConsecutiveMiss = 'ConsecutiveMissCriterion';
   _CrtMaxTrials = 'MaxTrialCriterion';
-  _NextBlocOnCriteria = 'NextBlocOnCriteria';
-  _NextBlocOnNotCriteria = 'NextBlocOnNotCriteria';
+  _NextBlocOnCriteria = 'NextBloc.OnCriteria';
+  _NextBlocOnNotCriteria = 'NextBloc.OnNotCriteria';
   _CsqCriterion = 'CsqCriterion';
   _DefNextBlc = 'DefNextBlc';
   _MaxCorrection = 'MaxCorrection';
