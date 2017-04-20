@@ -365,7 +365,9 @@ begin
   NextTrial := CfgTrial.SList.Values[_NextTrial];
 
   // will the trial count as MISS, HIT or NONE?
-  Result := T_NONE;
+  Result := CfgTrial.SList.Values[_cRes]
+  if Result = '' then
+    Result := T_NONE;
 
   // what will happen during the inter trial interval?
   IETConsequence := T_NONE;
