@@ -201,6 +201,7 @@ begin
   FSDataSupport.SampLatency := TimeStart;
   FSDataSupport.SampleBegin := TickCount;
   VisibleSample(True);
+  //FSample.Key.Play;
   OnMouseDown := @SampleMouseDown;
 end;
 

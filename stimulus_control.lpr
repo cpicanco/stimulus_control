@@ -25,7 +25,7 @@ uses
   , Forms
 
   //Forms
-  , userconfigs
+  , userconfigs, versioning_lazarus
   //, userconfigs_trial_mirrored
   //, userconfigs_get_matrix
   //, userconfigs_simple_discrimination_matrix

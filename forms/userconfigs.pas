@@ -24,7 +24,6 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
     , config_session
     , escriba
     , constants
-    , git_vertioning
     ;
 
 type
@@ -183,6 +182,8 @@ uses background, strutils
      , userconfigs_feature_positive
      , userconfigs_go_nogo
      , ini_helpers
+     , versioning_git
+     , versioning_lazarus
      {$ifdef DEBUG}
      , debug_logger
      {$endif}
@@ -1300,6 +1301,8 @@ begin
 end;
 
 procedure TFormUserConfig.FormCreate(Sender: TObject);
+var
+  LGitCommit : string;
 begin
   FAudioDevice := TBassAudioDevice.Create(WindowHandle);
   FrmBackground := TBackground.Create(Application);
@@ -1307,30 +1310,27 @@ begin
   //StringGrid1.ColCount := 9;
   Caption := Application.Title;
   stAppTitle.Caption := Application.Title;
-  stVersion.Caption := CurrentVersion(GetCommitTag(True));
-  MemoAppInfo.Lines.Append(
-  'Stimulus Control' + LineEnding +
-  'Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.' + LineEnding + LineEnding +
-  'The present software is distributed under the terms of the GNU General Public License (GPL v3.0).' + LineEnding + LineEnding +
-  'You should have received a copy of the GNU General Public License' + LineEnding +
-  'along with this program. If not, see <http://www.gnu.org/licenses/>.' + LineEnding + LineEnding +
-  'Last Commit: ' + GetCommitTag(False).Text
-  );
+  try
+    stVersion.Caption := CurrentVersion(GetCommitTag(True));
+    LGitCommit := GetCommitTag(False).Text;
+  except
+    on E : Exception do
+      begin
+        stVersion.Caption := FileVersion;
+        LGitCommit:='A git repository was not found inside the program''s folder.';
+      end;
+  end;
 
-  //with StringGrid1 do
-  //  begin
-  //    Cells[0, 0] := rsTrials;
-  //    Cells[1, 0] := rsAngle;
-  //    Cells[2, 0] := 'x0';
-  //    Cells[3, 0] := 'y0';
-  //    Cells[4, 0] := 'x1';
-  //    Cells[5, 0] := 'y1';
-  //    Cells[6, 0] := rsExpectedResponse;
-  //    Cells[7, 0] := rsSize;
-  //    Cells[8, 0] := rsSchedule;
-  //    //aRowCount := RowCount;
-  //    //aColCount := ColCount;
-  //  end;
+  MemoAppInfo.Lines.Append(
+    'Stimulus Control' + LineEnding +
+    'Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.' + LineEnding + LineEnding +
+    'The present software is distributed under the terms of the GNU General Public License (GPL v3.0).' + LineEnding + LineEnding +
+    'You should have received a copy of the GNU General Public License' + LineEnding +
+    'along with this program. If not, see <http://www.gnu.org/licenses/>.' + LineEnding + LineEnding +
+    'File Version: '+ FileVersion + LineEnding +
+    'ZMQ Version: ' + ZMQVersion + LineEnding +
+    'Last Commit: ' + LGitCommit
+  );
   Randomize;
   ResetRepetionMatrix;
 

@@ -7,7 +7,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit git_vertioning;
+unit versioning_git;
 
 {$mode objfpc}{$H+}
 
@@ -21,13 +21,45 @@ uses
   , FileUtil
   ;
 
-function ReadProcessOutput(Output : TInputPipeStream) : TStringList;
 function GetCommitTag(UseTagsOption : Boolean) : TStringList;
 
 function CurrentVersion(CommitTag : TStringList) : string;
 function LastCommitShortCode(IncludeLocalCommits: Boolean) : string;
 
 implementation
+
+// http://wiki.freepascal.org/Executing_External_Programs#Reading_large_output
+function ReadProcessOutput(Output: TInputPipeStream): TStringList;
+var
+  NumBytes, BytesRead: LongInt;
+  MemStream: TMemoryStream;
+const
+  READ_BYTES = 2048;
+begin
+  BytesRead := 0;
+  MemStream := TMemoryStream.Create;
+  try
+    while True do
+      begin
+        // make sure we have room
+        MemStream.SetSize(BytesRead + READ_BYTES);
+
+        // try reading it
+        NumBytes := Output.Read((MemStream.Memory + BytesRead)^, READ_BYTES);
+        if NumBytes > 0 then
+          begin
+            Inc(BytesRead, NumBytes);
+          end
+        else Break;
+      end;
+    MemStream.SetSize(BytesRead);
+    Result := TStringList.Create;
+    Result.LoadFromStream(MemStream);
+  finally
+    // clean the room
+    MemStream.Free;
+  end;
+end;
 
 function GetCommitTag(UseTagsOption: Boolean): TStringList;
 var
@@ -64,39 +96,6 @@ begin
     else EmptyResult;
   finally
     GitProcess.Free;
-  end;
-end;
-
-// http://wiki.freepascal.org/Executing_External_Programs#Reading_large_output
-function ReadProcessOutput(Output: TInputPipeStream): TStringList;
-var
-  NumBytes, BytesRead: LongInt;
-  MemStream: TMemoryStream;
-const
-  READ_BYTES = 2048;
-begin
-  BytesRead := 0;
-  MemStream := TMemoryStream.Create;
-  try
-    while True do
-      begin
-        // make sure we have room
-        MemStream.SetSize(BytesRead + READ_BYTES);
-
-        // try reading it
-        NumBytes := Output.Read((MemStream.Memory + BytesRead)^, READ_BYTES);
-        if NumBytes > 0 then
-          begin
-            Inc(BytesRead, NumBytes);
-          end
-        else Break;
-      end;
-    MemStream.SetSize(BytesRead);
-    Result := TStringList.Create;
-    Result.LoadFromStream(MemStream);
-  finally
-    // clean the room
-    MemStream.Free;
   end;
 end;
 

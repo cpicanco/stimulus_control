@@ -19,7 +19,7 @@
       <AutoIncrementBuild Value="True"/>
       <RevisionNr Value="4"/>
       <Language Value="0416"/>
-      <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará" FileDescription="Stimulus Control Application" InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control App" ProductVersion=""/>
+      <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control" ProductVersion=""/>
     </VersionInfo>
     <BuildModes Count="4">
       <Item1 Name="Linux64Debug" Default="True"/>
@@ -159,7 +159,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="47">
+    <Units Count="48">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -280,7 +280,7 @@
         <IsPartOfProject Value="True"/>
       </Unit25>
       <Unit26>
-        <Filename Value="units/git_vertioning.pas"/>
+        <Filename Value="units/versioning_git.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit26>
       <Unit27>
@@ -366,6 +366,10 @@
         <Filename Value="units/counter_performance_review.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit46>
+      <Unit47>
+        <Filename Value="units/versioning_lazarus.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit47>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
