@@ -124,28 +124,42 @@ begin
 end;
 
 procedure TSession.EndBlc(Sender: TObject);
+var
+  LLastBlc : integer;
 begin
+  LLastBlc := Manager.CurrentBlc;
+  Manager.OnEndBlc(Sender); // go to the next blc
+
   case Configs.SessionType of
-    T_CIC : if FBlc.NextBlc = T_END then
-              Manager.CurrentBlc := Configs.NumBlc
-            else
-              Manager.OnEndBlc(Sender);
+    T_CIC : // go to next blc always, except if user defined an end alias
+      if FBlc.NextBlc = T_END then
+        Manager.CurrentBlc := Configs.NumBlc;
 
-    T_CRT:  if FCrtReached then
-              Manager.OnEndBlc(Sender)
-            else
-              Manager.CurrentBlc := Configs.NumBlc;
+    T_CRT: // go to next blc if criteria else end session
+      if not FCrtReached then
+        Manager.CurrentBlc := Configs.NumBlc;
 
-    T_CND:
+    T_CND: // if not defined go to the next bloc, if defined go to user defined blc
       begin
         if FCrtReached then
-          Manager.CurrentBlc := Configs.CurrentBlc.NextBlocOnCriteria
+          begin
+            if Configs.CurrentBlc.NextBlocOnCriteria > 0 then
+              Manager.CurrentBlc := Configs.CurrentBlc.NextBlocOnCriteria;
+          end
         else
-          Manager.CurrentBlc := Configs.CurrentBlc.NextBlocOnNotCriteria;
-        Manager.OnEndBlc(Sender);
+          begin
+            if Configs.CurrentBlc.NextBlocOnNotCriteria > 0 then
+              Manager.CurrentBlc := Configs.CurrentBlc.NextBlocOnNotCriteria;
+          end;
       end;
-
   end;
+
+  // increment blc repetitions
+  if LLastBlc = Manager.CurrentBlc then
+    Manager.OnBlcRepetition(Sender);
+
+  if Manager.BlcRepetitions > Configs.CurrentBlc.MaxBlcRepetition then
+    Manager.CurrentBlc := Configs.NumBlc;
 
   if Assigned(OnEndBlc) then FOnEndBlc(Sender);
   PlayBlc(Sender);
@@ -363,8 +377,8 @@ procedure TSession.PlayBlc(Sender: TObject);
 begin
   if Manager.CurrentBlc < Configs.NumBlc then
     begin
-      Manager.SetVirtualTrialValue(Configs.Blcs[Manager.CurrentBlc].VirtualTrialValue);
-      FBlc.Play(Configs.Blc[Manager.CurrentBlc], FManager, FGlobalContainer)
+      Manager.SetVirtualTrialValue(Configs.CurrentBlc.VirtualTrialValue);
+      FBlc.Play(Configs.CurrentBlc, FManager, FGlobalContainer)
     end
   else EndSess(Sender);
 end;

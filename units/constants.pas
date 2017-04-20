@@ -43,6 +43,7 @@ const
   _CsqCriterion = 'CsqCriterion';
   _DefNextBlc = 'DefNextBlc';
   _MaxCorrection = 'MaxCorrection';
+  _MaxBlcRepetition = 'MaxBlcRepetition';
   _ITI = 'ITI';
   _Counter = 'Counter';
 

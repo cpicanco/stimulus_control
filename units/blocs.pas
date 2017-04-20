@@ -408,7 +408,7 @@ begin
 
   // misc criteria
   if FBlc.CrtMaxTrials > 0 then
-    FTrial.NextTrial = T_END;
+    FTrial.NextTrial := T_END;
 
   // criteria related to hits
   LCriteriaWasReached := False;

@@ -37,10 +37,12 @@ type
     FHits : integer;
     FMisses : integer;
     FNones : integer;
+    FOnBlcRepetition: TNotifyEvent;
     FStmResponses : integer;
     FTrials : integer;
     FVirtualHits : integer;
   {Current Blc}
+    FBlcRepetitions : integer;
     FBlcBkGndResponses : integer;
     FBlcConsequences : integer;
     FBlcCorrections : integer;
@@ -99,6 +101,8 @@ type
     procedure Miss(Sender : TObject);
     procedure NotCorrection(Sender : TObject);
     procedure StmResponse(Sender : TObject);
+    procedure BlcRepeated(Sender : TObject);
+    procedure SetOnBlcRepetition(AValue: TNotifyEvent);
   public
     constructor Create (AOwner : TComponent); override;
     function HitPorcentage(AGlobal : Boolean = False) : integer;
@@ -147,6 +151,7 @@ type
     property BlcNones : integer read FBlcNones;
     property BlcCscNones : integer read FBlcCscNones;
     property BlcHighCscNones : integer read FBlcHighCscNones;
+    property BlcRepetitions : integer read FBlcRepetitions;
     property CurrentTrial : integer read FCurrentTrial write FCurrentTrial;
   {Each Stm}
     property StmCounter : integer read FStmCounter;
@@ -167,6 +172,7 @@ type
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
     property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
     property OnCsqCriterion : TNotifyEvent read FOnCsqCriterion write FOnCsqCriterion;
+    property OnBlcRepetition : TNotifyEvent read FOnBlcRepetition write SetOnBlcRepetition;
   end;
 implementation
 
@@ -235,11 +241,12 @@ begin
   OnStmResponse := @StmResponse;
   OnCsqCriterion := @CsqCriterion;
   OnNotCorrection := @NotCorrection;
+  OnBlcRepetition := @BlcRepeated;
 end;
 
 function TCounterManager.HitPorcentage(AGlobal: Boolean): integer;
 var
-  LHits := integer;
+  LHits : integer;
 begin
   if AGlobal then
     LHits := Hits
@@ -404,6 +411,12 @@ begin
     end;
 end;
 
+procedure TCounterManager.SetOnBlcRepetition(AValue: TNotifyEvent);
+begin
+  if FOnBlcRepetition=AValue then Exit;
+  FOnBlcRepetition:=AValue;
+end;
+
 procedure TCounterManager.CustomNxtTrial(Sender: TObject);
 begin
   Inc(FTrials);
@@ -421,6 +434,11 @@ begin
   Inc(FStmResponses);
   Inc(FBlcStmResponses);
   Inc(FTrialStmResponses);
+end;
+
+procedure TCounterManager.BlcRepeated(Sender: TObject);
+begin
+  Inc(FBlcRepetitions);
 end;
 
 

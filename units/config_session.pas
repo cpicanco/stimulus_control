@@ -74,6 +74,8 @@ type
     VirtualTrialValue: Integer;
 
     MaxCorrection: Integer;
+    MaxBlcRepetition: Integer;
+
     DefNextBlc: string;
 
     CrtConsecutiveHit: Integer;
@@ -340,6 +342,7 @@ begin
                 VirtualTrialValue:= StrToIntDef(s1, 0);
                 DefNextBlc:= ReadString(_Blc + #32 + IntToStr(a1+1), _DefNextBlc, '');
                 MaxCorrection:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _MaxCorrection, 0);
+                MaxBlcRepetition := ReadInteger(_Blc + #32 + IntToStr(a1+1), _MaxBlcRepetition, 0);
               end;
             SetLength(FBlcs[a1].Trials, FBlcs[a1].NumTrials);
             for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
