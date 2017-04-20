@@ -21,7 +21,7 @@ Kind=	MTS
 Delayed = True
 Delay = 2000
 SBnd=400 142 100 100
-SStm=A1.bmp 0 200
+SStm=CSQ1.wav 1 200
 SSch=CRF
 SMsg= M - 1
 
