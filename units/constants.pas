@@ -34,6 +34,7 @@ const
 
   // Blc
   _NumTrials = 'NumTrials';
+  _CrtHitPorcentage = 'HitPorcentage';
   _CrtConsecutiveHit  = 'ConsecutiveHitCriterion';
   _CrtConsecutiveMiss = 'ConsecutiveMissCriterion';
   _CrtMaxTrials = 'MaxTrialCriterion';

@@ -17,6 +17,8 @@ uses Classes, Dialogs, SysUtils;
 
 type
 
+  { TCounterManager }
+
   TCounterManager = class (TComponent)
   private
   {Current Session}
@@ -99,6 +101,7 @@ type
     procedure StmResponse(Sender : TObject);
   public
     constructor Create (AOwner : TComponent); override;
+    function HitPorcentage(AGlobal : Boolean = False) : integer;
     procedure _VirtualTrialFix;
     procedure SetVirtualTrialValue(Value : integer);
   {Current Trial}
@@ -232,6 +235,17 @@ begin
   OnStmResponse := @StmResponse;
   OnCsqCriterion := @CsqCriterion;
   OnNotCorrection := @NotCorrection;
+end;
+
+function TCounterManager.HitPorcentage(AGlobal: Boolean): integer;
+var
+  LHits := integer;
+begin
+  if AGlobal then
+    LHits := Hits
+  else
+    LHits := BlcHits;
+  Result := (LHits*100) div Trials;
 end;
 
 procedure TCounterManager.BeginBlc(Sender: TObject);

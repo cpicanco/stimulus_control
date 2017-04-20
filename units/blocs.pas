@@ -331,8 +331,9 @@ var s0, s1, s2, s3, s4 : string;
     HasTimeOut,
     HasCsqInterval,
     NegativeCsqInt : boolean;
-    //TimestampsData : TRegData;
 
+    LCriteriaWasReached : Boolean;
+    //TimestampsData : TRegData;
 
   procedure SetValuesToStrings (var as1, as2, as3, as4 : string);
   var
@@ -405,11 +406,23 @@ begin
           FIsCorrection := False;
         end;
 
-  //Critérios de ACERTO atingido
-  if  ((FBlc.CrtConsecutiveHit > 0) and (FBlc.CrtConsecutiveHit = FCounterManager.BlcCscHits))
-   //or ((FCfgBlc.CrtConsecutiveMiss > 0) and (FCfgBlc.CrtConsecutiveMiss = FCounterManager.BlcCscMisses.Counter))
-   or ((FTrial.NextTrial = IntToStr(FBlc.CrtMaxTrials)) and (FBlc.CrtMaxTrials > 0))
-  then
+  // misc criteria
+  if FBlc.CrtMaxTrials > 0 then
+    FTrial.NextTrial = T_END;
+
+  // criteria related to hits
+  LCriteriaWasReached := False;
+  if FBlc.CrtConsecutiveHit > 0 then
+    LCriteriaWasReached := FCounterManager.BlcCscHits = FBlc.CrtConsecutiveHit;
+
+  if FBlc.CrtHitPorcentage > 0 then
+    LCriteriaWasReached := FCounterManager.HitPorcentage >= FBlc.CrtHitPorcentage;
+
+  // criteria related to misses
+  if FBlc.CrtConsecutiveMiss > 0 then
+    LCriteriaWasReached := FCounterManager.BlcCscMisses = FBlc.CrtConsecutiveMiss;
+
+  if LCriteriaWasReached then
     begin
       //FCounterManager.CurrentTrial := FBlc.NumTrials;
       if Assigned(OnCriteria) then FOnCriteria(Sender);

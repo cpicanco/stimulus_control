@@ -77,6 +77,7 @@ type
     DefNextBlc: string;
 
     CrtConsecutiveHit: Integer;
+    CrtHitPorcentage : Integer;
     CrtConsecutiveMiss : Integer;
     CrtMaxTrials : Integer;
     CrtKCsqHit : Integer;
@@ -323,6 +324,8 @@ begin
                 Name:= ReadString(_Blc + #32 + IntToStr(a1+1), _Name, '');
                 BkGnd:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _BkGnd, 0);
                 ITI:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _ITI, 0);
+
+                CrtHitPorcentage := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtHitPorcentage, -1);
                 CrtConsecutiveHit := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtConsecutiveHit, -1);
                 CrtConsecutiveMiss := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtConsecutiveMiss, -1);
                 CrtMaxTrials:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtMaxTrials, -1);
