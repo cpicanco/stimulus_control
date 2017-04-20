@@ -95,6 +95,7 @@ begin
   EditMode := False;
   Edge:= clInactiveCaption;
   OnMouseDown := @KeyMouseDown;
+  Loops := -1;
 
   FSchedule := TSchedule.Create(Self);
   with FSchedule do
@@ -200,12 +201,9 @@ end;
 
 procedure TKey.Stop;
 begin
-  {if Assigned(FMedia) then
-  if FMedia.playState = wmppsPlaying then
-    begin
-      FMedia.controls.stop;
-      FMedia.close();
-    end;}
+  if FKind.stmAudio then
+    if Assigned(FAudioPlayer) then
+      FAudioPlayer.Stop;
 end;
 
 procedure TKey.SetFileName(Path: string);                 //Review required
@@ -344,7 +342,10 @@ var
   function Load_AUD(AFilename : string): boolean;
   begin
     Result := False;
-    FAudioPlayer := TBassStream.Create(AFilename);
+    if Loops > 0 then
+      FAudioPlayer := TBassStream.Create(AFilename,Loops)
+    else
+      FAudioPlayer := TBassStream.Create(AFilename);
     SetKind(True, TImage.stmNone);
     Result := True;
   end;

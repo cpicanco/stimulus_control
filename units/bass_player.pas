@@ -55,12 +55,12 @@ type
 
   TBassStream = class
     private
-      FLoop : Boolean;
+      FLoops : integer;
       FSample : HSAMPLE;
       FSyncProcedure: SYNCPROC;
       procedure SetSyncProcedure(AValue: SYNCPROC);
     public
-      constructor Create(FileName : AnsiString; Loop : Boolean = False); overload;
+      constructor Create(FileName : AnsiString; Loops : integer = -1); overload;
       procedure Play;
       procedure Stop;
       property SyncProcedure : SYNCPROC read FSyncProcedure write SetSyncProcedure;
@@ -80,24 +80,25 @@ begin
     BASS_ChannelSetSync(FSample, BASS_SYNC_END, 0, SyncProcedure, nil);
 end;
 
-constructor TBassStream.Create(FileName: AnsiString; Loop: Boolean);
+constructor TBassStream.Create(FileName: AnsiString; Loops: integer);
 begin
-  FLoop := Loop;
-  if FLoop then
-    FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, BASS_SAMPLE_LOOP)
-  else
-    FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, BASS_STREAM_AUTOFREE);
+  FLoops := Loops;
+  case FLoops of
+   -MaxInt..0: FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, BASS_STREAM_AUTOFREE);
+   else
+     FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, BASS_SAMPLE_LOOP);
+  end;
 end;
 
 procedure TBassStream.Play;
 begin
-  BASS_ChannelPlay(FSample, FLoop);
+  BASS_ChannelPlay(FSample, FLoops > 0);
 end;
 
 procedure TBassStream.Stop;
 begin
   BASS_ChannelStop(FSample);
-  if FLoop then
+  if FLoops > 0 then
     BASS_StreamFree(FSample);
 end;
 
