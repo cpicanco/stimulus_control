@@ -332,8 +332,8 @@ begin
                 CrtConsecutiveMiss := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtConsecutiveMiss, -1);
                 CrtMaxTrials:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtMaxTrials, -1);
                 CrtKCsqHit := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CsqCriterion, -1);
-                NextBlocOnCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnCriteria, -1);
-                NextBlocOnNotCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnNotCriteria, -1);
+                NextBlocOnCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnCriteria, -1)-1;
+                NextBlocOnNotCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnNotCriteria, -1)-1;
                 Counter:= ReadString(_Blc + #32 + IntToStr(a1+1), _Counter, 'NONE');
 
                 s1:= ReadString(_Blc + #32 + IntToStr(a1+1), _NumTrials, '0 0');
