@@ -55,12 +55,14 @@ type
 
   TBassStream = class
     private
+      FLoop : Boolean;
       FSample : HSAMPLE;
       FSyncProcedure: SYNCPROC;
       procedure SetSyncProcedure(AValue: SYNCPROC);
     public
-      constructor Create(FileName : AnsiString); overload;
+      constructor Create(FileName : AnsiString; Loop : Boolean = False); overload;
       procedure Play;
+      procedure Stop;
       property SyncProcedure : SYNCPROC read FSyncProcedure write SetSyncProcedure;
   end;
 
@@ -78,14 +80,25 @@ begin
     BASS_ChannelSetSync(FSample, BASS_SYNC_END, 0, SyncProcedure, nil);
 end;
 
-constructor TBassStream.Create(FileName: AnsiString);
+constructor TBassStream.Create(FileName: AnsiString; Loop: Boolean);
 begin
-  FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, BASS_STREAM_AUTOFREE);
+  FLoop := Loop;
+  if FLoop then
+    FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, BASS_SAMPLE_LOOP)
+  else
+    FSample := BASS_StreamCreateFile(FALSE, PChar(FileName), 0, 0, BASS_STREAM_AUTOFREE);
 end;
 
 procedure TBassStream.Play;
 begin
-  BASS_ChannelPlay(FSample, FALSE);
+  BASS_ChannelPlay(FSample, FLoop);
+end;
+
+procedure TBassStream.Stop;
+begin
+  BASS_ChannelStop(FSample);
+  if FLoop then
+    BASS_StreamFree(FSample);
 end;
 
 { TBassAudioDevice }
