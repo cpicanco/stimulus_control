@@ -365,7 +365,7 @@ begin
   NextTrial := CfgTrial.SList.Values[_NextTrial];
 
   // will the trial count as MISS, HIT or NONE?
-  Result := CfgTrial.SList.Values[_cRes]
+  Result := CfgTrial.SList.Values[_cRes];
   if Result = '' then
     Result := T_NONE;
 
