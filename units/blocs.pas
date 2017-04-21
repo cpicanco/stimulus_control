@@ -77,7 +77,7 @@ type
     FBackGround: TWinControl;
     FBlc: TCfgBlc;
     FTrial: TTrial;
-    FCounterManager : TCounterManager;
+    FManager : TCounterManager;
     FCounterLabel : TLabel;
     FIETMedia : TKey;
 
@@ -176,7 +176,7 @@ end;
 procedure TBlc.Play(ACfgBlc: TCfgBlc; AManager: TCountermanager; AGlobalContainer: TGlobalContainer);
 begin
   FBlc:= ACfgBlc;
-  FCounterManager := AManager;
+  FManager := AManager;
   FGlobalContainer:= AGlobalContainer;
   FBackGround.OnKeyUp:=@IETKeyUp;
   FLastTrialHeader:= '';
@@ -202,7 +202,7 @@ begin
 
   FBackGround.Color:= FBlc.BkGnd;
 
-  IndTrial := FCounterManager.CurrentTrial;
+  IndTrial := FManager.CurrentTrial;
   if IndTrial = 0 then FFirstTrialBegin := TickCount;
   if IndTrial < FBlc.NumTrials then
     begin
@@ -219,13 +219,13 @@ begin
         T_Simple : FTrial := TSimpl.Create(FBackGround);
       end;
 
-      if FCounterManager.Trials = 0 then
+      if FManager.Trials = 0 then
         SaveTData(FTrial.HeaderTimestamps + LineEnding);
 
       if Assigned(FTrial) then
         begin
           FTrial.GlobalContainer := FGlobalContainer;
-          FTrial.CounterManager := FCounterManager;
+          FTrial.CounterManager := FManager;
           FTrial.CfgTrial := FBlc.Trials[IndTrial];
           FTrial.SaveTData := SaveTData;
           //FTrial.DoubleBuffered := True;
@@ -268,19 +268,19 @@ begin
 
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
 
-  CountBlc := IntToStr(FCounterManager.CurrentBlc + 1);
+  CountBlc := IntToStr(FManager.CurrentBlc + 1);
 
-  CountTr := IntToStr(FCounterManager.Trials + 1);
-  NumTr:= IntToStr(FCounterManager.CurrentTrial + 1);
+  CountTr := IntToStr(FManager.Trials + 1);
+  NumTr:= IntToStr(FManager.CurrentTrial + 1);
 
   // Fill Empty Names
   if Sender is TPerformanceReview then
     NameTr := 'Performance Counter'
   else
-    if FBlc.Trials[FCounterManager.CurrentTrial].Name = '' then
+    if FBlc.Trials[FManager.CurrentTrial].Name = '' then
       NameTr := '--------'
     else
-      NameTr := FBlc.Trials[FCounterManager.CurrentTrial].Name;
+      NameTr := FBlc.Trials[FManager.CurrentTrial].Name;
 
   NewData := CountBlc + #9 + FBlc.Name + #9 + CountTr + #9 + NumTr + #9 + NameTr;
 
@@ -299,7 +299,7 @@ begin
         ITIData :=  DoNotApply + #9 + DoNotApply
       else
         // Check if it is the fisrt trial
-        if (FCounterManager.Trials + 1) = 1 then
+        if (FManager.Trials + 1) = 1 then
           IsFirst := True
         else IsFirst := False;
 
@@ -307,7 +307,7 @@ begin
   else
     begin
 
-      if (FCounterManager.Trials + 1) = 1 then
+      if (FManager.Trials + 1) = 1 then
         IsFirst := True
       else IsFirst := False;
 
@@ -366,22 +366,22 @@ begin
   HasCsqInterval := False;
 
   if  (FTrial.NextTrial = T_END) then //end bloc
-    FCounterManager.CurrentTrial := FBlc.NumTrials
+    FManager.CurrentTrial := FBlc.NumTrials
   else // continue
-    if (FTrial.NextTrial = T_CRT) or // FTrial.NextTrial base 1, FCounterManager.CurrentTrial.Counter base 0)
-       (FTrial.NextTrial = (IntToStr(FCounterManager.CurrentTrial + 1))) then
+    if (FTrial.NextTrial = T_CRT) or // FTrial.NextTrial base 1, FManager.CurrentTrial.Counter base 0)
+       (FTrial.NextTrial = (IntToStr(FManager.CurrentTrial + 1))) then
       begin //correction trials were on
-        if ((FBlc.MaxCorrection) = FCounterManager.BlcCscCorrections) and
+        if ((FBlc.MaxCorrection) = FManager.BlcCscCorrections) and
            (FBlc.MaxCorrection <> 0) then
           begin //correction
-            FCounterManager._VirtualTrialFix;
-            FCounterManager.OnNotCorrection(Sender);
-            FCounterManager.OnTrialEnd (Sender);
+            FManager._VirtualTrialFix;
+            FManager.OnNotCorrection(Sender);
+            FManager.OnTrialEnd (Sender);
             FIsCorrection := False;
           end
         else
           begin // not correction
-            FCounterManager.OnCorrection(Sender);
+            FManager.OnCorrection(Sender);
             FIsCorrection := True;
           end;
       end
@@ -389,20 +389,20 @@ begin
       if StrToIntDef(FTrial.NextTrial, 0) > 0 then
         begin //go to the especified trial
           if FTrial.Result = T_MISS then
-            FCounterManager.VirtualTrialLoop := FCounterManager.VirtualTrialValue;
+            FManager.VirtualTrialLoop := FManager.VirtualTrialValue;
 
-          FCounterManager.OnNotCorrection(Sender);
-          FCounterManager.CurrentTrial := StrToIntDef(FTrial.NextTrial, 0) - 1;
-          FCounterManager.OnNxtTrial(Sender);
+          FManager.OnNotCorrection(Sender);
+          FManager.CurrentTrial := StrToIntDef(FTrial.NextTrial, 0) - 1;
+          FManager.OnNxtTrial(Sender);
           FIsCorrection := False;
         end
       else // go to the next trial,
         begin
           if FTrial.Result = T_MISS then
-            FCounterManager.VirtualTrialLoop := FCounterManager.VirtualTrialValue;
+            FManager.VirtualTrialLoop := FManager.VirtualTrialValue;
 
-          FCounterManager.OnNotCorrection(Sender);
-          FCounterManager.OnTrialEnd(Sender);
+          FManager.OnNotCorrection(Sender);
+          FManager.OnTrialEnd(Sender);
           FIsCorrection := False;
         end;
 
@@ -413,18 +413,23 @@ begin
   // criteria related to hits
   LCriteriaWasReached := False;
   if FBlc.CrtConsecutiveHit > 0 then
-    LCriteriaWasReached := FCounterManager.BlcCscHits = FBlc.CrtConsecutiveHit;
+    LCriteriaWasReached := FManager.BlcCscHits = FBlc.CrtConsecutiveHit;
 
-  if FBlc.CrtHitPorcentage > 0 then
-    LCriteriaWasReached := FCounterManager.HitPorcentage >= FBlc.CrtHitPorcentage;
+  if FManager.BlcTrials >= FBlc.NumTrials then
+    if FBlc.CrtHitPorcentage > 0 then
+      begin
+        WriteLn(FManager.HitPorcentage);
+        LCriteriaWasReached := FManager.HitPorcentage >= FBlc.CrtHitPorcentage;
+
+      end;
 
   // criteria related to misses
   if FBlc.CrtConsecutiveMiss > 0 then
-    LCriteriaWasReached := FCounterManager.BlcCscMisses = FBlc.CrtConsecutiveMiss;
+    LCriteriaWasReached := FManager.BlcCscMisses = FBlc.CrtConsecutiveMiss;
 
   if LCriteriaWasReached then
     begin
-      //FCounterManager.CurrentTrial := FBlc.NumTrials;
+      //FManager.CurrentTrial := FBlc.NumTrials;
       if Assigned(OnCriteria) then FOnCriteria(Sender);
     end;
 
@@ -663,7 +668,7 @@ begin
           end;
         FTrial := TPerformanceReview.Create(FBackGround);
         FTrial.GlobalContainer := FGlobalContainer;
-        FTrial.CounterManager := FCounterManager;
+        FTrial.CounterManager := FManager;
         FTrial.SaveTData := SaveTData;
         FTrial.OnTrialEnd := @EndBlcAndFreeTrial;
         FTrial.OnTrialWriteData := @WriteTrialData;
@@ -697,9 +702,9 @@ end;
 procedure TBlc.LogEvent(ACode: string);
 begin
   SaveTData(TimestampToStr(TickCount - TimeStart) + #9 +
-           IntToStr(FCounterManager.CurrentBlc+1) + #9 +
-           IntToStr(FCounterManager.CurrentTrial+1) + #9 +
-           IntToStr(FCounterManager.Trials+1) + #9 + // Current trial cycle
+           IntToStr(FManager.CurrentBlc+1) + #9 +
+           IntToStr(FManager.CurrentTrial+1) + #9 +
+           IntToStr(FManager.Trials+1) + #9 + // Current trial cycle
            'ITI' + #32 + ACode + LineEnding)
 end;
 
@@ -757,11 +762,11 @@ end;   }
 
 procedure TBlc.Hit(Sender: TObject);
 begin
-  FCounterManager.OnHit(Sender);
+  FManager.OnHit(Sender);
   if FBlc.CrtKCsqHit > 0 then
-    if FBlc.CrtKCsqHit = FCounterManager.BlcCsqHits then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
+    if FBlc.CrtKCsqHit = FManager.BlcCsqHits then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
       begin
-        FCounterManager.OnCsqCriterion(Sender);
+        FManager.OnCsqCriterion(Sender);
         //FTrial.DispenserPlusCall;
       end;
   if Assigned(OnHit) then FOnHit(Sender);
@@ -780,7 +785,7 @@ end;
 
 procedure TBlc.Miss(Sender: TObject);
 begin
-  FCounterManager.OnMiss(Sender);
+  FManager.OnMiss(Sender);
   if Assigned(OnMiss) then FOnMiss(Sender);
 end;
 

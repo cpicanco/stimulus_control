@@ -40,6 +40,7 @@ type
     FOnBlcRepetition: TNotifyEvent;
     FStmResponses : integer;
     FTrials : integer;
+    FBlcTrials : integer;
     FVirtualHits : integer;
   {Current Blc}
     FBlcRepetitions : integer;
@@ -129,6 +130,7 @@ type
     property Nones : integer read FNones;
     property StmResponses : integer read FStmResponses;
     property Trials : integer read FTrials;
+    property BlcTrials : integer read FBlcTrials;
     property VirtualHits : integer read FVirtualHits;
   {Current Blc}
     property VirtualTrialValue : Integer read FVirtualTrialValue;
@@ -151,7 +153,7 @@ type
     property BlcNones : integer read FBlcNones;
     property BlcCscNones : integer read FBlcCscNones;
     property BlcHighCscNones : integer read FBlcHighCscNones;
-    property BlcRepetitions : integer read FBlcRepetitions;
+    property BlcRepetitions : integer read FBlcRepetitions write FBlcRepetitions;
     property CurrentTrial : integer read FCurrentTrial write FCurrentTrial;
   {Each Stm}
     property StmCounter : integer read FStmCounter;
@@ -247,12 +249,19 @@ end;
 function TCounterManager.HitPorcentage(AGlobal: Boolean): integer;
 var
   LHits : integer;
+  LBaseTrials : integer;
 begin
   if AGlobal then
-    LHits := Hits
+    begin
+      LHits := Hits;
+      LBaseTrials := Trials;
+    end
   else
-    LHits := BlcHits;
-  Result := (LHits*100) div Trials;
+    begin
+      LHits := BlcHits;
+      LBaseTrials := BlcTrials;
+    end;
+  Result := (LHits*100) div LBaseTrials;
 end;
 
 procedure TCounterManager.BeginBlc(Sender: TObject);
@@ -286,6 +295,7 @@ end;
 procedure TCounterManager.Correction(Sender: TObject);
 begin
   Inc(FTrials);
+  Inc(FBlcTrials);
   Inc(FCorrections);
   Inc(FCscCorrections);
   Inc(FBlcCorrections);
@@ -318,7 +328,7 @@ begin
   FBlcCscNones := 0;
   FBlcHighCscNones := 0;
   FCurrentTrial := 0;
-  FBlcRepetitions:=0;
+  FBlcTrials:= 0;
 
   Inc(FCurrentBlc);
 end;
@@ -331,6 +341,7 @@ end;
 procedure TCounterManager.EndTrial(Sender: TObject);
 begin
   Inc(FTrials);
+  Inc(FBlcTrials);
   Inc(FCurrentTrial);
   FTrialBkGndResponses := 0;
   FTrialStmResponses := 0;

@@ -125,9 +125,12 @@ end;
 
 procedure TSession.EndBlc(Sender: TObject);
 var
-  LLastBlc : integer;
+  LLastBlcIndex : integer;
+  LLastBlc : TCfgBlc;
 begin
-  LLastBlc := Manager.CurrentBlc;
+  if Assigned(OnEndBlc) then FOnEndBlc(Sender);
+  LLastBlcIndex := Manager.CurrentBlc;
+  LLastBlc := Configs.CurrentBlc;
   Manager.OnEndBlc(Sender); // go to the next blc
 
   case Configs.SessionType of
@@ -143,25 +146,31 @@ begin
       begin
         if FCrtReached then
           begin
-            if Configs.CurrentBlc.NextBlocOnCriteria > 0 then
-              Manager.CurrentBlc := Configs.CurrentBlc.NextBlocOnCriteria;
+            if LLastBlc.NextBlocOnCriteria > 0 then
+              Manager.CurrentBlc := LLastBlc.NextBlocOnCriteria;
           end
         else
           begin
-            if Configs.CurrentBlc.NextBlocOnNotCriteria > 0 then
-              Manager.CurrentBlc := Configs.CurrentBlc.NextBlocOnNotCriteria;
+            if LLastBlc.NextBlocOnNotCriteria > 0 then
+              Manager.CurrentBlc := LLastBlc.NextBlocOnNotCriteria;
           end;
       end;
   end;
 
-  // increment blc repetitions
-  if LLastBlc = Manager.CurrentBlc then
-    Manager.OnBlcRepetition(Sender);
+  // increment blc (successive) repetitions
+  if Manager.CurrentBlc < Configs.NumBlc then
+    if LLastBlcIndex = Manager.CurrentBlc then
+      begin
+        Manager.OnBlcRepetition(Sender);
+        if Manager.BlcRepetitions >= Configs.CurrentBlc.MaxBlcRepetition then
+          Manager.CurrentBlc := Configs.NumBlc;
+      end
+    else
+      Manager.BlcRepetitions := 0;
 
-  if Manager.BlcRepetitions > Configs.CurrentBlc.MaxBlcRepetition then
-    Manager.CurrentBlc := Configs.NumBlc;
+  if FCrtReached then
+    FCrtReached := False;
 
-  if Assigned(OnEndBlc) then FOnEndBlc(Sender);
   PlayBlc(Sender);
 end;
 
