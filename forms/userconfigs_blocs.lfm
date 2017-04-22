@@ -8,7 +8,6 @@ object FormBlocs: TFormBlocs
   ClientWidth = 549
   Color = clBlack
   Font.Color = clBlack
-  OnKeyPress = FormKeyPress
   PopupMenu = PopupMenuBlocs
   LCLVersion = '1.6.2.0'
   object LvlGraphControl1: TLvlGraphControl

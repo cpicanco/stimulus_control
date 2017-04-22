@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, Menus, LvlGraphCtrl, Grids;
+  Menus, LvlGraphCtrl, Grids;
 
 type
 
@@ -52,7 +52,6 @@ type
   TFormBlocs = class(TForm)
     LvlGraphControl1: TLvlGraphControl;
     PopupMenuBlocs: TPopupMenu;
-    procedure FormKeyPress(Sender: TObject; var Key: char);
   private
     FBlocsPath: string;
     FChoosenBlocs : TStringList;
