@@ -13,7 +13,7 @@ unit config_session;
 
 interface
 
-uses Classes, ComCtrls, IniFiles, SysUtils,  Dialogs, Forms
+uses Classes, ComCtrls, SysUtils,  Dialogs, Forms
     , pupil_communication
     , countermanager
     ;
@@ -99,11 +99,6 @@ type
     Height : Integer;
   end;
 
-  TCIniFile = class (TIniFile)
-  public
-    procedure ReadSectionValues(const Section: string; Strings: TStrings); override;
-  end;
-
   { TCfgSes }
 
   TCfgSes = class(TComponent)
@@ -176,7 +171,7 @@ resourcestring
 
 implementation
 
-uses strutils, constants, config_session_global_container;
+uses strutils, constants, config_session_fileutils, config_session_global_container;
 { TCfgSes }
 
 function TCfgSes.GetCfgBlc(Ind: Integer): TCfgBlc;
@@ -222,30 +217,6 @@ begin
   inherited Destroy;
 end;
 
-procedure TCIniFile.ReadSectionValues(const Section: string; Strings: TStrings);
-var
-  KeyList: TStringList;
-  I: Integer;
-begin
-  KeyList := TStringList.Create;
-  //KeyList.Sorted := False;
-  KeyList.CaseSensitive := False;
-  KeyList.Duplicates := dupIgnore;
-  try
-    ReadSection(Section, KeyList);
-    //showmessage(Keylist.Text);
-    //Strings.BeginUpdate;
-    //try
-      for I := 0 to KeyList.Count - 1 do
-        Strings.Add(KeyList[I] + '=' + ReadString(Section, KeyList[I], ''))
-    //finally
-    //  Strings.EndUpdate;
-    //end;
-  finally
-    KeyList.Free;
-  end;
-end;
-
 procedure TCfgSes.SetLengthVetBlc;
 begin
   SetLength(FBlcs, FNumBlc);
@@ -272,7 +243,7 @@ end;
 function TCfgSes.LoadFromFile(AFileName: string; AEditMode: Boolean): Boolean;
 var
   a1, a2, a3, a4: Integer; s1: string;
-  LIniFile: TCIniFile;
+  LIniFile: TConfigurationFile;
   LNumList : TStringList;
 
   function GetBarPosition(NowNumber, MaxNumber : integer):integer;
@@ -297,7 +268,7 @@ begin
   if FileExists(AFileName) then begin
     FEditMode := AEditMode;
     FFilename := AFileName;
-    LIniFile:= TCIniFile.Create(AFileName);
+    LIniFile:= TConfigurationFile.Create(AFileName);
     with LIniFile do begin
       //frmMain.Statusbar1.Panels[0].Text := messLoading;
       if  SectionExists(_Main) and
@@ -321,49 +292,13 @@ begin
         SetLength(FBlcs, FNumBlc);
         for a1:= Low(FBlcs) to High(FBlcs) do
           begin
-            with FBlcs[a1] do
-              begin
-                Name:= ReadString(_Blc + #32 + IntToStr(a1+1), _Name, '');
-                BkGnd:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _BkGnd, 0);
-                ITI:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _ITI, 0);
+            FBlcs[a1] := Bloc[a1];
 
-                CrtHitPorcentage := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtHitPorcentage, -1);
-                CrtConsecutiveHit := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtConsecutiveHit, -1);
-                CrtConsecutiveMiss := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtConsecutiveMiss, -1);
-                CrtMaxTrials:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _CrtMaxTrials, -1);
-                CrtKCsqHit := ReadInteger(_Blc + #32 + IntToStr(a1+1), _CsqCriterion, -1);
-                NextBlocOnCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnCriteria, -1)-1;
-                NextBlocOnNotCriteria := ReadInteger(_Blc + #32 + IntToStr(a1+1), _NextBlocOnNotCriteria, -1)-1;
-                Counter:= ReadString(_Blc + #32 + IntToStr(a1+1), _Counter, 'NONE');
-
-                s1:= ReadString(_Blc + #32 + IntToStr(a1+1), _NumTrials, '0 0');
-                NumTrials:= StrToIntDef(Copy(s1, 0, pos(' ', s1)-1), 0);
-                Delete(s1, 1, pos(' ', s1)); If Length(s1)>0 then While s1[1]=' ' do Delete(s1, 1, 1);
-                VirtualTrialValue:= StrToIntDef(s1, 0);
-                DefNextBlc:= ReadString(_Blc + #32 + IntToStr(a1+1), _DefNextBlc, '');
-                MaxCorrection:= ReadInteger(_Blc + #32 + IntToStr(a1+1), _MaxCorrection, 0);
-                MaxBlcRepetition := ReadInteger(_Blc + #32 + IntToStr(a1+1), _MaxBlcRepetition, 0);
-              end;
             SetLength(FBlcs[a1].Trials, FBlcs[a1].NumTrials);
             for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
               begin
-                with FBlcs[a1].Trials[a2] do
-                  begin
-                    Id :=  a2 + 1;
-                    Name:= ReadString(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1),_Name, '');
-                    Kind:= ReadString(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1), _Kind, '');
-                    NumComp := ReadInteger(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1), _NumComp, 0);
-                    SList:= TStringList.Create;
-                    with SList do
-                      begin
-                        //SList.Sorted := False;
-                        CaseSensitive := False;
-                        Duplicates := dupIgnore;
-                        BeginUpdate;
-                        ReadSectionValues(_Blc + #32 + IntToStr(a1+1) + ' - ' + _Trial + IntToStr(a2+1), SList);
-                        EndUpdate;
-                      end;
-                  end;
+                FBlcs[a1].Trials[a2] := Trial[a1,a2];
+
                 //frmMain.Statusbar1.Panels[1].Text := '[' + _Blc + IntToStr(a1+1) + ' - ' + _Trial +IntToStr(a2+1) + ']';
                 //frmMain.ProgressBar1.Position := GetBarPosition(a2, FVetCfgBlc[a1].NumTrials-1);
                 Application.ProcessMessages;
@@ -443,12 +378,12 @@ var
   i1, i2, i3, aNumBlc, aNumTrials, aNumComp : Integer;
   ANode : TTreeNode;
   CurrStr, aux: string;
-  LIniFile : TCIniFile;
+  LIniFile : TConfigurationFile;
 begin
   Result:= False;
   if FileExists(FileName) then
     begin
-      LIniFile:= TCIniFile.Create(FileName);
+      LIniFile:= TConfigurationFile.Create(FileName);
       aTree.BeginUpdate;
       with LIniFile do
         try

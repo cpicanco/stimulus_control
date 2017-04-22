@@ -19,7 +19,6 @@ uses
   , constants
   ;
 
-function GetNumTrials(ASessionIniFile : TCIniFile) : integer;
 function GetSection(ATrial: integer; ABloc : integer) : string; overload;
 function GetSection(ABloc : integer) : string; overload;
 //function IncSection(ASection : string; ABloc : integer) : string; overload;
@@ -33,13 +32,6 @@ const
   Separator = #32 + '-' + #32;
   EndStr = ']';
 
-function GetNumTrials(ASessionIniFile: TCIniFile): integer;
-var
-  s1 : string;
-begin
-  //s1:= ASessionIniFile.ReadString(_Blc + #32 + IntToStr(i), _NumTrials, '0 0') + #32;
-  //Result := StrToIntDef(Copy(s1, 0, Pos(#32, s1) - 1), 0);
-end;
 
 {.
  . For Trial Sections: GetSection(1, 2); // Trial 1, Bloc 2
