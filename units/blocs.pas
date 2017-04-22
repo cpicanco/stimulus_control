@@ -417,11 +417,7 @@ begin
 
   if FManager.BlcTrials >= FBlc.NumTrials then
     if FBlc.CrtHitPorcentage > 0 then
-      begin
-        WriteLn(FManager.HitPorcentage);
-        LCriteriaWasReached := FManager.HitPorcentage >= FBlc.CrtHitPorcentage;
-
-      end;
+      LCriteriaWasReached := FManager.HitPorcentage >= FBlc.CrtHitPorcentage;
 
   // criteria related to misses
   if FBlc.CrtConsecutiveMiss > 0 then
