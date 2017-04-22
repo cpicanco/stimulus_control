@@ -25,77 +25,12 @@ uses
   , Forms
 
   //Forms
-  , userconfigs, versioning_lazarus
-  //, userconfigs_trial_mirrored
-  //, userconfigs_get_matrix
-  //, userconfigs_simple_discrimination_matrix
-  //, background
-
-  //units
-  //, client
-  //, criatore
-  //, escriba
-  //, custom_timer
-  //, regdata
-  //, constants
-  //, countermanager
-
-  // Responses, Schedules of Reinforcement, Stimuli
-  //, schedules
-  //, schedules_main
-  //, response_key
-  //, bass_player
-
-  // session, blocs, trials
-  //, trial_abstract
-  //, trial_simple
-  //, trial_matching
-  //, trial_message
-
-  //, trial_mirrored_stm
-  //, trial_feature_positive
-  //, trial_calibration
-  //, trial_dizzy_timers
-
-  //, blocs
-  //, session
-  //, config_session
-
-  //PLP, RS232
-  //, interface_rs232
-  //, interface_plp
-
-  // helpers
-  //, draw_methods
-  //, timestamps_logger
-  //, timestamps_helpers
-  //, timestamps
-  //, git_vertioning
-
-  {$ifdef DEBUG}
-  , debug_logger
-  , SysUtils
-  , FileUtil, debug_logger_thread
-  {$endif}
-
+  , userconfigs
   ;
 
 {$R *.res}
 
-{$ifdef DEBUG}
-  resourcestring
-    ApplicationTitle = 'Controle de Estímulos';
-{$endif}
-
 begin
-
-  {$ifdef DEBUG}
-    DebugLn(mt_Information + 'Debug Logger initialized');
-    {$ifdef WIN32}
-      DebugLn(mt_Information + 'Inp32(0):' + IntToStr(Inp32(0)));
-    {$endif}
-  {$endif}
-
   Application.Initialize;
   {$ifdef DEBUG}
     DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
