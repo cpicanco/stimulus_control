@@ -25,7 +25,7 @@ uses
   , Forms
 
   //Forms
-  , userconfigs
+  , userconfigs, config_session_guiutils
   ;
 
 {$R *.res}
