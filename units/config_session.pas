@@ -158,17 +158,6 @@ type
     property Row : integer read FRow write FRow;
   end;
 
-resourcestring
-  messuCfgSessionMainError = 'Valor não encontrado: Main, Name or NumBlc.';
-  messLoading = 'Carregando...';
-  messReady = 'Pronto.';
-  messRoot = 'Estrutura';
-  messLevel_01 = 'Sessão 1';
-  messLevel_04_M = 'Mensagem';
-  DefName = 'No name';
-  DefSubject = 'No subject';
-  DefAddress = '127.0.1.1:5020';
-
 implementation
 
 uses strutils, constants, config_session_fileutils, config_session_global_container;
@@ -275,11 +264,11 @@ begin
           ValueExists(_Main, _Name) and
           ValueExists(_Main, _NumBlc) then begin
 
-        FSessionName := ReadString(_Main, _Name, DefName);
-        FSessionSubject := ReadString(_Main, _Subject, DefSubject);
+        FSessionName := ReadString(_Main, _Name, rsDefName);
+        FSessionSubject := ReadString(_Main, _Subject, rsDefSubject);
         FSessionType := ReadString(_Main, _Type, T_CIC);
         FNumBlc := ReadInteger(_Main, _NumBlc, 0);
-        FSessionServer := ReadString(_Main,_ServerAddress, DefAddress);
+        FSessionServer := ReadString(_Main,_ServerAddress, rsDefAddress);
 
         // set media and data paths
         s1 := ReadString(_Main, _RootMedia, '');
@@ -292,15 +281,12 @@ begin
         SetLength(FBlcs, FNumBlc);
         for a1:= Low(FBlcs) to High(FBlcs) do
           begin
-            FBlcs[a1] := Bloc[a1];
+            FBlcs[a1] := Bloc[a1+1];
 
             SetLength(FBlcs[a1].Trials, FBlcs[a1].NumTrials);
             for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
               begin
-                FBlcs[a1].Trials[a2] := Trial[a1,a2];
-
-                //frmMain.Statusbar1.Panels[1].Text := '[' + _Blc + IntToStr(a1+1) + ' - ' + _Trial +IntToStr(a2+1) + ']';
-                //frmMain.ProgressBar1.Position := GetBarPosition(a2, FVetCfgBlc[a1].NumTrials-1);
+                FBlcs[a1].Trials[a2] := Trial[a1+1,a2+1];
                 Application.ProcessMessages;
               end;
           end;

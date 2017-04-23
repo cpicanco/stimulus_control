@@ -22,8 +22,8 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
     , pupil_communication
     , session
     , config_session
+    , config_session_guiutils
     , escriba
-    , constants
     ;
 
 type
@@ -48,9 +48,12 @@ type
     chkDrawTrialGroup: TCheckBox;
     chkPlayOnSecondMonitor: TCheckBox;
     ColorButtonBloc: TColorButton;
+    ComboBoxSessionType: TComboBox;
     ComboBoxBlocCounter: TComboBox;
+    EditParticipant: TEdit;
     EditBlocName: TEdit;
     EditBlocChainingPath: TEdit;
+    EditSessionName: TEdit;
     edtTrialGroup: TEdit;
     edtTarget: TEdit;
     edtContent: TEdit;
@@ -58,6 +61,9 @@ type
     gbRepetitionsBlocks: TGroupBox;
     gbTrialGroup: TGroupBox;
     Image1: TImage;
+    LabelParticipant: TLabel;
+    LabelSessionName: TLabel;
+    LabelSessionType: TLabel;
     LabelBlocBkGnd: TLabel;
     LabelBlocCounter: TLabel;
     LabelBlocCrtConsecutiveHit: TLabel;
@@ -68,9 +74,7 @@ type
     LabelBlocITI: TLabel;
     LabelBlocChainingPath: TLabel;
     LabelBlocVirtualTrial: TLabel;
-    leParticipant: TLabeledEdit;
     leFillValue: TLabeledEdit;
-    leSessionName: TLabeledEdit;
     Memo1: TMemo;
     MemoAppInfo: TMemo;
     piBlocChaining: TMenuItem;
@@ -118,7 +122,6 @@ type
     procedure btnGridTypeClick(Sender: TObject);
     procedure btnNextGeneralClick(Sender: TObject);
     procedure btnNextStimuliClick(Sender: TObject);
-    procedure btnPrependTrialClick(Sender: TObject);
     procedure btnTrialsDoneClick(Sender: TObject);
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
@@ -144,13 +147,12 @@ type
   private
     FRepetitionMatrix : array of array of boolean;
     FLastFocusedCol : integer;
-    //FNumTrials : integer;
     FSession : TSession;
-    //FManager : TCounterManager;
     FConfigs : TCfgSes;
     FAudioDevice : TBassAudioDevice;
     FEscriba : TEscriba;
-    //FData : TRegData;
+    FGuiMain : TGuiMain;
+    FGuiBloc : TGuiBloc;
     function MeetCondition(aCol, aRow : integer): boolean;
     function SaneConstraints: Boolean;
     function RepetitionBlocksMeetsConstraints(ALowRow,AHighRow:integer) : Boolean;
@@ -160,9 +162,6 @@ type
     procedure ResetRepetionMatrix;
     procedure ReceiveTimestamp(Sender: TObject; ARequest, AResponse: String);
     procedure CreateFormBloc;
-    //SimpleGui : TSimpleGui;
-    //FData : TRegData;
-    //FConfig : TConfig;
   public
     { public declarations }
 
@@ -170,52 +169,6 @@ type
 
 var
   FormUserConfig: TFormUserConfig;
-resourcestring
-  rsPosition = 'Bnd';
-  rsComparison = 'C';
-  rsTrials = 'Tentativas';
-  rsConsequence = 'Consequência';
-  rsAngle = 'Ângulo';
-  rsExpectedResponse = 'Resposta';
-  rsContingency = 'Contingência';
-  rsPositive = 'Positiva';
-  rsNegative = 'Negativa';
-  rsStimulus = 'Figura';
-  rsLimitedHold = 'Tempo/Estímulo';
-  rsSize = 'Tamanho';
-  rsDefBlc = 'Bloco 1';
-  rsEndSession = 'Fim.';
-  rsSchedule = 'Esquema';
-
-  rsFillTypeAxes = 'Eixos';
-  rsFillTypeMatriz = 'FP/FN';
-  rsFillTypeGoNoGo = 'Go/No-Go';
-  rsFillTypeMTS = 'MTS';
-  rsFillTypeBlocChaining = 'Encadear Blocos';
-
-  rsBlocs = 'Bloco';
-  rsBlocName = 'Nome';
-  rsBlocCrtHitPorcentage = 'Critério (% de acertos)';
-  rsBlocCrtConsecutiveHit = 'Critério (acertos consecutivos)';
-  rsBlocMaxBlcRepetition = 'Número máximo de repetições seguidas do bloco';
-  rsBlocNextBlocOnCriteria = 'Bloco seguinte se critério for atingido';
-  rsBlocNextBlocOnNotCriteria = 'Bloco seguinte se critério não for atingido';
-  rsBlocAddress = 'Endereço';
-  rsBlocITI = 'Intervalo entre tentativas';
-  rsBlocBkGnd = 'Cor do Fundo';
-  rsBlocCounter = 'Mostrar contador ao final?';
-  rsBlocVirtualTrialValue = 'Quantas tarefas contabilizam uma tentativa?';
-  rsBlocMaxCorrection = 'Número máximo de correções por tentativa';
-
-
-  //rsBlocDefNextBlc
-  //rsBlocCrtConsecutiveMiss
-  //rsBlocCrtMaxTrials
-
-  rsRandomizeTrials = 'Randomizar ordem das tentativas';
-  rsRandomizeResponses = 'Randomizar respostas';
-  rsRandomizeGroupTrial = 'Randomizar em grupos ordem das tentativas';
-  rsRandomizeTrialsWithConstraints = 'Randomizar ordem das tentativas com restrições.';
 
 implementation
 
@@ -229,6 +182,7 @@ uses background, strutils
      , userconfigs_blocs
      , versioning_git
      , versioning_lazarus
+     , constants
      {$ifdef DEBUG}
      , debug_logger
      {$endif}
@@ -252,22 +206,7 @@ begin
     begin
       StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeAxes;
-
-      StringGrid1.ColCount := 9;
-      StringGrid1.RowCount := 2;
-      with StringGrid1 do
-        begin
-          Cells[0, 0] := rsTrials;
-          Cells[1, 0] := rsAngle;
-          Cells[2, 0] := 'x0';
-          Cells[3, 0] := 'y0';
-          Cells[4, 0] := 'x1';
-          Cells[5, 0] := 'y1';
-          Cells[6, 0] := rsExpectedResponse;
-          Cells[7, 0] := rsSize;
-          Cells[8, 0] := rsSchedule;
-        end;
-
+      SetGridHeader(StringGrid1,rsFillTypeAxes);
       ResetRepetionMatrix;
     end;
 
@@ -275,15 +214,7 @@ begin
     begin
       StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeMatriz;
-
-      StringGrid1.ColCount := 2;
-      StringGrid1.RowCount := 2;
-      with StringGrid1 do
-        begin
-          Cells[0, 0] := rsTrials;
-          Cells[1, 0] := rsContingency;
-        end;
-
+      SetGridHeader(StringGrid1,rsFillTypeMatriz);
       ResetRepetionMatrix;
     end;
 
@@ -291,19 +222,7 @@ begin
     begin
       StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeGoNoGo;
-
-      StringGrid1.ColCount := 6;
-      StringGrid1.RowCount := 2;
-      with StringGrid1 do
-        begin
-          Cells[0, 0] := rsTrials;
-          Cells[1, 0] := rsConsequence;
-          Cells[2, 0] := rsSchedule;
-          Cells[3, 0] := rsLimitedHold;
-          Cells[4, 0] := rsStimulus;
-          Cells[5, 0] := rsSize;
-        end;
-
+      SetGridHeader(StringGrid1,rsFillTypeGoNoGo);
       ResetRepetionMatrix;
     end;
 
@@ -314,18 +233,7 @@ begin
         begin
           StringGrid1.Clean;
           btnGridType.Caption := rsFillTypeBlocChaining;
-
-          StringGrid1.ColCount := 5;
-          StringGrid1.RowCount := 2;
-          with StringGrid1 do
-            begin
-              Cells[0, 0] := rsBlocs;
-              Cells[1, 0] := rsBlocName;
-              Cells[2, 0] := rsBlocNextBlocOnCriteria;
-              Cells[3, 0] := rsBlocNextBlocOnNotCriteria;
-              Cells[4, 0] := rsBlocAddress;
-            end;
-
+          SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
           ResetRepetionMatrix;
           CreateFormBloc;
         end;
@@ -335,6 +243,7 @@ begin
       begin
         FormBlocs.Free;
         FormBlocs := nil;
+        StringGrid1.PopupMenu := nil
       end;
 
   // Randomize Buttom
@@ -712,120 +621,6 @@ begin
   //
 end;
 
-{
-
-  btnApplyClick may become a class in the near future
-
-}
-//
-//procedure TFormUserConfig.btnApplyClick(Sender: TObject);
-//var
-//
-//  i, line,
-//  //VirtualTrialValue,
-//  NumTrials : integer;
-//
-//  s1,
-//  Content : string;
-//
-//  NewFile,
-//  Sections : TStringList;
-//
-//  IniTarget,
-//  IniContent : TIniFile;
-//begin
-//  if FileExists(edtTarget.Text) and FileExists(edtContent.Text) then
-//    begin
-//
-//      // initialize  string lists
-//      NewFile := TStringList.Create;
-//      NewFile.Duplicates := dupIgnore;
-//
-//      Sections := TStringList.Create;
-//      Sections.Duplicates := dupIgnore;
-//      try
-//        Sections.LoadFromFile(edtTarget.Text);
-//
-//        // get content
-//        IniContent := TCIniFile.Create(edtContent.Text);
-//        try
-//          IniContent.ReadSectionRaw('Trial', Sections);
-//          Content := Sections.Text;
-//        finally
-//          IniContent.Free;
-//        end;
-//
-//        // get target
-//        IniTarget := TCIniFile.Create(edtTarget.Text);
-//        try
-//          // get sections
-//          // Sections.Clear;
-//          // IniTarget.ReadSections(Sections);
-//
-//          i := 1;
-//          // get old number of trials
-//          NumTrials:= GetNumTrials(IniTarget);
-//          //showmessage(inttostr(numtrials));
-//
-//          // get old virtual trial value
-//          //Delete(s1, 1, Pos(#32, s1));
-//          //if Length(s1) > 0 then while s1[1] = #32 do Delete(s1, 1, 1);
-//          //VirtualTrialValue:= StrToIntDef(s1, 0);
-//
-//          // Update the NumTrial key
-//          Inc(NumTrials);
-//
-//          //for this method we must have made a copy first
-//          //IniTarget.WriteString(GetSection(0,1, False), 'NumTrials', IntToStr(NumTrials) + #32 + IntToStr(VirtualTrialValue) );
-//          //IniTarget.UpdateFile;
-//
-//
-//          // this method does not work with multiple blocs
-//          // load/copy target stream
-//          NewFile.LoadFromFile(edtTarget.Text);
-//          i := NewFile.IndexOf('NumTrials=');
-//
-//          for i := 0 to NewFile.Count -1 do
-//            begin
-//              if Pos('NumTrials', NewFile.Strings[i]) <> 0 then Break;
-//            end;
-//
-//          NewFile.Strings[i] := 'NumTrials=' + #9 + IntToStr(NumTrials) + #32 + '0';
-//
-//          //ShowMessage(NewFile.Strings[i]);
-//
-//        finally
-//          IniTarget.Free;
-//        end;
-//        // insert the content before the first trial
-//        s1 := NewFile.Text;
-//        Insert(GetSection(0,1) + LineEnding + Content + LineEnding, s1, Pos(GetSection(1,1), NewFile.Text));
-//        NewFile.Text := s1;
-//        // loop incrementing trial section numbers
-//        for i := 0 to NumTrials -1 do
-//          begin
-//
-//            // Make i + 1 turns to 0
-//            line := NewFile.IndexOf(GetSection(i + 1,1));
-//            if line <> -1 then
-//              begin
-//                NewFile[line] := GetSection(0,1);
-//              end;
-//
-//            // Inc i
-//            line := NewFile.IndexOf(GetSection(0,1));
-//            NewFile[line] := GetSection(i + 1,1);
-//          end;
-//
-//         NewFile.SaveToFile(edtTarget.Text + '.new');
-//
-//      finally
-//        NewFile.Free;
-//        Sections.Free;
-//      end;
-//    end;
-//end;
-
 procedure TFormUserConfig.btnClientTestClick(Sender: TObject);
 var PupilClient : TPupilCommunication;
 begin
@@ -894,9 +689,8 @@ end;
 
 procedure TFormUserConfig.btnFillConditionClick(Sender: TObject);
 var
-    aRow,
-    aRowCount : integer;
-
+  aRow,
+  aRowCount : integer;
 begin
   if (FLastFocusedCol <> -1) and (FLastFocusedCol <> 0) then
     begin
@@ -916,18 +710,16 @@ begin
   pgRodar.TabIndex := 2;
 end;
 
-procedure TFormUserConfig.btnPrependTrialClick(Sender: TObject);
-begin
-  // todo: edit configuration files, prepend
-  // (edtTarget.Text);
-end;
-
 procedure TFormUserConfig.btnTrialsDoneClick(Sender: TObject);
 var
   aTrial, aStm, aBlc, aNumTrials : integer;
   aValues : string;
   T : TCfgTrial;
   B : TCfgBlc;
+  LDefaultMain : TStringList;
+  LDefaultBloc : TStringList;
+  LGuiMain : TGuiMain;
+  LGuiBloc : TGuiBloc;
 
   function GetBndString (StmNumber : integer) : string;
   begin
@@ -983,8 +775,8 @@ begin
     begin
       aBlc := 0;
 
-      FEscriba.SessionName := leSessionName.Text;
-      FEscriba.SessionSubject := leParticipant.Text;
+      FEscriba.SessionName := EditSessionName.Text;
+      FEscriba.SessionSubject := EditParticipant.Text;
       FEscriba.Blcs[aBlc].ITI := 1000;
       FEscriba.SessionType  := T_CIC;
       FEscriba.Data := 'Data';
@@ -1043,8 +835,8 @@ begin
     begin
       aBlc := 0;
 
-      FEscriba.SessionName := leSessionName.Text;
-      FEscriba.SessionSubject := leParticipant.Text;
+      FEscriba.SessionName := EditSessionName.Text;
+      FEscriba.SessionSubject := EditParticipant.Text;
       FEscriba.Blcs[aBlc].ITI := 2300;
       FEscriba.SessionType  := 'CIC';
       FEscriba.Data := 'Data';
@@ -1103,8 +895,8 @@ begin
     begin
       aBlc := 0;
 
-      FEscriba.SessionName := leSessionName.Text;
-      FEscriba.SessionSubject := leParticipant.Text;
+      FEscriba.SessionName := EditSessionName.Text;
+      FEscriba.SessionSubject := EditParticipant.Text;
       FEscriba.Blcs[aBlc].ITI := 1000;
       FEscriba.SessionType  := 'CIC';
       FEscriba.Data := 'Data';
@@ -1147,7 +939,37 @@ begin
         end;
     end;
 
-  pgRodar.TabIndex := 3;
+  if piBlocChaining.Checked then
+    begin
+      LGuiMain.Blocs := StringGrid1;
+      LGuiMain.Participant := EditParticipant;
+      LGuiMain.SessionName := EditSessionName;
+      LGuiMain.SessionType := ComboBoxSessionType;
+      LGuiMain.PupilAddress := nil;
+      LGuiMain.RootData := nil;
+      LGuiMain.RootMedia := nil;
+
+      LGuiBloc.BlocITI := seBlocITI;
+      LGuiBloc.CrtConsecutiHits := seBlocCrtConsecutiveHit;
+      LGuiBloc.CrtHitPorcentage := seBlocCrtHitPorcentage;
+      LGuiBloc.Counter := ComboBoxBlocCounter;
+      LGuiBloc.BlocName := EditBlocName;
+      LGuiBloc.Color := ColorButtonBloc;
+      LGuiBloc.MaxCorrection := seBlocMaxCorrection;
+      LGuiBloc.MaxRepetition := seBlocMaxRepetition;
+      LGuiBloc.Trials := nil;
+      LGuiBloc.VirtualTrial := nil;
+      LDefaultMain := TStringList.Create;
+      LDefaultBloc := TStringList.Create;
+      MainFromGui(LDefaultMain,LGuiMain);
+      BlocFromGui(LDefaultBloc,LGuiBloc);
+      FormBlocs.WriteToDisk(LDefaultMain,LDefaultBloc);
+      Memo1.Lines.LoadFromFile(FormBlocs.BlocsPath+DirectorySeparator+LAST_BLOCS_INI_FILENAME);
+      LDefaultMain.Free;
+      LDefaultBloc.Free;
+    end;
+
+  pgRodar.TabIndex := 4;
 end;
 
 procedure TFormUserConfig.chkUseMediaChange(Sender: TObject);
@@ -1388,9 +1210,10 @@ begin
           FormBlocs.InvalidateGraph;
           if FormBlocs.ShowModal = mrOK then
             begin
-              if FormBlocs.Count > 0 then
-                for aBloc := 0 to FormBlocs.Count-1 do
-                  FormBlocs.AppendBlocToStringGrid(aBloc);
+              // May allow editing
+              //if FormBlocs.Count > 0 then
+              //  for aBloc := 0 to FormBlocs.Count-1 do
+              //    FormBlocs.AppendBlocToStringGrid(aBloc);
               ResetRepetionMatrix;
               FLastFocusedCol := -1;
             end;
@@ -1465,7 +1288,7 @@ end;
 procedure TFormUserConfig.btnRunClick(Sender: TObject);
 var LDirectory : string;
 begin
-  LDirectory := GetCurrentDirUTF8 + PathDelim + leParticipant.Text;
+  LDirectory := GetCurrentDirUTF8 + PathDelim + EditParticipant.Text;
   if ForceDirectoriesUTF8(LDirectory) then
       OpenDialog1.InitialDir := LDirectory;
 
@@ -1504,7 +1327,7 @@ end;
 procedure TFormUserConfig.btnSaveClick(Sender: TObject);
 var aDirectory : string;
 begin
-  aDirectory := GetCurrentDirUTF8 + PathDelim + leParticipant.Text;
+  aDirectory := GetCurrentDirUTF8 + PathDelim + EditParticipant.Text;
   if ForceDirectoriesUTF8(aDirectory) then
     SaveDialog1.InitialDir := aDirectory;
 

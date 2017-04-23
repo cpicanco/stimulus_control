@@ -3,11 +3,11 @@ object FormUserConfig: TFormUserConfig
   Height = 470
   Top = 135
   Width = 674
-  HorzScrollBar.Page = 674
-  VertScrollBar.Page = 288
+  HorzScrollBar.Page = 434
+  VertScrollBar.Page = 368
   AutoScroll = True
   Caption = 'Configurar'
-  ClientHeight = 460
+  ClientHeight = 470
   ClientWidth = 674
   Constraints.MinHeight = 400
   Constraints.MinWidth = 400
@@ -1626,7 +1626,7 @@ object FormUserConfig: TFormUserConfig
   object btnRun: TButton
     Left = 8
     Height = 25
-    Top = 428
+    Top = 438
     Width = 64
     Anchors = [akLeft, akBottom]
     Caption = 'Rodar'
@@ -1636,7 +1636,7 @@ object FormUserConfig: TFormUserConfig
   object chkPlayOnSecondMonitor: TCheckBox
     Left = 80
     Height = 21
-    Top = 431
+    Top = 441
     Width = 99
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
@@ -1644,55 +1644,79 @@ object FormUserConfig: TFormUserConfig
   end
   object pgRodar: TPageControl
     Left = 0
-    Height = 422
+    Height = 432
     Top = 0
-    Width = 675
-    ActivePage = tbTrials
+    Width = 676
+    ActivePage = tbBlocs
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 40
-    TabIndex = 3
+    TabIndex = 2
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
-      ClientHeight = 389
-      ClientWidth = 669
-      object leParticipant: TLabeledEdit
-        Left = 0
+      ChildSizing.TopBottomSpacing = 25
+      ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 399
+      ClientWidth = 670
+      object LabelSessionName: TLabel
+        Left = 48
+        Height = 25
+        Top = 25
+        Width = 127
+        Caption = 'Nome da Sessão'
+        ParentColor = False
+      end
+      object EditSessionName: TEdit
+        Left = 223
+        Height = 25
+        Top = 25
+        Width = 400
+        Constraints.MinWidth = 400
+        TabOrder = 2
+        Text = 'Sessão 1'
+      end
+      object LabelParticipant: TLabel
+        Left = 48
+        Height = 25
+        Top = 50
+        Width = 127
+        Caption = 'Nome do Participante'
+        ParentColor = False
+      end
+      object EditParticipant: TEdit
+        Left = 223
+        Height = 25
+        Top = 50
+        Width = 400
+        Constraints.MinWidth = 400
+        TabOrder = 1
+        Text = 'Participante 1'
+      end
+      object LabelSessionType: TLabel
+        Left = 48
         Height = 25
         Top = 75
-        Width = 668
-        Anchors = [akTop, akLeft, akRight]
-        EditLabel.AnchorSideLeft.Control = leParticipant
-        EditLabel.AnchorSideRight.Control = leParticipant
-        EditLabel.AnchorSideRight.Side = asrBottom
-        EditLabel.AnchorSideBottom.Control = leParticipant
-        EditLabel.Left = 0
-        EditLabel.Height = 15
-        EditLabel.Top = 57
-        EditLabel.Width = 668
-        EditLabel.Caption = 'Participante'
-        EditLabel.ParentColor = False
-        TabOrder = 0
-        Text = 'Participante1'
+        Width = 127
+        Caption = 'Avançar blocos'
+        ParentColor = False
       end
-      object leSessionName: TLabeledEdit
-        Left = 0
+      object ComboBoxSessionType: TComboBox
+        Left = 223
         Height = 25
-        Top = 24
-        Width = 668
-        Anchors = [akTop, akLeft, akRight]
-        EditLabel.AnchorSideLeft.Control = leSessionName
-        EditLabel.AnchorSideRight.Control = leSessionName
-        EditLabel.AnchorSideRight.Side = asrBottom
-        EditLabel.AnchorSideBottom.Control = leSessionName
-        EditLabel.Left = 0
-        EditLabel.Height = 15
-        EditLabel.Top = 6
-        EditLabel.Width = 668
-        EditLabel.Caption = 'Nome da Sessão'
-        EditLabel.ParentColor = False
-        TabOrder = 1
-        Text = 'Sessão1'
+        Top = 75
+        Width = 400
+        Constraints.MinWidth = 400
+        ItemHeight = 0
+        ItemIndex = 0
+        Items.Strings = (
+          'independente de critérios'
+          'se critério for atingido, se não encerrar sessão'
+          'condicional ao critério'
+        )
+        TabOrder = 0
+        Text = 'independente de critérios'
       end
     end
     object tbStimuli: TTabSheet
@@ -1701,23 +1725,24 @@ object FormUserConfig: TFormUserConfig
     end
     object tbBlocs: TTabSheet
       Caption = 'Bloco'
+      ChildSizing.TopBottomSpacing = 25
       ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 389
-      ClientWidth = 669
+      ClientHeight = 399
+      ClientWidth = 670
       object LabelBlocChainingPath: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 0
+        Top = 25
         Width = 178
         Caption = 'Pasta com blocos de encadear'
         ParentColor = False
       end
       object EditBlocChainingPath: TEdit
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 0
+        Top = 25
         Width = 250
         Constraints.MinWidth = 250
         OnDblClick = EditBlocChainingPathDblClick
@@ -1727,17 +1752,17 @@ object FormUserConfig: TFormUserConfig
         TextHint = 'Clique duas vezes para escolher a pasta'
       end
       object LabelBlocName: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 25
+        Top = 50
         Width = 178
         Caption = 'LabelBlocName'
         ParentColor = False
       end
       object EditBlocName: TEdit
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 25
+        Top = 50
         Width = 250
         Constraints.MinWidth = 250
         ParentShowHint = False
@@ -1746,118 +1771,118 @@ object FormUserConfig: TFormUserConfig
         TextHint = 'Clique para editar'
       end
       object LabelBlocCrtHitPorcentage: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 50
+        Top = 75
         Width = 178
         Caption = 'LabelBlocCrtHitPorcentage'
         ParentColor = False
       end
       object seBlocCrtHitPorcentage: TSpinEdit
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 50
+        Top = 75
         Width = 100
         Constraints.MaxWidth = 100
         TabOrder = 2
       end
       object LabelBlocCrtConsecutiveHit: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 75
+        Top = 100
         Width = 178
         Caption = 'LabelBlocCrtConsecutiveHit'
         ParentColor = False
       end
       object seBlocCrtConsecutiveHit: TSpinEdit
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 75
+        Top = 100
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000
         TabOrder = 3
       end
       object LabelBlocITI: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 100
+        Top = 125
         Width = 178
         Caption = 'LabelBlocITI'
         ParentColor = False
       end
       object seBlocITI: TSpinEdit
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 100
+        Top = 125
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000000
         TabOrder = 4
       end
       object LabelBlocVirtualTrial: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 125
+        Top = 150
         Width = 178
         Caption = 'LabelBlocVirtualTrial'
         ParentColor = False
       end
       object seBlocVirtualTrial: TSpinEdit
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 125
+        Top = 150
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000000
         TabOrder = 5
       end
       object LabelBlocMaxCorrection: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 150
+        Top = 175
         Width = 178
         Caption = 'LabelBlocMaxCorrection'
         ParentColor = False
       end
       object seBlocMaxCorrection: TSpinEdit
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 150
+        Top = 175
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000000
         TabOrder = 6
       end
       object LabelBlocMaxRepetition: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 175
+        Top = 200
         Width = 178
         Caption = 'LabelBlocMaxRepetition'
         ParentColor = False
       end
       object seBlocMaxRepetition: TSpinEdit
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 175
+        Top = 200
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000000
         TabOrder = 7
       end
       object LabelBlocCounter: TLabel
-        Left = 80
+        Left = 81
         Height = 25
-        Top = 200
+        Top = 225
         Width = 178
         Caption = 'LabelBlocCounter'
         ParentColor = False
       end
       object ComboBoxBlocCounter: TComboBox
-        Left = 338
+        Left = 340
         Height = 25
-        Top = 200
+        Top = 225
         Width = 250
         ItemHeight = 0
         ItemIndex = 0
@@ -1869,32 +1894,32 @@ object FormUserConfig: TFormUserConfig
         Text = 'Não'
       end
       object LabelBlocBkGnd: TLabel
-        Left = 80
+        Left = 81
         Height = 20
-        Top = 225
+        Top = 250
         Width = 178
         Caption = 'LabelBlocBkGnd'
         ParentColor = False
       end
       object ColorButtonBloc: TColorButton
-        Left = 338
+        Left = 340
         Height = 20
-        Top = 225
+        Top = 250
         Width = 250
         BorderWidth = 2
         ButtonColorSize = 16
-        ButtonColor = clBlack
+        ButtonColor = clWhite
       end
     end
     object tbTrials: TTabSheet
       Caption = 'Tentativas'
-      ClientHeight = 389
-      ClientWidth = 669
+      ClientHeight = 399
+      ClientWidth = 670
       object StringGrid1: TStringGrid
         Left = 0
         Height = 224
         Top = 125
-        Width = 669
+        Width = 671
         Align = alClient
         BorderSpacing.Top = 125
         BorderSpacing.Bottom = 40
@@ -2061,10 +2086,10 @@ object FormUserConfig: TFormUserConfig
       object btnTrialsDone: TButton
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Side = asrBottom
-        Left = 0
+        Left = 1
         Height = 40
-        Top = 351
-        Width = 669
+        Top = 352
+        Width = 671
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Escrever'
         OnClick = btnTrialsDoneClick
@@ -2076,8 +2101,8 @@ object FormUserConfig: TFormUserConfig
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ClientHeight = 389
-      ClientWidth = 669
+      ClientHeight = 399
+      ClientWidth = 670
       object btnSave: TButton
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Side = asrBottom
@@ -2103,8 +2128,8 @@ object FormUserConfig: TFormUserConfig
     end
     object tbTools: TTabSheet
       Caption = 'Ferramentas'
-      ClientHeight = 389
-      ClientWidth = 669
+      ClientHeight = 399
+      ClientWidth = 670
       TabVisible = False
       object btnTargetFile: TButton
         AnchorSideLeft.Control = tbTools
@@ -2191,14 +2216,13 @@ object FormUserConfig: TFormUserConfig
         Top = 168
         Width = 328
         Caption = 'Inserir Tentativa no InícioTrial'
-        OnClick = btnPrependTrialClick
         TabOrder = 7
       end
     end
     object tbVersion: TTabSheet
       Caption = 'Sobre o programa'
-      ClientHeight = 389
-      ClientWidth = 669
+      ClientHeight = 399
+      ClientWidth = 670
       ParentBiDiMode = False
       object Image1: TImage
         Left = 267
@@ -3871,7 +3895,7 @@ object FormUserConfig: TFormUserConfig
   object chkPupilClient: TCheckBox
     Left = 200
     Height = 21
-    Top = 431
+    Top = 441
     Width = 107
     Anchors = [akLeft, akBottom]
     Caption = 'Interface Pupil'

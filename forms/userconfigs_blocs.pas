@@ -23,18 +23,24 @@ type
     FName: string;
     FNextBlcOnCriteria: integer;
     FNextBlcOnNotCriteria: integer;
-    procedure StringToAddress(AValue : string);
     function AddressToString:string;
+    function GetAsSection : TStrings;
+    function GetOriginalIndex: integer;
+    function GetTrialSection(Index : integer): TStrings;
     procedure SetBlocName(AValue: string);
     procedure SetNextBlcOnCriteria(AValue: integer);
     procedure SetNextBlcOnNotCriteria(AValue: integer);
+    procedure StringToAddress(AValue : string);
   public
     Address : TBlcAddress;
     MenuItem : TMenuItem;
+    property OriginalIndex : integer read GetOriginalIndex;
     property BlocName : string read FName write SetBlocName;
     property NextBlcOnCriteria : integer read FNextBlcOnCriteria write SetNextBlcOnCriteria;
     property NextBlcOnNotCriteria : integer read FNextBlcOnNotCriteria write SetNextBlcOnNotCriteria;
     property AddressAsString : string read AddressToString write StringToAddress;
+    property AsSection : TStrings read GetAsSection;
+    property TrialSection[Index : integer] : TStrings read GetTrialSection;
   end;
 
   TSimpleBlcs = array of TSimpleBlc;
@@ -70,9 +76,10 @@ type
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure AppendBlocToStringGrid(AAddress : string); overload;
+    procedure AppendBlocToStringGrid(AShortAddress : string); overload;
     procedure AppendBlocToStringGrid(ABlc : integer); overload;
     procedure InvalidateGraph;
+    procedure WriteToDisk(ADefaultMainSection: TStrings; ADefaultBlocSection:TStrings);
     property BlocsPath : string read FBlocsPath write SetBlocsPath;
     property Count : integer read GetCount;
     property Items[BlocIndex : integer] : TSimpleBlc read GetItems; default;
@@ -92,7 +99,7 @@ operator in (const A: TSimpleBlc; const B: TSimpleBlcs): boolean;
 
 implementation
 
-uses config_session, config_session_fileutils, strutils,FileUtil, LazFileUtils;
+uses config_session, config_session_fileutils, strutils,FileUtil, LazFileUtils, constants;
 
 operator=(B1, B2: TBlcAddress)B: Boolean;
 begin
@@ -147,6 +154,23 @@ begin
   Result := Address.Path + #32 + IntToStr(Address.SessionIndex) + #32 + IntToStr(Address.BlocIndex);
 end;
 
+function TSimpleBlc.GetAsSection: TStrings;
+begin
+  Result := nil;
+  AbstractError;
+end;
+
+function TSimpleBlc.GetOriginalIndex: integer;
+begin
+  Result := Address.BlocIndex+1;
+end;
+
+function TSimpleBlc.GetTrialSection(Index : integer): TStrings;
+begin
+  Result := nil;
+  AbstractError;
+end;
+
 procedure TSimpleBlc.SetBlocName(AValue: string);
 begin
   if FName=AValue then Exit;
@@ -180,6 +204,7 @@ var
   s,
   i: Integer;
   LCfgBloc : TCfgBlc;
+  M : TMenuItem;
 begin
   if FBlocsPath=AValue then Exit;
   FBlocsPath:=AValue;
@@ -199,7 +224,7 @@ begin
           SetLength(FSessions[s].Blocs,LConfigurationFile.BlocCount);
           for i := 0 to LConfigurationFile.BlocCount -1 do
             begin
-              LCfgBloc := LConfigurationFile.Bloc[i];
+              LCfgBloc := LConfigurationFile.Bloc[i+1];
               FSessions[s].Blocs[i] := TSimpleBlc.Create(FSessions[s].MenuItem);
               FSessions[s].Blocs[i].Address.SessionIndex:=s;
               FSessions[s].Blocs[i].Address.BlocIndex := i;
@@ -213,21 +238,31 @@ begin
               FSessions[s].Blocs[i].MenuItem.OnClick := OnBlocItemClick;
               PopupMenuBlocs.Items[s].Add(FSessions[s].Blocs[i].MenuItem);
             end;
+            M := TMenuItem.Create(PopupMenuBlocs);
+            M.Caption:='Blocos';
+            M.Enabled:=False;
+            PopupMenuBlocs.Items[s].Insert(0,M);
             Inc(s);
          end;
+     LConfigurationFile.Free;
     end;
+    M := TMenuItem.Create(PopupMenuBlocs);
+    M.Caption:='Sessões';
+    M.Enabled:=False;
+    PopupMenuBlocs.Items.Insert(0,M);
 end;
 
 procedure TFormBlocs.BlocItemClick(Sender: TObject);
 var
-  LSessionIndex,
-  LBlocIndex , LAddress: string;
+  LBlocIndex : integer;
+  LSessionIndex : integer;
+  LShortAddress: string;
 begin
-  LBlocIndex := ExtractDelimited(1,TMenuItem(Sender).Caption,[':']);
-  LSessionIndex := ExtractDelimited(1,TMenuItem(Sender).Parent.Caption,[':']);
-  LAddress := LSessionIndex+#32+LBlocIndex;
-  FChoosenBlocs.Append(LAddress);
-  AppendBlocToStringGrid(LAddress);
+  LBlocIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Caption,[':']));
+  LSessionIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Parent.Caption,[':']));
+  LShortAddress := IntToStr(LSessionIndex-1)+#32+IntToStr(LBlocIndex-1);
+  FChoosenBlocs.Append(LShortAddress);
+  AppendBlocToStringGrid(LShortAddress);
 end;
 
 function TFormBlocs.GetItems(BlocIndex : integer): TSimpleBlc;
@@ -251,8 +286,8 @@ end;
 procedure TFormBlocs.SetAddressHelper(var i, j: integer; AAddress: string;
   SN: integer; BN: integer);
 begin
-  i := StrToInt(ExtractDelimited(SN,AAddress,[#32]))-1;
-  j := StrToInt(ExtractDelimited(BN,AAddress,[#32]))-1;
+  i := StrToInt(ExtractDelimited(SN,AAddress,[#32]));
+  j := StrToInt(ExtractDelimited(BN,AAddress,[#32]));
 end;
 
 procedure TFormBlocs.SetOnBlocItemClick(AValue: TNotifyEvent);
@@ -274,12 +309,12 @@ begin
   inherited Destroy;
 end;
 
-procedure TFormBlocs.AppendBlocToStringGrid(AAddress: string);
+procedure TFormBlocs.AppendBlocToStringGrid(AShortAddress: string);
 var
   i : integer = 0;
   j : integer = 0;
 begin
-  SetAddressHelper(i, j,AAddress);
+  SetAddressHelper(i, j,AShortAddress);
   with StringGrid do
     begin
       if Cells[0,RowCount-1] <> '' then RowCount := RowCount+1;
@@ -345,7 +380,56 @@ begin
         LvlGraphControl1.Graph.GetEdge(LSource, LTarget1, True);
         LvlGraphControl1.Graph.GetEdge(LSource, LTarget2, True);
       end;
+end;
 
+procedure TFormBlocs.WriteToDisk(ADefaultMainSection: TStrings;
+  ADefaultBlocSection: TStrings);
+var
+  LRow : integer;
+  i : integer = 0;
+  j : integer = 0;
+  FNewSession : TConfigurationFile;
+  FTargetSession : TConfigurationFile;
+  LDestination : string;
+begin
+  LDestination := BlocsPath+DirectorySeparator+LAST_BLOCS_INI_FILENAME;
+  if FileExistsUTF8(LDestination) then
+    DeleteFileUTF8(LDestination);
+  FNewSession := TConfigurationFile.Create(LDestination);
+  FNewSession.CacheUpdates:=True;
+  FNewSession.WriteMain(ADefaultMainSection);
+  with StringGrid do
+    for LRow := 1 to RowCount-1 do
+      begin
+        try
+          // ReadFromAddress
+          SetAddressHelper(i, j,Cells[4, LRow], 2, 3);
+          FTargetSession := TConfigurationFile.Create(FSessions[i].Blocs[j].Address.Path);
+
+          // Keep changes in memory and do not call FTargetSession.UpdateFile
+          FTargetSession.CacheUpdates:=True;
+
+          // Check for empty keys and apply defaults
+          FTargetSession.WriteBlocIfEmpty(FSessions[i].Blocs[j].OriginalIndex, ADefaultBlocSection);
+
+          // Override some keys in memory
+          with FTargetSession do
+            begin
+              WriteToBloc(FSessions[i].Blocs[j].OriginalIndex,_Name,Cells[1, LRow]);
+              WriteToBloc(FSessions[i].Blocs[j].OriginalIndex,_NextBlocOnCriteria,Cells[2, LRow]);
+              WriteToBloc(FSessions[i].Blocs[j].OriginalIndex,_NextBlocOnNotCriteria,Cells[3, LRow])
+            end;
+
+          // copy from target
+          FNewSession.WriteBlocFromTarget(FSessions[i].Blocs[j].Address.BlocIndex+1,FTargetSession);
+        finally
+          FTargetSession.Free;
+        end;
+      end;
+
+  // Save changes to disk
+  FNewSession.UpdateFile;
+  FNewSession.Free;
 end;
 
 

@@ -46,6 +46,7 @@ const
   _MaxBlcRepetition = 'MaxBlcRepetition';
   _ITI = 'ITI';
   _Counter = 'Counter';
+  _Counter_Performance = 'performance';
 
   // Blc and Trial
   _BkGnd = 'BkGnd';
@@ -114,6 +115,8 @@ const
   _Trial = 'T';
   _Comp = 'C';
   _Samp = 'S';
+
+  LAST_BLOCS_INI_FILENAME = 'last.blocs.ini';
 
 
 const
@@ -228,6 +231,64 @@ const
 resourcestring
   ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
   ExceptionConfigurationNotAllowed = 'A configuração não é permitida.';
+
+  // user configs
+  rsPosition = 'Bnd';
+  rsComparison = 'C';
+  rsTrials = 'Tentativas';
+  rsConsequence = 'Consequência';
+  rsAngle = 'Ângulo';
+  rsExpectedResponse = 'Resposta';
+  rsContingency = 'Contingência';
+  rsPositive = 'Positiva';
+  rsNegative = 'Negativa';
+  rsStimulus = 'Figura';
+  rsLimitedHold = 'Tempo/Estímulo';
+  rsSize = 'Tamanho';
+  rsDefBlc = 'Bloco 1';
+  rsEndSession = 'Fim.';
+  rsSchedule = 'Esquema';
+
+  rsFillTypeAxes = 'Eixos';
+  rsFillTypeMatriz = 'FP/FN';
+  rsFillTypeGoNoGo = 'Go/No-Go';
+  rsFillTypeMTS = 'MTS';
+  rsFillTypeBlocChaining = 'Encadear Blocos';
+
+  rsBlocs = 'Bloco';
+  rsBlocName = 'Nome';
+  rsBlocCrtHitPorcentage = 'Critério (% de acertos)';
+  rsBlocCrtConsecutiveHit = 'Critério (acertos consecutivos)';
+  rsBlocMaxBlcRepetition = 'Número máximo de repetições seguidas do bloco';
+  rsBlocNextBlocOnCriteria = 'Bloco seguinte se critério for atingido';
+  rsBlocNextBlocOnNotCriteria = 'Bloco seguinte se critério não for atingido';
+  rsBlocAddress = 'Endereço';
+  rsBlocITI = 'Intervalo entre tentativas';
+  rsBlocBkGnd = 'Cor do Fundo';
+  rsBlocCounter = 'Mostrar contador ao final?';
+  rsBlocVirtualTrialValue = 'Quantas tarefas contabilizam uma tentativa?';
+  rsBlocMaxCorrection = 'Número máximo de correções por tentativa';
+
+
+  //rsBlocDefNextBlc
+  //rsBlocCrtConsecutiveMiss
+  //rsBlocCrtMaxTrials
+
+  rsRandomizeTrials = 'Randomizar ordem das tentativas';
+  rsRandomizeResponses = 'Randomizar respostas';
+  rsRandomizeGroupTrial = 'Randomizar em grupos ordem das tentativas';
+  rsRandomizeTrialsWithConstraints = 'Randomizar ordem das tentativas com restrições.';
+
+  // config_session
+  messuCfgSessionMainError = 'Valor não encontrado: Main, Name or NumBlc.';
+  messLoading = 'Carregando...';
+  messReady = 'Pronto.';
+  messRoot = 'Estrutura';
+  messLevel_01 = 'Sessão 1';
+  messLevel_04_M = 'Mensagem';
+  rsDefName = 'No name';
+  rsDefSubject = 'No subject';
+  rsDefAddress = '127.0.1.1:5020';
 
 implementation
 
