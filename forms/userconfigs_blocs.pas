@@ -421,7 +421,7 @@ begin
             end;
 
           // copy from target
-          FNewSession.WriteBlocFromTarget(FSessions[i].Blocs[j].Address.BlocIndex+1,FTargetSession);
+          FNewSession.WriteBlocFromTarget(FSessions[i].Blocs[j].OriginalIndex,FTargetSession);
         finally
           FTargetSession.Free;
         end;
