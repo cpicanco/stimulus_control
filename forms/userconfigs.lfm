@@ -3,8 +3,8 @@ object FormUserConfig: TFormUserConfig
   Height = 482
   Top = 129
   Width = 604
-  HorzScrollBar.Page = 296
-  VertScrollBar.Page = 146
+  HorzScrollBar.Page = 434
+  VertScrollBar.Page = 368
   AutoScroll = True
   Caption = 'Configurar'
   ClientHeight = 482
@@ -1622,7 +1622,7 @@ object FormUserConfig: TFormUserConfig
   ParentBiDiMode = False
   Position = poScreenCenter
   SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Text;EditBlocChainingPath.Text;EditBlocName.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;Width;Position;Height;WindowState;HorzScrollBar;VertScrollBar'
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.6.2.0'
   object btnRun: TButton
     Left = 8
     Height = 25
@@ -1635,9 +1635,9 @@ object FormUserConfig: TFormUserConfig
   end
   object chkPlayOnSecondMonitor: TCheckBox
     Left = 80
-    Height = 19
-    Top = 455
-    Width = 89
+    Height = 21
+    Top = 453
+    Width = 99
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
     TabOrder = 1
@@ -1647,10 +1647,10 @@ object FormUserConfig: TFormUserConfig
     Height = 444
     Top = 0
     Width = 606
-    ActivePage = tbSave
+    ActivePage = tbBlocs
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 40
-    TabIndex = 4
+    TabIndex = 2
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
@@ -1658,8 +1658,8 @@ object FormUserConfig: TFormUserConfig
       ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 399
-      ClientWidth = 670
+      ClientHeight = 411
+      ClientWidth = 600
       object LabelSessionName: TLabel
         Left = 48
         Height = 25
@@ -1708,7 +1708,7 @@ object FormUserConfig: TFormUserConfig
         Top = 75
         Width = 400
         Constraints.MinWidth = 400
-        ItemHeight = 15
+        ItemHeight = 0
         ItemIndex = 0
         Items.Strings = (
           'independente de critérios'
@@ -1729,40 +1729,41 @@ object FormUserConfig: TFormUserConfig
       ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 404
-      ClientWidth = 668
+      ClientHeight = 411
+      ClientWidth = 600
       object LabelBlocChainingPath: TLabel
-        Left = 86
-        Height = 23
+        Left = 58
+        Height = 25
         Top = 25
-        Width = 160
+        Width = 178
         Caption = 'Pasta com blocos de encadear'
         ParentColor = False
       end
       object EditBlocChainingPath: TEdit
-        Left = 332
-        Height = 23
+        Left = 294
+        Height = 25
         Top = 25
         Width = 250
         Constraints.MinWidth = 250
         OnDblClick = EditBlocChainingPathDblClick
+        OnEditingDone = EditBlocChainingPathEditingDone
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
         TextHint = 'Clique duas vezes para escolher a pasta'
       end
       object LabelBlocName: TLabel
-        Left = 86
-        Height = 23
-        Top = 48
-        Width = 160
+        Left = 58
+        Height = 25
+        Top = 50
+        Width = 178
         Caption = 'LabelBlocName'
         ParentColor = False
       end
       object EditBlocName: TEdit
-        Left = 332
-        Height = 23
-        Top = 48
+        Left = 294
+        Height = 25
+        Top = 50
         Width = 250
         Constraints.MinWidth = 250
         ParentShowHint = False
@@ -1771,120 +1772,120 @@ object FormUserConfig: TFormUserConfig
         TextHint = 'Clique para editar'
       end
       object LabelBlocCrtHitPorcentage: TLabel
-        Left = 86
-        Height = 23
-        Top = 71
-        Width = 160
+        Left = 58
+        Height = 25
+        Top = 75
+        Width = 178
         Caption = 'LabelBlocCrtHitPorcentage'
         ParentColor = False
       end
       object seBlocCrtHitPorcentage: TSpinEdit
-        Left = 332
-        Height = 23
-        Top = 71
+        Left = 294
+        Height = 25
+        Top = 75
         Width = 100
         Constraints.MaxWidth = 100
         TabOrder = 2
       end
       object LabelBlocCrtConsecutiveHit: TLabel
-        Left = 86
-        Height = 23
-        Top = 94
-        Width = 160
+        Left = 58
+        Height = 25
+        Top = 100
+        Width = 178
         Caption = 'LabelBlocCrtConsecutiveHit'
         ParentColor = False
       end
       object seBlocCrtConsecutiveHit: TSpinEdit
-        Left = 332
-        Height = 23
-        Top = 94
+        Left = 294
+        Height = 25
+        Top = 100
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000
         TabOrder = 3
       end
       object LabelBlocITI: TLabel
-        Left = 86
-        Height = 23
-        Top = 117
-        Width = 160
+        Left = 58
+        Height = 25
+        Top = 125
+        Width = 178
         Caption = 'LabelBlocITI'
         ParentColor = False
       end
       object seBlocITI: TSpinEdit
-        Left = 332
-        Height = 23
-        Top = 117
+        Left = 294
+        Height = 25
+        Top = 125
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000000
         TabOrder = 4
       end
       object LabelBlocVirtualTrial: TLabel
-        Left = 86
-        Height = 23
-        Top = 140
-        Width = 160
+        Left = 58
+        Height = 25
+        Top = 150
+        Width = 178
         Caption = 'LabelBlocVirtualTrial'
         ParentColor = False
       end
       object seBlocVirtualTrial: TSpinEdit
-        Left = 332
-        Height = 23
-        Top = 140
+        Left = 294
+        Height = 25
+        Top = 150
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000000
         TabOrder = 5
       end
       object LabelBlocMaxCorrection: TLabel
-        Left = 86
-        Height = 23
-        Top = 163
-        Width = 160
+        Left = 58
+        Height = 25
+        Top = 175
+        Width = 178
         Caption = 'LabelBlocMaxCorrection'
         ParentColor = False
       end
       object seBlocMaxCorrection: TSpinEdit
-        Left = 332
-        Height = 23
-        Top = 163
+        Left = 294
+        Height = 25
+        Top = 175
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000000
         TabOrder = 6
       end
       object LabelBlocMaxRepetition: TLabel
-        Left = 86
-        Height = 23
-        Top = 186
-        Width = 160
+        Left = 58
+        Height = 25
+        Top = 200
+        Width = 178
         Caption = 'LabelBlocMaxRepetition'
         ParentColor = False
       end
       object seBlocMaxRepetition: TSpinEdit
-        Left = 332
-        Height = 23
-        Top = 186
+        Left = 294
+        Height = 25
+        Top = 200
         Width = 100
         Constraints.MaxWidth = 100
         MaxValue = 1000000
         TabOrder = 7
       end
       object LabelBlocCounter: TLabel
-        Left = 86
-        Height = 23
-        Top = 209
-        Width = 160
+        Left = 58
+        Height = 25
+        Top = 225
+        Width = 178
         Caption = 'LabelBlocCounter'
         ParentColor = False
       end
       object ComboBoxBlocCounter: TComboBox
-        Left = 332
-        Height = 23
-        Top = 209
+        Left = 294
+        Height = 25
+        Top = 225
         Width = 250
-        ItemHeight = 15
+        ItemHeight = 0
         ItemIndex = 0
         Items.Strings = (
           'Não'
@@ -1894,17 +1895,17 @@ object FormUserConfig: TFormUserConfig
         Text = 'Não'
       end
       object LabelBlocBkGnd: TLabel
-        Left = 86
+        Left = 58
         Height = 20
-        Top = 232
-        Width = 160
+        Top = 250
+        Width = 178
         Caption = 'LabelBlocBkGnd'
         ParentColor = False
       end
       object ColorButtonBloc: TColorButton
-        Left = 332
+        Left = 294
         Height = 20
-        Top = 232
+        Top = 250
         Width = 250
         BorderWidth = 2
         ButtonColorSize = 16
@@ -1913,13 +1914,13 @@ object FormUserConfig: TFormUserConfig
     end
     object tbTrials: TTabSheet
       Caption = 'Tentativas'
-      ClientHeight = 416
-      ClientWidth = 598
+      ClientHeight = 411
+      ClientWidth = 600
       object StringGrid1: TStringGrid
         Left = 0
-        Height = 236
+        Height = 231
         Top = 125
-        Width = 598
+        Width = 600
         Align = alClient
         BorderSpacing.Top = 125
         BorderSpacing.Bottom = 55
@@ -1978,12 +1979,12 @@ object FormUserConfig: TFormUserConfig
         Top = 8
         Width = 144
         Caption = 'Mostrar Repetições'
-        ClientHeight = 31
+        ClientHeight = 34
         ClientWidth = 140
         TabOrder = 3
         object seCount: TSpinEdit
           Left = 75
-          Height = 23
+          Height = 25
           Top = 3
           Width = 50
           Anchors = [akTop, akRight]
@@ -1994,9 +1995,9 @@ object FormUserConfig: TFormUserConfig
         end
         object chkShowRepetitions: TCheckBox
           Left = 8
-          Height = 19
+          Height = 21
           Top = 3
-          Width = 20
+          Width = 21
           OnChange = chkShowRepetitionsChange
           TabOrder = 1
         end
@@ -2007,12 +2008,12 @@ object FormUserConfig: TFormUserConfig
         Top = 8
         Width = 144
         Caption = 'Grupo de repetições'
-        ClientHeight = 31
+        ClientHeight = 34
         ClientWidth = 140
         TabOrder = 8
         object seBlocksCount: TSpinEdit
           Left = 80
-          Height = 23
+          Height = 25
           Hint = 'Blocos'
           Top = 3
           Width = 50
@@ -2025,7 +2026,7 @@ object FormUserConfig: TFormUserConfig
       end
       object leFillValue: TLabeledEdit
         Left = 126
-        Height = 23
+        Height = 25
         Top = 82
         Width = 298
         EditLabel.AnchorSideLeft.Control = leFillValue
@@ -2063,20 +2064,20 @@ object FormUserConfig: TFormUserConfig
         Top = 8
         Width = 144
         Caption = 'Grupo de Tentativas'
-        ClientHeight = 31
+        ClientHeight = 34
         ClientWidth = 140
         TabOrder = 6
         object chkDrawTrialGroup: TCheckBox
           Left = 8
-          Height = 19
+          Height = 21
           Top = 3
-          Width = 20
+          Width = 21
           OnChange = chkDrawTrialGroupChange
           TabOrder = 0
         end
         object edtTrialGroup: TEdit
           Left = 48
-          Height = 23
+          Height = 25
           Top = 3
           Width = 80
           TabOrder = 1
@@ -2088,8 +2089,8 @@ object FormUserConfig: TFormUserConfig
         AnchorSideBottom.Side = asrBottom
         Left = 1
         Height = 40
-        Top = 370
-        Width = 591
+        Top = 365
+        Width = 593
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Escrever'
         OnClick = btnTrialsDoneClick
@@ -2101,15 +2102,15 @@ object FormUserConfig: TFormUserConfig
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ClientHeight = 416
-      ClientWidth = 598
+      ClientHeight = 411
+      ClientWidth = 600
       object btnSave: TButton
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Side = asrBottom
         Left = 0
         Height = 40
-        Top = 370
-        Width = 591
+        Top = 365
+        Width = 593
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Salvar'
         OnClick = btnSaveClick
@@ -2118,9 +2119,9 @@ object FormUserConfig: TFormUserConfig
       object Memo1: TMemo
         AnchorSideBottom.Control = btnSave
         Left = 0
-        Height = 361
+        Height = 356
         Top = 0
-        Width = 598
+        Width = 600
         BorderSpacing.Bottom = 55
         ScrollBars = ssAutoVertical
         TabOrder = 1
@@ -2128,8 +2129,8 @@ object FormUserConfig: TFormUserConfig
     end
     object tbTools: TTabSheet
       Caption = 'Ferramentas'
-      ClientHeight = 399
-      ClientWidth = 670
+      ClientHeight = 411
+      ClientWidth = 600
       TabVisible = False
       object btnTargetFile: TButton
         AnchorSideLeft.Control = tbTools
@@ -2221,8 +2222,8 @@ object FormUserConfig: TFormUserConfig
     end
     object tbVersion: TTabSheet
       Caption = 'Sobre o programa'
-      ClientHeight = 399
-      ClientWidth = 670
+      ClientHeight = 411
+      ClientWidth = 600
       ParentBiDiMode = False
       object Image1: TImage
         Left = 267
@@ -3894,9 +3895,9 @@ object FormUserConfig: TFormUserConfig
   end
   object chkPupilClient: TCheckBox
     Left = 200
-    Height = 19
-    Top = 455
-    Width = 96
+    Height = 21
+    Top = 453
+    Width = 107
     Anchors = [akLeft, akBottom]
     Caption = 'Interface Pupil'
     TabOrder = 3

@@ -130,6 +130,7 @@ type
     procedure chkShowRepetitionsChange(Sender: TObject);
     procedure chkUseMediaChange(Sender: TObject);
     procedure EditBlocChainingPathDblClick(Sender: TObject);
+    procedure EditBlocChainingPathEditingDone(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
@@ -985,6 +986,15 @@ begin
     EditBlocChainingPath.Text := SelectDirectoryDialog1.FileName;
 end;
 
+procedure TFormUserConfig.EditBlocChainingPathEditingDone(Sender: TObject);
+begin
+  if btnGridType.Caption = rsFillTypeBlocChaining then
+    begin
+      FormBlocs.BlocsPath := EditBlocChainingPath.Text;
+      StringGrid1.PopupMenu := FormBlocs.PopupMenuBlocs;
+    end;
+end;
+
 //procedure TFormUserConfig.FormActivate(Sender: TObject);
 //var i : integer;
 //  function GetMonitorString(Monitor : TMonitor) : string;
@@ -1002,7 +1012,7 @@ end;
 
 procedure TFormUserConfig.btnGridTypeClick(Sender: TObject);
 var
-  aRow, aCol, aTrial, aBloc, aNode, aAxis, aRepeat : integer;
+  aRow, aCol, aTrial, aNode, aAxis, aRepeat : integer;
   cAngle,              //Angle
   cSize,               //Size. width, heigth
   cX0, cY0,            //line

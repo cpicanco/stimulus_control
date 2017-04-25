@@ -8,7 +8,6 @@ object FormBlocs: TFormBlocs
   ClientWidth = 549
   Color = clBlack
   Font.Color = clBlack
-  PopupMenu = PopupMenuBlocs
   LCLVersion = '1.6.2.0'
   object LvlGraphControl1: TLvlGraphControl
     Left = 50
@@ -29,9 +28,5 @@ object FormBlocs: TFormBlocs
     ParentShowHint = False
     TabOrder = 0
     TabStop = False
-  end
-  object PopupMenuBlocs: TPopupMenu
-    left = 40
-    top = 200
   end
 end
