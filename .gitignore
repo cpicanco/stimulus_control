@@ -30,10 +30,14 @@ core
 __history
 backup/*
 */backup/*
-debug_log/*
 lib/i386-win32/*.lfm
 lib/x86_64-linux/*.lfm
+
+# self
+debug_log/*
 Participante*/*
+config_examples/Data/*
+*last.bloc.ini
 
 # link
 stimulus_control
