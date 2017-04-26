@@ -111,7 +111,7 @@ var
   LNumTrials : string;
 
 const
-  PERFORMANCE_COUNTER = 0;
+  PERFORMANCE_COUNTER = 1;
 
   function GetCounterType(Index : integer) : string;
   begin
