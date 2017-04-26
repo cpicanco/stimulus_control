@@ -117,6 +117,7 @@ const
   _Samp = 'S';
 
   LAST_BLOCS_INI_FILENAME = 'last.blocs.ini';
+  LAST_BLOC_INI_FILENAME = 'last.bloc.ini';
 
 
 const

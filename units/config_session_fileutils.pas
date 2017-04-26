@@ -30,13 +30,15 @@ type
   public
     constructor Create(const AConfigurationFile: string; AEscapeLineFeeds:Boolean=False); override;
     destructor Destroy; override;
-    //procedure Invalidate;
+    procedure Invalidate;
     procedure WriteToBloc(ABloc : integer;AName, AValue: string);
+    procedure WriteToTrial(ATrial : integer; AName, AValue: string); overload;
+    procedure WriteToTrial(ATrial : integer; ABloc : integer; AName, AValue: string); overload;
     procedure WriteMain(AMain : TStrings);
     procedure WriteBlocFromTarget(ATargetBloc : integer; ATargetConfigurationFile : TConfigurationFile;
       AlsoAppendTrials : Boolean = True);
     procedure WriteTrialFromTarget(ATargetBloc,ATargetTrial: integer; ATargetConfigurationFile : TConfigurationFile);
-    procedure WriteBlocIfEmpty(ABloc : integer; ABlocSenction : TStrings);
+    procedure WriteBlocIfEmpty(ABloc : integer; ABlocSection : TStrings);
     //procedure WriteBloc(ABloc: TCfgBlc; AlsoAppendTrials: Boolean);
     //procedure WriteTrial(ATrial : TCfgTrial);
     property BlocCount : integer read GetBlocCount;
@@ -171,11 +173,14 @@ begin
     end;
 end;
 
-//procedure TConfigurationFile.Invalidate;
-//begin
-//  WriteInteger(_Main,_NumBlc,BlocCount);
-//  WriteInteger(BlocSection(BlocCount),_NumTrials,TrialCount[BlocCount]);
-//end;
+procedure TConfigurationFile.Invalidate;
+var
+  i: Integer;
+begin
+  WriteInteger(_Main,_NumBlc,BlocCount);
+  for i := 0 to BlocCount-1 do
+    WriteInteger(BlocSection(i+1),_NumTrials,TrialCount[i+1]);
+end;
 
 constructor TConfigurationFile.Create(const AConfigurationFile: string;
   AEscapeLineFeeds: Boolean);
@@ -193,6 +198,18 @@ end;
 procedure TConfigurationFile.WriteToBloc(ABloc: integer; AName, AValue: string);
 begin
   WriteString(BlocSection(ABloc),AName,AValue);
+end;
+
+procedure TConfigurationFile.WriteToTrial(ATrial: integer; AName, AValue: string
+  );
+begin
+  WriteString(TrialSection(BlocCount,ATrial),AName,AValue);
+end;
+
+procedure TConfigurationFile.WriteToTrial(ATrial: integer; ABloc: integer;
+  AName, AValue: string);
+begin
+  WriteString(TrialSection(ABloc,ATrial),AName,AValue);
 end;
 
 procedure TConfigurationFile.WriteMain(AMain: TStrings);
@@ -228,7 +245,7 @@ begin
 end;
 
 procedure TConfigurationFile.WriteBlocIfEmpty(ABloc: integer;
-  ABlocSenction: TStrings);
+  ABlocSection: TStrings);
 var
   LBlocSection,
   LLine, LKeyName: String;
@@ -246,17 +263,17 @@ var
 
 begin
   LBlocSection:=BlocSection(ABloc);
-  for LLine in ABlocSenction do
+  for LLine in ABlocSection do
     begin
-      LKeyName := ABlocSenction.ExtractName(LLine);
+      LKeyName := ABlocSection.ExtractName(LLine);
       if ValueExists(LBlocSection, LKeyName) then
         begin
           if EmptyKey then
-            WriteString(LBlocSection, LKeyName, ABlocSenction.Values[LKeyName])
+            WriteString(LBlocSection, LKeyName, ABlocSection.Values[LKeyName])
           else; // do nothing
         end
       else
-        WriteString(LBlocSection, LKeyName, ABlocSenction.Values[LKeyName]);
+        WriteString(LBlocSection, LKeyName, ABlocSection.Values[LKeyName]);
     end;
 end;
 

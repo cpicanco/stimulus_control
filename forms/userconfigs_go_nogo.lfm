@@ -1,14 +1,13 @@
 object FormGo_NoGo: TFormGo_NoGo
-  Left = 219
+  Left = 115
   Height = 243
-  Top = 187
+  Top = 256
   Width = 991
   Caption = 'Go No-Go'
   ClientHeight = 243
   ClientWidth = 991
   Color = clWhite
   DefaultMonitor = dmDesktop
-  OnActivate = FormActivate
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnPaint = FormPaint
@@ -46,36 +45,15 @@ object FormGo_NoGo: TFormGo_NoGo
       TabOrder = 1
     end
     object cbPreview: TCheckBox
-      Left = 8
+      Left = 312
       Height = 21
       Top = 128
-      Width = 68
-      Caption = 'Preview'
+      Width = 116
+      Caption = 'Pré-vizualização'
       Checked = True
       OnChange = cbPreviewChange
       State = cbChecked
       TabOrder = 2
-    end
-    object gbBlocks: TGroupBox
-      Left = 8
-      Height = 80
-      Top = 8
-      Width = 104
-      Caption = 'Blocos'
-      ClientHeight = 63
-      ClientWidth = 100
-      TabOrder = 3
-      object seTrials: TSpinEdit
-        Left = 16
-        Height = 25
-        Top = 16
-        Width = 71
-        Alignment = taCenter
-        MaxValue = 2000
-        MinValue = 2
-        TabOrder = 0
-        Value = 4
-      end
     end
     object btnOk: TButton
       Left = 746
@@ -85,93 +63,82 @@ object FormGo_NoGo: TFormGo_NoGo
       Anchors = [akTop, akRight]
       Caption = 'Adicionar à Lista'
       ModalResult = 1
-      TabOrder = 4
+      TabOrder = 3
     end
     object gbStimuli: TGroupBox
-      Left = 114
-      Height = 80
+      Left = 8
+      Height = 144
       Top = 8
-      Width = 432
+      Width = 304
       Caption = 'Estímulos'
       ChildSizing.LeftRightSpacing = 5
       ChildSizing.TopBottomSpacing = 5
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 4
-      ClientHeight = 63
-      ClientWidth = 428
-      TabOrder = 5
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 127
+      ClientWidth = 300
+      TabOrder = 4
       object ButtonPositive: TButton
         Left = 5
-        Height = 27
+        Height = 25
+        Hint = 'Clique para adicionar os estímulos.'
         Top = 5
-        Width = 102
+        Width = 198
         Caption = 'Positivos'
         OnClick = ButtonClick
         TabOrder = 0
       end
-      object ButtonNegative: TButton
-        Left = 107
-        Height = 27
+      object LabelCountPos: TLabel
+        Left = 203
+        Height = 25
         Top = 5
-        Width = 108
+        Width = 92
+        Alignment = taCenter
+        Caption = '0'
+        Layout = tlCenter
+        ParentColor = False
+      end
+      object ButtonNegative: TButton
+        Left = 5
+        Height = 25
+        Hint = 'Clique para adicionar os estímulos.'
+        Top = 30
+        Width = 198
         Caption = 'Negativos'
         OnClick = ButtonClick
         TabOrder = 1
       end
-      object LabelSize: TLabel
-        Left = 215
-        Height = 27
-        Hint = 'Tamanho em pixels'
-        Top = 5
-        Width = 97
-        Alignment = taCenter
-        Caption = 'Tamanho'
-        Layout = tlCenter
-        ParentColor = False
-        ParentShowHint = False
-        ShowHint = True
-      end
-      object LabelLimitedHold: TLabel
-        Left = 312
-        Height = 27
-        Hint = 'Tempo em milisegundos'
-        Top = 5
-        Width = 111
-        Alignment = taCenter
-        Caption = 'Tempo (ms)'
-        Layout = tlCenter
-        ParentColor = False
-        ParentShowHint = False
-        ShowHint = True
-      end
-      object LabelCountPos: TLabel
-        Left = 5
-        Height = 26
-        Top = 32
-        Width = 102
-        Alignment = taCenter
-        Caption = '0'
-        Layout = tlCenter
-        ParentColor = False
-      end
       object LabelCountNeg: TLabel
-        Left = 107
-        Height = 26
-        Top = 32
-        Width = 108
+        Left = 203
+        Height = 25
+        Top = 30
+        Width = 92
         Alignment = taCenter
         Caption = '0'
         Layout = tlCenter
         ParentColor = False
+      end
+      object LabelSize: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Tamanho em pixels'
+        Top = 55
+        Width = 198
+        Alignment = taCenter
+        Caption = 'Tamanho (pixels)'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
       end
       object SpinSize: TSpinEdit
-        Left = 215
-        Height = 26
-        Hint = 'Tamanho em pixels'
-        Top = 32
-        Width = 97
+        Left = 203
+        Height = 25
+        Hint = 'Tamanho horizontal e vertical em pixels'
+        Top = 55
+        Width = 92
         Alignment = taCenter
         MaxValue = 2000
         MinValue = 100
@@ -181,12 +148,25 @@ object FormGo_NoGo: TFormGo_NoGo
         TabOrder = 2
         Value = 300
       end
-      object SpinLimitedHold: TSpinEdit
-        Left = 312
-        Height = 26
+      object LabelLimitedHold: TLabel
+        Left = 5
+        Height = 25
         Hint = 'Tempo em milisegundos'
-        Top = 32
-        Width = 111
+        Top = 80
+        Width = 198
+        Alignment = taCenter
+        Caption = 'Tempo (milisegundos)'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object SpinLimitedHold: TSpinEdit
+        Left = 203
+        Height = 25
+        Hint = 'Tempo em milisegundos'
+        Top = 80
+        Width = 92
         Alignment = taCenter
         Increment = 500
         MaxValue = 1000
@@ -197,23 +177,50 @@ object FormGo_NoGo: TFormGo_NoGo
         TabOrder = 3
         Value = 2000
       end
+      object LabelPresentations: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Tempo em milisegundos'
+        Top = 105
+        Width = 198
+        Alignment = taCenter
+        Caption = 'Número de apresentações'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object SpinPresentations: TSpinEdit
+        Left = 203
+        Height = 25
+        Hint = 'Quantas vezes cada estímulo será apresentado?'
+        Top = 105
+        Width = 92
+        Alignment = taCenter
+        MinValue = 1
+        OnEditingDone = SpinLimitedHoldEditingDone
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 4
+        Value = 1
+      end
     end
     object Schedule: TLabeledEdit
-      Left = 560
+      Left = 312
       Height = 25
-      Top = 27
-      Width = 80
+      Top = 24
+      Width = 136
       EditLabel.AnchorSideLeft.Control = Schedule
       EditLabel.AnchorSideRight.Control = Schedule
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = Schedule
-      EditLabel.Left = 560
+      EditLabel.Left = 312
       EditLabel.Height = 15
-      EditLabel.Top = 9
-      EditLabel.Width = 80
-      EditLabel.Caption = 'Resposta'
+      EditLabel.Top = 6
+      EditLabel.Width = 136
+      EditLabel.Caption = 'Exigência de Resposta'
       EditLabel.ParentColor = False
-      TabOrder = 6
+      TabOrder = 5
       Text = 'CRF'
     end
   end

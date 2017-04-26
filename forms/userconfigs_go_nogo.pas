@@ -14,7 +14,7 @@ unit userconfigs_go_nogo;
 interface
 
 uses LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics,
-     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList, ExtDlgs
+     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList, ExtDlgs, Grids
      , response_key
      ;
 
@@ -37,8 +37,8 @@ type
       ButtonPositive: TButton;
       ButtonNegative: TButton;
       cbPreview: TCheckBox;
+      LabelPresentations: TLabel;
       OpenPictureDialog: TOpenPictureDialog;
-      gbBlocks: TGroupBox;
       gbStimuli: TGroupBox;
       LabelCountPos: TLabel;
       LabelCountNeg: TLabel;
@@ -46,14 +46,13 @@ type
       LabelSize: TLabel;
       LabelLimitedHold: TLabel;
       Panel1: TPanel;
-      seTrials: TSpinEdit;
       PreviewTimer: TTimer;
+      SpinPresentations: TSpinEdit;
       SpinSize: TSpinEdit;
       SpinLimitedHold: TSpinEdit;
       procedure btnMinimizeTopTabClick(Sender: TObject);
       procedure ButtonClick(Sender: TObject);
       procedure cbPreviewChange(Sender: TObject);
-      procedure FormActivate(Sender: TObject);
       procedure FormCreate(Sender: TObject);
       procedure FormKeyPress(Sender: TObject; var Key: char);
       procedure FormPaint(Sender: TObject);
@@ -70,6 +69,10 @@ type
       procedure SetTrials(APositive, ANegative : TStringList);
     public
       procedure SetFullScreen(TurnOn : Boolean);
+      procedure Resize; override;
+      procedure AddTrialsToGui(ATrialGrid : TStringGrid);
+      procedure WriteToDisk(ADefaultMainSection: TStrings; ADefaultBlocSection : TStrings;
+        ATrialGrid : TStringGrid; AFilename : string);
       property Trials : TTrials read FTrials write FTrials;
       property MonitorToShow : integer read FMonitor write SetMonitor;
     end;
@@ -81,25 +84,17 @@ implementation
 
 {$R *.lfm}
 
-uses LazFileUtils;
+uses LazFileUtils, config_session_fileutils, constants;
 
 { TFormGo_NoGo }
 
-procedure TFormGo_NoGo.FormActivate(Sender: TObject);
-begin
-  FStimulus.Show;
-  FStimulus.Centralize;
-  BorderStyle := bsNone;
-  WindowState := wsFullScreen;
-  Left := Screen.Monitors[MonitorToShow].Left;
-  FCurrentTrial := 0;
-  //Randomize;
-end;
-
 procedure TFormGo_NoGo.FormCreate(Sender: TObject);
 begin
+  BorderStyle := bsNone;
+  WindowState := wsFullScreen;
   Canvas.Pen.Width:=10;
   OpenPictureDialog.InitialDir := ExtractFilePath(Application.ExeName);
+  FCurrentTrial := 0;
   FStimulus := TKey.Create(Self);
   with FStimulus do
     begin
@@ -111,7 +106,7 @@ begin
       //Loops:= StrToIntDef(LLoop, 0);
       //FullPath:= LName;
       //Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
-      Visible := False;
+      Visible := True;
       Parent := Self;
     end;
 end;
@@ -173,6 +168,7 @@ procedure TFormGo_NoGo.SetMonitor(AValue: integer);
 begin
   if FMonitor = AValue then Exit;
   FMonitor := AValue;
+  Left := Screen.Monitors[FMonitor].Left;
 end;
 
 procedure TFormGo_NoGo.SetTrials(APositive, ANegative: TStringList);
@@ -260,6 +256,78 @@ begin
     end;
   FFullScreen := TurnOn;
 end;
+
+procedure TFormGo_NoGo.Resize;
+begin
+  inherited Resize;
+  if Assigned(FStimulus) then
+    FStimulus.Centralize;
+end;
+
+procedure TFormGo_NoGo.AddTrialsToGui(ATrialGrid: TStringGrid);
+var
+  LRow, i, j: Integer;
+  LConsequence : string;
+begin
+  ATrialGrid.RowCount := 2;
+  LRow := 1;
+  for i := Low(Trials) to High(Trials) do
+    begin
+      if Trials[i].Positive then
+        LConsequence := rsPositive
+      else
+        LConsequence := rsNegative;
+
+      for j := 0 to SpinPresentations.Value-1 do
+        begin
+          with ATrialGrid do
+            begin
+              if (LRow + 1) > RowCount then RowCount := LRow + 1;
+              Cells[0, LRow] := IntToStr(LRow);
+              Cells[1, LRow] := LConsequence;
+              Cells[2, LRow] := Schedule.Text;
+              Cells[3, LRow] := IntToStr(SpinLimitedHold.Value);
+              Cells[4, LRow] := ExtractFileName(Trials[i].Path);
+              Cells[5, LRow] := IntToStr(SpinSize.Value);
+            end;
+          Inc(LRow);
+        end;
+    end;
+end;
+
+procedure TFormGo_NoGo.WriteToDisk(ADefaultMainSection: TStrings;
+  ADefaultBlocSection: TStrings; ATrialGrid: TStringGrid; AFilename: string);
+var
+  LRow : integer;
+  FNewBloc : TConfigurationFile;
+  LDestination : string;
+begin
+  if FileExistsUTF8(AFilename) then
+    DeleteFileUTF8(AFilename);
+  FNewBloc := TConfigurationFile.Create(AFilename);
+  FNewBloc.CacheUpdates:=True;
+  FNewBloc.WriteMain(ADefaultMainSection);
+  FNewBloc.WriteBlocIfEmpty(1,ADefaultBlocSection);
+  with ATrialGrid do
+    for LRow := 1 to RowCount-1 do
+      begin
+          FNewBloc.WriteToTrial(LRow, _Kind, T_GNG);
+          FNewBloc.WriteToTrial(LRow, _Name,           Cells[1, LRow] + #32 + IntToStr(LRow));
+          FNewBloc.WriteToTrial(LRow, _Consequence,    Cells[1, LRow]);
+          FNewBloc.WriteToTrial(LRow, _Schedule,       Cells[2, LRow]);
+          FNewBloc.WriteToTrial(LRow, _LimitedHold,    Cells[3, LRow]);
+          FNewBloc.WriteToTrial(LRow, _Comp+'1'+_cStm, Cells[4, LRow]);   // configure the IETConsenquence
+          FNewBloc.WriteToTrial(LRow, _Comp+'1'+_cBnd, Cells[5, LRow]);   // configure the IETConsenquence
+      end;
+
+  // update numblc and numtrials
+  FNewBloc.Invalidate;
+
+  // Save changes to disk
+  FNewBloc.UpdateFile;
+  FNewBloc.Free;
+end;
+
 
 end.
 

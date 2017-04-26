@@ -192,6 +192,9 @@ uses background, strutils
 const
   CSESSION_SERVER = '127.0.1.1:5020';
 
+var
+  LAST_BLOC_INIFILE_PATH : string;
+
 { TFormUserConfig }
 
 
@@ -757,15 +760,38 @@ var
         Delete(TopRightCell, Pos(rsComparison, TopRightCell), Length(rsComparison));
         Result := StrToInt(TopRightCell);
       end;
-
   end;
 
-  procedure NextValue(var S : string);
+  procedure SetupDefaultsFromGui;
   begin
-    Delete( S, 1, pos( #32, S ) );
-    if Length( S ) > 0 then
-      while S[1] = #32 do
-        Delete( S, 1, 1 );
+    LGuiMain.Blocs := StringGrid1;
+    LGuiMain.Participant := EditParticipant;
+    LGuiMain.SessionName := EditSessionName;
+    LGuiMain.SessionType := ComboBoxSessionType;
+    LGuiMain.PupilAddress := nil;
+    LGuiMain.RootData := nil;
+    LGuiMain.RootMedia := nil;
+
+    LGuiBloc.BlocITI := seBlocITI;
+    LGuiBloc.CrtConsecutiHits := seBlocCrtConsecutiveHit;
+    LGuiBloc.CrtHitPorcentage := seBlocCrtHitPorcentage;
+    LGuiBloc.Counter := ComboBoxBlocCounter;
+    LGuiBloc.BlocName := EditBlocName;
+    LGuiBloc.Color := ColorButtonBloc;
+    LGuiBloc.MaxCorrection := seBlocMaxCorrection;
+    LGuiBloc.MaxRepetition := seBlocMaxRepetition;
+    LGuiBloc.Trials := nil;
+    LGuiBloc.VirtualTrial := nil;
+    LDefaultMain := TStringList.Create;
+    LDefaultBloc := TStringList.Create;
+    MainFromGui(LDefaultMain,LGuiMain);
+    BlocFromGui(LDefaultBloc,LGuiBloc);
+  end;
+
+  procedure FreeDefaults;
+  begin
+    LDefaultMain.Free;
+    LDefaultBloc.Free;
   end;
 
 begin
@@ -894,80 +920,18 @@ begin
 
   if piGo_NoGo.Checked then
     begin
-      aBlc := 0;
-
-      FEscriba.SessionName := EditSessionName.Text;
-      FEscriba.SessionSubject := EditParticipant.Text;
-      FEscriba.Blcs[aBlc].ITI := 1000;
-      FEscriba.SessionType  := 'CIC';
-      FEscriba.Data := 'Data';
-      FEscriba.Media:= 'Media';
-      // FEscriba.SetVariables;
-      FEscriba.SetMain;
-
-      B := FEscriba.Blcs[aBlc];
-      with B do
-        begin
-          Name := rsDefBlc;
-          BkGnd := clWhite;
-          VirtualTrialValue:= 1;
-          NumTrials := aNumTrials;
-        end;
-      FEscriba.Blcs[aBlc] := B;
-      FEscriba.SetBlc(aBlc, True);
-      FEscriba.SetLengthVetTrial(aBlc);
-      B := FEscriba.Blcs[aBlc];
-
-      for aTrial := Low(B.Trials) to High(B.Trials) do
-        begin
-          T := FEscriba.Blcs[aBlc].Trials[aTrial];
-          with T do
-            begin
-              Id := aTrial + 1;
-              Kind := T_GNG;
-              Name := StringGrid1.Cells[1, aTrial + 1] + #32 + IntToStr(Id);
-
-              SList.BeginUpdate;
-              SList.Values[_Consequence] := StringGrid1.Cells[1, aTrial + 1];
-              SList.Values[_Schedule] := StringGrid1.Cells[2, aTrial + 1];
-              SList.Values[_LimitedHold] := StringGrid1.Cells[3, aTrial + 1];;
-              SList.Values[_Comp+'1'+_cStm] := StringGrid1.Cells[4, aTrial + 1];   // configure the IETConsenquence
-              SList.Values[_Comp+'1'+_cBnd] := StringGrid1.Cells[5, aTrial + 1];   // configure the IETConsenquence
-              SList.EndUpdate;
-            end;
-          FEscriba.Blcs[aBlc].Trials[aTrial] := T;
-          FEscriba.SetTrial(aTrial, False);
-        end;
+      SetupDefaultsFromGui;
+      FormGo_NoGo.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
+      Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
+      FreeDefaults;
     end;
 
   if piBlocChaining.Checked then
     begin
-      LGuiMain.Blocs := StringGrid1;
-      LGuiMain.Participant := EditParticipant;
-      LGuiMain.SessionName := EditSessionName;
-      LGuiMain.SessionType := ComboBoxSessionType;
-      LGuiMain.PupilAddress := nil;
-      LGuiMain.RootData := nil;
-      LGuiMain.RootMedia := nil;
-
-      LGuiBloc.BlocITI := seBlocITI;
-      LGuiBloc.CrtConsecutiHits := seBlocCrtConsecutiveHit;
-      LGuiBloc.CrtHitPorcentage := seBlocCrtHitPorcentage;
-      LGuiBloc.Counter := ComboBoxBlocCounter;
-      LGuiBloc.BlocName := EditBlocName;
-      LGuiBloc.Color := ColorButtonBloc;
-      LGuiBloc.MaxCorrection := seBlocMaxCorrection;
-      LGuiBloc.MaxRepetition := seBlocMaxRepetition;
-      LGuiBloc.Trials := nil;
-      LGuiBloc.VirtualTrial := nil;
-      LDefaultMain := TStringList.Create;
-      LDefaultBloc := TStringList.Create;
-      MainFromGui(LDefaultMain,LGuiMain);
-      BlocFromGui(LDefaultBloc,LGuiBloc);
+      SetupDefaultsFromGui;
       FormBlocs.WriteToDisk(LDefaultMain,LDefaultBloc);
       Memo1.Lines.LoadFromFile(FormBlocs.BlocsPath+DirectorySeparator+LAST_BLOCS_INI_FILENAME);
-      LDefaultMain.Free;
-      LDefaultBloc.Free;
+      FreeDefaults;
     end;
 
   pgRodar.TabIndex := 4;
@@ -1095,28 +1059,6 @@ var
         Inc(aRow);
       end;
   end;
-
-  procedure AddGoNoGoTrialsToGrid;
-  var
-    aConsequence : string;
-  begin
-    if FormGo_NoGo.Trials[aTrial].Positive then
-      aConsequence := rsPositive
-    else
-      aConsequence := rsNegative;
-
-    with StringGrid1 do
-      begin
-        if (aRow + 1) > RowCount then RowCount := aRow + 1;
-        Cells[0, aRow] := IntToStr(aTrial+1);
-        Cells[1, aRow] := aConsequence;
-        Cells[2, aRow] := FormGo_NoGo.Schedule.Text;
-        Cells[3, aRow] := IntToStr(FormGo_NoGo.SpinLimitedHold.Value);
-        Cells[4, aRow] := ExtractFileName(FormGo_NoGo.Trials[aTrial].Path);
-        Cells[5, aRow] := IntToStr(FormGo_NoGo.SpinSize.Value);
-      end;
-    Inc(aRow);
-  end;
 begin
   GGlobalContainer := TGlobalContainer.Create;
   if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
@@ -1205,8 +1147,7 @@ begin
       FormGo_NoGo.MonitorToShow := GGlobalContainer.MonitorToShow;
       if FormGo_NoGo.ShowModal = mrOK then
         begin
-          for aTrial := Low(FormGo_NoGo.Trials) to High(FormGo_NoGo.Trials) do AddGoNoGoTrialsToGrid;
-
+          FormGo_NoGo.AddTrialsToGui(StringGrid1);
           FormGo_NoGo.Free;
           ResetRepetionMatrix;
           FLastFocusedCol := -1;
@@ -1238,6 +1179,7 @@ var
   LGitCommit : string;
 begin
   LInitialDirectory := ExtractFilePath(Application.ExeName);
+  LAST_BLOC_INIFILE_PATH := LInitialDirectory+LAST_BLOC_INI_FILENAME;
   OpenDialog1.InitialDir := LInitialDirectory;
   SaveDialog1.InitialDir:=LInitialDirectory;
   SelectDirectoryDialog1.InitialDir := LInitialDirectory;
