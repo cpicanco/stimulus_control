@@ -20,6 +20,7 @@ type
 
   TSimpleBlc = class(TComponent)
   strict private
+    FSep : Char;
     FName: string;
     FNextBlcOnCriteria: integer;
     FNextBlcOnNotCriteria: integer;
@@ -57,8 +58,8 @@ type
 
   TFormBlocs = class(TForm)
     LvlGraphControl1: TLvlGraphControl;
-    PopupMenuBlocs: TPopupMenu;
   private
+    FPopupMenuBlocs : TPopupMenu;
     FBlocsPath: string;
     FChoosenBlocs : TStringList;
     FOnBlocItemClick: TNotifyEvent;
@@ -85,6 +86,7 @@ type
     property Items[BlocIndex : integer] : TSimpleBlc read GetItems; default;
     property OnBlocItemClick : TNotifyEvent read FOnBlocItemClick write SetOnBlocItemClick;
     property StringGrid : TStringGrid read FStringGrid write FStringGrid;
+    property PopupMenuBlocs :TPopupMenu read FPopupMenuBlocs;
   end;
 
 var
@@ -100,6 +102,9 @@ operator in (const A: TSimpleBlc; const B: TSimpleBlcs): boolean;
 implementation
 
 uses config_session, config_session_fileutils, strutils,FileUtil, LazFileUtils, constants;
+
+const
+   ADDRESS_SEP : Char = #58;
 
 operator=(B1, B2: TBlcAddress)B: Boolean;
 begin
@@ -141,17 +146,17 @@ end;
 
 procedure TSimpleBlc.StringToAddress(AValue: string);
 begin
-  if WordCount(AValue,[#32]) < 2 then
+  if WordCount(AValue,[ADDRESS_SEP]) < 2 then
     raise Exception.Create('StringToAddress failed with value:'+AValue);
 
-  Address.Path:=ExtractDelimited(1,AValue,[#32]);
-  Address.SessionIndex:=StrToInt(ExtractDelimited(2,AValue,[#32]));;
-  Address.BlocIndex := StrToInt(ExtractDelimited(3,AValue,[#32]));
+  Address.Path:=ExtractDelimited(1,AValue,[ADDRESS_SEP]);
+  Address.SessionIndex:=StrToInt(ExtractDelimited(2,AValue,[ADDRESS_SEP]));;
+  Address.BlocIndex := StrToInt(ExtractDelimited(3,AValue,[ADDRESS_SEP]));
 end;
 
 function TSimpleBlc.AddressToString: string;
 begin
-  Result := Address.Path + #32 + IntToStr(Address.SessionIndex) + #32 + IntToStr(Address.BlocIndex);
+  Result := Address.Path + FSep + IntToStr(Address.SessionIndex) + FSep + IntToStr(Address.BlocIndex);
 end;
 
 function TSimpleBlc.GetAsSection: TStrings;
@@ -208,6 +213,7 @@ var
 begin
   if FBlocsPath=AValue then Exit;
   FBlocsPath:=AValue;
+  FPopupMenuBlocs.Items.Clear;
 
   s := 0;
   LSessionFiles := FindAllFiles(FBlocsPath,'*.txt');
@@ -218,9 +224,9 @@ begin
         begin
           SetLength(FSessions,s+1);
           FSessions[s].Filename := LSession;
-          FSessions[s].MenuItem := TMenuItem.Create(PopupMenuBlocs);
-          FSessions[s].MenuItem.Caption := IntToStr(s+1)+': '+ExtractFileNameOnly(LSession);
-          PopupMenuBlocs.Items.Add(FSessions[s].MenuItem);
+          FSessions[s].MenuItem := TMenuItem.Create(FPopupMenuBlocs);
+          FSessions[s].MenuItem.Caption := IntToStr(s+1)+ADDRESS_SEP+#32+ExtractFileNameOnly(LSession);
+          FPopupMenuBlocs.Items.Add(FSessions[s].MenuItem);
           SetLength(FSessions[s].Blocs,LConfigurationFile.BlocCount);
           for i := 0 to LConfigurationFile.BlocCount -1 do
             begin
@@ -234,22 +240,22 @@ begin
               FSessions[s].Blocs[i].NextBlcOnCriteria:= LCfgBloc.NextBlocOnCriteria;
               FSessions[s].Blocs[i].NextBlcOnNotCriteria:= LCfgBloc.NextBlocOnNotCriteria;
               FSessions[s].Blocs[i].MenuItem := TMenuItem.Create(FSessions[s].Blocs[i]);
-              FSessions[s].Blocs[i].MenuItem.Caption := IntToStr(i+1)+': '+ LCfgBloc.Name;
+              FSessions[s].Blocs[i].MenuItem.Caption := IntToStr(i+1)+ADDRESS_SEP+#32+ LCfgBloc.Name;
               FSessions[s].Blocs[i].MenuItem.OnClick := OnBlocItemClick;
-              PopupMenuBlocs.Items[s].Add(FSessions[s].Blocs[i].MenuItem);
+              FPopupMenuBlocs.Items[s].Add(FSessions[s].Blocs[i].MenuItem);
             end;
-            M := TMenuItem.Create(PopupMenuBlocs);
+            M := TMenuItem.Create(FPopupMenuBlocs);
             M.Caption:='Blocos';
             M.Enabled:=False;
-            PopupMenuBlocs.Items[s].Insert(0,M);
+            FPopupMenuBlocs.Items[s].Insert(0,M);
             Inc(s);
          end;
      LConfigurationFile.Free;
     end;
-    M := TMenuItem.Create(PopupMenuBlocs);
+    M := TMenuItem.Create(FPopupMenuBlocs);
     M.Caption:='Sessões';
     M.Enabled:=False;
-    PopupMenuBlocs.Items.Insert(0,M);
+    FPopupMenuBlocs.Items.Insert(0,M);
 end;
 
 procedure TFormBlocs.BlocItemClick(Sender: TObject);
@@ -258,9 +264,9 @@ var
   LSessionIndex : integer;
   LShortAddress: string;
 begin
-  LBlocIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Caption,[':']));
-  LSessionIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Parent.Caption,[':']));
-  LShortAddress := IntToStr(LSessionIndex-1)+#32+IntToStr(LBlocIndex-1);
+  LBlocIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Caption,[ADDRESS_SEP]));
+  LSessionIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Parent.Caption,[ADDRESS_SEP]));
+  LShortAddress := IntToStr(LSessionIndex-1)+ADDRESS_SEP+IntToStr(LBlocIndex-1);
   FChoosenBlocs.Append(LShortAddress);
   AppendBlocToStringGrid(LShortAddress);
 end;
@@ -286,8 +292,8 @@ end;
 procedure TFormBlocs.SetAddressHelper(var i, j: integer; AAddress: string;
   SN: integer; BN: integer);
 begin
-  i := StrToInt(ExtractDelimited(SN,AAddress,[#32]));
-  j := StrToInt(ExtractDelimited(BN,AAddress,[#32]));
+  i := StrToInt(ExtractDelimited(SN,AAddress,[ADDRESS_SEP]));
+  j := StrToInt(ExtractDelimited(BN,AAddress,[ADDRESS_SEP]));
 end;
 
 procedure TFormBlocs.SetOnBlocItemClick(AValue: TNotifyEvent);
@@ -299,6 +305,7 @@ end;
 constructor TFormBlocs.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FPopupMenuBlocs := TPopupMenu.Create(Self);
   FChoosenBlocs := TStringList.Create;
   OnBlocItemClick:=@BlocItemClick;
 end;
@@ -345,24 +352,32 @@ var
   end;
 
   function TargetEdge(ACol : integer) : string;
+  var
+    S : string;
   begin
+    Result := '';
     with StringGrid do
       begin
-        n := StrToInt(Cells[ACol, LRow]);
-        if n > 0 then
-          // custom bloc
-          Result := Cells[ACol, LRow] +'|'+ Cells[1,n]
-        else
+        S := Cells[ACol, LRow];
+        if S <> '' then
           begin
-            // next bloc
-            n := LRow+1;
-            if n <= RowCount-1 then
-              Result := Cells[0, n] +'|'+Cells[1, n];
-          end;
+            n := StrToInt(S);
 
-        // end bloc
-        if n > RowCount-1 then
-          Result := 'FIM';
+            if n > 0 then
+              // custom bloc
+              Result := S +'|'+ Cells[1,n]
+            else
+              begin
+                // next bloc
+                n := LRow+1;
+                if n <= RowCount-1 then
+                  Result := Cells[0, n] +'|'+Cells[1, n];
+              end;
+
+            // end bloc
+            if n > RowCount-1 then
+              Result := 'FIM';
+          end;
       end;
   end;
 
@@ -377,8 +392,11 @@ begin
         LTarget2 := TargetEdge(3);
         if LRow = 1 then
           LvlGraphControl1.Graph.GetEdge('INÍCIO', LSource, True);
-        LvlGraphControl1.Graph.GetEdge(LSource, LTarget1, True);
-        LvlGraphControl1.Graph.GetEdge(LSource, LTarget2, True);
+        if (LTarget1 <> '') and (LTarget2 <> '') then
+          begin
+            LvlGraphControl1.Graph.GetEdge(LSource, LTarget1, True);
+            LvlGraphControl1.Graph.GetEdge(LSource, LTarget2, True);
+          end;
       end;
 end;
 
