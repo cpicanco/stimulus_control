@@ -1262,35 +1262,35 @@ begin
 
   if OpenDialog1.Execute then
     begin
-      FormRandomizePositions := TFormRandomizePositions.Create(Self);
-      FormRandomizePositions.LoadPositionsFromFile(OpenDialog1.Filename,1);
-      FormRandomizePositions.ShowModal;
-      //FrmBackground.Show;
-      //FrmBackground.SetFullScreen(True);
-      //
-      //FSession := TSession.Create(FrmBackground);
-      //FConfigs := TCfgSes.Create(FSession);
-      //if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
-      //  begin
-      //    FConfigs.GlobalContainer.MonitorToShow := 1;
-      //    FrmBackground.Left := Screen.Width + 1;
-      //  end
-      //else
-      //  FConfigs.GlobalContainer.MonitorToShow := 0;
-      //
-      //FConfigs.LoadFromFile(OpenDialog1.Filename, False);
-      //FConfigs.PupilEnabled := chkPupilClient.Checked;
-      //
-      //with FSession do
-      //  begin
-      //    OnEndSess:= @EndSession;
-      //    AudioDevice := FAudioDevice;
-      //    BackGround := FrmBackground;
-      //    Configs := FConfigs;
-      //    TestMode := False;
-      //    ShowCounter := False;
-      //    Play('000');
-      //  end;
+      //FormRandomizePositions := TFormRandomizePositions.Create(Self);
+      //FormRandomizePositions.LoadPositionsFromFile(OpenDialog1.Filename,1);
+      //FormRandomizePositions.ShowModal;
+      FrmBackground.Show;
+      FrmBackground.SetFullScreen(True);
+
+      FSession := TSession.Create(FrmBackground);
+      FConfigs := TCfgSes.Create(FSession);
+      if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
+        begin
+          FConfigs.GlobalContainer.MonitorToShow := 1;
+          FrmBackground.Left := Screen.Width + 1;
+        end
+      else
+        FConfigs.GlobalContainer.MonitorToShow := 0;
+
+      FConfigs.LoadFromFile(OpenDialog1.Filename, False);
+      FConfigs.PupilEnabled := chkPupilClient.Checked;
+
+      with FSession do
+        begin
+          OnEndSess:= @EndSession;
+          AudioDevice := FAudioDevice;
+          BackGround := FrmBackground;
+          Configs := FConfigs;
+          TestMode := False;
+          ShowCounter := False;
+          Play('000');
+        end;
     end;
 
 end;
