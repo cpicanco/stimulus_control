@@ -177,10 +177,10 @@ procedure TKey.Paint;
           Pen.Color := Edge;
           Brush.Color:= Color;//FBorderColor;
           //FillRect(Rect(0, 0, Width, Height));
-          Rectangle(0, 0, Width, Height);
-          TextRect(Rect(3, 3, Width -3, Height -3),
-                   ((Width div 2) - (TextWidth(Caption)div 2)),
-                   ((Height div 2) - (TextHeight(Caption)div 2)),
+          Rectangle(ClientRect);
+          TextRect(ClientRect,
+                   (((ClientRect.Right-ClientRect.Left) div 2) - (TextWidth(Caption)div 2)),
+                   (((ClientRect.Bottom-ClientRect.Top) div 2) - (TextHeight(Caption)div 2)),
                    Caption);
         end;
     end;
