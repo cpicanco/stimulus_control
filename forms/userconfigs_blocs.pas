@@ -20,7 +20,6 @@ type
 
   TSimpleBlc = class(TComponent)
   strict private
-    FSep : Char;
     FName: string;
     FNextBlcOnCriteria: integer;
     FNextBlcOnNotCriteria: integer;
@@ -156,7 +155,7 @@ end;
 
 function TSimpleBlc.AddressToString: string;
 begin
-  Result := Address.Path + FSep + IntToStr(Address.SessionIndex) + FSep + IntToStr(Address.BlocIndex);
+  Result := Address.Path + ADDRESS_SEP + IntToStr(Address.SessionIndex) + ADDRESS_SEP + IntToStr(Address.BlocIndex);
 end;
 
 function TSimpleBlc.GetAsSection: TStrings;
