@@ -531,7 +531,7 @@ begin
       Exit;
     end;
 
-  if HasCsqInterval and (HasITI or (not HasITI)) then
+  if HasCsqInterval then
     begin
       {$ifdef DEBUG}
         DebugLn(mt_Debug +  'Time Condition 3');
@@ -553,7 +553,7 @@ begin
         end
     end;
 
-  if HasTimeOut and (HasITI or (not HasITI)) then
+  if HasTimeOut then
     begin
       {$ifdef DEBUG}
         DebugLn(mt_Debug +  'Time Condition 4');
@@ -716,17 +716,13 @@ begin
   FIETMedia.OnResponse:= @IETResponse;
   FIETMedia.Loops := StrToIntDef(HowManyLoops, 1) - 1;
   FIETMedia.Color := StrToIntDef(Color, 0);
-  FIETMedia.Width := Screen.Width;
-  FIETMedia.Height := Screen.Height;
-  {
-  FIETMedia.Width := (Screen.Width div 5) * 4;
-  FIETMedia.Height := (Screen.Height div 5) * 4;
-  FIETMedia.Top := (Screen.Height div 2) - (FIETMedia.Height div 2);
-  FIETMedia.Left := (Screen.Width div 2) - (FIETMedia.Width div 2);
-  }
+  FIETMedia.Width := 500;
+  FIETMedia.Height := 500;
+  FIETMedia.Centralize(FBackGround);
+
   FIETMedia.FullPath := FileName;
   FIETMedia.Play;
-  FIETMedia.FullScreen;
+  //FIETMedia.FullScreen;
   //FTrial.IETConsequence := '';
   //FIETMedia.Show;
   if Assigned(OnConsequence) then FOnConsequence(FIETMedia);
