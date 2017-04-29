@@ -31,6 +31,9 @@ type
     constructor Create(const AConfigurationFile: string; AEscapeLineFeeds:Boolean=False); override;
     destructor Destroy; override;
     procedure Invalidate;
+    procedure ReadPositionsInBloc(ABloc:integer; APositionsList : TStrings);
+    function ReadTrialString(ABloc : integer; ATrial : integer; AName:string):string;
+    function ReadTrialInteger(ABloc : integer; ATrial : integer; AName:string):LongInt;
     procedure WriteToBloc(ABloc : integer;AName, AValue: string);
     procedure WriteToTrial(ATrial : integer; AName, AValue: string); overload;
     procedure WriteToTrial(ATrial : integer; ABloc : integer; AName, AValue: string); overload;
@@ -86,6 +89,7 @@ begin
   LBlcSection := BlocSection(BlocIndex);
   with Result do
     begin
+      ID := BlocIndex;
       s1 := ReadString(LBlcSection, _NumTrials, '0 0');
       NumTrials:=StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
       VirtualTrialValue:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
@@ -180,6 +184,52 @@ begin
   WriteInteger(_Main,_NumBlc,BlocCount);
   for i := 0 to BlocCount-1 do
     WriteInteger(BlocSection(i+1),_NumTrials,TrialCount[i+1]);
+end;
+
+procedure TConfigurationFile.ReadPositionsInBloc(ABloc: integer;
+  APositionsList: TStrings);
+var
+  L : TStringList;
+  LNumComp: LongInt;
+  LTrialSection, LCompName, S: String;
+  j, i: Integer;
+begin
+  L := TStringList.Create;
+  L.Sorted := True;
+  L.Duplicates:=dupIgnore;
+  try
+    for i := 0 to TrialCount[ABloc]-1 do
+      begin
+        LTrialSection := TrialSection(ABloc,i+1);
+        LNumComp := ReadInteger(LTrialSection,_NumComp,0);
+        if LNumComp > 0 then
+          for j := 0 to  LNumComp-1 do
+            begin
+              LCompName := _Comp+IntToStr(j+1)+_cBnd;
+              S := ReadString(LTrialSection,LCompName,'');
+              if S <> '' then
+                L.Append(S);
+            end;
+      end;
+
+    for i := 0 to L.Count-1 do
+      APositionsList.Values[IntToStr(i+1)] := L[i];
+
+  finally
+    L.Free;
+  end;
+end;
+
+function TConfigurationFile.ReadTrialString(ABloc: integer; ATrial: integer;
+  AName: string): string;
+begin
+  Result := ReadString(TrialSection(ABloc, ATrial), AName, '');
+end;
+
+function TConfigurationFile.ReadTrialInteger(ABloc: integer; ATrial: integer;
+  AName: string): LongInt;
+begin
+  Result := ReadInteger(TrialSection(ABloc, ATrial), AName, MaxInt);
 end;
 
 constructor TConfigurationFile.Create(const AConfigurationFile: string;

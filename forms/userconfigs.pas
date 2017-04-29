@@ -77,6 +77,7 @@ type
     leFillValue: TLabeledEdit;
     Memo1: TMemo;
     MemoAppInfo: TMemo;
+    piMTS: TMenuItem;
     piBlocChaining: TMenuItem;
     piGo_NoGo: TMenuItem;
     piTrialsWithConstraints: TMenuItem;
@@ -135,7 +136,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
     procedure piClick(Sender: TObject);
-    procedure piFillEvenClick(Sender: TObject);
     procedure StringGrid1Click(Sender: TObject);
     procedure StringGrid1ColRowMoved(Sender: TObject; IsColumn: Boolean;
       sIndex, tIndex: Integer);
@@ -180,7 +180,9 @@ uses background, strutils
      , userconfigs_trial_mirrored
      , userconfigs_feature_positive
      , userconfigs_go_nogo
+     , userconfigs_mts
      , userconfigs_blocs
+     , userconfigs_positions
      , versioning_git
      , versioning_lazarus
      , constants
@@ -230,6 +232,13 @@ begin
       ResetRepetionMatrix;
     end;
 
+  if (TMenuItem(Sender) = piMTS) and (btnGridType.Caption <> rsFillTypeMTS) then
+      begin
+        StringGrid1.Clean;
+        btnGridType.Caption := rsFillTypeMTS;
+        SetGridHeader(StringGrid1,rsFillTypeMTS);
+        ResetRepetionMatrix;
+      end;
 
   if TMenuItem(Sender) = piBlocChaining then
     begin
@@ -262,12 +271,6 @@ begin
 
   TMenuItem(Sender).Checked := True;
 end;
-
-procedure TFormUserConfig.piFillEvenClick(Sender: TObject);
-begin
-
-end;
-
 
 procedure TFormUserConfig.StringGrid1Click(Sender: TObject);
 begin
@@ -1154,6 +1157,19 @@ begin
         end;
     end;
 
+  if piMTS.Checked then
+    begin
+      FormMTS := TFormMTS.Create(Application);
+      FormMTS.MonitorToShow := GGlobalContainer.MonitorToShow;
+      if FormMTS.ShowModal = mrOK then
+        begin
+          FormMTS.AddTrialsToGui(StringGrid1);
+          FormMTS.Free;
+          ResetRepetionMatrix;
+          FLastFocusedCol := -1;
+        end;
+    end;
+
   if piBlocChaining.Checked then
     begin
       if (EditBlocChainingPath.Text <> '') and DirectoryExistsUTF8(EditBlocChainingPath.Text) then
@@ -1246,32 +1262,35 @@ begin
 
   if OpenDialog1.Execute then
     begin
-      FrmBackground.Show;
-      FrmBackground.SetFullScreen(True);
-
-      FSession := TSession.Create(FrmBackground);
-      FConfigs := TCfgSes.Create(FSession);
-      if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
-        begin
-          FConfigs.GlobalContainer.MonitorToShow := 1;
-          FrmBackground.Left := Screen.Width + 1;
-        end
-      else
-        FConfigs.GlobalContainer.MonitorToShow := 0;
-
-      FConfigs.LoadFromFile(OpenDialog1.Filename, False);
-      FConfigs.PupilEnabled := chkPupilClient.Checked;
-
-      with FSession do
-        begin
-          OnEndSess:= @EndSession;
-          AudioDevice := FAudioDevice;
-          BackGround := FrmBackground;
-          Configs := FConfigs;
-          TestMode := False;
-          ShowCounter := False;
-          Play('000');
-        end;
+      FormRandomizePositions := TFormRandomizePositions.Create(Self);
+      FormRandomizePositions.LoadPositionsFromFile(OpenDialog1.Filename,1);
+      FormRandomizePositions.ShowModal;
+      //FrmBackground.Show;
+      //FrmBackground.SetFullScreen(True);
+      //
+      //FSession := TSession.Create(FrmBackground);
+      //FConfigs := TCfgSes.Create(FSession);
+      //if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
+      //  begin
+      //    FConfigs.GlobalContainer.MonitorToShow := 1;
+      //    FrmBackground.Left := Screen.Width + 1;
+      //  end
+      //else
+      //  FConfigs.GlobalContainer.MonitorToShow := 0;
+      //
+      //FConfigs.LoadFromFile(OpenDialog1.Filename, False);
+      //FConfigs.PupilEnabled := chkPupilClient.Checked;
+      //
+      //with FSession do
+      //  begin
+      //    OnEndSess:= @EndSession;
+      //    AudioDevice := FAudioDevice;
+      //    BackGround := FrmBackground;
+      //    Configs := FConfigs;
+      //    TestMode := False;
+      //    ShowCounter := False;
+      //    Play('000');
+      //  end;
     end;
 
 end;

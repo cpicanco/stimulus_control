@@ -1621,7 +1621,7 @@ object FormUserConfig: TFormUserConfig
   OnDestroy = FormDestroy
   ParentBiDiMode = False
   Position = poScreenCenter
-  SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Text;EditBlocChainingPath.Text;EditBlocName.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;Width;Position;Height;WindowState;HorzScrollBar;VertScrollBar'
+  SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Text;EditBlocChainingPath.Text;EditBlocName.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;Height;HorzScrollBar;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;Position;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;VertScrollBar;Width;WindowState;piMTS.Checked'
   LCLVersion = '1.6.2.0'
   object btnRun: TButton
     Left = 8
@@ -1891,6 +1891,7 @@ object FormUserConfig: TFormUserConfig
           'Não'
           'Mostrar número de acertos e erros'
         )
+        Style = csDropDownList
         TabOrder = 8
         Text = 'Não'
       end
@@ -2139,7 +2140,7 @@ object FormUserConfig: TFormUserConfig
         Left = 0
         Height = 25
         Top = 258
-        Width = 460
+        Width = 600
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Arquivo alvo'
         OnClick = btnClick
@@ -2162,7 +2163,7 @@ object FormUserConfig: TFormUserConfig
         Left = 0
         Height = 25
         Top = 330
-        Width = 460
+        Width = 600
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Novas configurações'
         OnClick = btnClick
@@ -2175,7 +2176,7 @@ object FormUserConfig: TFormUserConfig
         Left = 0
         Height = 25
         Top = 303
-        Width = 460
+        Width = 600
         Anchors = [akTop, akLeft, akRight]
         TabOrder = 3
         Text = 'conteúdo'
@@ -3964,6 +3965,13 @@ object FormUserConfig: TFormUserConfig
     end
     object piGo_NoGo: TMenuItem
       Caption = 'Go No-Go'
+      GroupIndex = 1
+      RadioItem = True
+      ShowAlwaysCheckable = True
+      OnClick = piClick
+    end
+    object piMTS: TMenuItem
+      Caption = 'Emparelhamento ao modelo'
       GroupIndex = 1
       RadioItem = True
       ShowAlwaysCheckable = True

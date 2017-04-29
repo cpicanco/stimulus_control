@@ -236,6 +236,7 @@ resourcestring
   // user configs
   rsPosition = 'Bnd';
   rsComparison = 'C';
+  rsMTSRelation = 'Relação';
   rsTrials = 'Tentativas';
   rsConsequence = 'Consequência';
   rsAngle = 'Ângulo';
@@ -249,6 +250,17 @@ resourcestring
   rsDefBlc = 'Bloco 1';
   rsEndSession = 'Fim.';
   rsSchedule = 'Esquema';
+  rsSample = 'Modelo';
+
+  rsFilename = 'Nome do arquivo';
+  rsColor = 'Cor';
+  rsCount = 'Contar';
+  rsMediaSound = 'Som';
+  rsTimeOut = 'TimeOut';
+  rsNextTrial = 'Tentativa Seguinte';
+  rsDelay = 'Atraso';
+  rsDuration = 'Duração';
+  rsStyle = 'Estilo';
 
   rsFillTypeAxes = 'Eixos';
   rsFillTypeMatriz = 'FP/FN';

@@ -66,6 +66,7 @@ type
   TVetCfgTrial = array of TCfgTrial;
 
   TCfgBlc = record
+    ID : integer;
     Name: string;
     ITI: Integer;
     BkGnd: Integer;

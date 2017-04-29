@@ -141,50 +141,50 @@ end;
 procedure TFormStimuliSets.btnClick(Sender: TObject);
 var aIndex, aTag : Integer;
 begin
-  if btnBackward = TBitBtn(Sender) then
-  begin
-    if TKey(btnBackward.Parent) is TKey then
-    begin
-      aTag := TKey(btnBackward.Parent).Tag;
-      if FTrialSet.theGrid[aTag].Index >= 0 then
-      begin
-        aIndex := FTrialSet.theGrid[aTag].Index -1;
-        FTrialSet.theGrid[aTag].Index := aIndex;
-        if aIndex >= 0 then
-          begin
-            lblStmName.Caption := ExtractFileName(FTrialSet.theGrid[aTag].Files.Strings[aIndex]);
-            FTrialSet.theGrid[aTag].Key.FullPath:= FTrialSet.theGrid[aTag].Files.Strings[aIndex];
-          end
-        else
-          begin
-            lblStmName.Caption := '';
-            FTrialSet.theGrid[aTag].Key.FullPath:= '';
-            FTrialSet.theGrid[aTag].Key.Refresh;
-          end;
-      end;
-    end;
-  end;
-  if btnForward = TBitBtn(Sender) then
-  begin
-    if TKey(btnForward.Parent) is TKey then
-    begin
-      aTag := TKey(btnForward.Parent).Tag;
-      if FTrialSet.theGrid[aTag].Index < (FTrialSet.theGrid[aTag].Files.Count -1) then
-      begin
-        aIndex := FTrialSet.theGrid[aTag].Index +1;
-        FTrialSet.theGrid[aTag].Index := aIndex;
-        lblStmName.Caption := ExtractFileName(FTrialSet.theGrid[aTag].Files.Strings[aIndex]);
-        FTrialSet.theGrid[aTag].Key.FullPath:= FTrialSet.theGrid[aTag].Files.Strings[aIndex];
-      end
-      else
-        begin
-          lblStmName.Caption := '';
-          FTrialSet.theGrid[aTag].Key.FullPath:= '';
-          FTrialSet.theGrid[aTag].Key.Refresh;
-          FTrialSet.theGrid[aTag].Index := -1;
-        end;
-    end;
-  end;
+  //if btnBackward = TBitBtn(Sender) then
+  //begin
+  //  if TKey(btnBackward.Parent) is TKey then
+  //  begin
+  //    aTag := TKey(btnBackward.Parent).Tag;
+  //    if FTrialSet.theGrid[aTag].Index >= 0 then
+  //    begin
+  //      aIndex := FTrialSet.theGrid[aTag].Index -1;
+  //      FTrialSet.theGrid[aTag].Index := aIndex;
+  //      if aIndex >= 0 then
+  //        begin
+  //          lblStmName.Caption := ExtractFileName(FTrialSet.theGrid[aTag].Files.Strings[aIndex]);
+  //          FTrialSet.theGrid[aTag].Key.FullPath:= FTrialSet.theGrid[aTag].Files.Strings[aIndex];
+  //        end
+  //      else
+  //        begin
+  //          lblStmName.Caption := '';
+  //          FTrialSet.theGrid[aTag].Key.FullPath:= '';
+  //          FTrialSet.theGrid[aTag].Key.Refresh;
+  //        end;
+  //    end;
+  //  end;
+  //end;
+  //if btnForward = TBitBtn(Sender) then
+  //begin
+  //  if TKey(btnForward.Parent) is TKey then
+  //  begin
+  //    aTag := TKey(btnForward.Parent).Tag;
+  //    if FTrialSet.theGrid[aTag].Index < (FTrialSet.theGrid[aTag].Files.Count -1) then
+  //    begin
+  //      aIndex := FTrialSet.theGrid[aTag].Index +1;
+  //      FTrialSet.theGrid[aTag].Index := aIndex;
+  //      lblStmName.Caption := ExtractFileName(FTrialSet.theGrid[aTag].Files.Strings[aIndex]);
+  //      FTrialSet.theGrid[aTag].Key.FullPath:= FTrialSet.theGrid[aTag].Files.Strings[aIndex];
+  //    end
+  //    else
+  //      begin
+  //        lblStmName.Caption := '';
+  //        FTrialSet.theGrid[aTag].Key.FullPath:= '';
+  //        FTrialSet.theGrid[aTag].Key.Refresh;
+  //        FTrialSet.theGrid[aTag].Index := -1;
+  //      end;
+  //  end;
+  //end;
 
 end;
 
@@ -332,11 +332,11 @@ procedure TFormStimuliSets.KeyMouseDown(Sender : TObject; Button: TMouseButton; 
       begin
         if dlgOpenPic.Files.Count > 0 then
         for K := 0 to (dlgOpenPic.Files.Count - 1) do
-        begin
-         FTrialSet.theGrid[I].Files.Add(dlgOpenPic.Files.Strings[K]);
-         FTrialSet.theGrid[I].Key.Caption:= IntToStr(FTrialSet.theGrid[I].Files.Count);
-         FTrialSet.theGrid[I].Key.Refresh;
-        end;
+          begin
+            FTrialSet.theGrid[I].Files.Add(dlgOpenPic.Files.Strings[K]);
+            FTrialSet.theGrid[I].Key.Caption:= IntToStr(FTrialSet.theGrid[I].Files.Count);
+            FTrialSet.theGrid[I].Key.Refresh;
+          end;
         dlgOpenPic.Files.Clear;
       end;
   end;
@@ -361,11 +361,11 @@ begin
   btnBackwardLeft := TKey(Sender).ClientRect.Left + (TKey(Sender).Width div 2) - btnBackward.Width - 6;
   btnBackwardTop  := TKey(Sender).ClientRect.Bottom - btnBackward.Height - 4;
 
-  btnBackward.Parent := TKey(Sender);
-  btnBackward.Left := btnBackwardLeft;
-  btnBackward.Top := btnBackwardTop;
-  btnBackward.Visible := True;
-  btnBackward.BringToFront;
+  //btnBackward.Parent := TKey(Sender);
+  //btnBackward.Left := btnBackwardLeft;
+  //btnBackward.Top := btnBackwardTop;
+  //btnBackward.Visible := True;
+  //btnBackward.BringToFront;
 
   lblStmName.Left := TKey(Sender).Left;
   lblStmName.Top  := TKey(Sender).Top - (lblStmName.Height + 12);
@@ -375,11 +375,11 @@ begin
   btnForwardLeft := TKey(Sender).ClientRect.Left + (TKey(Sender).Width div 2) + 6;
   btnForwardTop := TKey(Sender).ClientRect.Bottom - btnForward.Height - 4;
 
-  btnForward.Parent := TKey(Sender);
-  btnForward.Left := btnForwardLeft;
-  btnForward.Top := btnForwardTop;
-  btnForward.Visible := True;
-  btnForward.BringToFront;
+  //btnForward.Parent := TKey(Sender);
+  //btnForward.Left := btnForwardLeft;
+  //btnForward.Top := btnForwardTop;
+  //btnForward.Visible := True;
+  //btnForward.BringToFront;
 end;
 
 procedure TFormStimuliSets.KeyMouseLeave(Sender: TObject);

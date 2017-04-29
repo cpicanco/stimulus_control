@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit config_session_guiutils;
 
 {$mode objfpc}{$H+}
@@ -46,10 +55,10 @@ procedure SetGridHeader(AGrid: TStringGrid; ATrialType: string);
 begin
   with AGrid do
     begin
+      RowCount := 2;
       if ATrialType = rsFillTypeAxes then
         begin
           ColCount := 9;
-          RowCount := 2;
           Cells[0, 0] := rsTrials;
           Cells[1, 0] := rsAngle;
           Cells[2, 0] := 'x0';
@@ -64,7 +73,6 @@ begin
       if ATrialType = rsFillTypeMatriz then
         begin
           ColCount := 2;
-          RowCount := 2;
           Cells[0, 0] := rsTrials;
           Cells[1, 0] := rsContingency;
         end;
@@ -72,7 +80,6 @@ begin
       if ATrialType = rsFillTypeGoNoGo then
         begin
           ColCount := 6;
-          RowCount := 2;
           Cells[0, 0] := rsTrials;
           Cells[1, 0] := rsConsequence;
           Cells[2, 0] := rsSchedule;
@@ -81,10 +88,17 @@ begin
           Cells[5, 0] := rsSize;
         end;
 
+      if ATrialType = rsFillTypeMTS then
+        begin
+          ColCount := 3;
+          Cells[0, 0] := rsTrials;
+          Cells[1, 0] := rsMTSRelation;
+          Cells[2, 0] := rsConsequence;
+        end;
+
       if ATrialType = rsFillTypeBlocChaining then
         begin
           ColCount := 5;
-          RowCount := 2;
           Cells[0, 0] := rsBlocs;
           Cells[1, 0] := rsBlocName;
           Cells[2, 0] := rsBlocNextBlocOnCriteria;

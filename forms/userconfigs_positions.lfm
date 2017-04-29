@@ -1,0 +1,192 @@
+object FormRandomizePositions: TFormRandomizePositions
+  Left = 0
+  Height = 256
+  Top = 29
+  Width = 823
+  HorzScrollBar.Page = 688
+  VertScrollBar.Page = 64
+  ActiveControl = btnRand
+  AutoScroll = True
+  Caption = 'Aleatorizar posições'
+  ClientHeight = 256
+  ClientWidth = 823
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  FormStyle = fsStayOnTop
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '1.6.2.0'
+  object LabelGap: TLabel
+    Left = 358
+    Height = 13
+    Top = 13
+    Width = 34
+    Caption = 'e Pular'
+    ParentColor = False
+  end
+  object LabelSeqToWrite: TLabel
+    Left = 218
+    Height = 13
+    Top = 13
+    Width = 54
+    Caption = 'Aleatorizar'
+    ParentColor = False
+  end
+  object LabelBeginAt: TLabel
+    Left = 218
+    Height = 13
+    Top = 41
+    Width = 59
+    Caption = 'Começar na'
+    ParentColor = False
+  end
+  object LabelEndAt: TLabel
+    Left = 347
+    Height = 13
+    Top = 41
+    Width = 59
+    Caption = 'Terminar na'
+    ParentColor = False
+  end
+  object LabelLines: TLabel
+    Left = 479
+    Height = 13
+    Top = 13
+    Width = 32
+    Caption = 'linhas.'
+    ParentColor = False
+  end
+  object LabelNumPos: TLabel
+    Left = 78
+    Height = 13
+    Top = 44
+    Width = 60
+    Caption = 'Nº Posições:'
+    ParentColor = False
+  end
+  object LabelTrial: TLabel
+    Left = 479
+    Height = 13
+    Top = 41
+    Width = 47
+    Caption = 'tentativa.'
+    ParentColor = False
+  end
+  object btnApp: TButton
+    Left = 8
+    Height = 25
+    Top = 39
+    Width = 64
+    Caption = 'Aplicar'
+    OnClick = btnAppClick
+    TabOrder = 0
+  end
+  object seGap: TSpinEdit
+    Left = 412
+    Height = 23
+    Hint = 'Valor salto'
+    Top = 10
+    Width = 56
+    MaxValue = 0
+    OnChange = seGapChange
+    OnKeyPress = seGapKeyPress
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 1
+  end
+  object seSeqToWrite: TSpinEdit
+    Left = 285
+    Height = 23
+    Hint = 'Valor n.'
+    Top = 10
+    Width = 56
+    MaxValue = 0
+    OnKeyPress = seGapKeyPress
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 2
+  end
+  object btnRand: TButton
+    Left = 8
+    Height = 25
+    Hint = 'CLIQUE BOTÃO DIREITO para selecionar o tipo.'
+    Top = 8
+    Width = 64
+    Caption = 'Aleatorizar'
+    OnClick = btnRandClick
+    ParentShowHint = False
+    PopupMenu = pmRand
+    ShowHint = True
+    TabOrder = 3
+  end
+  object chkAllDifferent: TCheckBox
+    Left = 536
+    Height = 21
+    Hint = 'Marque se quiser n sequências diferentes ao aleatorizar. '
+    Top = 12
+    Width = 152
+    Caption = 'Sequências diferentes'
+    OnClick = chkAllDifferentClick
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 4
+  end
+  object seBeginAt: TSpinEdit
+    Left = 285
+    Height = 23
+    Hint = 'Primeira tentativa.'
+    Top = 38
+    Width = 56
+    MaxValue = 0
+    OnKeyPress = seGapKeyPress
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 5
+  end
+  object seEndAt: TSpinEdit
+    Left = 412
+    Height = 23
+    Hint = 'Última tentativa.'
+    Top = 38
+    Width = 56
+    MaxValue = 0
+    OnChange = seGapChange
+    OnKeyPress = seGapKeyPress
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 6
+  end
+  object PanelNumPos: TPanel
+    Left = 148
+    Height = 25
+    Top = 39
+    Width = 64
+    BevelOuter = bvLowered
+    TabOrder = 7
+  end
+  object pmRand: TPopupMenu
+    left = 416
+    top = 112
+    object pRand: TMenuItem
+      Caption = 'Random'
+      Checked = True
+      GroupIndex = 1
+      RadioItem = True
+      ShowAlwaysCheckable = True
+    end
+    object pSpan: TMenuItem
+      Caption = 'Span'
+      GroupIndex = 1
+      RadioItem = True
+      ShowAlwaysCheckable = True
+    end
+    object pBalanced: TMenuItem
+      Caption = 'Balanceado'
+      GroupIndex = 1
+      RadioItem = True
+      ShowAlwaysCheckable = True
+    end
+  end
+end

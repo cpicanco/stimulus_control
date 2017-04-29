@@ -1,0 +1,215 @@
+object FormMTS: TFormMTS
+  Left = 97
+  Height = 496
+  Top = 125
+  Width = 1046
+  HorzScrollBar.Page = 781
+  VertScrollBar.Page = 160
+  AutoScroll = True
+  Caption = 'FormMTS'
+  ClientHeight = 496
+  ClientWidth = 1046
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '1.6.2.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 160
+    Top = 0
+    Width = 1046
+    Align = alTop
+    ClientHeight = 160
+    ClientWidth = 1046
+    ParentColor = False
+    TabOrder = 0
+    object btnMinimizeTopTab: TButton
+      Left = 801
+      Height = 56
+      Hint = 'Aperte barra de espaço para alternar a aba'
+      Top = 8
+      Width = 118
+      Anchors = [akTop, akRight]
+      Caption = 'Minimizar Aba'
+      ParentShowHint = False
+      TabOrder = 0
+    end
+    object btnClose: TButton
+      Left = 921
+      Height = 56
+      Top = 8
+      Width = 118
+      Anchors = [akTop, akRight]
+      Caption = 'Fechar'
+      ModalResult = 11
+      TabOrder = 1
+    end
+    object cbPreview: TCheckBox
+      Left = 664
+      Height = 21
+      Top = 120
+      Width = 116
+      Caption = 'Pré-vizualização'
+      Checked = True
+      State = cbChecked
+      TabOrder = 2
+    end
+    object btnOk: TButton
+      Left = 801
+      Height = 73
+      Top = 79
+      Width = 238
+      Anchors = [akTop, akRight]
+      Caption = 'Adicionar à Lista'
+      ModalResult = 1
+      TabOrder = 3
+    end
+    object gbStimuli: TGroupBox
+      Left = 8
+      Height = 144
+      Top = 8
+      Width = 304
+      Caption = 'Configurações gerais'
+      ChildSizing.LeftRightSpacing = 5
+      ChildSizing.TopBottomSpacing = 5
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 127
+      ClientWidth = 300
+      TabOrder = 4
+      object LabelSize: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Tamanho em pixels'
+        Top = 5
+        Width = 205
+        Alignment = taCenter
+        Caption = 'Tamanho dos estímulos (pixels)'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object SpinSize: TSpinEdit
+        Left = 210
+        Height = 25
+        Hint = 'Tamanho horizontal e vertical em pixels'
+        Top = 5
+        Width = 85
+        Alignment = taCenter
+        MaxValue = 2000
+        MinValue = 100
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 0
+        Value = 300
+      end
+      object LabelPresentations: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Tempo em milisegundos'
+        Top = 30
+        Width = 205
+        Alignment = taCenter
+        Caption = 'Número de apresentações'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object SpinPresentations: TSpinEdit
+        Left = 210
+        Height = 25
+        Hint = 'Quantas vezes cada estímulo será apresentado?'
+        Top = 30
+        Width = 85
+        Alignment = taCenter
+        MinValue = 1
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 1
+        Value = 1
+      end
+      object LabelComparisons: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Tempo em milisegundos'
+        Top = 55
+        Width = 205
+        Alignment = taCenter
+        Caption = 'Número de Comparações'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object SpinComparisons: TSpinEdit
+        Left = 210
+        Height = 25
+        Hint = 'Quantos estímulos de comparação?'
+        Top = 55
+        Width = 85
+        Alignment = taCenter
+        MaxValue = 8
+        MinValue = 2
+        OnEditingDone = SpinComparisonsEditingDone
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 2
+        Value = 2
+      end
+      object LabelDefaultCsqHIT: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Tempo em milisegundos'
+        Top = 80
+        Width = 205
+        Alignment = taCenter
+        Caption = 'Consequência padrão para acerto'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object EditDefaultCsqHit: TEdit
+        Left = 210
+        Height = 25
+        Top = 80
+        Width = 85
+        TabOrder = 3
+        Text = 'CSQ1.wav 0 0 1000'
+        TextHint = 'Clique duas vezes para escolher o arquivo'
+      end
+      object LabelDefaultCsqMISS: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Tempo em milisegundos'
+        Top = 105
+        Width = 205
+        Alignment = taCenter
+        Caption = 'Consequência padrão para erro'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object EditDefaultCsqMISS: TEdit
+        Left = 210
+        Height = 25
+        Top = 105
+        Width = 85
+        TabOrder = 4
+        Text = 'CSQ2.wav 0 0 1000'
+        TextHint = 'Clique duas vezes para escolher o arquivo'
+      end
+    end
+  end
+  object OpenDialog: TOpenDialog
+    Title = 'Selecionar arquivo de estímulo'
+    Filter = 'Imagens (jpg, bmp, png)|*.png;*.jpg;*.bmp;*.PNG;*.JPG;*.BMP|Som (wav)|*.wav;*.WAV'
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 51
+    top = 184
+  end
+end
