@@ -35,6 +35,7 @@ type
     function ReadTrialString(ABloc : integer; ATrial : integer; AName:string):string;
     function ReadTrialInteger(ABloc : integer; ATrial : integer; AName:string):LongInt;
     procedure WriteToBloc(ABloc : integer;AName, AValue: string);
+    procedure WriteToTrial(ATrial : integer; AStrings : TStrings); overload;
     procedure WriteToTrial(ATrial : integer; AName, AValue: string); overload;
     procedure WriteToTrial(ATrial : integer; ABloc : integer; AName, AValue: string); overload;
     procedure WriteMain(AMain : TStrings);
@@ -248,6 +249,11 @@ end;
 procedure TConfigurationFile.WriteToBloc(ABloc: integer; AName, AValue: string);
 begin
   WriteString(BlocSection(ABloc),AName,AValue);
+end;
+
+procedure TConfigurationFile.WriteToTrial(ATrial: integer; AStrings: TStrings);
+begin
+  WriteSection(TrialSection(BlocCount,ATrial),AStrings);
 end;
 
 procedure TConfigurationFile.WriteToTrial(ATrial: integer; AName, AValue: string
