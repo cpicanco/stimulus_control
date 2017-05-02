@@ -25,7 +25,7 @@ uses
   , Forms
 
   //Forms
-  , userconfigs,
+  , userconfigs
   ;
 
 {$R *.res}

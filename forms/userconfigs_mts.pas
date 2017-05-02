@@ -14,8 +14,8 @@ unit userconfigs_mts;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, Spin, Grids
+  Classes, SysUtils, FileUtil, IDEWindowIntf, Forms, Controls, Graphics,
+  Dialogs, ExtCtrls, StdCtrls, Spin, Grids, XMLPropStorage
   , config_session_gui_comparison
   , response_key
   ;
@@ -52,6 +52,7 @@ type
     Panel1: TPanel;
     SpinPresentations: TSpinEdit;
     SpinComparisons: TSpinEdit;
+    XMLPropStorage1: TXMLPropStorage;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SpinComparisonsEditingDone(Sender: TObject);

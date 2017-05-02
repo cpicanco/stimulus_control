@@ -11,6 +11,7 @@ object FormGo_NoGo: TFormGo_NoGo
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
   OnPaint = FormPaint
+  SessionProperties = 'cbPreview.Checked;OpenPictureDialog.InitialDir;Schedule.Text;SpinLimitedHold.Value;SpinPresentations.Value;SpinSize.Value'
   LCLVersion = '1.6.2.0'
   object Panel1: TPanel
     Left = 0
@@ -236,6 +237,12 @@ object FormGo_NoGo: TFormGo_NoGo
     Filter = 'Imagens (jpg, bmp, png)|*.png;*.jpg;*.bmp;*.PNG;*.JPG;*.BMP'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofFileMustExist, ofEnableSizing]
     left = 144
+    top = 176
+  end
+  object XMLPropStorage1: TXMLPropStorage
+    StoredValues = <>
+    FileName = 'session.xml'
+    left = 264
     top = 176
   end
 end

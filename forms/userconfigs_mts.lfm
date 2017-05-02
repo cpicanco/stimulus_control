@@ -11,6 +11,7 @@ object FormMTS: TFormMTS
   ClientWidth = 1046
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  SessionProperties = 'EditDefaultCsqHIT.Text;EditDefaultCsqMISS.Text;SpinComparisons.Value;SpinPresentations.Value;OpenDialog.InitialDir'
   LCLVersion = '1.6.2.0'
   object Panel1: TPanel
     Left = 0
@@ -175,6 +176,12 @@ object FormMTS: TFormMTS
     Filter = 'Imagens (jpg, bmp, png)|*.png;*.jpg;*.bmp;*.PNG;*.JPG;*.BMP|Som (wav)|*.wav;*.WAV'
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
     left = 51
+    top = 184
+  end
+  object XMLPropStorage1: TXMLPropStorage
+    StoredValues = <>
+    FileName = 'session.xml'
+    left = 176
     top = 184
   end
 end

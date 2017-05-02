@@ -14,7 +14,7 @@ unit userconfigs_go_nogo;
 interface
 
 uses LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics,
-     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList, ExtDlgs, Grids
+     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList, ExtDlgs, Grids, XMLPropStorage
      , response_key
      ;
 
@@ -50,6 +50,7 @@ type
       SpinPresentations: TSpinEdit;
       SpinSize: TSpinEdit;
       SpinLimitedHold: TSpinEdit;
+      XMLPropStorage1: TXMLPropStorage;
       procedure btnMinimizeTopTabClick(Sender: TObject);
       procedure ButtonClick(Sender: TObject);
       procedure cbPreviewChange(Sender: TObject);

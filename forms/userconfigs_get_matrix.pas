@@ -14,7 +14,7 @@ unit userconfigs_get_matrix;
 interface
 
 uses LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics,
-     Controls, Forms, Dialogs, StdCtrls, ExtCtrls, Menus
+     Controls, Forms, Dialogs, StdCtrls, ExtCtrls, Menus, XMLPropStorage
 
      , criatore
      , constants
@@ -59,6 +59,7 @@ type
     PanelMain: TPanel;
     puMenu: TPopupMenu;
     SaveDialog1: TSaveDialog;
+    XMLPropStorage1: TXMLPropStorage;
     procedure btnOKClick(Sender: TObject);
     procedure edtDistxEditingDone(Sender: TObject);
     procedure edtRowChange(Sender: TObject);

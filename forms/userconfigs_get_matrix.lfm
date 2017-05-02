@@ -368,4 +368,10 @@ object FormMatrixConfig: TFormMatrixConfig
     left = 32
     top = 16
   end
+  object XMLPropStorage1: TXMLPropStorage
+    StoredValues = <>
+    FileName = 'session.xml'
+    left = 112
+    top = 72
+  end
 end
