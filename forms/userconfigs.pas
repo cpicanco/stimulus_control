@@ -152,8 +152,8 @@ type
     FConfigs : TCfgSes;
     FAudioDevice : TBassAudioDevice;
     FEscriba : TEscriba;
-    FGuiMain : TGuiMain;
-    FGuiBloc : TGuiBloc;
+    //FGuiMain : TGuiMain;
+    //FGuiBloc : TGuiBloc;
     function MeetCondition(aCol, aRow : integer): boolean;
     function SaneConstraints: Boolean;
     function RepetitionBlocksMeetsConstraints(ALowRow,AHighRow:integer) : Boolean;
@@ -183,6 +183,7 @@ uses background, strutils
      , userconfigs_mts
      , userconfigs_blocs
      , userconfigs_positions
+     , userconfigs_get_matrix
      , versioning_git
      , versioning_lazarus
      , constants
@@ -210,7 +211,6 @@ procedure TFormUserConfig.piClick(Sender: TObject);
 begin
   if (TMenuItem(Sender) = piAxes) and (btnGridType.Caption <> rsFillTypeAxes) then
     begin
-      StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeAxes;
       SetGridHeader(StringGrid1,rsFillTypeAxes);
       ResetRepetionMatrix;
@@ -218,7 +218,6 @@ begin
 
   if (TMenuItem(Sender) = piFPE) and (btnGridType.Caption <> rsFillTypeMatriz) then
     begin
-      StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeMatriz;
       SetGridHeader(StringGrid1,rsFillTypeMatriz);
       ResetRepetionMatrix;
@@ -226,25 +225,29 @@ begin
 
   if (TMenuItem(Sender) = piGo_NoGo) and (btnGridType.Caption <> rsFillTypeGoNoGo) then
     begin
-      StringGrid1.Clean;
       btnGridType.Caption := rsFillTypeGoNoGo;
       SetGridHeader(StringGrid1,rsFillTypeGoNoGo);
       ResetRepetionMatrix;
     end;
 
-  if (TMenuItem(Sender) = piMTS) and (btnGridType.Caption <> rsFillTypeMTS) then
-      begin
-        StringGrid1.Clean;
-        btnGridType.Caption := rsFillTypeMTS;
-        SetGridHeader(StringGrid1,rsFillTypeMTS);
-        ResetRepetionMatrix;
-      end;
+  if TMenuItem(Sender) = piMTS then
+    begin
+      if btnGridType.Caption <> rsFillTypeMTS then
+        begin
+          btnGridType.Caption := rsFillTypeMTS;
+          SetGridHeader(StringGrid1,rsFillTypeMTS);
+          ResetRepetionMatrix;
+          FormMTS := TFormMTS.Create(Application);
+        end;
+    end
+  else
+    if Assigned(FormMTS) then
+      FormMTS.Free;
 
   if TMenuItem(Sender) = piBlocChaining then
     begin
       if btnGridType.Caption <> rsFillTypeBlocChaining then
         begin
-          StringGrid1.Clean;
           btnGridType.Caption := rsFillTypeBlocChaining;
           SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
           ResetRepetionMatrix;
@@ -368,12 +371,19 @@ begin
     StringGrid1.LoadFromCSVFile('stringgrid.csv',',',True,0,False);
   if btnGridType.Caption = rsFillTypeBlocChaining then
     CreateFormBloc;
+  if btnGridType.Caption = rsFillTypeMTS then
+    begin
+      FormMTS := TFormMTS.Create(Application);
+      // todo: Load stringgrid objects
+    end;
   ResetRepetionMatrix;
 end;
 
 procedure TFormUserConfig.XMLPropStorage1SaveProperties(Sender: TObject);
 begin
   StringGrid1.SaveToCSVFile('stringgrid.csv');
+  if btnGridType.Caption = rsFillTypeMTS then
+    SetGridHeader(StringGrid1,rsFillTypeMTS);
 end;
 
 function TFormUserConfig.MeetCondition(aCol, aRow : integer): boolean;
@@ -929,6 +939,38 @@ begin
       FreeDefaults;
     end;
 
+  if piMTS.Checked then
+    begin
+      SetupDefaultsFromGui;
+
+      FormMatrixConfig := TFormMatrixConfig.Create(Application);
+      FormMatrixConfig.btnShowMatrix.Click;
+      if FormMatrixConfig.ShowModal = mrOK then
+        begin;
+          //FormMTS.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
+          FormRandomizePositions := TFormRandomizePositions.Create(Application);
+          FormRandomizePositions.LoadPositionsFromFile(LAST_BLOC_INIFILE_PATH,1,FormMatrixConfig.Positions);
+          FormRandomizePositions.btnRandomize.Click;
+          if FormRandomizePositions.ShowModal = mrOK then
+            begin
+              FormRandomizePositions.Free;
+            end
+          else
+            begin
+              FormRandomizePositions.Free;
+              Exit;
+            end;
+          FormMatrixConfig.Free;
+        end
+      else
+        begin
+          FormMatrixConfig.Free;
+          Exit;
+        end;
+      Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
+      FreeDefaults;
+    end;
+
   if piBlocChaining.Checked then
     begin
       SetupDefaultsFromGui;
@@ -1159,12 +1201,11 @@ begin
 
   if piMTS.Checked then
     begin
-      FormMTS := TFormMTS.Create(Application);
       FormMTS.MonitorToShow := GGlobalContainer.MonitorToShow;
       if FormMTS.ShowModal = mrOK then
         begin
           FormMTS.AddTrialsToGui(StringGrid1);
-          FormMTS.Free;
+          FormMTS.Hide;
           ResetRepetionMatrix;
           FLastFocusedCol := -1;
         end;
@@ -1262,9 +1303,6 @@ begin
 
   if OpenDialog1.Execute then
     begin
-      //FormRandomizePositions := TFormRandomizePositions.Create(Self);
-      //FormRandomizePositions.LoadPositionsFromFile(OpenDialog1.Filename,1);
-      //FormRandomizePositions.ShowModal;
       FrmBackground.Show;
       FrmBackground.SetFullScreen(True);
 
