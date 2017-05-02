@@ -96,7 +96,6 @@ type
     FString     : TStringList;
     FOutputString : TStrings;
   strict protected
-    procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormPaint(Sender: TObject);
     //Panel
     procedure FocusPanel(Sender : TPanel);
@@ -109,7 +108,7 @@ type
     procedure SetPanelSizePosition (X, Y, W, H : Integer);
     procedure SetPanelFeatures (Count : Integer);
   public
-    constructor Create(aBackGround : TForm; OutputStrings : TStrings);
+    constructor Create(aBackGround : TForm); virtual; reintroduce;
     destructor Destroy; override;
     procedure ClearAll;
     procedure SetVariables (SDistx, SDisty, SsW, SsH, Sni, Snj, SLeft, STop: string);
@@ -117,6 +116,7 @@ type
     property BackGround : TForm read FBackGround write FBackGround;
     property Distribuido : Boolean read FDistribuir write FDistribuir;
     property Items : TStringList read FString write FString;
+    property OutputItems : TStrings read FOutputString write FOutputString;
     property OnDraw : TNotifyEvent read FOnDraw write FOnDraw;
     property OnChange : TNotifyEvent read FOnChange write FOnChange;
   end;
@@ -130,7 +130,7 @@ type
     procedure GetCoordenatesFromForm (Sender: TObject);
     procedure DrawPositionsToForm (ArraySize : Integer);
   public
-    constructor Create (aBackGround : TForm; OutputStrings : TStrings);
+    constructor Create (aBackGround : TForm); override;
     //procedure SetWriter (Escritor : TEscriba);
     function GetPositions : TPositions;
     procedure RandomizePositions (CanDraw : Boolean);
@@ -266,10 +266,11 @@ begin
 end;
 
 destructor TPointer.Destroy;
-var i : integer;
+//var i : integer;
 begin
-  for i := 0 to 1 do
-    FCorner[i].Free;
+  //for i := 0 to 1 do
+  //  if Assigned(FCorner[i]) then
+  //    FCorner[i].Free;
   inherited Destroy;
 end;
 
@@ -283,19 +284,23 @@ begin
   FCorner[1].BringToFront;
 end;
 
-constructor TDrawCoordenates.Create(aBackGround : TForm; OutputStrings : TStrings);
+constructor TDrawCoordenates.Create(aBackGround : TForm);
 begin
+  inherited Create;
   FPointer := TPointer.Create(aBackGround);
   BackGround := aBackGround;
   SetBackGroundFeatures;
-  FOutputString := OutputStrings;
   FString := TStringList.Create;
 end;
 
 destructor TDrawCoordenates.Destroy;
 begin
-  FString.Free;
-  FPointer.Free;
+  if Assigned(FString) then
+    FString.Free;
+
+  if Assigned(FPointer) then
+    FPointer.Free;
+
   ClearAll;
   inherited Destroy;
 end;
@@ -312,9 +317,12 @@ begin
         begin
           if Components[i] is TPanel then
             begin
-              LIsClean := False;
-              TPanel(Components[i]).Free;
-              Break;
+              if TPanel(Components[i]).Name <> 'PanelMain' then
+                begin
+                  LIsClean := False;
+                  TPanel(Components[i]).Free;
+                  Break;
+                end;
             end;
         end;
     until LIsClean;
@@ -366,7 +374,7 @@ begin
             end;
         end;
     end;
-  if Assigned(OnDraw) then FOnDraw(Self);
+  if Assigned(OnDraw) then OnDraw(Self);
 end;
 
 procedure TDrawCoordenates.FocusPanel(Sender: TPanel);
@@ -376,15 +384,6 @@ begin
       FPanel := TPanel(Sender);
       FPointer.AnchorToControl(FPanel);
     end;
-end;
-
-procedure TDrawCoordenates.FormKeyPress(Sender: TObject; var Key: char);
-var i : integer;
-begin
-  if key = #32 then
-    for i := 0 to Application.ComponentCount -1 do
-      if Application.Components[i].ClassName = 'TMatrixConfigForm' then
-        TForm(Application.Components[i]).BringToFront;
 end;
 
 procedure TDrawCoordenates.FormPaint(Sender: TObject);
@@ -448,9 +447,9 @@ begin
   s1 := IntToStr(TPanel(Sender).Top)    + #32 +
         IntToStr(TPanel(Sender).Left)   + #32 +
         IntToStr(TPanel(Sender).Width)  + #32 +
-        IntToStr(TPanel(Sender).Height) + '*';
+        IntToStr(TPanel(Sender).Height);
   TPanel(Sender).Hint := s1;
-  FOutputString.Strings[TPanel(Sender).Tag - 1] := s1;
+  FOutputString.Values[IntToStr(TPanel(Sender).Tag)] := s1;
   FPointer.MoveToControl(TPanel(Sender));
 end;
 
@@ -500,7 +499,6 @@ end;
 procedure TDrawCoordenates.SetBackGroundFeatures;
 begin
   BackGround.OnPaint := @FormPaint;
-  BackGround.OnKeyPress := @FormKeyPress;
 end;
 
 procedure TDrawCoordenates.SetPanelFeatures(Count: Integer);
@@ -531,7 +529,7 @@ begin
   FPanel.Hint := IntToStr(X) + #32 + IntToStr(Y) + #32 + IntToStr(W) + #32 + IntToStr(H);
   FPanel.Visible := True;
 
-  FString.Add(Format('%d %d %d %d', [X, Y, W, H]));
+  FString.Values[IntToStr(FPanel.Tag)]:= Format('%d %d %d %d', [X, Y, W, H]);
 end;
 
 procedure TDrawCoordenates.SetVariables(SDistx, SDisty, SsW, SsH, Sni, Snj, SLeft, STop: string);
@@ -577,9 +575,9 @@ end;
 { TAleatorizator }
 
 
-constructor TAleatorizator.Create(aBackGround : TForm; OutputStrings : TStrings);
+constructor TAleatorizator.Create(aBackGround : TForm);
 begin
-  inherited Create(aBackGround, OutputStrings);
+  inherited Create(aBackGround);
   OnDraw := @GetPositionsFromForm;
   OnChange := @GetCoordenatesFromForm;
   SetLength(FPositions, 0);
@@ -614,15 +612,16 @@ begin
   with BackGround do
     for i := 0 to ComponentCount - 1 do
         if Components[i] is TPanel then
-          begin
-            FPositions[count].Index := Components[i].Tag;
-            FPositions[count].Top := TPanel(Components[i]).Top;
-            FPositions[count].Left := TPanel(Components[i]).Left;
-            FPositions[count].Width := TPanel(Components[i]).Width;
-            FPositions[count].Height := TPanel(Components[i]).Height;
-            Inc(count);
-          end;
-  end;
+          if TPanel(Components[i]).Name <> 'PanelMain' then
+            begin
+              FPositions[count].Index := Components[i].Tag;
+              FPositions[count].Top := TPanel(Components[i]).Top;
+              FPositions[count].Left := TPanel(Components[i]).Left;
+              FPositions[count].Width := TPanel(Components[i]).Width;
+              FPositions[count].Height := TPanel(Components[i]).Height;
+              Inc(count);
+            end;
+end;
 
 function TAleatorizator.GetPositions: TPositions;
 begin
@@ -637,11 +636,15 @@ begin
   count := 0;
   with BackGround do
     for i := 0 to ComponentCount - 1 do
-      if Components[i] is TPanel then Inc(Count);
+      if Components[i] is TPanel then
+        if TPanel(Components[i]).Name <> 'PanelMain' then
+          Inc(Count);
+
   if Count > 0 then
     begin
       SetLength(FPositions, Count);
-      if Assigned(OnChange) then FOnChange(Sender);
+      if Assigned(OnChange) then
+        OnChange(Sender);
     end;
   FPointer.Visible := True;
 end;
