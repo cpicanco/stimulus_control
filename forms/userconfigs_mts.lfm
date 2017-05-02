@@ -181,6 +181,7 @@ object FormMTS: TFormMTS
   object XMLPropStorage1: TXMLPropStorage
     StoredValues = <>
     FileName = 'session.xml'
+    OnRestoreProperties = XMLPropStorage1RestoreProperties
     left = 176
     top = 184
   end

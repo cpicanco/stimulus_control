@@ -60,6 +60,7 @@ type
       procedure PreviewTimerTimer(Sender: TObject);
       procedure SpinLimitedHoldEditingDone(Sender: TObject);
       procedure SpinSizeEditingDone(Sender: TObject);
+      procedure XMLPropStorage1RestoreProperties(Sender: TObject);
     private
       FStimulus : TKey;
       FFullScreen : Boolean;
@@ -161,8 +162,13 @@ begin
     begin
       Width := SpinSize.Value;
       Height := SpinSize.Value;
-      FStimulus.Centralize;
+      Centralize;
     end;
+end;
+
+procedure TFormGo_NoGo.XMLPropStorage1RestoreProperties(Sender: TObject);
+begin
+  SpinSizeEditingDone(Sender);
 end;
 
 procedure TFormGo_NoGo.SetMonitor(AValue: integer);

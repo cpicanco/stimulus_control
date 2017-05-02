@@ -242,6 +242,7 @@ object FormGo_NoGo: TFormGo_NoGo
   object XMLPropStorage1: TXMLPropStorage
     StoredValues = <>
     FileName = 'session.xml'
+    OnRestoreProperties = XMLPropStorage1RestoreProperties
     left = 264
     top = 176
   end

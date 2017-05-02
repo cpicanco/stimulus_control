@@ -56,6 +56,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SpinComparisonsEditingDone(Sender: TObject);
+    procedure XMLPropStorage1RestoreProperties(Sender: TObject);
   private
     FMonitor: integer;
     FTrial : TSimpleMTSTRial;
@@ -140,6 +141,11 @@ begin
 end;
 
 procedure TFormMTS.SpinComparisonsEditingDone(Sender: TObject);
+begin
+  UpdateComparisons(FTrial);
+end;
+
+procedure TFormMTS.XMLPropStorage1RestoreProperties(Sender: TObject);
 begin
   UpdateComparisons(FTrial);
 end;
