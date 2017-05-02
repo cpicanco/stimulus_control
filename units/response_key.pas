@@ -53,6 +53,7 @@ type
     FOnEndMedia: TNotifyEvent;
     procedure AutoDestroy(Sender: TObject);
     procedure Consequence(Sender: TObject);
+    function GetShortName: string;
     procedure Response(Sender: TObject);
     procedure KeyMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -73,6 +74,7 @@ type
     property Kind: TKind read FKind;
     property LastResponseLog : string read FLastResponseLog;
     property ResponseCount : integer read FResponseCount;
+    property ShortName : string read GetShortName;
   public
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
@@ -85,6 +87,8 @@ type
   end;
 
 implementation
+
+uses FileUtil;
 
 constructor TKey.Create(AOwner: TComponent);
 begin
@@ -439,6 +443,14 @@ end;
 procedure TKey.Consequence(Sender: TObject);
 begin
   if Assigned(OnConsequence) then FOnConsequence(Self);   //Necessariamente Self
+end;
+
+function TKey.GetShortName: string;
+begin
+  if FullPath = '' then
+    Result := 'NA'
+  else
+    Result := ExtractFileNameWithoutExt(ExtractFileNameOnly(FullPath));
 end;
 
 procedure TKey.Response(Sender: TObject);
