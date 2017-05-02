@@ -17,12 +17,20 @@ NumTrials=	5 1
 [Blc 1 - T1]
 Name=	M1
 Kind=	MSG
-Msg=	This is a test 1
+Msg=	Calibration will start.
 
 [Blc 1 - T2]
 Name=	C1
 Kind=	CLB
 Cursor=	-1
+Blocking= TRUE
+ShowDots= TRUE
+NumComp= 5
+C1Bnd=9 10 50
+C2Bnd=9 1220 50
+C3Bnd=359 615 50
+C4Bnd=709 10 50
+C5Bnd=709 1220 50
 
 [Blc 1 - T3]
 
