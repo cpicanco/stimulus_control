@@ -13,7 +13,7 @@ unit trial_calibration;
 
 interface
 
-uses LCLIntf, Classes, SysUtils
+uses LCLIntf, LCLType, Classes, SysUtils
     , pupil_communication
     , trial_abstract
     , Graphics
@@ -82,7 +82,9 @@ procedure TCLB.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (ssCtrl in Shift) and (key = 67) { c } then
     if GlobalContainer.PupilEnabled then
-      StartPupilCalibration;
+      StartPupilCalibration
+    else
+      EndTrial(Self);
 end;
 
 procedure TCLB.StartPupilCalibration;
@@ -118,6 +120,10 @@ end;
 procedure TCLB.TrialPaint;
 var
   aleft, atop, asize, i : integer;
+  LRect: TRect;
+  S: String;
+  Sw : integer = 0;
+  Sh : integer = 0;
 begin
   if FShowDots then
     with Canvas do
@@ -129,7 +135,16 @@ begin
               atop  := Y;
               asize := Size;
             end;
-          Ellipse(Rect(aleft, atop, aleft + asize, atop + asize));
+          S := IntToStr(i+1);
+          LRect := Rect(aleft, atop, aleft + asize, atop + asize);
+          Brush.Style:=bsSolid;
+          Ellipse(LRect);
+
+          GetTextSize(S, Sw, Sh);
+          aLeft := LRect.Left+(asize div 2)-(Sw div 2);
+          aTop := LRect.Top+(asize div 2)-(Sh div 2);
+          Brush.Style:=bsClear;
+          TextOut(aleft,atop,S);
         end;
 end;
 
@@ -155,6 +170,7 @@ begin
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
+  OnTrialPaint:=@TrialPaint;
   FShowDots := False;
 
   with Canvas do
@@ -164,7 +180,10 @@ begin
 
       Brush.Style := bsSolid;
       Pen.Style   := psSolid;
-      Pen.Mode    := pmBlack;
+      //Pen.Mode    := pmBlack;
+
+      Font.Size:=20;
+      Font.Color:=clWhite;
     end;
 
   Header := 'StmBegin' + #9 +
