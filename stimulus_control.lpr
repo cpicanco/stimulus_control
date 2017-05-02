@@ -25,7 +25,7 @@ uses
   , Forms
 
   //Forms
-  , userconfigs, userconfigs_mts, config_session_gui_comparison
+  , userconfigs,
   ;
 
 {$R *.res}

@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <RevisionNr Value="4"/>
-      <BuildNr Value="2"/>
+      <BuildNr Value="3"/>
       <Language Value="0416"/>
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control" ProductVersion=""/>
     </VersionInfo>
@@ -163,7 +163,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="53">
+    <Units Count="54">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -251,7 +251,7 @@
       <Unit18>
         <Filename Value="forms/userconfigs_get_matrix.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="MatrixConfigForm"/>
+        <ComponentName Value="FormMatrixConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit18>
@@ -400,6 +400,13 @@
         <Filename Value="units/config_session_gui_comparison.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit52>
+      <Unit53>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Frame1"/>
+        <ResourceBaseClass Value="Frame"/>
+        <UnitName Value="Unit1"/>
+      </Unit53>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
