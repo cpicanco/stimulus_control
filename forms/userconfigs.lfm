@@ -3,8 +3,8 @@ object FormUserConfig: TFormUserConfig
   Height = 482
   Top = 129
   Width = 604
-  HorzScrollBar.Page = 590
-  VertScrollBar.Page = 303
+  HorzScrollBar.Page = 533
+  VertScrollBar.Page = 198
   AutoScroll = True
   Caption = 'Configurar'
   ClientHeight = 482
@@ -1621,7 +1621,7 @@ object FormUserConfig: TFormUserConfig
   OnDestroy = FormDestroy
   ParentBiDiMode = False
   Position = poScreenCenter
-  SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Text;EditBlocChainingPath.Text;EditBlocName.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;Height;HorzScrollBar;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;Position;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;VertScrollBar;Width;WindowState;piMTS.Checked'
+  SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Text;EditBlocChainingPath.Text;EditBlocName.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;Height;HorzScrollBar;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piMTS.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;Position;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;VertScrollBar;Width;WindowState;ComboBoxSessionType.ItemIndex;ComboBoxSessionType.Text;EditParticipant.Text;EditSessionName.Text'
   LCLVersion = '1.6.2.0'
   object btnRun: TButton
     Left = 8
@@ -1647,10 +1647,10 @@ object FormUserConfig: TFormUserConfig
     Height = 444
     Top = 0
     Width = 606
-    ActivePage = tbTrials
+    ActivePage = tbGeneral
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 40
-    TabIndex = 3
+    TabIndex = 0
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
@@ -1661,7 +1661,7 @@ object FormUserConfig: TFormUserConfig
       ClientHeight = 411
       ClientWidth = 600
       object LabelSessionName: TLabel
-        Left = 48
+        Left = 25
         Height = 25
         Top = 25
         Width = 127
@@ -1669,7 +1669,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object EditSessionName: TEdit
-        Left = 223
+        Left = 177
         Height = 25
         Top = 25
         Width = 400
@@ -1678,7 +1678,7 @@ object FormUserConfig: TFormUserConfig
         Text = 'Sessão 1'
       end
       object LabelParticipant: TLabel
-        Left = 48
+        Left = 25
         Height = 25
         Top = 50
         Width = 127
@@ -1686,7 +1686,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object EditParticipant: TEdit
-        Left = 223
+        Left = 177
         Height = 25
         Top = 50
         Width = 400
@@ -1695,7 +1695,7 @@ object FormUserConfig: TFormUserConfig
         Text = 'Participante 1'
       end
       object LabelSessionType: TLabel
-        Left = 48
+        Left = 25
         Height = 25
         Top = 75
         Width = 127
@@ -1703,8 +1703,8 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object ComboBoxSessionType: TComboBox
-        Left = 223
-        Height = 23
+        Left = 177
+        Height = 25
         Top = 75
         Width = 400
         Constraints.MinWidth = 400
