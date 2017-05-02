@@ -14,6 +14,7 @@ object FormMatrixConfig: TFormMatrixConfig
   Font.Name = 'Tahoma'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyUp = FormKeyUp
   OnMouseDown = FormMouseDown
   SessionProperties = 'chkCustomResolution.Checked;chkPlotEquallySpaced.Checked;chkPlotProportional.Checked;edtCol.Text;edtDistx.Text;edtDisty.Text;edtHeight.Text;edtRow.Text;edtScreenLeft.Text;edtScreenTop.Text;edtWidth.Text'
   LCLVersion = '1.6.2.0'

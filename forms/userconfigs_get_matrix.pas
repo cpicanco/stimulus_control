@@ -77,6 +77,7 @@ type
     procedure edtWidthEditingDone(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure lbCoordenadasEndDock(Sender, Target: TObject; X, Y: Integer);
@@ -280,6 +281,17 @@ procedure TFormMatrixConfig.FormDestroy(Sender: TObject);
 begin
   if Assigned(FDrawCoordenates) then
     FDrawCoordenates.Free;
+end;
+
+procedure TFormMatrixConfig.FormKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Sender is TForm then
+    if Key = 122 {F11} then
+      if TForm(Sender).WindowState = wsFullScreen then
+        TForm(Sender).WindowState := wsMaximized
+      else
+        TForm(Sender).WindowState := wsFullScreen;
 end;
 
 procedure TFormMatrixConfig.FormMouseDown(Sender: TObject;
