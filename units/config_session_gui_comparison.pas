@@ -20,8 +20,6 @@ uses
 
 type
 
-  { TGUIKey }
-
   { TGUIKeySettings }
 
   TGUIKeySettings = class(TGroupBox)
@@ -84,6 +82,7 @@ type
   public
     constructor Create(AOwner: TComponent; ASample : Boolean = False); reintroduce;
     procedure Show; reintroduce;
+    procedure UpdateToConfigList;
     procedure UpdateFromConfigList;
     property IsSample : Boolean read FIsSample;
     property Header : string read GetHeader write SetHeader;
@@ -261,6 +260,7 @@ begin
   FIsSample:=ASample;
   SetHeader(0);
   AutoSize := True;
+  ShowHint:=True;
   with ChildSizing do
     begin
   	  ControlsPerLine := 1;
@@ -281,14 +281,14 @@ begin
   with LabelSFilename do
     begin
       Caption := rsFilename;
+      Hint:='Qual o arquivo de estímulo?';
       Parent := GBStimulus;
     end;
 
   EditSFilename := TEdit.Create(Self);
   with EditSFilename do
     begin
-      ShowHint:=True;
-      Hint:='Clique duas vezes para abrir o arquivo';
+      Hint:='Clique duas vezes para abrir o arquivo.';
       Parent := GBStimulus;
       OnDblClick:=@FileNameDblClick;
     end;
@@ -299,6 +299,7 @@ begin
   with LabelSRepeat do
     begin
       Caption := rsMediaSound;
+      Hint:='Como o arquivo (som) deve ser apresentado?';
       Parent := GBStimulus;
     end;
 
@@ -320,6 +321,7 @@ begin
   with LabelSColor do
     begin
       Caption := rsColor;
+      Hint:='Cor da janela do estímulo caso o arquivo de estímulo não seja encontrado.';
       Parent := GBStimulus;
     end;
 
@@ -342,6 +344,7 @@ begin
   with LabelSchedule do
     begin
       Caption := rsSchedule;
+      Hint:='Qual a exigência da resposta ao estimulo?';
       Parent := GBResponse;
     end;
 
@@ -367,6 +370,7 @@ begin
       with LabelSampleStyle do
         begin
           Caption := rsStyle;
+          Hint:='Qual o formato de apresentação do modelo?';
           Parent := GBConseque;
         end;
 
@@ -388,6 +392,7 @@ begin
       with LabelSampleDelay do
         begin
           Caption := rsDelay;
+          Hint:='Tempo entre a remoção do modelo e a apresentação das comparações, em milisegundos';
           Parent := GBConseque;
         end;
 
@@ -408,13 +413,14 @@ begin
       with LabelResult do
         begin
           Caption := rsCount;
+          Hint := 'O que a resposta ao estímulo contabilizará?';
           Parent := GBConseque;
         end;
 
       ComboResult := TComboBox.Create(Self);
       with ComboResult do
         begin
-          Items.Append('Indiferente'); // 0
+          Items.Append('Nada'); // 0
           Items.Append('Acerto'); // 1
           Items.Append('Erro'); // 2
           ItemIndex:=0;
@@ -430,14 +436,14 @@ begin
       with LabelCFilename do
         begin
           Caption := rsFilename;
+          Hint := 'Apresentar uma consequência após a resposta ao estímulo?';
           Parent := GBConseque;
         end;
 
       EditCFilename := TEdit.Create(Self);
       with EditCFilename do
         begin
-          ShowHint:=True;
-          Hint:='Deixe vazio para usar o padrão. Clique duas vezes para customizar';
+          Hint:='Deixe vazio para usar o padrão para acerto e erro. Clique duas vezes para customizar';
           OnDblClick:=@FileNameDblClick;
           Parent := GBConseque;
         end;
@@ -448,6 +454,7 @@ begin
       with LabelCRepeat do
         begin
           Caption := rsMediaSound;
+          Hint := 'Como o arquivo (som) deve ser apresentado?';
           Parent := GBConseque;
         end;
 
@@ -465,28 +472,11 @@ begin
 
       //////////////////////////////////////////////////////////////////////////////
 
-      LabelConsequenceDuration := TLabel.Create(Self);
-      with LabelConsequenceDuration do
-        begin
-          Caption := rsDuration;
-          Parent := GBConseque;
-        end;
-
-      EditConsequenceDuration := TEdit.Create(Self);
-      with EditConsequenceDuration do
-        begin
-          ShowHint:=True;
-          Hint:='Duração da consequência antes do IET, em milisegundos';
-          Parent := GBConseque;
-          OnEditingDone:=@ControlEditingDone;
-        end;
-
-      //////////////////////////////////////////////////////////////////////////////
-
       LabelCColor := TLabel.Create(Self);
       with LabelCColor do
         begin
           Caption := rsColor;
+          Hint := 'Cor da janela da consequência caso o arquivo não seja encontrado';
           Parent := GBConseque;
         end;
 
@@ -500,10 +490,30 @@ begin
 
       //////////////////////////////////////////////////////////////////////////////
 
+      LabelConsequenceDuration := TLabel.Create(Self);
+      with LabelConsequenceDuration do
+        begin
+          Caption := rsDuration;
+          Hint:='Duração da consequência (antes do IET) em milisegundos';
+          Parent := GBConseque;
+        end;
+
+      EditConsequenceDuration := TEdit.Create(Self);
+      with EditConsequenceDuration do
+        begin
+          ShowHint:=True;
+          Hint:='Duração da consequência (antes do IET) em milisegundos';
+          Parent := GBConseque;
+          OnEditingDone:=@ControlEditingDone;
+        end;
+
+      //////////////////////////////////////////////////////////////////////////////
+
       LabelNextTrial := TLabel.Create(Self);
       with LabelNextTrial do
         begin
           Caption := rsNextTrial;
+          Hint := 'Qual a tentativa seguinte?';
           Parent := GBConseque;
         end;
 
@@ -511,7 +521,7 @@ begin
       with EditNextTrial do
         begin
           ShowHint:=True;
-          Hint:='NXT=seguinte, CRT=correção, 1..N: tentativa especificada';
+          Hint:='vazio, 0 ou NXT=seguinte; CRT=correção; 1..N: tentativa especificada';
           Parent := GBConseque;
           OnEditingDone:=@ControlEditingDone;
         end;
@@ -522,6 +532,7 @@ begin
       with LabelTimeOut do
         begin
           Caption := rsTimeOut;
+          Hint := 'Apresentar Time-Out em tela preta';
           Parent := GBConseque;
         end;
 
@@ -633,6 +644,11 @@ begin
 
       S := ConfigList.Values[_Comp+IntToStr(Tag)+_cIET];
       EditCFilename.Text := ExtractDelimited(1,S,[#32]);
+      if UpperCase(RightStr(EditCFilename.Text,3)) = 'WAV' then
+        ComboCRepeat.Enabled:=True
+      else
+        ComboCRepeat.Enabled:=False;
+
       ComboCRepeat.ItemIndex := StrToIntDef(ExtractDelimited(2,S,[#32]),0);
       ButtonCColor.ButtonColor := StrToIntDef(ExtractDelimited(3,S,[#32]),clRed);
       EditConsequenceDuration.Text := ExtractDelimited(4,S,[#32]);
@@ -640,6 +656,15 @@ begin
       EditNextTrial.Text := ConfigList.Values[_Comp+IntToStr(Tag)+_cNxt];
       EditTimeOut.Text := ConfigList.Values[_Comp+IntToStr(Tag)+_cTO];
     end;
+end;
+
+procedure TGUIKeySettings.UpdateToConfigList;
+var
+  i: Integer;
+begin
+  for i := 0 to ComponentCount-1 do
+    if Components[i] is TLabel then
+      ControlEditingDone(Components[i]);
 end;
 
 end.
