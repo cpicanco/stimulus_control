@@ -22,7 +22,7 @@
       <Language Value="0416"/>
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control" ProductVersion=""/>
     </VersionInfo>
-    <BuildModes Count="4">
+    <BuildModes Count="6">
       <Item1 Name="Linux64Debug" Default="True"/>
       <Item2 Name="Linux64Release">
         <CompilerOptions>
@@ -73,7 +73,72 @@
           </Other>
         </CompilerOptions>
       </Item2>
-      <Item3 Name="Windows64Debug">
+      <Item3 Name="Windows32Debug">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control.exe" ApplyConventions="False"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+            </Debugging>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <CustomOptions Value="-dDEBUG"/>
+          </Other>
+        </CompilerOptions>
+      </Item3>
+      <Item4 Name="Windows32Release">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control.exe" ApplyConventions="False"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/delphizmq;dependency/synaser;dependency/msgpack-delphi"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item4>
+      <Item5 Name="Windows64Debug">
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
@@ -102,8 +167,8 @@
             <CustomOptions Value="-dDEBUG"/>
           </Other>
         </CompilerOptions>
-      </Item3>
-      <Item4 Name="Windows64Release">
+      </Item5>
+      <Item6 Name="Windows64Release">
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
@@ -137,7 +202,7 @@
             </Verbosity>
           </Other>
         </CompilerOptions>
-      </Item4>
+      </Item6>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
@@ -149,21 +214,18 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="4">
+    <RequiredPackages Count="3">
       <Item1>
         <PackageName Value="LazControls"/>
       </Item1>
       <Item2>
-        <PackageName Value="etpackage_dsgn"/>
+        <PackageName Value="etpackage"/>
       </Item2>
       <Item3>
-        <PackageName Value="etpackage"/>
-      </Item3>
-      <Item4>
         <PackageName Value="LCL"/>
-      </Item4>
+      </Item3>
     </RequiredPackages>
-    <Units Count="54">
+    <Units Count="53">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -400,13 +462,6 @@
         <Filename Value="units/config_session_gui_comparison.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit52>
-      <Unit53>
-        <Filename Value="unit1.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="Frame1"/>
-        <ResourceBaseClass Value="Frame"/>
-        <UnitName Value="Unit1"/>
-      </Unit53>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
