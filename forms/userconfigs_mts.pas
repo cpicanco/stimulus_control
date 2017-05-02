@@ -15,7 +15,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, Spin, Grids, ExtDlgs
+  StdCtrls, Spin, Grids
   , config_session_gui_comparison
   , response_key
   ;
@@ -41,20 +41,17 @@ type
     btnClose: TButton;
     btnMinimizeTopTab: TButton;
     btnOk: TButton;
-    cbPreview: TCheckBox;
-    EditDefaultCsqHit: TEdit;
+    EditDefaultCsqHIT: TEdit;
     EditDefaultCsqMISS: TEdit;
     gbStimuli: TGroupBox;
     LabelDefaultCsqHIT: TLabel;
     LabelDefaultCsqMISS: TLabel;
     LabelPresentations: TLabel;
     LabelComparisons: TLabel;
-    LabelSize: TLabel;
     OpenDialog: TOpenDialog;
     Panel1: TPanel;
     SpinPresentations: TSpinEdit;
     SpinComparisons: TSpinEdit;
-    SpinSize: TSpinEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SpinComparisonsEditingDone(Sender: TObject);
@@ -65,11 +62,13 @@ type
     FComparison : TGUIKeySettings;
     procedure SetMonitor(AValue: integer);
     procedure UpdateComparisons(ATrial : TSimpleMTSTrial);
+    procedure SetDefaultsToComparison(AList : TStrings; ATag : integer);
     procedure SetKeyPosition(AKeyUp, AKeyDown : TKey);
     procedure ShowKeySettings(Sender : TObject);
     procedure KeyClick(Sender : TObject);
+    procedure AllEditsDone(Sender : TObject);
   public
-    procedure AddTrialsToGui(AStringGrid : TStringGrid);
+    procedure AddTrialsToGui(ATrialGrid : TStringGrid);
     procedure WriteToDisk(ADefaultMainSection: TStrings; ADefaultBlocSection : TStrings;
             ATrialGrid : TStringGrid; AFilename : string);
     property MonitorToShow : integer read FMonitor write SetMonitor;
@@ -82,7 +81,7 @@ implementation
 
 {$R *.lfm}
 
-uses constants;
+uses constants, config_session_fileutils, LazFileUtils;
 
 { TFormMTS }
 
@@ -102,8 +101,8 @@ begin
       Top:= 300;
       Left:=50;
       OnClick:=@KeyClick;
-      Width:=SpinSize.Value;
-      Height:=SpinSize.Value;
+      Width:=300;
+      Height:=300;
       Tag := 0;
       Color:=clDkGray;
       Edge:=clBlack;
@@ -170,6 +169,7 @@ begin
           Comparisons[LComparisons].List := TStringList.Create;
           Comparisons[LComparisons].Key := TKey.Create(Self);
           Comparisons[LComparisons].Key.Tag := LComparisons+1;
+          SetDefaultsToComparison(Comparisons[LComparisons].List, Comparisons[LComparisons].Key.Tag);
           if LComparisons = 0 then
             SetKeyPosition(nil, Comparisons[LComparisons].Key)
           else
@@ -177,6 +177,20 @@ begin
               SetKeyPosition(Comparisons[LComparisons-1].Key, Comparisons[LComparisons].Key)
         end;
 
+    end;
+end;
+
+procedure TFormMTS.SetDefaultsToComparison(AList: TStrings; ATag: integer);
+begin
+  if ATag = 1 then
+    begin
+      AList.Values[_Comp+IntToStr(ATag)+_cIET] := EditDefaultCsqHIT.Text;
+      AList.Values[_Comp+IntToStr(ATag)+_cRes] := T_HIT;
+    end
+  else
+    begin
+      AList.Values[_Comp+IntToStr(ATag)+_cIET] := EditDefaultCsqMISS.Text;
+      AList.Values[_Comp+IntToStr(ATag)+_cRes] := T_MISS;
     end;
 end;
 
@@ -192,8 +206,8 @@ begin
     begin
       Left := FTrial.Sample.Key.Left + FTrial.Sample.Key.Width + 50;
       ShowHint:=True;
-      Width:=SpinSize.Value;
-      Height:=SpinSize.Value;
+      Width := 300;
+      Height := 300;
       Edge:= clBlack;
       OnClick:=@KeyClick;
       if Tag = 1 then
@@ -240,6 +254,7 @@ begin
           FSample.Left:=TKey(Sender).BoundsRect.Right+25;
           FSample.ResponseKey := FTrial.Sample.Key;
           FSample.ConfigList := FTrial.Sample.List;
+          FSample.BringToFront;
           FSample.Show;
         end;
 
@@ -250,6 +265,7 @@ begin
           FComparison.ConfigList := FTrial.Comparisons[ATag-1].List;
           FComparison.Tag:=ATag;
           FComparison.ResponseKey := TKey(Sender);//FTrial.Comparisons[ATag-1].Key;
+          FComparison.BringToFront;
           FComparison.Show;
         end;
     end;
@@ -261,14 +277,66 @@ begin
     end;
 end;
 
-procedure TFormMTS.AddTrialsToGui(AStringGrid: TStringGrid);
+procedure TFormMTS.AllEditsDone(Sender: TObject);
 begin
+  TEdit(Sender).Text := TEdit(Sender).Text + ' 0 0 1000';
+end;
 
+procedure TFormMTS.AddTrialsToGui(ATrialGrid: TStringGrid);
+var
+  LRow, i: Integer;
+begin
+  with ATrialGrid do
+    begin
+      LRow := RowCount-1;
+      for i := 0 to SpinPresentations.Value-1 do
+        begin
+          if (LRow + 1) > RowCount then
+            RowCount := LRow + 1;
+
+          Cells[0, LRow] := IntToStr(LRow);
+          Objects[0, LRow] := FTrial;
+          Cells[1, LRow] := FTrial.Sample.Key.ShortName+'->'+FTrial.Comparisons[0].Key.ShortName;
+          Cells[2, LRow] := FTrial.Comparisons[0].List.Values[_Comp+'1'+_cRes];
+          Inc(LRow);
+        end;
+    end;
 end;
 
 procedure TFormMTS.WriteToDisk(ADefaultMainSection: TStrings;
   ADefaultBlocSection: TStrings; ATrialGrid: TStringGrid; AFilename: string);
+var
+  LRow , i: integer;
+  FNewBloc : TConfigurationFile;
+  LTrial : TSimpleMTSTrial;
 begin
+  if FileExistsUTF8(AFilename) then
+    DeleteFileUTF8(AFilename);
+  FNewBloc := TConfigurationFile.Create(AFilename);
+  FNewBloc.CacheUpdates:=True;
+  FNewBloc.WriteMain(ADefaultMainSection);
+  FNewBloc.WriteBlocIfEmpty(1,ADefaultBlocSection);
+  with ATrialGrid do
+    for LRow := 1 to RowCount-1 do
+      begin
+        LTrial := TSimpleMTSTrial(Objects[0,LRow]);
+        with LTrial do
+          begin
+            FNewBloc.WriteToTrial(LRow,_Kind, T_MTS);
+            FNewBloc.WriteToTrial(LRow,_Name, Cells[1, LRow]);
+            FNewBloc.WriteToTrial(LRow, Sample.List);
+            FNewBloc.WriteToTrial(LRow,_NumComp,IntToStr(Length(Comparisons)));
+            for i := Low(Comparisons) to High(Comparisons) do
+              FNewBloc.WriteToTrial(LRow, Comparisons[i].List);
+          end;
+      end;
+
+  // update numblc and numtrials
+  FNewBloc.Invalidate;
+
+  // Save changes to disk
+  FNewBloc.UpdateFile;
+  FNewBloc.Free;
 
 end;
 
