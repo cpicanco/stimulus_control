@@ -3,8 +3,8 @@ object FormUserConfig: TFormUserConfig
   Height = 482
   Top = 129
   Width = 604
-  HorzScrollBar.Page = 434
-  VertScrollBar.Page = 368
+  HorzScrollBar.Page = 590
+  VertScrollBar.Page = 303
   AutoScroll = True
   Caption = 'Configurar'
   ClientHeight = 482
@@ -1647,10 +1647,10 @@ object FormUserConfig: TFormUserConfig
     Height = 444
     Top = 0
     Width = 606
-    ActivePage = tbBlocs
+    ActivePage = tbTrials
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 40
-    TabIndex = 2
+    TabIndex = 3
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
@@ -1874,7 +1874,7 @@ object FormUserConfig: TFormUserConfig
       end
       object LabelBlocCounter: TLabel
         Left = 58
-        Height = 25
+        Height = 23
         Top = 225
         Width = 178
         Caption = 'LabelBlocCounter'
@@ -1882,7 +1882,7 @@ object FormUserConfig: TFormUserConfig
       end
       object ComboBoxBlocCounter: TComboBox
         Left = 294
-        Height = 25
+        Height = 23
         Top = 225
         Width = 250
         ItemHeight = 0
@@ -1898,7 +1898,7 @@ object FormUserConfig: TFormUserConfig
       object LabelBlocBkGnd: TLabel
         Left = 58
         Height = 20
-        Top = 250
+        Top = 248
         Width = 178
         Caption = 'LabelBlocBkGnd'
         ParentColor = False
@@ -1906,7 +1906,7 @@ object FormUserConfig: TFormUserConfig
       object ColorButtonBloc: TColorButton
         Left = 294
         Height = 20
-        Top = 250
+        Top = 248
         Width = 250
         BorderWidth = 2
         ButtonColorSize = 16

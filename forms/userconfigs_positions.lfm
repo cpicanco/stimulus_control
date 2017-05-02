@@ -1,16 +1,14 @@
 object FormRandomizePositions: TFormRandomizePositions
-  Left = 0
+  Left = 20
   Height = 256
-  Top = 29
+  Top = 142
   Width = 823
-  HorzScrollBar.Page = 688
-  VertScrollBar.Page = 64
-  ActiveControl = btnRand
+  HorzScrollBar.Page = 526
+  VertScrollBar.Page = 63
   AutoScroll = True
-  Caption = 'Aleatorizar posições'
+  Caption = 'Aleatorizar posições dos estímulos'
   ClientHeight = 256
   ClientWidth = 823
-  Color = clBtnFace
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
@@ -18,6 +16,7 @@ object FormRandomizePositions: TFormRandomizePositions
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '1.6.2.0'
+  WindowState = wsMaximized
   object LabelGap: TLabel
     Left = 358
     Height = 13
@@ -25,6 +24,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Width = 34
     Caption = 'e Pular'
     ParentColor = False
+    Visible = False
   end
   object LabelSeqToWrite: TLabel
     Left = 218
@@ -33,6 +33,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Width = 54
     Caption = 'Aleatorizar'
     ParentColor = False
+    Visible = False
   end
   object LabelBeginAt: TLabel
     Left = 218
@@ -57,14 +58,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Width = 32
     Caption = 'linhas.'
     ParentColor = False
-  end
-  object LabelNumPos: TLabel
-    Left = 78
-    Height = 13
-    Top = 44
-    Width = 60
-    Caption = 'Nº Posições:'
-    ParentColor = False
+    Visible = False
   end
   object LabelTrial: TLabel
     Left = 479
@@ -74,13 +68,15 @@ object FormRandomizePositions: TFormRandomizePositions
     Caption = 'tentativa.'
     ParentColor = False
   end
-  object btnApp: TButton
+  object btnOK: TButton
     Left = 8
     Height = 25
-    Top = 39
-    Width = 64
-    Caption = 'Aplicar'
-    OnClick = btnAppClick
+    Top = 8
+    Width = 75
+    Caption = 'OK'
+    Default = True
+    ModalResult = 1
+    OnClick = btnOKClick
     TabOrder = 0
   end
   object seGap: TSpinEdit
@@ -90,11 +86,9 @@ object FormRandomizePositions: TFormRandomizePositions
     Top = 10
     Width = 56
     MaxValue = 0
-    OnChange = seGapChange
-    OnKeyPress = seGapKeyPress
     ParentShowHint = False
-    ShowHint = True
-    TabOrder = 1
+    TabOrder = 3
+    Visible = False
   end
   object seSeqToWrite: TSpinEdit
     Left = 285
@@ -103,35 +97,9 @@ object FormRandomizePositions: TFormRandomizePositions
     Top = 10
     Width = 56
     MaxValue = 0
-    OnKeyPress = seGapKeyPress
     ParentShowHint = False
-    ShowHint = True
     TabOrder = 2
-  end
-  object btnRand: TButton
-    Left = 8
-    Height = 25
-    Hint = 'CLIQUE BOTÃO DIREITO para selecionar o tipo.'
-    Top = 8
-    Width = 64
-    Caption = 'Aleatorizar'
-    OnClick = btnRandClick
-    ParentShowHint = False
-    PopupMenu = pmRand
-    ShowHint = True
-    TabOrder = 3
-  end
-  object chkAllDifferent: TCheckBox
-    Left = 536
-    Height = 21
-    Hint = 'Marque se quiser n sequências diferentes ao aleatorizar. '
-    Top = 12
-    Width = 152
-    Caption = 'Sequências diferentes'
-    OnClick = chkAllDifferentClick
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 4
+    Visible = False
   end
   object seBeginAt: TSpinEdit
     Left = 285
@@ -140,10 +108,10 @@ object FormRandomizePositions: TFormRandomizePositions
     Top = 38
     Width = 56
     MaxValue = 0
-    OnKeyPress = seGapKeyPress
     ParentShowHint = False
-    ShowHint = True
-    TabOrder = 5
+    ReadOnly = True
+    TabStop = False
+    TabOrder = 4
   end
   object seEndAt: TSpinEdit
     Left = 412
@@ -152,39 +120,46 @@ object FormRandomizePositions: TFormRandomizePositions
     Top = 38
     Width = 56
     MaxValue = 0
-    OnChange = seGapChange
-    OnKeyPress = seGapKeyPress
     ParentShowHint = False
-    ShowHint = True
+    ReadOnly = True
+    TabStop = False
+    TabOrder = 5
+  end
+  object btnCancel: TButton
+    Left = 88
+    Height = 25
+    Top = 8
+    Width = 75
+    Cancel = True
+    Caption = 'Cancelar'
+    ModalResult = 11
+    TabOrder = 1
+  end
+  object btnRandomize: TButton
+    Left = 8
+    Height = 25
+    Top = 38
+    Width = 75
+    Caption = 'Aleatorizar'
+    OnClick = btnRandClick
     TabOrder = 6
   end
-  object PanelNumPos: TPanel
-    Left = 148
-    Height = 25
-    Top = 39
-    Width = 64
-    BevelOuter = bvLowered
-    TabOrder = 7
-  end
   object pmRand: TPopupMenu
-    left = 416
+    left = 424
     top = 112
     object pRand: TMenuItem
-      Caption = 'Random'
-      Checked = True
-      GroupIndex = 1
-      RadioItem = True
-      ShowAlwaysCheckable = True
-    end
-    object pSpan: TMenuItem
-      Caption = 'Span'
+      AutoCheck = True
+      Caption = 'Aleatório'
       GroupIndex = 1
       RadioItem = True
       ShowAlwaysCheckable = True
     end
     object pBalanced: TMenuItem
+      AutoCheck = True
       Caption = 'Balanceado'
+      Checked = True
       GroupIndex = 1
+      Hint = 'Evita que um estímulo apareça na mesma posição de uma tentativa para outra.'
       RadioItem = True
       ShowAlwaysCheckable = True
     end

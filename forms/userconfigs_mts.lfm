@@ -3,7 +3,7 @@ object FormMTS: TFormMTS
   Height = 496
   Top = 125
   Width = 1046
-  HorzScrollBar.Page = 781
+  HorzScrollBar.Page = 313
   VertScrollBar.Page = 160
   AutoScroll = True
   Caption = 'FormMTS'
@@ -43,16 +43,6 @@ object FormMTS: TFormMTS
       ModalResult = 11
       TabOrder = 1
     end
-    object cbPreview: TCheckBox
-      Left = 664
-      Height = 21
-      Top = 120
-      Width = 116
-      Caption = 'Pré-vizualização'
-      Checked = True
-      State = cbChecked
-      TabOrder = 2
-    end
     object btnOk: TButton
       Left = 801
       Height = 73
@@ -61,56 +51,29 @@ object FormMTS: TFormMTS
       Anchors = [akTop, akRight]
       Caption = 'Adicionar à Lista'
       ModalResult = 1
-      TabOrder = 3
+      TabOrder = 2
     end
     object gbStimuli: TGroupBox
       Left = 8
-      Height = 144
+      Height = 128
       Top = 8
       Width = 304
-      Caption = 'Configurações gerais'
+      Caption = 'Configurações gerais da tentativa'
       ChildSizing.LeftRightSpacing = 5
       ChildSizing.TopBottomSpacing = 5
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 127
+      ClientHeight = 111
       ClientWidth = 300
-      TabOrder = 4
-      object LabelSize: TLabel
-        Left = 5
-        Height = 25
-        Hint = 'Tamanho em pixels'
-        Top = 5
-        Width = 205
-        Alignment = taCenter
-        Caption = 'Tamanho dos estímulos (pixels)'
-        Layout = tlCenter
-        ParentColor = False
-        ParentShowHint = False
-        ShowHint = True
-      end
-      object SpinSize: TSpinEdit
-        Left = 210
-        Height = 25
-        Hint = 'Tamanho horizontal e vertical em pixels'
-        Top = 5
-        Width = 85
-        Alignment = taCenter
-        MaxValue = 2000
-        MinValue = 100
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 0
-        Value = 300
-      end
+      TabOrder = 3
       object LabelPresentations: TLabel
         Left = 5
-        Height = 25
-        Hint = 'Tempo em milisegundos'
-        Top = 30
-        Width = 205
+        Height = 26
+        Hint = 'Quantas vezes cada estímulo será apresentado?'
+        Top = 5
+        Width = 183
         Alignment = taCenter
         Caption = 'Número de apresentações'
         Layout = tlCenter
@@ -119,24 +82,24 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinPresentations: TSpinEdit
-        Left = 210
-        Height = 25
+        Left = 188
+        Height = 26
         Hint = 'Quantas vezes cada estímulo será apresentado?'
-        Top = 30
-        Width = 85
+        Top = 5
+        Width = 107
         Alignment = taCenter
         MinValue = 1
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 1
+        TabOrder = 0
         Value = 1
       end
       object LabelComparisons: TLabel
         Left = 5
         Height = 25
-        Hint = 'Tempo em milisegundos'
-        Top = 55
-        Width = 205
+        Hint = 'Quantos estímulos de comparação?'
+        Top = 31
+        Width = 183
         Alignment = taCenter
         Caption = 'Número de Comparações'
         Layout = tlCenter
@@ -145,61 +108,63 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinComparisons: TSpinEdit
-        Left = 210
+        Left = 188
         Height = 25
         Hint = 'Quantos estímulos de comparação?'
-        Top = 55
-        Width = 85
+        Top = 31
+        Width = 107
         Alignment = taCenter
         MaxValue = 8
         MinValue = 2
         OnEditingDone = SpinComparisonsEditingDone
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 2
+        TabOrder = 1
         Value = 2
       end
       object LabelDefaultCsqHIT: TLabel
         Left = 5
         Height = 25
-        Hint = 'Tempo em milisegundos'
-        Top = 80
-        Width = 205
+        Hint = 'Consequência padrão para acerto'
+        Top = 56
+        Width = 183
         Alignment = taCenter
-        Caption = 'Consequência padrão para acerto'
+        Caption = 'Consequência (acerto)'
         Layout = tlCenter
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
       end
-      object EditDefaultCsqHit: TEdit
-        Left = 210
+      object EditDefaultCsqHIT: TEdit
+        Left = 188
         Height = 25
-        Top = 80
-        Width = 85
-        TabOrder = 3
+        Hint = 'Consequência padrão para acerto'
+        Top = 56
+        Width = 107
+        TabOrder = 2
         Text = 'CSQ1.wav 0 0 1000'
         TextHint = 'Clique duas vezes para escolher o arquivo'
       end
       object LabelDefaultCsqMISS: TLabel
         Left = 5
         Height = 25
-        Hint = 'Tempo em milisegundos'
-        Top = 105
-        Width = 205
+        Hint = 'Consequência padrão para erro'
+        Top = 81
+        Width = 183
         Alignment = taCenter
-        Caption = 'Consequência padrão para erro'
+        Caption = 'Consequência (erro)'
         Layout = tlCenter
         ParentColor = False
         ParentShowHint = False
         ShowHint = True
       end
       object EditDefaultCsqMISS: TEdit
-        Left = 210
+        Left = 188
         Height = 25
-        Top = 105
-        Width = 85
-        TabOrder = 4
+        Hint = 'Consequência padrão para erro'
+        Top = 81
+        Width = 107
+        TabOrder = 3
         Text = 'CSQ2.wav 0 0 1000'
         TextHint = 'Clique duas vezes para escolher o arquivo'
       end
