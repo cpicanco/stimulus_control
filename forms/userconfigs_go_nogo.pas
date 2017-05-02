@@ -300,7 +300,6 @@ procedure TFormGo_NoGo.WriteToDisk(ADefaultMainSection: TStrings;
 var
   LRow : integer;
   FNewBloc : TConfigurationFile;
-  LDestination : string;
 begin
   if FileExistsUTF8(AFilename) then
     DeleteFileUTF8(AFilename);

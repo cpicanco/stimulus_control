@@ -55,6 +55,7 @@ procedure SetGridHeader(AGrid: TStringGrid; ATrialType: string);
 begin
   with AGrid do
     begin
+      Clean;
       RowCount := 2;
       if ATrialType = rsFillTypeAxes then
         begin
