@@ -103,7 +103,7 @@ implementation
 uses config_session, config_session_fileutils, strutils,FileUtil, LazFileUtils, constants;
 
 const
-   ADDRESS_SEP : Char = #58;
+   ADDRESS_SEP : Char = #31;
 
 operator=(B1, B2: TBlcAddress)B: Boolean;
 begin
