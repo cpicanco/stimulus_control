@@ -1267,16 +1267,14 @@ begin
   //StringGrid1.ColCount := 9;
   Caption := Application.Title;
   stAppTitle.Caption := Application.Title;
-  try
-    stVersion.Caption := CurrentVersion(GetCommitTag(True));
-    LGitCommit := GetCommitTag(False).Text;
-  except
-    on E : Exception do
-      begin
-        stVersion.Caption := FileVersion;
-        LGitCommit:='A git repository was not found inside the program''s folder.';
-      end;
-  end;
+
+  stVersion.Caption := CurrentVersion(GetCommitTag(True));
+  if stVersion.Caption = '' then
+    stVersion.Caption := FileVersion;
+
+  LGitCommit := GetCommitTag(False).Text;
+  if LGitCommit = '' then
+    LGitCommit:='A git repository was not found inside the program''s folder.';
 
   MemoAppInfo.Lines.Append(
     'Stimulus Control' + LineEnding +

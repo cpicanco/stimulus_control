@@ -118,7 +118,11 @@ begin
         Delimiter := '-';
         DelimitedText := CommitTag.Text;
       end;
-    Result := #32 + VersionLines[0] + #32 + 'c' + VersionLines[1];
+    if VersionLines.Count >= 2 then
+      Result := #32 + VersionLines[0] + #32 + 'c' + VersionLines[1]
+    else
+      Result := '';
+
   finally
     VersionLines.Free;
   end;
@@ -139,7 +143,10 @@ begin
             Delimiter := '-';
             DelimitedText := GetCommitTag(True).Text;
           end;
-        Result := VersionLines[2];
+        if VersionLines.Count >= 3 then
+          Result := VersionLines[2]
+        else
+          Result := '';
       finally
         VersionLines.Free;
       end;
