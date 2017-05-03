@@ -224,7 +224,7 @@ begin
           SetLength(FSessions,s+1);
           FSessions[s].Filename := LSession;
           FSessions[s].MenuItem := TMenuItem.Create(FPopupMenuBlocs);
-          FSessions[s].MenuItem.Caption := IntToStr(s+1)+ADDRESS_SEP+#32+ExtractFileNameOnly(LSession);
+          FSessions[s].MenuItem.Caption := IntToStr(s+1)+#58+#32+ExtractFileNameOnly(LSession);
           FPopupMenuBlocs.Items.Add(FSessions[s].MenuItem);
           SetLength(FSessions[s].Blocs,LConfigurationFile.BlocCount);
           for i := 0 to LConfigurationFile.BlocCount -1 do
@@ -239,7 +239,7 @@ begin
               FSessions[s].Blocs[i].NextBlcOnCriteria:= LCfgBloc.NextBlocOnCriteria;
               FSessions[s].Blocs[i].NextBlcOnNotCriteria:= LCfgBloc.NextBlocOnNotCriteria;
               FSessions[s].Blocs[i].MenuItem := TMenuItem.Create(FSessions[s].Blocs[i]);
-              FSessions[s].Blocs[i].MenuItem.Caption := IntToStr(i+1)+ADDRESS_SEP+#32+ LCfgBloc.Name;
+              FSessions[s].Blocs[i].MenuItem.Caption := IntToStr(i+1)+#58+#32+ LCfgBloc.Name;
               FSessions[s].Blocs[i].MenuItem.OnClick := OnBlocItemClick;
               FPopupMenuBlocs.Items[s].Add(FSessions[s].Blocs[i].MenuItem);
             end;
@@ -263,8 +263,8 @@ var
   LSessionIndex : integer;
   LShortAddress: string;
 begin
-  LBlocIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Caption,[ADDRESS_SEP]));
-  LSessionIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Parent.Caption,[ADDRESS_SEP]));
+  LBlocIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Caption,[#58]));
+  LSessionIndex := StrToInt(ExtractDelimited(1,TMenuItem(Sender).Parent.Caption,[#58]));
   LShortAddress := IntToStr(LSessionIndex-1)+ADDRESS_SEP+IntToStr(LBlocIndex-1);
   FChoosenBlocs.Append(LShortAddress);
   AppendBlocToStringGrid(LShortAddress);
@@ -362,20 +362,24 @@ var
           begin
             n := StrToInt(S);
 
-            if n > 0 then
-              // custom bloc
-              Result := S +'|'+ Cells[1,n]
+            if n = 0 then
+              n := LRow+1 // next bloc
             else
               begin
-                // next bloc
-                n := LRow+1;
-                if n <= RowCount-1 then
-                  Result := Cells[0, n] +'|'+Cells[1, n];
+                if n < 0 then
+                  n := RowCount+n; // count backwards
+
+                if n > 0 then; // do nothing, just use n
+
+                //Result := S +'|'+ Cells[1 {bloc name}, n]
               end;
 
-            // end bloc
-            if n > RowCount-1 then
-              Result := 'FIM';
+            if (n > 0) and (n <= RowCount-1) then
+              Result := Cells[0, n] +'|'+Cells[1 {bloc name}, n]
+            else
+              // end bloc
+              if n > RowCount-1 then
+                Result := 'FIM';
           end;
       end;
   end;
