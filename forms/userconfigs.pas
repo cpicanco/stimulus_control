@@ -941,30 +941,38 @@ begin
 
   if piMTS.Checked then
     begin
-      SetupDefaultsFromGui;
-
-      FormMatrixConfig := TFormMatrixConfig.Create(Application);
-      FormMatrixConfig.btnShowMatrix.Click;
-      if FormMatrixConfig.ShowModal = mrOK then
-        begin;
-          //FormMTS.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
-          FormRandomizePositions := TFormRandomizePositions.Create(Application);
-          FormRandomizePositions.LoadPositionsFromFile(LAST_BLOC_INIFILE_PATH,1,FormMatrixConfig.Positions);
-          FormRandomizePositions.btnRandomize.Click;
-          if FormRandomizePositions.ShowModal = mrOK then
+      if StringGrid1.RowCount > 2 then
+        begin
+          SetupDefaultsFromGui;
+          FormMatrixConfig := TFormMatrixConfig.Create(Application);
+          FormMatrixConfig.btnShowMatrix.Click;
+          if FormMatrixConfig.ShowModal = mrOK then
             begin
-              FormRandomizePositions.Free;
+              FormMTS.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
+              FormRandomizePositions := TFormRandomizePositions.Create(Application);
+              FormRandomizePositions.LoadPositionsFromFile(LAST_BLOC_INIFILE_PATH,1,FormMatrixConfig.Positions);
+              FormRandomizePositions.btnRandomize.Click;
+              if FormRandomizePositions.ShowModal = mrOK then
+                begin
+                  FormRandomizePositions.Free;
+                  FormMatrixConfig.Free;
+                end
+              else
+                begin
+                  FormRandomizePositions.Free;
+                  FormMatrixConfig.Free;
+                  Exit;
+                end;
             end
           else
             begin
-              FormRandomizePositions.Free;
+              FormMatrixConfig.Free;
               Exit;
             end;
-          FormMatrixConfig.Free;
         end
       else
         begin
-          FormMatrixConfig.Free;
+          ShowMessage('Não foi possível continuar, pois a tabela de tentativas está vazia.');
           Exit;
         end;
       Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
