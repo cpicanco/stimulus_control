@@ -46,16 +46,19 @@ type
     gbStimuli: TGroupBox;
     LabelDefaultCsqHIT: TLabel;
     LabelDefaultCsqMISS: TLabel;
+    LabelDefaultCursor: TLabel;
     LabelPresentations: TLabel;
     LabelComparisons: TLabel;
     OpenDialog: TOpenDialog;
     Panel1: TPanel;
+    SpinCursor: TSpinEdit;
     SpinPresentations: TSpinEdit;
     SpinComparisons: TSpinEdit;
     XMLPropStorage1: TXMLPropStorage;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SpinComparisonsEditingDone(Sender: TObject);
+    procedure SpinCursorEditingDone(Sender: TObject);
     procedure XMLPropStorage1RestoreProperties(Sender: TObject);
   private
     FMonitor: integer;
@@ -143,6 +146,12 @@ end;
 procedure TFormMTS.SpinComparisonsEditingDone(Sender: TObject);
 begin
   UpdateComparisons(FTrial);
+end;
+
+procedure TFormMTS.SpinCursorEditingDone(Sender: TObject);
+begin
+  if Sender is TSpinEdit then
+    LabelDefaultCursor.Cursor := TSpinEdit(Sender).Value;
 end;
 
 procedure TFormMTS.XMLPropStorage1RestoreProperties(Sender: TObject);
@@ -331,6 +340,7 @@ begin
           begin
             FNewBloc.WriteToTrial(LRow,_Kind, T_MTS);
             FNewBloc.WriteToTrial(LRow,_Name, Cells[1, LRow]);
+            FNewBloc.WriteToTrial(LRow, _Cursor, IntToStr(SpinCursor.Value));
             FNewBloc.WriteToTrial(LRow, Sample.List);
             FNewBloc.WriteToTrial(LRow,_NumComp,IntToStr(Length(Comparisons)));
             for i := Low(Comparisons) to High(Comparisons) do
