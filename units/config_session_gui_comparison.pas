@@ -145,7 +145,11 @@ end;
 procedure TGUIKeySettings.SetHeader(ATag: integer);
 begin
   if IsSample then
+  {$IFDEF WINDOWS}
+    Caption := ''
+  {$ELSE}
     Caption := rsSample
+  {$ENDIF}
   else
     Caption := rsComparison + IntToStr(Tag);
 end;
@@ -261,15 +265,19 @@ begin
   SetHeader(0);
   AutoSize := True;
   ShowHint:=True;
+  {$IFDEF WINDOWS}
+    ParentColor:=False;
+    Color := clBtnFace;
+  {$ENDIF}
   with ChildSizing do
     begin
-  	  ControlsPerLine := 1;
-  	  EnlargeHorizontal := crsAnchorAligning;
+      ControlsPerLine := 1;
+      EnlargeHorizontal := crsAnchorAligning;
       EnlargeVertical := crsAnchorAligning;
       Layout := cclLeftToRightThenTopToBottom;
-  	  LeftRightSpacing := 0;
-  	  TopBottomSpacing := 0;
-  	  VerticalSpacing := 20;
+      LeftRightSpacing := 0;
+      TopBottomSpacing := 0;
+      VerticalSpacing := 20;
     end;
   {
   ..............................    STIMULUS    ..............................
