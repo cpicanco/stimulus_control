@@ -205,7 +205,10 @@ begin
     begin
       LogEvent('C');
       if Assigned(FSound) then
-        FSound.Free
+        begin
+          FSound.Free;
+          FSound := TBassStream.Create(LSoundFile);
+        end
       else
         FSound := TBassStream.Create(LSoundFile);
       FSound.Play;
