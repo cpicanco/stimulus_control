@@ -35,7 +35,7 @@ Msg=	This is a message that requires a click or a keyboard key (space) to procee
 Name=	M6
 Kind=	MSG
 Prompt=	True
-Msg=	This is a message that has a prompt description at the bootom.
+Msg=	This is a message that has a prompt description at the bottom.
 
 [Blc 1 - T5]
 Name=	M7
