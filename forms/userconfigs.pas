@@ -36,12 +36,8 @@ type
     btnRun: TButton;
     btnRandomize: TButton;
     btnSave: TButton;
-    btnTargetFile: TButton;
-    btnContentFile: TButton;
-    btnApply: TButton;
     btnExportStimulus: TButton;
     btnTrialsDone: TButton;
-    btnPrependTrial: TButton;
     chkPupilClient: TCheckBox;
     chkShowRepetitions: TCheckBox;
     btnGridType: TButton;
@@ -55,8 +51,6 @@ type
     EditBlocChainingPath: TEdit;
     EditSessionName: TEdit;
     edtTrialGroup: TEdit;
-    edtTarget: TEdit;
-    edtContent: TEdit;
     gbRepetitions: TGroupBox;
     gbRepetitionsBlocks: TGroupBox;
     gbTrialGroup: TGroupBox;
@@ -144,7 +138,7 @@ type
     procedure XMLPropStorage1RestoreProperties(Sender: TObject);
     procedure XMLPropStorage1SaveProperties(Sender: TObject);
   published
-    procedure btnClick(Sender: TObject);
+
   private
     FRepetitionMatrix : array of array of boolean;
     FLastFocusedCol : integer;
@@ -252,11 +246,13 @@ begin
           SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
           ResetRepetionMatrix;
           CreateFormBloc;
+          StringGrid1.Hint := rsHintBlocsAvailableRightClick;
         end;
     end
   else
     if Assigned(FormBlocs) then
       begin
+        StringGrid1.Hint := '';
         FormBlocs.Free;
         FormBlocs := nil;
         StringGrid1.PopupMenu := nil
@@ -1352,24 +1348,12 @@ end;
 
 procedure TFormUserConfig.chkDrawTrialGroupChange(Sender: TObject);
 begin
-  Invalidate;
+  StringGrid1.Invalidate;
 end;
 
 procedure TFormUserConfig.chkShowRepetitionsChange(Sender: TObject);
 begin
   ResetRepetionMatrix;
-end;
-
-procedure TFormUserConfig.btnClick(Sender: TObject);
-begin
-  OpenDialog1.InitialDir := GetCurrentDirUTF8;
-  if OpenDialog1.Execute then
-    begin
-      if Sender = btnTargetFile then
-        edtTarget.Text := OpenDialog1.FileName;
-      if Sender = btnContentFile then
-        edtContent.Text := OpenDialog1.FileName;
-    end;
 end;
 
 end.

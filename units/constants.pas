@@ -267,7 +267,7 @@ resourcestring
   rsFillTypeGoNoGo = 'Go/No-Go';
   rsFillTypeMTS = 'MTS';
   rsFillTypeBlocChaining = 'Encadear Blocos';
-
+  rsHintBlocsAvailableRightClick = 'Clique com o botão direito e selecione os blocos disponíveis';
   rsBlocs = 'Bloco';
   rsBlocName = 'Nome';
   rsBlocCrtHitPorcentage = 'Critério (% de acertos)';
