@@ -313,6 +313,7 @@ begin
   FConsequenceFired := False;
   FDataSupport.Latency := TimeStart;
   FDataSupport.StmBegin := TickCount;
+  Invalidate;
 end;
 
 procedure TFPE.WriteData(Sender: TObject);
