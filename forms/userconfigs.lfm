@@ -1947,7 +1947,7 @@ object FormUserConfig: TFormUserConfig
       object btnGridType: TButton
         Left = 6
         Height = 25
-        Hint = 'Clique com o botão direito para escolher o tipo de preenchimento da tabela'
+        Hint = 'Clique com o botão direito e selecione o tipo de preenchimento da tabela.'
         Top = 8
         Width = 114
         Caption = 'Eixos'
@@ -1960,7 +1960,7 @@ object FormUserConfig: TFormUserConfig
       object btnRandomize: TButton
         Left = 6
         Height = 25
-        Hint = 'Clique com o botão direito para escolher o tipo de randomização.'
+        Hint = 'Clique com o botão direito e selecione o tipo de randomização.'
         Top = 34
         Width = 115
         Caption = 'Randomizar'
@@ -1973,7 +1973,7 @@ object FormUserConfig: TFormUserConfig
       object gbRepetitions: TGroupBox
         Left = 276
         Height = 51
-        Hint = 'Qual o número que define um grupo de tentativas repetidas?'
+        Hint = 'Permitir no máximo quantas repetições ao randomizar com restrições?'
         Top = 8
         Width = 160
         Caption = 'Repetições'
@@ -2007,7 +2007,7 @@ object FormUserConfig: TFormUserConfig
       object gbRepetitionsBlocks: TGroupBox
         Left = 442
         Height = 51
-        Hint = 'Quantos grupos de tentativas repetidas, de acordo com a coluna selecionada, podem ocorrer?'
+        Hint = 'Permitir no máximo quantos grupos de repetições ao randomizar com restrições?'
         Top = 8
         Width = 152
         Caption = 'Grupo de repetições'
@@ -2063,6 +2063,7 @@ object FormUserConfig: TFormUserConfig
       object gbTrialGroup: TGroupBox
         Left = 126
         Height = 51
+        Hint = 'Agrupar tentativas antes de randomizar? (Evita que os se misturem)'
         Top = 8
         Width = 144
         Caption = 'Grupo de Tentativas'
