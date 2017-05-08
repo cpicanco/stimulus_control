@@ -295,6 +295,7 @@ begin
           FNewBloc.WriteToTrial(LRow, _Consequence,    Cells[1, LRow]);
           FNewBloc.WriteToTrial(LRow, _Schedule,       Cells[2, LRow]);
           FNewBloc.WriteToTrial(LRow, _LimitedHold,    Cells[3, LRow]);
+          FNewBloc.WriteToTrial(LRow, _PresentConsequenceJustOnce, 'True');
           FNewBloc.WriteToTrial(LRow, _Comp+'1'+_cStm, Cells[4, LRow]);   // configure the IETConsenquence
           FNewBloc.WriteToTrial(LRow, _Comp+'1'+_cBnd, Cells[5, LRow]);   // configure the IETConsenquence
       end;
