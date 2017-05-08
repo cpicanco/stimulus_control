@@ -184,7 +184,7 @@ var
 begin
   WriteInteger(_Main,_NumBlc,BlocCount);
   for i := 0 to BlocCount-1 do
-    WriteInteger(BlocSection(i+1),_NumTrials,TrialCount[i+1]);
+    WriteString(BlocSection(i+1),_NumTrials,IntToStr(TrialCount[i+1])+' 1');
 end;
 
 procedure TConfigurationFile.ReadPositionsInBloc(ABloc: integer;
