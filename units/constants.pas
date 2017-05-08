@@ -93,6 +93,7 @@ const
 
   // GNG
   _PopUpTime = 'ConsequenceTime';
+  _PresentConsequenceJustOnce = 'PresentConsequenceJustOnce';
 
   // SIMPLE
   _NumComp = 'NumComp';   // number of stimuli on screen / comparisons
