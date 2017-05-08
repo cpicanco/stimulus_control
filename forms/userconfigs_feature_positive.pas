@@ -107,7 +107,6 @@ begin
   WindowState := wsFullScreen;
   Left := Screen.Monitors[MonitorToShow].Left;
   FCurrentTrial := 0;
-  Randomize;
   //SetMatrix(GetMatrix(MonitorToShow));
   SetCircleGrid(GetCircleGrid(MonitorToShow));
 end;
