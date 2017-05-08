@@ -34,19 +34,21 @@ type
       btnClose: TButton;
       btnMinimizeTopTab: TButton;
       btnOk: TButton;
-      ButtonPositive: TButton;
       ButtonNegative: TButton;
       cbPreview: TCheckBox;
       LabelPresentations: TLabel;
+      LabelPresentations1: TLabel;
+      LabelPos: TLabel;
+      LabelCountPos: TLabel;
+      LabelNeg: TLabel;
+      LabelCountNeg: TLabel;
       OpenPictureDialog: TOpenPictureDialog;
       gbStimuli: TGroupBox;
-      LabelCountPos: TLabel;
-      LabelCountNeg: TLabel;
-      Schedule: TLabeledEdit;
       LabelSize: TLabel;
       LabelLimitedHold: TLabel;
       Panel1: TPanel;
       PreviewTimer: TTimer;
+      Schedule: TEdit;
       SpinPresentations: TSpinEdit;
       SpinSize: TSpinEdit;
       SpinLimitedHold: TSpinEdit;
@@ -63,14 +65,12 @@ type
       procedure XMLPropStorage1RestoreProperties(Sender: TObject);
     private
       FStimulus : TKey;
-      FFullScreen : Boolean;
       FCurrentTrial : integer;
       FMonitor: integer;
       FTrials : TTrials;
       procedure SetMonitor(AValue: integer);
       procedure SetTrials(APositive, ANegative : TStringList);
     public
-      procedure SetFullScreen(TurnOn : Boolean);
       procedure Resize; override;
       procedure AddTrialsToGui(ATrialGrid : TStringGrid);
       procedure WriteToDisk(ADefaultMainSection: TStrings; ADefaultBlocSection : TStrings;
@@ -235,33 +235,6 @@ procedure TFormGo_NoGo.cbPreviewChange(Sender: TObject);
 begin
   PreviewTimer.Enabled := not PreviewTimer.Enabled;
   // tkey visible
-end;
-
-procedure TFormGo_NoGo.SetFullScreen(TurnOn: Boolean);
-begin
-  if TurnOn then
-    begin
-      //fullscreen true
-      {$IFDEF MSWINDOWS}
-      // to do
-      {$ENDIF}
-
-      {$IFDEF LINUX}
-      WindowState := wsFullScreen;
-      {$ENDIF}
-    end
-  else
-    begin
-      //fullscreen false
-      {$IFDEF MSWINDOWS}
-      // to do
-      {$ENDIF}
-
-      {$IFDEF LINUX}
-      WindowState := wsNormal;
-      {$ENDIF}
-    end;
-  FFullScreen := TurnOn;
 end;
 
 procedure TFormGo_NoGo.Resize;
