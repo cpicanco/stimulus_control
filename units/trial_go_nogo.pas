@@ -34,6 +34,7 @@ type
 
   TGNG = Class(TTrial)
   private
+    FPresentConsequenceJustOnce : Boolean;
     FGoNoGoStyle : TGoNoGoStyle;
     FConsequenceFired : Boolean;
     FDataSupport : TDataSupport;
@@ -145,7 +146,7 @@ begin
 
   if FileExists(LSoundFile) then
     begin
-      LogEvent('C');
+      LogEvent('CS');
       if Assigned(FSound) then
         begin
           FSound.Free;
@@ -158,6 +159,7 @@ begin
 
   if FileExists(LPopUpFile) then
     begin
+      LogEvent('CI');
       LPopUp := TKey.Create(Parent);
       with LPopUp do
         begin
@@ -194,17 +196,28 @@ begin
 end;
 
 procedure TGNG.Consequence(Sender: TObject);
+  procedure DoConsequence;
+  begin
+    FConsequenceFired := True;
+    TrialResult(Sender);
+
+    if gngPlayGoOnBeforeEnd in FGoNoGoStyle then
+      // do nothing
+    else
+      if gngPlayGo in FGoNoGoStyle then
+        PlayConsequence;
+
+    if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+  end;
+
 begin
-  if FConsequenceFired = False then FConsequenceFired := True;
-  TrialResult(Sender);
-
-  if gngPlayGoOnBeforeEnd in FGoNoGoStyle then
-    // do nothing
+  if FPresentConsequenceJustOnce then
+    begin
+      if not FConsequenceFired then
+        DoConsequence;
+    end
   else
-    if gngPlayGo in FGoNoGoStyle then
-      PlayConsequence;
-
-  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+    DoConsequence;
 end;
 
 procedure TGNG.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -248,6 +261,8 @@ begin
 
     C1Stm=A1.png
   }
+
+  FPresentConsequenceJustOnce := StrToBoolDef(CfgTrial.SList.Values[_PresentConsequenceJustOnce],True);
   FGoNoGoStyle := [];
   s1 := CfgTrial.SList.Values[_Style];
   for i := 1 to WordCount(s1,[#32]) do
