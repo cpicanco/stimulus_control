@@ -55,6 +55,7 @@ type
     SpinPresentations: TSpinEdit;
     SpinComparisons: TSpinEdit;
     XMLPropStorage1: TXMLPropStorage;
+    procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure SpinComparisonsEditingDone(Sender: TObject);
@@ -94,6 +95,7 @@ procedure TFormMTS.FormCreate(Sender: TObject);
 begin
   OpenDialog.InitialDir := ExtractFilePath(Application.ExeName);
   OnClick:=@KeyClick;
+  BorderStyle:=bsNone;
   WindowState:=wsFullScreen;
   FTrial := TSimpleMTSTrial.Create(Self);
   FTrial.Sample.List := TStringList.Create;
@@ -132,6 +134,13 @@ begin
   FComparison.Left:= FComparison.Width + FSample.Left + 20;
   FComparison.Parent := Self;
   FComparison.Hide;
+end;
+
+procedure TFormMTS.FormActivate(Sender: TObject);
+begin
+  BorderStyle := bsNone;
+  WindowState := wsFullScreen;
+  Left := Screen.Monitors[MonitorToShow].Left;
 end;
 
 procedure TFormMTS.FormDestroy(Sender: TObject);
