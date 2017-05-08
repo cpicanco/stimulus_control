@@ -34,7 +34,7 @@ type
       btnClose: TButton;
       btnMinimizeTopTab: TButton;
       btnOk: TButton;
-      ButtonNegative: TButton;
+      ButtonStimuli: TButton;
       cbPreview: TCheckBox;
       LabelPresentations: TLabel;
       LabelPresentations1: TLabel;
@@ -92,7 +92,7 @@ uses LazFileUtils, config_session_fileutils, constants;
 
 procedure TFormGo_NoGo.FormCreate(Sender: TObject);
 begin
-  BorderStyle := bsNone;
+  ButtonStimuli.Caption := 'Adicionar'+LineEnding+'Estímulos';
   WindowState := wsFullScreen;
   Canvas.Pen.Width:=10;
   OpenPictureDialog.InitialDir := ExtractFilePath(Application.ExeName);
