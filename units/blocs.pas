@@ -170,6 +170,10 @@ end;
 destructor TBlc.Destroy;
 begin
   FTimer.Enabled := False;
+  if Assigned(FTrial) then
+    FTrial.Free;
+
+  FBackGround.Invalidate;
   inherited Destroy;
 end;
 
@@ -301,7 +305,8 @@ begin
         // Check if it is the fisrt trial
         if (FManager.Trials + 1) = 1 then
           IsFirst := True
-        else IsFirst := False;
+        else
+          IsFirst := False;
 
     end
   else
@@ -309,7 +314,8 @@ begin
 
       if (FManager.Trials + 1) = 1 then
         IsFirst := True
-      else IsFirst := False;
+      else
+        IsFirst := False;
 
     end;
 
