@@ -56,6 +56,7 @@ type
       procedure btnMinimizeTopTabClick(Sender: TObject);
       procedure ButtonClick(Sender: TObject);
       procedure cbPreviewChange(Sender: TObject);
+      procedure FormActivate(Sender: TObject);
       procedure FormCreate(Sender: TObject);
       procedure FormKeyPress(Sender: TObject; var Key: char);
       procedure FormPaint(Sender: TObject);
@@ -93,7 +94,6 @@ uses LazFileUtils, config_session_fileutils, constants;
 procedure TFormGo_NoGo.FormCreate(Sender: TObject);
 begin
   ButtonStimuli.Caption := 'Adicionar'+LineEnding+'Estímulos';
-  WindowState := wsFullScreen;
   Canvas.Pen.Width:=10;
   OpenPictureDialog.InitialDir := ExtractFilePath(Application.ExeName);
   FCurrentTrial := 0;
@@ -235,6 +235,13 @@ procedure TFormGo_NoGo.cbPreviewChange(Sender: TObject);
 begin
   PreviewTimer.Enabled := not PreviewTimer.Enabled;
   // tkey visible
+end;
+
+procedure TFormGo_NoGo.FormActivate(Sender: TObject);
+begin
+  BorderStyle := bsNone;
+  WindowState := wsFullScreen;
+  Left := Screen.Monitors[MonitorToShow].Left;
 end;
 
 procedure TFormGo_NoGo.Resize;
