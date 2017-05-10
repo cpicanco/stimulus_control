@@ -95,8 +95,6 @@ procedure TFormMTS.FormCreate(Sender: TObject);
 begin
   OpenDialog.InitialDir := ExtractFilePath(Application.ExeName);
   OnClick:=@KeyClick;
-  BorderStyle:=bsNone;
-  WindowState:=wsFullScreen;
   FTrial := TSimpleMTSTrial.Create(Self);
   FTrial.Sample.List := TStringList.Create;
   FTrial.Sample.Key := TKey.Create(Self);
@@ -138,9 +136,7 @@ end;
 
 procedure TFormMTS.FormActivate(Sender: TObject);
 begin
-  BorderStyle := bsNone;
-  WindowState := wsFullScreen;
-  Left := Screen.Monitors[MonitorToShow].Left;
+  WindowState:=wsMaximized;
 end;
 
 procedure TFormMTS.FormDestroy(Sender: TObject);
@@ -313,10 +309,13 @@ var
 begin
   with ATrialGrid do
     begin
-      LRow := RowCount-1;
+      if (RowCount = 2) and (Cells[0,1] = '') then
+        LRow := RowCount-1
+      else
+        LRow := RowCount;
       for i := 0 to SpinPresentations.Value-1 do
         begin
-          if (LRow + 1) > RowCount then
+          if LRow >= RowCount then
             RowCount := LRow + 1;
 
           Cells[0, LRow] := IntToStr(LRow);

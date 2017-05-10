@@ -13,7 +13,7 @@ object FormMTS: TFormMTS
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   SessionProperties = 'EditDefaultCsqHIT.Text;EditDefaultCsqMISS.Text;SpinComparisons.Value;SpinPresentations.Value;OpenDialog.InitialDir'
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.6.2.0'
   object Panel1: TPanel
     Left = 0
     Height = 160
@@ -67,15 +67,15 @@ object FormMTS: TFormMTS
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 124
+      ClientHeight = 127
       ClientWidth = 300
       TabOrder = 3
       object LabelPresentations: TLabel
         Left = 5
-        Height = 23
+        Height = 25
         Hint = 'Quantas vezes cada estímulo será apresentado?'
         Top = 5
-        Width = 174
+        Width = 183
         Alignment = taCenter
         Caption = 'Número de apresentações'
         Layout = tlCenter
@@ -84,11 +84,11 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinPresentations: TSpinEdit
-        Left = 179
-        Height = 23
+        Left = 188
+        Height = 25
         Hint = 'Quantas vezes cada estímulo será apresentado?'
         Top = 5
-        Width = 116
+        Width = 107
         Alignment = taCenter
         MinValue = 1
         ParentShowHint = False
@@ -98,10 +98,10 @@ object FormMTS: TFormMTS
       end
       object LabelComparisons: TLabel
         Left = 5
-        Height = 23
+        Height = 25
         Hint = 'Quantos estímulos de comparação?'
-        Top = 28
-        Width = 174
+        Top = 30
+        Width = 183
         Alignment = taCenter
         Caption = 'Número de Comparações'
         Layout = tlCenter
@@ -110,11 +110,11 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinComparisons: TSpinEdit
-        Left = 179
-        Height = 23
+        Left = 188
+        Height = 25
         Hint = 'Quantos estímulos de comparação?'
-        Top = 28
-        Width = 116
+        Top = 30
+        Width = 107
         Alignment = taCenter
         MaxValue = 8
         MinValue = 2
@@ -126,10 +126,10 @@ object FormMTS: TFormMTS
       end
       object LabelDefaultCsqHIT: TLabel
         Left = 5
-        Height = 23
+        Height = 25
         Hint = 'Consequência padrão para acerto'
-        Top = 51
-        Width = 174
+        Top = 55
+        Width = 183
         Alignment = taCenter
         Caption = 'Consequência (acerto)'
         Layout = tlCenter
@@ -138,21 +138,21 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object EditDefaultCsqHIT: TEdit
-        Left = 179
-        Height = 23
+        Left = 188
+        Height = 25
         Hint = 'Consequência padrão para acerto'
-        Top = 51
-        Width = 116
+        Top = 55
+        Width = 107
         TabOrder = 2
         Text = 'CSQ1.wav 0 0 1000'
         TextHint = 'Clique duas vezes para escolher o arquivo'
       end
       object LabelDefaultCsqMISS: TLabel
         Left = 5
-        Height = 23
+        Height = 25
         Hint = 'Consequência padrão para erro'
-        Top = 74
-        Width = 174
+        Top = 80
+        Width = 183
         Alignment = taCenter
         Caption = 'Consequência (erro)'
         Layout = tlCenter
@@ -161,21 +161,21 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object EditDefaultCsqMISS: TEdit
-        Left = 179
-        Height = 23
+        Left = 188
+        Height = 25
         Hint = 'Consequência padrão para erro'
-        Top = 74
-        Width = 116
+        Top = 80
+        Width = 107
         TabOrder = 3
         Text = 'CSQ2.wav 0 0 1000'
         TextHint = 'Clique duas vezes para escolher o arquivo'
       end
       object LabelDefaultCursor: TLabel
         Left = 5
-        Height = 23
+        Height = 25
         Hint = 'Imagem do cursor do mouse'
-        Top = 97
-        Width = 174
+        Top = 105
+        Width = 183
         Alignment = taCenter
         Caption = 'Cursor'
         Layout = tlCenter
@@ -184,11 +184,11 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinCursor: TSpinEdit
-        Left = 179
-        Height = 23
+        Left = 188
+        Height = 25
         Hint = 'Imagem do cursor do mouse'
-        Top = 97
-        Width = 116
+        Top = 105
+        Width = 107
         Alignment = taCenter
         MaxValue = 42
         MinValue = -1
