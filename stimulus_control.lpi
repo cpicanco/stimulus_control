@@ -268,7 +268,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="49">
+    <Units Count="51">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -489,6 +489,14 @@
         <Filename Value="units/trial_calibration.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit48>
+      <Unit49>
+        <Filename Value="units/pupil_communication.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit49>
+      <Unit50>
+        <Filename Value="units/zmq_client.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit50>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
