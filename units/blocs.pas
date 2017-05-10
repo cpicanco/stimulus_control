@@ -725,12 +725,10 @@ begin
   FIETMedia.Width := 500;
   FIETMedia.Height := 500;
   FIETMedia.Centralize(FBackGround);
-
   FIETMedia.FullPath := FileName;
-  FIETMedia.Play;
   //FIETMedia.FullScreen;
-  //FTrial.IETConsequence := '';
-  //FIETMedia.Show;
+  FIETMedia.Show;
+  FIETMedia.Play;
   if Assigned(OnConsequence) then FOnConsequence(FIETMedia);
 end;
 
