@@ -355,7 +355,7 @@ begin
   case Configs.SessionType of
     T_CIC, T_CRT:
       Manager.CurrentTrial := Configs.CurrentBlc.NumTrials;
-    T_CND: ; // todo: ask julia what should happen when the critera is reached
+    T_CND: ; // for now, do nothing
   end;
 end;
 
