@@ -49,9 +49,11 @@ type
     FMouseInside : TCorner;
     FCorner : array [0..1] of TCorner;
     FMouseDownSpot : TPoint;
+    FOnPointerMouseUp: TMouseEvent;
     FVisible: Boolean;
     procedure ChangeAnchoredControlBounds;
     function GetAnchored: Boolean;
+    procedure SetOnPointerMouseUp(AValue: TMouseEvent);
     procedure SetVisible(AValue: Boolean);
     procedure CornerMoveTo(Sender: TObject; X,Y : integer);
     procedure CornerMouseDown(Sender: TObject; Button: TMouseButton;Shift: TShiftState; X, Y: Integer);
@@ -63,10 +65,12 @@ type
     destructor Destroy; override;
     procedure AnchorToControl(AControl: TCustomControl);
     procedure MoveToControl(AControl: TCustomControl);
+    property AnchoredControl : TCustomControl read FAnchoredControl;
     property MouseInside : TCorner read FMouseInside;
     property Anchored : Boolean read GetAnchored;
     property Dragging : Boolean read FDragging write FDragging;
     property Visible : Boolean read FVisible write SetVisible;
+    property OnPointerMouseUp : TMouseEvent read FOnPointerMouseUp write SetOnPointerMouseUp;
   end;
 
   { TDrawCoordenates }
@@ -103,6 +107,7 @@ type
     procedure PanelMouseMove(Sender: TObject; Shift: TShiftState; X,  Y: Integer);
     procedure PanelMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PanelMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure CornerMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PanelDblClick(Sender: TObject);
     procedure SetBackGroundFeatures;
     procedure SetPanelSizePosition (X, Y, W, H : Integer);
@@ -201,6 +206,12 @@ begin
   Result := Assigned(FAnchoredControl);
 end;
 
+procedure TPointer.SetOnPointerMouseUp(AValue: TMouseEvent);
+begin
+  if FOnPointerMouseUp=AValue then Exit;
+  FOnPointerMouseUp:=AValue;
+end;
+
 procedure TPointer.SetVisible(AValue: Boolean);
 var i : integer;
 begin
@@ -232,6 +243,8 @@ procedure TPointer.CornerMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   Dragging := False;
+  if Assigned(OnPointerMouseUp) then
+    OnPointerMouseUp(Self, Button, Shift,X,Y);
 end;
 
 procedure TPointer.CornerMouseMove(Sender: TObject; Shift: TShiftState; X,
@@ -288,6 +301,7 @@ constructor TDrawCoordenates.Create(aBackGround : TForm);
 begin
   inherited Create;
   FPointer := TPointer.Create(aBackGround);
+  FPointer.OnPointerMouseUp:=@CornerMouseUp;
   BackGround := aBackGround;
   SetBackGroundFeatures;
   FString := TStringList.Create;
@@ -493,6 +507,21 @@ begin
     begin
       FDragging := False;
       if Assigned(OnChange) then FOnChange(Sender);
+    end;
+end;
+
+procedure TDrawCoordenates.CornerMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  s1 : string;
+  LPanel : TPanel;
+begin
+  if TPointer(Sender).Anchored then
+    begin
+      LPanel := TPanel(TPointer(Sender).AnchoredControl);
+      s1 := Format('%d %d %d %d', [LPanel.Top, LPanel.Left, LPanel.Width, LPanel.Height]);
+      LPanel.Hint := s1;
+      FOutputString.Values[IntToStr(LPanel.Tag)] := s1;
     end;
 end;
 

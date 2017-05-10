@@ -75,6 +75,7 @@ type
     procedure btnClearAllClick(Sender: TObject);
     procedure btnRandomizeMatrixClick(Sender: TObject);
     procedure edtWidthEditingDone(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -266,6 +267,11 @@ begin
      TEdit(Sender).Text := CSizeDefault;
      TEdit(Sender).SelectAll;
    end;
+end;
+
+procedure TFormMatrixConfig.FormActivate(Sender: TObject);
+begin
+  FDrawCoordenates.OutputItems := lbCoordenates.Items;
 end;
 
 procedure TFormMatrixConfig.FormCreate(Sender: TObject);
