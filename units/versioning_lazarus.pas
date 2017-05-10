@@ -24,7 +24,9 @@ function ZMQVersion : string;
 
 implementation
 
+{$IFNDEF NO_LIBZMQ}
 uses zmq;
+{$ENDIF}
 
 function FileVersion : string;
 var
@@ -45,7 +47,9 @@ var
   LPatch, LMinor, LMajor: Integer;
 begin
   LMajor := 0; LMinor := 0; LPatch := 0;
+  {$IFNDEF NO_LIBZMQ}
   zmq_version(LMajor,LMinor,LPatch);
+  {$ENDIF}
   Result := 'v'+IntToStr(LMajor)+'.'+IntToStr(LMinor)+'.'+IntToStr(LPatch);
 end;
 

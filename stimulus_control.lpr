@@ -17,9 +17,8 @@ uses
     {$IFDEF UseCThreads}
       cthreads
       , cmem
+      ,
     {$ENDIF}
-  //, heaptrc
-  ,
   {$ENDIF}
   Interfaces // this includes the LCL widgetset
   , Forms

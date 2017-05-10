@@ -19,7 +19,9 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
 
     , draw_methods
     , bass_player
+    {$IFNDEF NO_LIBZMQ}
     , pupil_communication
+    {$ENDIF}
     , session
     , config_session
     , config_session_guiutils
@@ -111,7 +113,6 @@ type
     tbTrials: TTabSheet;
     XMLPropStorage1: TXMLPropStorage;
     procedure btnCheckClick(Sender: TObject);
-    procedure btnClientTestClick(Sender: TObject);
     procedure btnExportStimulusClick(Sender: TObject);
     procedure btnFillConditionClick(Sender: TObject);
     procedure btnGridTypeClick(Sender: TObject);
@@ -155,7 +156,6 @@ type
     procedure EndSession(Sender : TObject);
     procedure RandTrialOrder(BeginRow, EndRow : integer);
     procedure ResetRepetionMatrix;
-    procedure ReceiveTimestamp(Sender: TObject; ARequest, AResponse: String);
     procedure CreateFormBloc;
   public
     { public declarations }
@@ -515,14 +515,6 @@ begin
   StringGrid1.Invalidate;
 end;
 
-procedure TFormUserConfig.ReceiveTimestamp(Sender: TObject; ARequest,
-  AResponse: String);
-begin
-  case ARequest of
-    REQ_TIMESTAMP : ShowMessage(Sender.ClassName + #32 + AResponse);
-  end;
-end;
-
 procedure TFormUserConfig.CreateFormBloc;
 begin
   FormBlocs := TFormBlocs.Create(Application);
@@ -634,21 +626,21 @@ begin
   //
 end;
 
-procedure TFormUserConfig.btnClientTestClick(Sender: TObject);
-var PupilClient : TPupilCommunication;
-begin
-  if chkPupilClient.Checked then
-    begin
-      PupilClient := TPupilCommunication.Create('127.0.1.1:5020');
-      PupilClient.OnRequestReceived := @ReceiveTimestamp;
-
-      PupilClient.Start;
-      PupilClient.Request(REQ_TIMESTAMP);
-
-      Sleep(1000);
-      PupilClient.Terminate;
-    end;
-end;
+//procedure TFormUserConfig.btnClientTestClick(Sender: TObject);
+//var PupilClient : TPupilCommunication;
+//begin
+//  if chkPupilClient.Checked then
+//    begin
+//      PupilClient := TPupilCommunication.Create('127.0.1.1:5020');
+//      PupilClient.OnRequestReceived := @ReceiveTimestamp;
+//
+//      PupilClient.Start;
+//      PupilClient.Request(REQ_TIMESTAMP);
+//
+//      Sleep(1000);
+//      PupilClient.Terminate;
+//    end;
+//end;
 
 procedure TFormUserConfig.btnExportStimulusClick(Sender: TObject);
 var

@@ -14,7 +14,9 @@ unit trial_calibration;
 interface
 
 uses LCLIntf, LCLType, Classes, SysUtils
+    {$IFNDEF NO_LIBZMQ}
     , pupil_communication
+    {$ENDIF}
     , trial_abstract
     , Graphics
     ;
@@ -47,7 +49,9 @@ type
     FDataSupport : FDataSupport;
     procedure StartPupilCalibration;
     procedure None(Sender: TObject);
+    {$IFNDEF NO_LIBZMQ}
     procedure PupilCalibrationSuccessful(Sender: TObject; AMultiPartMessage : TMPMessage);
+    {$ENDIF}
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
@@ -64,10 +68,15 @@ type
 
 implementation
 
-uses strutils, constants, timestamps, background;
+uses strutils, constants, timestamps
+    {$IFNDEF NO_LIBZMQ}
+    , background
+    {$ENDIF}
+    ;
 
 { TCLB }
 
+{$IFNDEF NO_LIBZMQ}
 procedure TCLB.PupilCalibrationSuccessful(Sender: TObject;
   AMultiPartMessage: TMPMessage);
 begin
@@ -76,7 +85,7 @@ begin
   if not FBlocking then
     EndTrial(Self);
 end;
-
+{$ENDIF}
 
 procedure TCLB.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
@@ -89,7 +98,9 @@ end;
 
 procedure TCLB.StartPupilCalibration;
 begin
+  {$IFNDEF NO_LIBZMQ}
   GlobalContainer.PupilClient.Request(REQ_SHOULD_START_CALIBRATION, True);
+  {$ENDIF}
   //FrmBackground.Hide;
 end;
 
@@ -215,8 +226,10 @@ begin
         end;
     end;
 
+  {$IFNDEF NO_LIBZMQ}
   if GlobalContainer.PupilEnabled then
     GlobalContainer.PupilClient.OnCalibrationSuccessful := @PupilCalibrationSuccessful;
+  {$ENDIF}
 
   if Self.ClassType = TCLB then Config(Self);
 end;

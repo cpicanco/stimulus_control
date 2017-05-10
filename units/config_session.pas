@@ -14,7 +14,9 @@ unit config_session;
 interface
 
 uses Classes, ComCtrls, SysUtils,  Dialogs, Forms
+    {$IFNDEF NO_LIBZMQ}
     , pupil_communication
+    {$ENDIF}
     , countermanager
     ;
 
@@ -26,7 +28,9 @@ type
   { TGlobalContainer }
 
   TGlobalContainer = class //(TObject)
+    {$IFNDEF NO_LIBZMQ}
     PupilClient: TPupilCommunication;
+    {$ENDIF}
     PupilEnabled : Boolean;
     CounterManager : TCounterManager;
     RootData: string;

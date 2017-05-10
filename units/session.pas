@@ -13,15 +13,16 @@ unit session;
 
 interface
 
-uses Classes, Controls, SysUtils, LCLIntf
+uses Classes, Controls, SysUtils, LCLIntf, FileUtil
      //,dialogs
      , constants
      , bass_player
      , config_session
      , countermanager
-     , FileUtil
      , blocs
+     {$IFNDEF NO_LIBZMQ}
      , pupil_communication
+     {$ENDIF}
      , timestamps
      ;
 
@@ -55,8 +56,10 @@ type
     procedure Miss(Sender: TObject);
     procedure Play; overload;
     procedure PlayBlc(Sender: TObject);
+    {$IFNDEF NO_LIBZMQ}
     procedure PupilMultipartReceived(Sender: TObject; AMultipart : TMPMessage);
     procedure PupilRecordingStarted(Sender: TObject; AMultipart : TMPMessage);
+    {$ENDIF}
     procedure PupilRequestReceived(Sender: TObject; ARequest, AResponse : string);
     procedure SetBackGround(BackGround: TWinControl);
     procedure SetPupilClient(AValue: Boolean);
@@ -184,11 +187,13 @@ procedure TSession.EndSess(Sender: TObject);
 var Footer : string;
 begin
   Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
+  {$IFNDEF NO_LIBZMQ}
   if PupilClientEnabled then
     begin
       FGlobalContainer.PupilClient.Request(REQ_SHOULD_STOP_RECORDING);
       CopyFile(FConfigs.Filename,FGlobalContainer.RootData + ExtractFileName(FConfigs.Filename));
     end;
+  {$ENDIF}
 
   Sleep(100);
   FreeLogger(LGData, Footer);
@@ -241,7 +246,7 @@ begin
   FManager.OnBeginSess(Self);
   PlayBlc(Self);
 end;
-
+{$IFNDEF NO_LIBZMQ}
 procedure TSession.PupilMultipartReceived(Sender: TObject;
   AMultipart: TMPMessage);
 begin
@@ -256,6 +261,7 @@ begin
   FGlobalContainer.RootData := AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim;
   Play;
 end;
+{$ENDIF}
 
 procedure TSession.PupilRequestReceived(Sender: TObject; ARequest,
   AResponse: string);
@@ -274,6 +280,7 @@ end;
 procedure TSession.SetPupilClient(AValue: Boolean);
 begin
   if FPupilClientEnabled=AValue then Exit;
+  {$IFNDEF NO_LIBZMQ}
   if AValue then
     begin
       FGlobalContainer.PupilClient := TPupilCommunication.Create(FServerAddress);
@@ -281,6 +288,9 @@ begin
   else FGlobalContainer.PupilClient.Terminate;
 
   FPupilClientEnabled:=AValue;
+  {$ELSE}
+  FPupilClientEnabled:=False;
+  {$ENDIF}
 end;
 
 procedure TSession.StmResponse(Sender: TObject);
@@ -368,6 +378,7 @@ begin
 
   if PupilClientEnabled then
     begin
+      {$IFNDEF NO_LIBZMQ}
       with FGlobalContainer.PupilClient do
         begin
           OnRequestReceived := @PupilRequestReceived;
@@ -384,6 +395,7 @@ begin
           //end;
           Request(REQ_SHOULD_START_RECORDING); // must be non-blocking
         end
+      {$ENDIF}
     end
   else Play;
 end;

@@ -2154,7 +2154,6 @@ object FormUserConfig: TFormUserConfig
         Top = 8
         Width = 163
         Caption = 'Testar Interface Pupil'
-        OnClick = btnClientTestClick
         ParentShowHint = False
         ShowHint = True
         TabOrder = 1

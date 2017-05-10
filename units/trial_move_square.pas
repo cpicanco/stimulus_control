@@ -109,11 +109,14 @@ end;
 
 procedure TMSQ.TrialStart(Sender: TObject);
 begin
+  {$IFNDEF NO_LIBZMQ}
   if GlobalContainer.PupilEnabled then
     begin
       GlobalContainer.PupilClient.Subscribe('surface');
       GlobalContainer.PupilClient.OnMultiPartMessageReceived := @UpdateSquare;
     end;
+  {$ENDIF}
+
   FDataSupport.TrialBegin := TickCount;
   Invalidate;
 end;
@@ -187,11 +190,13 @@ end;
 
 destructor TMSQ.Destroy;
 begin
+  {$IFNDEF NO_LIBZMQ}
   if GlobalContainer.PupilEnabled then
     begin
       GlobalContainer.PupilClient.UnSubscribe('surface');
       GlobalContainer.PupilClient.OnMultiPartMessageReceived := nil;
     end;
+  {$ENDIF}
   inherited Destroy;
 end;
 
