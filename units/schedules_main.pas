@@ -126,7 +126,12 @@ begin
         //FSchedule.Parameter4 := StrToIntDef(LParameter4, 0);
       end;
     else
-      raise Exception.Create('Esquema desconhecido: '+ Kind);
+      begin
+        // use CRF as default if invalid
+        FSchedule:= TRatioSchedule.Create(Self);
+        FSchedule.Parameter1 := 1;
+        FSchedule.Parameter2 := 0;
+      end;
   end;
 
   FScheduleLoaded := Assigned(FSchedule);
