@@ -14,7 +14,9 @@ unit trial_move_square;
 interface
 
 uses LCLIntf, Classes, SysUtils, Forms, Graphics
+    {$IFNDEF NO_LIBZMQ}
     , pupil_communication
+    {$ENDIF}
     , trial_abstract
     , draw_methods
     ;
@@ -37,7 +39,9 @@ type
     FGazePoint : TPoint;
     FDataSupport : FDataSupport;
     procedure None(Sender: TObject);
+    {$IFNDEF NO_LIBZMQ}
     procedure UpdateSquare(Sender: TObject; AMultiPartMessage : TMPMessage);
+    {$ENDIF}
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
@@ -70,6 +74,7 @@ begin
   if Assigned(OnNone) then OnNone(Sender);
 end;
 
+{$IFNDEF NO_LIBZMQ}
 procedure TMSQ.UpdateSquare(Sender: TObject; AMultiPartMessage: TMPMessage);
 var
   LX,LY : Double;
@@ -95,6 +100,7 @@ begin
               Invalidate;
 				    end;
 end;
+{$ENDIF}
 
 procedure TMSQ.TrialBeforeEnd(Sender: TObject);
 begin
