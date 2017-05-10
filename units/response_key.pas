@@ -214,6 +214,13 @@ procedure TKey.SetFileName(Path: string);                 //Review required
 var
   s1 : String;
 
+  LGuessedExtensions : array [0..5] of string = (
+    '.BMP', '.JPG', '.PNG',
+    '.bmp', '.jpg', '.png'
+  );
+
+  LExtension : string;
+
   procedure CreateBitmap;
   begin
     if Assigned(FStimulus) then
@@ -375,7 +382,7 @@ var
 begin
   if FFileName = Path then Exit;
   FFileName := '';
-  if FileExistsUTF8(Path) then
+  if FileExists(Path) then
     begin
       s1:= UpperCase(ExtractFileExt(Path));
       case s1 of
@@ -401,17 +408,17 @@ begin
               s1:= Path;
               Delete(s1, pos(Copy(Path,Length(Path)- 3,4),s1), 4);
 
-              if FileExists(s1 + '.BMP') then
-                Load_BMP(s1 + '.BMP',True);
-
-              if FileExists(s1 + '.JPG') then
-                Load_JPG(s1 + '.JPG',True);
-
-              if FileExists(s1 + '.PNG') then
-                Load_PNG(s1 + '.PNG',True);
-
-              //if FileExists(s1 + '.GIF') then
-              //  Load_GIF(s1 + '.GIF',True);
+              for LExtension in LGuessedExtensions do
+                if FileExists(s1 + LExtension) then
+                  begin
+                    case UpperCase(LExtension) of
+                      // images
+                      '.BMP' : Load_BMP(s1 + LExtension, True);
+                      '.JPG' : Load_JPG(s1 + LExtension, True);
+                      '.PNG' : Load_PNG(s1 + LExtension, True);
+                    end;
+                    Break;
+                  end;
             end;
       end;
 
