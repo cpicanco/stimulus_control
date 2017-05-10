@@ -239,9 +239,7 @@ end;
 
 procedure TFormGo_NoGo.FormActivate(Sender: TObject);
 begin
-  BorderStyle := bsNone;
-  WindowState := wsFullScreen;
-  Left := Screen.Monitors[MonitorToShow].Left;
+  WindowState := wsMaximized;
 end;
 
 procedure TFormGo_NoGo.Resize;
