@@ -254,16 +254,19 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="etpackage"/>
       </Item1>
       <Item2>
-        <PackageName Value="LazControls"/>
+        <PackageName Value="IDEIntf"/>
       </Item2>
       <Item3>
-        <PackageName Value="LCL"/>
+        <PackageName Value="LazControls"/>
       </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
     </RequiredPackages>
     <Units Count="49">
       <Unit0>
