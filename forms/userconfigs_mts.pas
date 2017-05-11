@@ -27,12 +27,16 @@ type
     Key : TKey;
   end;
 
+  { TSimpleMTSTrial }
+
   TSimpleMTSTrial = class(TComponent)
   private
 
   public
     Sample : TStimulus;
     Comparisons : array of TStimulus;
+    procedure Assign(Source: TSimpleMTSTrial); overload;
+    destructor Destroy; override;
   end;
 
   { TFormMTS }
@@ -57,7 +61,6 @@ type
     XMLPropStorage1: TXMLPropStorage;
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure SpinComparisonsEditingDone(Sender: TObject);
     procedure SpinCursorEditingDone(Sender: TObject);
     procedure XMLPropStorage1RestoreProperties(Sender: TObject);
@@ -88,6 +91,48 @@ implementation
 {$R *.lfm}
 
 uses constants, config_session_fileutils, LazFileUtils;
+
+{ TSimpleMTSTrial }
+
+procedure TSimpleMTSTrial.Assign(Source: TSimpleMTSTrial);
+var
+  i : integer;
+  LComparisons : integer;
+begin
+  // We need to copy lists only
+  if Assigned(Source.Sample.List) then
+    begin
+      Sample.List := TStringList.Create;
+      Sample.List.Text := Source.Sample.List.Text;
+    end;
+
+  LComparisons := Length(Source.Comparisons);
+  if LComparisons > 0 then
+    begin
+      SetLength(Comparisons, LComparisons);
+      for i := Low(Source.Comparisons) to High(Source.Comparisons) do
+        if Assigned(Source.Comparisons[i].List) then
+          begin
+            Comparisons[i].List := TStringList.Create;
+            Comparisons[i].List.Text := Source.Comparisons[i].List.Text;
+          end;
+
+    end;
+end;
+
+destructor TSimpleMTSTrial.Destroy;
+var
+  i : integer;
+begin
+  if Assigned(Sample.List) then
+    Sample.List.Free;
+
+  if Length(Comparisons) > 0 then
+    for i := Low(Comparisons) to High(Comparisons) do
+      if Assigned(Comparisons[i].List) then
+        Comparisons[i].List.Free;
+  inherited Destroy;
+end;
 
 { TFormMTS }
 
@@ -137,15 +182,6 @@ end;
 procedure TFormMTS.FormActivate(Sender: TObject);
 begin
   WindowState:=wsMaximized;
-end;
-
-procedure TFormMTS.FormDestroy(Sender: TObject);
-var
-  i: Integer;
-begin
-  FTrial.Sample.List.Free;
-  for i := 0 to High(FTrial.Comparisons) do
-    FTrial.Comparisons[i].List.Free;
 end;
 
 procedure TFormMTS.SpinComparisonsEditingDone(Sender: TObject);
@@ -306,7 +342,12 @@ end;
 procedure TFormMTS.AddTrialsToGui(ATrialGrid: TStringGrid);
 var
   LRow, i: Integer;
+  LTrial : TSimpleMTSTrial;
 begin
+  // we must create a copy here
+  LTrial := TSimpleMTSTrial.Create(Self);
+  LTrial.Assign(FTrial);
+
   with ATrialGrid do
     begin
       if (RowCount = 2) and (Cells[0,1] = '') then
@@ -317,9 +358,8 @@ begin
         begin
           if LRow >= RowCount then
             RowCount := LRow + 1;
-
+          Objects[0, LRow] := LTrial; // and assign our copy here
           Cells[0, LRow] := IntToStr(LRow);
-          Objects[0, LRow] := FTrial;
           Cells[1, LRow] := FTrial.Sample.Key.ShortName+'->'+FTrial.Comparisons[0].Key.ShortName;
           Cells[2, LRow] := FTrial.Comparisons[0].List.Values[_Comp+'1'+_cRes];
           Inc(LRow);

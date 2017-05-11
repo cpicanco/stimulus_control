@@ -217,7 +217,11 @@ var
   Atr_Mod,
   Frq_Mod: String;
 begin
-  Pos_Mod:= FSample.Msg;
+  case FSample.Msg of
+    '','AUTO':Pos_Mod:= FSample.Key.ShortName+' - '+'('+IntToStr(FSample.Key.Top)+','+IntToStr(FSample.Key.Left)+')';
+    else
+      Pos_Mod:= FSample.Msg;
+  end;
 
   if FSDataSupport.SampLatency = TimeStart then
     Lat_Mod := #32#32#32#32#32#32 + 'NA'

@@ -151,61 +151,36 @@ begin
 end;
 
 procedure TSimpl.TrialResult(Sender: TObject);
-var I : integer;
+var i : integer;
 begin
   FDataSupport.StmEnd := TickCount;
   FResponseEnabled:= False;
 
   if Sender is TKey then
     begin
-      I := TKey(Sender).Tag;
-      //FDataSupport.PLPCode:= FComparisons[I].Csq;
-      //FDataSupport.RS232Code := FComparisons[I].Usb;
-      TimeOut := FComparisons[I].TO_;
-      IETConsequence := FComparisons[I].IET;
+      i := TKey(Sender).Tag;
+      //FDataSupport.PLPCode:= FComparisons[i].Csq;
+      //FDataSupport.RS232Code := FComparisons[i].Usb;
+      TimeOut := FComparisons[i].TO_;
+      IETConsequence := FComparisons[i].IET;
 
-      if (FComparisons[I].Res = T_HIT) or (FComparisons[I].Res = T_MISS)  then
-        begin
-          if FComparisons[I].Res = T_HIT then Result := T_HIT;
-          if FComparisons[I].Res = T_MISS then Result := T_MISS;
-        end
+      case FComparisons[i].Res of
+        T_HIT : Result := T_HIT;
+        T_MISS : Result := T_MISS;
       else
         Result := T_NONE;
+      end;
 
-      if FComparisons[I].Nxt = T_CRT then
+      if FComparisons[i].Nxt = T_CRT then
         NextTrial := T_CRT
       else
-        NextTrial := FComparisons[I].Nxt;
+        NextTrial := FComparisons[i].Nxt;
 
-      if FComparisons[I].Msg = 'GONOGO' then
-        begin       //GONOGO serve apenas para a diferenciação entre Go e NoGo nos esquemas RRRT
-          if FConsequenceFired then
-            FDataSupport.CompMsg := 'GO'
-          else
-            FDataSupport.CompMsg := 'NOGO';
-
-          if (FConsequenceFired = False) and (FComparisons[I].Res = T_HIT) then
-            Result := 'MISS';
-
-          if (FConsequenceFired = False) and (FComparisons[I].Res = T_MISS) then
-           begin
-             FDataSupport.PLPCode := 0;
-             FDataSupport.RS232Code := '0';
-             TimeOut := 0;
-             Result := T_HIT;
-           end;
-
-          if FConsequenceFired and (FComparisons[I].Res = T_HIT) then
-            TimeOut := 0;
-
-          if FConsequenceFired and (FComparisons[I].Res = T_MISS) then
-           begin
-             FDataSupport.PLPCode := 0;
-             FDataSupport.RS232Code := '0';
-           end;
-        end
-      else
-        FDataSupport.CompMsg:= FComparisons[I].Msg;
+      case FComparisons[i].Msg of
+        '','AUTO' : FDataSupport.CompMsg := TKey(Sender).ShortName+' - '+'('+IntToStr(TKey(Sender).Top)+','+IntToStr(TKey(Sender).Left)+')';
+        else
+          FDataSupport.CompMsg:= FComparisons[i].Msg;
+      end;
     end;
 end;
 

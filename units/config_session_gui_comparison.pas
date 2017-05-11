@@ -131,7 +131,32 @@ begin
             end;
 
           if Sender = EditCFilename then
-            UpdateCFilename;
+            begin
+              if Assigned(FResponseKey) then
+                begin
+                  FResponseKey.FullPath := OpenDialog.FileName;
+                  if FResponseKey.Kind.stmAudio then
+                    ComboCRepeat.Enabled:=True
+                  else
+                    ComboCRepeat.Enabled:=False;
+                end;
+              UpdateCFilename;
+            end;
+        end;
+      Exit;
+    end;
+
+  if Sender is TKey then
+    begin
+      if OpenDialog.Execute then
+        begin
+          TKey(Sender).FullPath := OpenDialog.FileName;
+          EditSFilename.Text := ExtractFileName(OpenDialog.FileName);
+          if TKey(Sender).Kind.stmAudio then
+            ComboSRepeat.Enabled:=True
+          else
+            ComboSRepeat.Enabled:=False;
+          UpdateSFilename;
         end;
     end;
 end;
@@ -158,6 +183,7 @@ procedure TGUIKeySettings.SetResponseKey(AValue: TKey);
 begin
   if FResponseKey=AValue then Exit;
   FResponseKey:=AValue;
+  FResponseKey.OnDblClick:=@FileNameDblClick;
 end;
 
 procedure TGUIKeySettings.ControlEditingDone(Sender: TObject);
@@ -181,7 +207,7 @@ begin
   //  GBStimulus : TGroupBox;
   if Assigned(ConfigList) then
     begin
-      if (Sender = ComboSRepeat) or (Sender = ButtonSColor) then
+      if (Sender = EditSFilename) or (Sender = ComboSRepeat) or (Sender = ButtonSColor) then
         UpdateSFilename;
 
       if IsSample then
@@ -215,7 +241,7 @@ begin
           if Sender = ComboResult then
             ConfigList.Values[_Comp+IntToStr(Tag)+_cRes] := ResultToStr(ComboResult.ItemIndex);
 
-          if (Sender = ComboCRepeat) or (Sender = ButtonCColor) or (Sender = EditConsequenceDuration) then
+          if (Sender = EditCFilename) or (Sender = ComboCRepeat) or (Sender = ButtonCColor) or (Sender = EditConsequenceDuration) then
             UpdateCFilename;
 
           if Sender = EditNextTrial then
@@ -299,6 +325,7 @@ begin
       Hint:='Clique duas vezes para abrir o arquivo.';
       Parent := GBStimulus;
       OnDblClick:=@FileNameDblClick;
+      OnEditingDone:=@ControlEditingDone;
     end;
 
   //////////////////////////////////////////////////////////////////////////////
@@ -453,6 +480,7 @@ begin
         begin
           Hint:='Deixe vazio para usar o padrão para acerto e erro. Clique duas vezes para customizar';
           OnDblClick:=@FileNameDblClick;
+          OnEditingDone:=@ControlEditingDone;
           Parent := GBConseque;
         end;
 

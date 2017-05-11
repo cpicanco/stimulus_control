@@ -80,6 +80,7 @@ type
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
     property OnEndMedia: TNotifyEvent read FOnEndMedia write FOnEndMedia;
   public
+    property OnDblClick;
     property Color;
     property Caption;
     property Font;

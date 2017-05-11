@@ -11,7 +11,6 @@ object FormMTS: TFormMTS
   ClientWidth = 1046
   OnActivate = FormActivate
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   SessionProperties = 'EditDefaultCsqHIT.Text;EditDefaultCsqMISS.Text;OpenDialog.InitialDir;SpinComparisons.Value;SpinPresentations.Value;SpinCursor.Value'
   LCLVersion = '1.6.2.0'
   object Panel1: TPanel

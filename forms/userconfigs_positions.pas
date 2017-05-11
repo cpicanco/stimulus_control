@@ -88,24 +88,45 @@ var
 
 implementation
 
-uses math, constants;
+uses math, strutils, FileUtil, constants;
 
 {$R *.lfm}
 
 procedure TFormRandomizePositions.btnOKClick(Sender: TObject);
-var LRow, LCol : integer;
+var
+  LRow, LCol : integer;
+  LReportMessage : string;
 begin
   with StringGrid do
     for LRow := 1 to RowCount -1 do
       for LCol := 1 to ColCount - 1 do
         begin
-          if FSession.ReadTrialString(FBloc.ID,LRow+1,_Kind) = T_MTS then
+          if FSession.ReadTrialString(FBloc.ID,LRow,_Kind) = T_MTS then
             if LCol = 1 then
-              FSession.WriteToTrial(LRow,FBloc.ID,_Samp+_cBnd, FPositions.Values[Cells[LCol,LRow]]);
+              begin
+                // position
+                FSession.WriteToTrial(LRow,FBloc.ID,_Samp+_cBnd, FPositions.Values[Cells[LCol,LRow]]);
+
+                // position report message
+                LReportMessage:=ExtractDelimited(1,FSession.ReadTrialString(FBloc.ID,LRow,_Samp+_cStm),[#32]);
+                LReportMessage:=ExtractFileNameWithoutExt(LReportMessage);
+                LReportMessage:=LReportMessage +' - '+Cells[LCol,LRow];
+                FSession.WriteToTrial(LRow,FBloc.ID,_Samp+_cMsg,LReportMessage);
+
+              end;
 
           if LCol > 1 then
-            if (LCol - 1) <= FSession.ReadTrialInteger(FBloc.ID,LRow+1,_NumComp) then
-              FSession.WriteToTrial(LRow,FBloc.ID,_Comp + IntToStr(LCol-1)+_cBnd, FPositions.Values[Cells[LCol,LRow]]);
+            if (LCol - 1) <= FSession.ReadTrialInteger(FBloc.ID,LRow,_NumComp) then
+              begin
+                // position
+                FSession.WriteToTrial(LRow,FBloc.ID,_Comp+IntToStr(LCol-1)+_cBnd,FPositions.Values[Cells[LCol,LRow]]);
+
+                // position report message
+                LReportMessage:=ExtractDelimited(1,FSession.ReadTrialString(FBloc.ID,LRow+1,_Comp+IntToStr(LCol-1)+_cStm),[#32]);
+                LReportMessage:=ExtractFileNameWithoutExt(LReportMessage);
+                LReportMessage:=LReportMessage +' - '+Cells[LCol,LRow];
+                FSession.WriteToTrial(LRow,FBloc.ID,_Comp+IntToStr(LCol-1)+_cMsg,LReportMessage);
+              end;
         end;
   StringGrid.Invalidate;
   FSession.UpdateFile;

@@ -377,9 +377,10 @@ end;
 
 procedure TFormUserConfig.XMLPropStorage1SaveProperties(Sender: TObject);
 begin
-  StringGrid1.SaveToCSVFile('stringgrid.csv');
   if btnGridType.Caption = rsFillTypeMTS then
     SetGridHeader(StringGrid1,rsFillTypeMTS);
+
+  StringGrid1.SaveToCSVFile('stringgrid.csv');
 end;
 
 function TFormUserConfig.MeetCondition(aCol, aRow : integer): boolean;

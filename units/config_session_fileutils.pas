@@ -230,7 +230,7 @@ end;
 function TConfigurationFile.ReadTrialInteger(ABloc: integer; ATrial: integer;
   AName: string): LongInt;
 begin
-  Result := ReadInteger(TrialSection(ABloc, ATrial), AName, MaxInt);
+  Result := ReadInteger(TrialSection(ABloc, ATrial), AName, 0);
 end;
 
 constructor TConfigurationFile.Create(const AConfigurationFile: string;
