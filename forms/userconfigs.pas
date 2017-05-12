@@ -454,10 +454,12 @@ var
   i, RandLine: integer;
   InCell : string;
   StrArray : array of string;
+  LTempObject : TObject;
 
   procedure SaveLine (Line : integer);
   var j : integer;
   begin
+    LTempObject := StringGrid1.Objects[0,Line];
     for j := 0 to StringGrid1.ColCount - 1 do
       begin
         InCell := StringGrid1.Cells[j, Line];
@@ -468,6 +470,7 @@ var
   procedure SendToLine (Line : integer);
   var j : integer;
   begin
+    StringGrid1.Objects[0,Line] := LTempObject;
     for j := 0 to StringGrid1.ColCount - 1 do
       begin
         InCell := StrArray[j];
@@ -478,6 +481,7 @@ var
   procedure ChangeLines (New, Old : integer);
   var j : integer;
   begin
+    StringGrid1.Objects[0,New] := StringGrid1.Objects[0,Old];
     for j := 0 to StringGrid1.ColCount - 1 do
       begin
         InCell := StringGrid1.Cells[j, Old];
@@ -486,6 +490,7 @@ var
   end;
 
 begin
+  LTempObject := nil;
   SetLength(StrArray, StringGrid1.ColCount);
 
   for i := BeginRow to EndRow do
@@ -496,9 +501,9 @@ begin
         DebugLn(mt_Information + IntToStr(i) + ',' + IntToStr(RandLine));
       {$endif}
 
-      SaveLine (i);
-      ChangeLines (i, RandLine);
-      SendToLine (RandLine);
+      SaveLine(i);
+      ChangeLines(i, RandLine);
+      SendToLine(RandLine);
     end;
 end;
 
