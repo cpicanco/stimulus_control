@@ -13,10 +13,9 @@ unit trial_matching;
 
 interface
 
-uses LCLIntf, LCLType, Controls, Classes, SysUtils
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls
 
     , response_key
-    , custom_timer
     , trial_simple
     //, interface_rs232
     //, interface_plp
@@ -33,8 +32,6 @@ type
     SampleBegin,
     Delay_Begin : Extended;
     //SampleMsg : string
-    //Rs232Code : string;
-    //PLPCode : BYTE;
   end;
 
   { TMTS }
@@ -42,8 +39,8 @@ type
   TMTS = Class(TSimpl)
   private
     FDelayed : Boolean;
-    FDelay : TClockThread;
-    FSample : TSupportKey;
+    FDelay : TTimer;
+    FSample : TKeySupport;
     FSDataSupport : TSampleDataSupport;
     procedure SampleMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
@@ -77,6 +74,8 @@ begin
             'Atr.Mod.' + #9 +
             'Frq.Mod.' + #9 + #9 + #9 +
             Header;
+
+  FDelay := nil;
 end;
 
 procedure TMTS.Play(ACorrection : Boolean);
@@ -85,48 +84,47 @@ var
   R: TRect;
 begin
   inherited Play(ACorrection);
-  with FSample do begin
+  with FSample do
+    begin
+      // Owner is TGraphicControl
+      Key:= TKey.Create(Self);
+      Key.Cursor:= Self.Cursor;
+      Key.OnConsequence:= @SampleConsequence;
+      Key.OnResponse:= @SampleResponse;
 
-    // Owner is TGraphicControl
-    Key:= TKey.Create(Self);
-    Key.Cursor:= Self.Cursor;
-    Key.OnConsequence:= @SampleConsequence;
-    Key.OnResponse:= @SampleResponse;
+      // Parent is TCustomControl/TForm
+      Key.Parent:= TCustomControl(Self.Parent);
 
-    // Parent is TCustomControl/TForm
-    Key.Parent:= TCustomControl(Self.Parent);
+      // BND
+      s1:= CfgTrial.SList.Values[_Samp + _cBnd];
+      R.Top:= StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
+      R.Left:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
+      R.Right:= StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
+      R.Bottom:= StrToIntDef(ExtractDelimited(4,s1,[#32]),100);
+      Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
-    // BND
-    s1:= CfgTrial.SList.Values[_Samp + _cBnd];
-    R.Top:= StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
-    R.Left:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
-    R.Right:= StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
-    R.Bottom:= StrToIntDef(ExtractDelimited(4,s1,[#32]),100);
-    Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
+      // STM
+      s1:= CfgTrial.SList.Values[_Samp + _cStm] + #32;
+      Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);  // must be set before fullpath
+      Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]),$0000FF);
+      Key.FullPath:= RootMedia + ExtractDelimited(1,s1,[#32]);
 
-    // STM
-    s1:= CfgTrial.SList.Values[_Samp + _cStm] + #32;
-    Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);  // must be set before fullpath
-    Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]),$0000FF);
-    Key.FullPath:= RootMedia + ExtractDelimited(1,s1,[#32]);
+      // SCH
+      Key.Schedule.Kind:= CfgTrial.SList.Values[_Samp + _cSch];
+      AddToClockList(Key.Schedule);
 
-    // SCH
-    Key.Schedule.Kind:= CfgTrial.SList.Values[_Samp + _cSch];
-    AddToClockList(Key.Schedule);
-
-    // MSG
-    Msg:= CfgTrial.SList.Values[_Samp + _cMsg];
-  end;
+      // MSG
+      Msg:= CfgTrial.SList.Values[_Samp + _cMsg];
+    end;
 
   // DELAY
   FDelayed:= StrToBoolDef(CfgTrial.SList.Values[_Delayed], False);
   if FDelayed then
     begin
-      FDelay := TClockThread.Create(True);
-      FDelay.OnTimer:= @DelayEnd;
+      FDelay := TTimer.Create(Self);
+      FDelay.Enabled:=False;
+      FDelay.OnTimer := @DelayEnd;
       FDelay.Interval:= StrToIntDef(CfgTrial.SList.Values[_Delay], 0);
-      FDelay.Enabled := False;
-      AddToClockList(@FDelay.Start);
     end;
 
   if Self.ClassType = TMTS then Config(Self);
@@ -135,7 +133,6 @@ end;
 procedure TMTS.DelayEnd(Sender: TObject);
 begin
   FDelay.Enabled:= False;
-  FDelay.Terminate;
   inherited TrialStart(Sender);
 end;
 
@@ -167,7 +164,7 @@ begin
             FSDataSupport.SampLatency := LTickCount;
 
         if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
-        if Assigned(OnStmResponse) then OnStmResponse (Self);
+        if Assigned(OnStmResponse) then OnStmResponse(Self);
       end;
 end;
 
@@ -178,7 +175,6 @@ end;
 
 procedure TMTS.SampleMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
-
 var
   aStimulus : string;
 begin
