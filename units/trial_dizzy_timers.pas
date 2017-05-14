@@ -15,11 +15,11 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
-    , trial_abstract
-    , schedules_main
-    , response_key
-    , custom_timer
-    ;
+  , trial_abstract
+  , schedules_main
+  , response_key
+  , custom_timer
+  ;
 
 type
 
@@ -93,13 +93,13 @@ begin
   OnTrialStart := @TrialStart;
   OnTrialPaint := @TrialPaint;
 
-  Header :=  'StmBegin' + #9 +
-             '_Latency' + #9 +
+  Header :=  rsReportStmBeg + #9 +
+             rsReportRspLat + #9 +
              '___Cycle' + #9 +
              '__Timer2' + #9 +
              '_Version' + #9 +
              '____Mode' + #9 +
-             'RespFreq';
+             rsReportRspFrq;
 
   FCycles := 0;
   FDataSupport.Responses:= 0;

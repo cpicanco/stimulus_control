@@ -14,12 +14,13 @@ unit trial_calibration;
 interface
 
 uses LCLIntf, LCLType, Classes, SysUtils, Graphics
-    {$IFNDEF NO_LIBZMQ}
-    , pupil_communication
-    {$ENDIF}
-    , trial_abstract
-    , trial_helpers
-    ;
+
+  , trial_abstract
+  , trial_helpers
+  {$IFNDEF NO_LIBZMQ}
+  , pupil_communication
+  {$ENDIF}
+  ;
 
 type
 
@@ -192,8 +193,8 @@ begin
       Font.Color:=clWhite;
     end;
 
-  Header := 'StmBegin' + #9 +
-            '__StmEnd' + #9 +
+  Header := rsReportStmBeg + #9 +
+            rsReportStmEnd + #9 +
             '____Dots';
 end;
 

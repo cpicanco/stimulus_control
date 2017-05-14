@@ -13,14 +13,14 @@ unit trial_simple;
 
 interface
 
-uses LCLIntf, LCLType, Controls, Classes, SysUtils, LazFileUtils
+uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
-    , response_key
-    , trial_abstract
-    , trial_helpers
-    //, interface_rs232
-    //, interface_plp
-    ;
+  , trial_abstract
+  , trial_helpers
+  , response_key
+  //, interface_rs232
+  //, interface_plp
+  ;
 
 type
 
@@ -44,15 +44,18 @@ type
   { TSimpl }
 
   {
+    Implements Simple Discriminations
     Presents comparisons
   }
-
   TSimpl = Class(TTrial)
   private
     procedure Consequence(Sender: TObject);
     procedure Dispenser(Csq: Byte; Usb: string);
     procedure Response(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
+    procedure BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    function GetHeader: string;
   protected
     FDataSupport : TDataSupport;
     FConsequence : TConsequenceSupport;
@@ -64,7 +67,6 @@ type
     procedure WriteData(Sender: TObject); override;
     procedure TrialResult(Sender: TObject);
     procedure VisibleComparisons(AValue: Boolean);
-    procedure BackgroundMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(ACorrection : Boolean); override;
@@ -80,19 +82,12 @@ begin
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialStart := @TrialStart;
 
-  Header :=  Header +
-             'Pos.Cmp.' + #9 + // Msg of each stimulus
-             'Res.Cmp.' + #9 + // Msg of the stimulus that have ended the trial
-             'Lat.Cmp.' + #9 + // Latency
-             'Dur.Cmp.' + #9 + // presentation time of all stimuli
-             '___Disp.' + #9 + // RS232 code of the stimulus that have ended the trial
-             '___UDsp.' + #9 + // USB code of the stimulus that have ended the trial
-             'Frq.Cmp.';       // absolute response frequency from each stimulus
+  if Self.ClassType = TSimpl then
+    Header := Header + #9 + GetHeader;
 
   HeaderTimestamps := HeaderTimestamps + #9 +
-                      'Lft.Cmp.' + #9 +
-                      'Top.Cmp.';              // top left of all clicks
-
+                      rsReportRspLft + #9 +
+                      rsReportRspTop;              // top left of all clicks (both background and comparisons)
 end;
 
 procedure TSimpl.Dispenser(Csq: Byte; Usb: string);
@@ -108,7 +103,6 @@ var
   I : Integer;
 begin
   inherited Play(ACorrection);
-
   FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
   SetLength(FComparisons, FNumComp);
   for I := 0 to FNumComp-1 do
@@ -210,26 +204,25 @@ end;
 
 procedure TSimpl.WriteData(Sender: TObject);
 var
-  Pos_Cmp,
-  Lat_Cmp,
-  Dur_Cmp,
-  Res_Cmp,
-  Disp,
-  uDisp,
-  Frq_Cmp: string;
-
+  HeaderTabs : string = #9;
+  Pos_Cmp : string = '';
+  Lat_Cmp : string = '';
+  Dur_Cmp : string = '';
+  Res_Cmp : string = '';
+  Disp : string = '';
+  uDisp : string = '';
+  Frq_Cmp: string = '';
+  End_Cmp: string = '';
+  Beg_Cmp: string = '';
   I : Integer;
 begin
-  Frq_Cmp := '';
-  Pos_Cmp := '';
-  Disp := '';
-  uDisp := '';
-  for I := 0 to High(FComparisons) do
+  inherited WriteData(Sender);
+  for I := Low(FComparisons) to High(FComparisons) do
       Frq_Cmp := Frq_Cmp + FComparisons[I].Msg + '=' +
                                    IntToStr(FComparisons[I].Key.ResponseCount) + #9;
-  Frq_Cmp := Frq_Cmp + 'BK.C='+ IntToStr(FDataSupport.BackgroundResponses);
+  Frq_Cmp := Frq_Cmp + 'BK.C='+ IntToStr(FDataSupport.BackgroundResponses) + #9;
 
-  for I:= 0 to FNumComp-1 do
+  for I:= Low(FComparisons) to High(FComparisons) do
     begin
       if FComparisons[I].Msg = '' then FComparisons[I].Msg:= '-';
       Pos_Cmp:= Pos_Cmp + FComparisons[I].Msg + #32;
@@ -240,22 +233,35 @@ begin
 
   if FDataSupport.Latency = TimeStart then
     Lat_Cmp := #32#32#32#32#32#32 + 'NA'
-  else Lat_Cmp := TimestampToStr(FDataSupport.Latency - TimeStart);
+  else
+    Lat_Cmp := TimestampToStr(FDataSupport.Latency - TimeStart);
   Dur_Cmp := TimestampToStr(FDataSupport.StmEnd - FDataSupport.StmBegin);
 
   //Disp:= RightStr(IntToBin(FDataSupport.PLPCode, 9)+#0, 8);
   //uDisp := IntToStr(FDataSupport.RS232Code);
+  Beg_Cmp := TimestampToStr(FDataSupport.StmBegin - TimeStart);
+  End_Cmp := TimestampToStr(FDataSupport.StmEnd - TimeStart);
 
   Data := Data +
           Pos_Cmp + #9 +
           Res_Cmp + #9 +
           Lat_Cmp + #9 +
+          Beg_Cmp + #9 +
+          End_Cmp + #9 +
           Dur_Cmp + #9 +
           Disp    + #9 +
           uDisp   + #9 +
           Frq_Cmp;
 
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+  if Self.ClassType = TSimpl then
+    if Assigned(OnTrialWriteData) then OnTrialWriteData(Self)
+    else // do nothing
+  else
+    begin
+      for I := Low(FComparisons) to High(FComparisons) do
+        HeaderTabs := HeaderTabs + #9;
+      Header := Header + #9 + GetHeader + HeaderTabs;
+    end;
 end;
 
 procedure TSimpl.BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
@@ -265,6 +271,19 @@ begin
   Inc(FDataSupport.BackgroundResponses); // local
   CounterManager.OnBkgndResponse(Self); // global
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
+end;
+
+function TSimpl.GetHeader: string;
+begin
+  Result :=  rsReportStmCmp + #9 +    // Msg of each stimulus
+             rsReportRspCmp + #9 +    // Msg of the stimulus that have ended the trial
+             rsReportRspCmpLat + #9 + // Latency
+             rsReportStmCmpBeg + #9 +
+             rsReportStmCmpEnd + #9 +
+             rsReportStmCmpDur + #9 + // presentation time of all stimuli
+             rsReportCsqPLP + #9 +    // RS232 code of the stimulus that have ended the trial
+             rsReportCsqUSB + #9 +    // USB code of the stimulus that have ended the trial
+             rsReportRspCmpFrq;       // absolute response frequency from each stimulus
 end;
 
 procedure TSimpl.TrialBeforeEnd(Sender: TObject);

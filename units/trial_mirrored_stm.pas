@@ -15,20 +15,15 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
-    , config_session
-    , trial_abstract
-    , trial_helpers
-    , constants
-    , draw_methods
-    , schedules_main
-    //, response_key
-    ;
+  , trial_abstract
+  , trial_helpers
+  , schedules_main
+  ;
 
 type
 
   TCurrentTrial = record
     C : array of TCircle; //circles
-    //K : array of TKey; // not implemented yet
     i : integer; //trial index
     NextTrial : string;
     angle : Extended; // angle from "userconfigs_trial_mirrored" form,
@@ -44,8 +39,6 @@ type
     FDataSupport : TDataSupport;
     FCircles: TCurrentTrial;
     FSchedule : TSchedule;
-    //FKey1 : TKey;
-    //FKey2 : TKey;
     FFirstResp : Boolean;
     FUseMedia : Boolean;
     procedure Consequence(Sender: TObject);
@@ -60,15 +53,11 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(ACorrection : Boolean); override;
-    //procedure DispenserPlusCall; override;
-
   end;
 
 implementation
 
-uses
-  timestamps
-  , strutils
+uses strutils, constants, timestamps, draw_methods
 {$ifdef DEBUG}
   , debug_logger
   , dialogs
@@ -85,16 +74,16 @@ begin
   inherited Create(AOwner);
 
   Header :=  Header + #9 +
-             'StmBegin' + #9 +
-             '_Latency' + #9 +
-             '__StmEnd' + #9 +
+             rsReportStmBeg + #9 +
+             rsReportRspLat + #9 +
+             rsReportStmEnd + #9 +
              '___Angle' + #9 +
              '______X1' + #9 +
              '______Y1' + #9 +
              '______X2' + #9 +
              '______Y2' + #9 +
-             'ExpcResp' + #9 +
-             'RespFreq';
+             rsReportRspExp + #9 +
+             rsReportRspFrq;
 
   FDataSupport.Responses:= 0;
 end;
@@ -127,34 +116,20 @@ end;
 procedure TMRD.TrialPaint;
 var i : integer;
 begin
-  if not FUseMedia then
-    for i := 0 to 1 do
-      with FCircles.C[i] do
-        DrawCustomEllipse(Canvas,OuterRect,InnerRect, gap, gap_degree, gap_length);
+  for i := 0 to 1 do
+    with FCircles.C[i] do
+      DrawCustomEllipse(Canvas,OuterRect,InnerRect, gap, gap_degree, gap_length);
 end;
 
 procedure TMRD.Play(ACorrection: Boolean);
 var
-  s1{, sName, sLoop, sColor, sGap, sGapDegree, sGapLength} : string;
+  s1 : string;
   LOuterR : TRect;
   a1, LWidth, LHeight : Integer;
-
-  //procedure KeyConfig(var aKey : TKey);
-  //begin
-  //  with aKey do
-  //    begin
-  //      BoundsRect := R;
-  //      Color := StrToIntDef(sColor, $0000FF); // clRed
-  //      Loops := StrToIntDef(sLoop, 0);
-  //      FullPath := sName;
-  //      Schedule.Kind := CfgTrial.SList.Values[_Schedule];
-  //      // Visible := False;
-  //    end;
-  //end;
-
 begin
   inherited Play(ACorrection);
-  FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
+  //FUseMedia := StrToBoolDef(CfgTrial.SList.Values[_UseMedia], False);
+  FUseMedia := False;
 
   if not FUseMedia then
     SetLength(FCircles.C, 2);
@@ -172,58 +147,37 @@ begin
 
   for a1 := 0 to 1 do
     begin
-        s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
+      s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
 
-        LOuterR.Left:= StrToIntDef(ExtractDelimited(1,s1,[#32]), 0);
-        LOuterR.Top:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
-        LWidth := StrToIntDef(ExtractDelimited(3,s1,[#32]), 100);
-        LOuterR.Right := LOuterR.Left + LWidth;
-        LHeight := StrToIntDef(ExtractDelimited(4,s1,[#32]), 100);
-        LOuterR.Bottom := LOuterR.Top + LHeight;
+      LOuterR.Left:= StrToIntDef(ExtractDelimited(1,s1,[#32]), 0);
+      LOuterR.Top:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
+      LWidth := StrToIntDef(ExtractDelimited(3,s1,[#32]), 100);
+      LOuterR.Right := LOuterR.Left + LWidth;
+      LHeight := StrToIntDef(ExtractDelimited(4,s1,[#32]), 100);
+      LOuterR.Bottom := LOuterR.Top + LHeight;
 
-       if FUseMedia then
-         begin
-           //s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1)+_cStm] + #32;
-           //
-           //sName := RootMedia + Copy(s1, 0, pos(#32, s1)-1);
-           //NextSpaceDelimitedParameter(s1);
-           //
-           //sLoop := Copy(s1, 0, pos(#32, s1)-1);
-           //NextSpaceDelimitedParameter(s1);
-           //
-           //sColor := s1;
-           //
-           //if a1 = 0 then KeyConfig(FKey1) else KeyConfig(FKey2)
-         end
-       else
-          with FCircles.C[a1] do
-            begin
-              OuterRect := LOuterR;
-              InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
-              gap := StrToBoolDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
-              gap_degree := 16 * StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
-              gap_length := 16 * StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
-            end;
-      end;
+      with FCircles.C[a1] do
+        begin
+          OuterRect := LOuterR;
+          InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
+          gap := StrToBoolDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
+          gap_degree := 16 * StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
+          gap_length := 16 * StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
+        end;
+  end;
 
   if Self.ClassType = TMRD then Config(Self);
 end;
 
 procedure TMRD.TrialStart(Sender: TObject);
 begin
-  {
-  if FUseMedia then
-    begin
-      KeyStart(FKey1);
-      KeyStart(FKey2);
-    end;
-  }
   FFirstResp := True;
   FDataSupport.StmBegin := TickCount;
 end;
 
 procedure TMRD.WriteData(Sender: TObject);  //
 begin
+  inherited WriteData(Sender);
   Data := Data +
           TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
           TimestampToStr(FDataSupport.Latency - TimeStart) + #9 +
@@ -257,7 +211,6 @@ begin
       FDataSupport.Latency := LTickCount;
     end;
 
-  //Invalidate;
   if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;

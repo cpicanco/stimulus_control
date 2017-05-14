@@ -14,13 +14,14 @@ unit trial_move_square;
 interface
 
 uses LCLIntf, Classes, SysUtils, Forms, Graphics
-    {$IFNDEF NO_LIBZMQ}
-    , pupil_communication
-    {$ENDIF}
-    , trial_abstract
-    , trial_helpers
-    , draw_methods
-    ;
+
+  , trial_abstract
+  , trial_helpers
+  , draw_methods
+  {$IFNDEF NO_LIBZMQ}
+  , pupil_communication
+  {$ENDIF}
+  ;
 
 type
 
@@ -53,7 +54,7 @@ type
 
 implementation
 
-uses timestamps;
+uses timestamps, constants;
 
 { TMSQ }
 
@@ -186,8 +187,9 @@ begin
       Pen.Style   := psSolid
     end;
 
-  Header := 'StmBegin' + #9 +
-            '__StmEnd' + #9 ;
+  Header := Header + #9 +
+            rsReportStmBeg + #9 +
+            rsReportStmEnd + #9;
 end;
 
 destructor TMSQ.Destroy;

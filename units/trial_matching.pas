@@ -15,11 +15,10 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls
 
-    , response_key
-    , trial_simple
-    //, interface_rs232
-    //, interface_plp
-    ;
+  , trial_simple
+  //, interface_rs232
+  //, interface_plp
+  ;
 
 type
 
@@ -36,19 +35,23 @@ type
 
   { TMTS }
 
+  {
+    Implements Conditional Discriminations
+  }
   TMTS = Class(TSimpl)
   private
     FDelayed : Boolean;
     FDelay : TTimer;
     FSample : TKeySupport;
     FSDataSupport : TSampleDataSupport;
-    procedure SampleMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+    procedure BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
     procedure DelayEnd(Sender: TObject);
     procedure SampleConsequence(Sender: TObject);
     procedure SampleResponse(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
     procedure VisibleSample(AValue: Boolean);
+    function GetHeader : string;
   protected
     // TTrial
     procedure TrialStart(Sender: TObject); override;
@@ -60,20 +63,13 @@ type
 
 implementation
 
-uses strutils, constants, timestamps;
+uses strutils, constants, timestamps, response_key;
 
 constructor TMTS.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialStart := @TrialStart;
-
-  Header := 'Pos.Mod.' + #9 +
-            'Lat.Mod.' + #9 +
-            'Dur.Mod.' + #9 +
-            'Atr.Mod.' + #9 +
-            'Frq.Mod.' + #9 + #9 + #9 +
-            Header;
 
   FDelay := nil;
 end;
@@ -173,7 +169,18 @@ begin
   FSample.Key.Visible := AValue;
 end;
 
-procedure TMTS.SampleMouseDown(Sender: TObject; Button: TMouseButton;
+function TMTS.GetHeader: string;
+begin
+  Result := rsReportStmMod + #9 +
+            rsReportRspModLat + #9 +
+            rsReportStmModBeg + #9 +
+            rsReportStmModEnd + #9 +
+            rsReportStmModDur + #9 +
+            rsReportStmModDel + #9 +
+            rsReportRspModFrq + #9 + #9 + #9;
+end;
+
+procedure TMTS.BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
   aStimulus : string;
@@ -201,18 +208,22 @@ begin
   VisibleSample(True);
   if FSample.Key.Kind.stmAudio then
     FSample.Key.Play;
-  OnMouseDown := @SampleMouseDown;
+  OnMouseDown := @BackgroundMouseDown;
 end;
 
 
 procedure TMTS.WriteData(Sender: TObject);
 var
-  Pos_Mod,
-  Lat_Mod,
-  Dur_Mod,
-  Atr_Mod,
-  Frq_Mod: String;
+  Pos_Mod : string = '';
+  Lat_Mod : string = '';
+  Dur_Mod : string = '';
+  Atr_Mod : string = '';
+  Frq_Mod : string = '';
+  End_Mod : string = '';
+  Beg_Mod : string = '';
 begin
+  inherited WriteData(Sender);
+  Header := Header + #9 + GetHeader;
   case FSample.Msg of
     '','AUTO':Pos_Mod:= FSample.Key.ShortName+' - '+'('+IntToStr(FSample.Key.Top)+','+IntToStr(FSample.Key.Left)+')';
     else
@@ -239,13 +250,19 @@ begin
              'BK.S='+ IntToStr(FSDataSupport.SampBkndRespCount) + #9 +
              'BK.D='+ IntToStr(FSDataSupport.DelaBkndRespCount);
 
-  Data := Pos_Mod + #9 +
+  Beg_Mod := TimestampToStr(FDataSupport.StmBegin - TimeStart);
+  End_Mod := TimestampToStr(FDataSupport.StmEnd - TimeStart);
+
+  Data := Data + #9 +
+          Pos_Mod + #9 +
           Lat_Mod + #9 +
+          Beg_Mod + #9 +
+          End_Mod + #9 +
           Dur_Mod + #9 +
           Atr_Mod + #9 +
-          Frq_Mod + #9;
+          Frq_Mod;
 
-  inherited WriteData(Sender);
+  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
 procedure TMTS.TrialBeforeEnd(Sender: TObject);

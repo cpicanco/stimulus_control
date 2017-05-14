@@ -15,12 +15,12 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, LazFileUtils
 
-    , trial_abstract
-    , trial_helpers
-    , schedules_main
-    , response_key
-    , bass_player
-    ;
+  , trial_abstract
+  , trial_helpers
+  , schedules_main
+  , response_key
+  , bass_player
+  ;
 
 type
 
@@ -70,13 +70,12 @@ begin
   OnTrialStart := @TrialStart;
   OnTrialPaint := @TrialPaint;
 
-  Header :=  Header +
-             'StmBegin' + #9 +
-             '_Latency' + #9 +
-             '__StmEnd' + #9 +
-             'RespFreq' + #9 +
-             'ExpcResp' + #9 +
-             '__Result';
+  Header :=  Header + #9 +
+             rsReportStmBeg + #9 +
+             rsReportRspLat + #9 +
+             rsReportStmEnd + #9 +
+             rsReportRspFrq + #9 +
+             rsReportRspExp;
 
   FDataSupport.Responses:= 0;
   FContingency := '';
@@ -313,7 +312,7 @@ begin
   FDataSupport.StmBegin := TickCount;
 end;
 
-procedure TGNG.WriteData(Sender: TObject);  //
+procedure TGNG.WriteData(Sender: TObject);
 var LLatency : string;
 begin
   inherited WriteData(Sender);
@@ -327,8 +326,7 @@ begin
            LLatency + #9 +
            TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
-           FContingency + #9 +
-           Result;
+           FContingency;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;

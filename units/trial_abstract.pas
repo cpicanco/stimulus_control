@@ -15,10 +15,9 @@ interface
 
 uses LCLIntf, LCLType, Controls, ExtCtrls, Classes, SysUtils, LCLProc
 
-  , schedules_main
   , config_session
   , countermanager
-  , custom_timer
+  , schedules_main
   ;
 
 type
@@ -113,7 +112,7 @@ type
   protected
     procedure Paint; override;
   public
-    constructor Create (AOwner : TComponent); override;
+    constructor Create (ACustomControlOwner : TComponent); override;
     destructor Destroy; override;
     procedure Play(ACorrection: Boolean=False); virtual;
     procedure Hide;virtual;
@@ -159,7 +158,6 @@ uses constants, timestamps, draw_methods
     {$endif}
     ;
 
-
 { TTrial }
 
 {$ifdef DEBUG}
@@ -184,12 +182,12 @@ end;
 
 procedure TTrial.WriteData(Sender: TObject);
 begin
+  Data := Result + #9;
   if FStarterLatency <> TimeStart then
-    Data := TimestampToStr(FStarterLatency - TimeStart) + #9;
+    Data := Data + TimestampToStr(FStarterLatency - TimeStart) + #9;
 end;
 
-procedure TTrial.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
-  );
+procedure TTrial.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if FResponseEnabled and (Key = 27 {ESC}) then
     begin
@@ -294,9 +292,10 @@ begin
   if Assigned(OnTrialPaint) and FResponseEnabled then OnTrialPaint;
 end;
 
-constructor TTrial.Create(AOwner: TComponent);
+constructor TTrial.Create(ACustomControlOwner: TComponent);
 begin
-  inherited Create(AOwner);
+  Assert(ACustomControlOwner is TCustomControl, 'Owner of TTrial must be a TCustomControl.');
+  inherited Create(ACustomControlOwner);
   FResponseEnabled := False;
   FShowStarter := False;
   NextTrial := '0';
@@ -304,21 +303,15 @@ begin
   IETConsequence := T_NONE;
   Color := 0;
   Cursor:= -1;
-
-  if AOwner is TCustomControl then
+  Align := alClient;
+  with TCustomControl(ACustomControlOwner) do
     begin
-      Align := alClient;
-      with TCustomControl(AOwner) do
-        begin
-          FOldKeyUp := OnKeyUp;
-          FOldKeyDown := OnKeyDown;
-          OnKeyUp := @TrialKeyUp;
-          OnKeyDown := @TrialKeyDown;
-        end;
-      Parent := TWinControl(AOwner);
-    end
-  else
-    raise Exception.Create('AOwner of TTrial must be a TCustomControl.');
+      FOldKeyUp := OnKeyUp;
+      FOldKeyDown := OnKeyDown;
+      OnKeyUp := @TrialKeyUp;
+      OnKeyDown := @TrialKeyDown;
+    end;
+  Parent := TWinControl(ACustomControlOwner);
 
   //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
   FLimitedHold := 0;
@@ -328,11 +321,17 @@ begin
   FClock.OnTimer := @EndTrialThread;
   FClock.OnStopTimer := @EndTrialThread;
 
-  HeaderTimestamps := 'Time' + #9 +
-                      'Bloc__Id' + #9 +
-                      'Trial_ID' + #9 +
-                      'Trial_No' + #9 +
-                      'Event';
+  // setup report header
+  // descendents should concatenate its own data, if any, to in their OnCreate method
+  Header := rsReportCsqRes;
+
+  // setup timestamps header
+  // descendents should concatenate its own data, if any, to in their OnCreate method
+  HeaderTimestamps := rsReportTime + #9 +
+                      rsReportBlocID + #9 +
+                      rsReportTrialID + #9 +
+                      rsReportTrialNO + #9 +
+                      rsReportEvent;
 end;
 
 destructor TTrial.Destroy;
@@ -353,8 +352,6 @@ end;
 
 procedure TTrial.Play(ACorrection: Boolean);
 begin
-  //Hide;
-
   // avoid responses while loading configurations
   FResponseEnabled := False;
 

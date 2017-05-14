@@ -186,7 +186,12 @@ begin
   FLastTrialHeader:= '';
   FIsCorrection := False;
 
-  FBlcHeader:= 'Bloc__Id' + #9 + 'Bloc_Nam' + #9 + 'Trial_No'+ #9 + 'Trial_Id'+ #9 + 'TrialNam' + #9;
+  FBlcHeader := rsReportBlocID + #9 +
+                rsReportBlocName + #9 +
+                rsReportTrialNO + #9 +
+                rsReportTrialID + #9 +
+                rsReportTrialName + #9;
+
   //SaveData(FBlc.Name + LineEnding);
 
   PlayTrial;
@@ -267,7 +272,7 @@ const
   DoNotApply = #32#32#32#32#32#32 + 'NA';
 begin
   if FTrial.Header <> FLastTrialHeader then
-    LReportLn := FBlcHeader + 'ITIBegin' + #9 + '__ITIEnd' + #9 + FTrial.Header + LineEnding;
+    LReportLn := FBlcHeader + rsReportITIBeg + #9 + rsReportITIEnd + #9 + FTrial.Header + LineEnding;
   FLastTrialHeader := FTrial.Header;
 
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
@@ -707,7 +712,7 @@ begin
            IntToStr(FManager.CurrentBlc+1) + #9 +
            IntToStr(FManager.CurrentTrial+1) + #9 +
            IntToStr(FManager.Trials+1) + #9 + // Current trial cycle
-           'ITI' + #32 + ACode + LineEnding)
+           rsReportITI + #32 + ACode + LineEnding)
 end;
 
 procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);

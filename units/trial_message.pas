@@ -13,13 +13,12 @@ unit trial_message;
 
 interface
 
-uses  LCLIntf, LCLType, Controls,
-      Classes, SysUtils, StdCtrls, Graphics
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, StdCtrls, Graphics
 
-     , trial_abstract
-     , trial_helpers
-     , bass_player
-     ;
+  , trial_abstract
+  , trial_helpers
+  , bass_player
+  ;
 
 type
 
@@ -94,10 +93,10 @@ begin
     Parent := TCustomControl(AOwner);
   end;
 
-  Header := Header +
-            '___Start' + #9 +
-            'Duration' + #9 +
-            'Message';
+  Header := Header + #9 +
+            rsReportStmBeg + #9 +
+            rsReportStmDur + #9 +
+            rsReportMsgTxt;
 
   Result := T_NONE;
   IETConsequence := T_NONE;

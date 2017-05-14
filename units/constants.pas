@@ -230,6 +230,51 @@ const
   rmKeyPlus = 'Tecla +';
   rmKeyMinus = 'Tecla -';
 
+// report headers
+resourcestring
+  rsReportMsgTxt = 'Mensagem';
+  rsReportStmBeg = 'S.Inicio';
+  rsReportStmDur = 'S.Duracao';
+  rsReportStmEnd = 'S.Fim';
+  rsReportRspLat = 'R.Latencia';
+  rsReportRspFrq = 'R.Frequencia';
+  rsReportRspExp = 'R.Prevista';
+
+  rsReportStmCmp = 'S.Comparacoes';
+  rsReportStmCmpBeg = 'S.Comparacoes.Inicio';
+  rsReportStmCmpEnd = 'S.Comparacoes.Fim';
+  rsReportRspCmp = 'R.Comparacao.Escolhida';
+  rsReportRspCmpLat = 'R.Comparacao.Escolhida.Latencia';
+  rsReportStmCmpDur = 'S.Comparacoes.Duracao';
+
+  rsReportStmMod = 'S.Modelo';
+  rsReportStmModBeg = 'S.Modelo.Inicio';
+  rsReportStmModEnd = 'S.Modelo.Fim';
+  rsReportRspModLat = 'R.Modelo.Latencia';
+  rsReportStmModDur = 'S.Modelo.Duracao';
+  rsReportStmModDel = 'S.Modelo.Atraso';
+  rsReportRspModFrq = 'R.Modelo.Frequencia';
+
+  rsReportCsqPLP = 'C.PLP';
+  rsReportCsqUSB = 'C.USB';
+  rsReportCsqRes = 'C.Resultado';
+  rsReportRspCmpFrq = 'R.Comparacoes.Frequencia';
+
+  rsReportTime = 'Tempo';
+  rsReportBlocID  = 'Bloco.ID';
+  rsReportBlocName = 'Bloco.Nome';
+  rsReportTrialID = 'Tentativa.ID';
+  rsReportTrialNO = 'Tentativa.Contador';
+  rsReportTrialName = 'Tentativa.Nome';
+  rsReportEvent = 'Evento';
+  rsReportITIBeg = 'IET.Inicio';
+  rsReportITIEnd = 'IET.Fim';
+  rsReportITI = 'IET';
+
+  rsReportRspLft = 'Lft.Cmp.';
+  rsReportRspTop = 'Top.Cmp.';
+
+
 resourcestring
   ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
   ExceptionConfigurationNotAllowed = 'A configuração não é permitida.';
