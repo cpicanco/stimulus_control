@@ -15,14 +15,8 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls, Graphics
 
-    //, counter
-    , dialogs
-    , config_session
-    //, countermanager
     , trial_abstract
     , trial_helpers
-    //, custom_timer
-    //, client
     , draw_methods
     , schedules_main
     //, response_key

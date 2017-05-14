@@ -12,6 +12,7 @@ type
   { TDataSupport }
 
   TDataSupport = record
+    BackgroundResponses,
     Responses : integer;
     Latency,
     StmBegin,

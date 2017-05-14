@@ -17,18 +17,14 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, LazFileUtils
 
     , response_key
     , trial_abstract
-    //, countermanager
-    //, config_session
-    //, counter
+    , trial_helpers
     //, interface_rs232
     //, interface_plp
     ;
 
 type
 
-  { Testing and refactoring required }
-
-  TSupportKey = record
+  TKeySupport = record
     Key : TKey; // response key
     Csq : BYTE; // PLP consequence
     Usb : string; // USB consequence
@@ -39,17 +35,17 @@ type
     TO_ : Integer; // Timeout consequence
   end;
 
-  TDataSupport = record
-    BackgroundResponseCount : integer;
-    Latency,
-    StmBegin,
-    StmEnd : Extended;
-    CompMsg,
+  TConsequenceSupport = record
+    ReportMessage,
     Rs232Code : string;
     PLPCode : BYTE;
   end;
 
   { TSimpl }
+
+  {
+    Presents comparisons
+  }
 
   TSimpl = Class(TTrial)
   private
@@ -59,15 +55,16 @@ type
     procedure TrialBeforeEnd(Sender: TObject);
   protected
     FDataSupport : TDataSupport;
+    FConsequence : TConsequenceSupport;
     FConsequenceFired : Boolean;
     FNumComp : Integer;
     FTrialInterval : Integer;
-    FComparisons : array of TSupportKey;
+    FComparisons : array of TKeySupport;
     procedure TrialStart(Sender: TObject); virtual;
     procedure WriteData(Sender: TObject); override;
     procedure TrialResult(Sender: TObject);
     procedure VisibleComparisons(AValue: Boolean);
-    procedure ComparisonMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure BackgroundMouseDown(Sender: TObject;Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   public
     constructor Create(AOwner: TComponent); override;
     procedure Play(ACorrection : Boolean); override;
@@ -177,9 +174,12 @@ begin
         NextTrial := FComparisons[i].Nxt;
 
       case FComparisons[i].Msg of
-        '','AUTO' : FDataSupport.CompMsg := TKey(Sender).ShortName+' - '+'('+IntToStr(TKey(Sender).Top)+','+IntToStr(TKey(Sender).Left)+')';
+        '','AUTO' :
+          FConsequence.ReportMessage := TKey(Sender).ShortName+' - ' +
+                                       '('+IntToStr(TKey(Sender).Top) +
+                                       ','+IntToStr(TKey(Sender).Left)+')';
         else
-          FDataSupport.CompMsg:= FComparisons[i].Msg;
+          FConsequence.ReportMessage:= FComparisons[i].Msg;
       end;
     end;
 end;
@@ -205,7 +205,7 @@ begin
     end;
 
   FDataSupport.StmBegin := TickCount;
-  OnMouseDown := @ComparisonMouseDown;
+  OnMouseDown := @BackgroundMouseDown;
 end;
 
 procedure TSimpl.WriteData(Sender: TObject);
@@ -227,7 +227,7 @@ begin
   for I := 0 to High(FComparisons) do
       Frq_Cmp := Frq_Cmp + FComparisons[I].Msg + '=' +
                                    IntToStr(FComparisons[I].Key.ResponseCount) + #9;
-  Frq_Cmp := Frq_Cmp + 'BK.C='+ IntToStr(FDataSupport.BackgroundResponseCount);
+  Frq_Cmp := Frq_Cmp + 'BK.C='+ IntToStr(FDataSupport.BackgroundResponses);
 
   for I:= 0 to FNumComp-1 do
     begin
@@ -235,9 +235,8 @@ begin
       Pos_Cmp:= Pos_Cmp + FComparisons[I].Msg + #32;
     end;
 
-  { todo: separate the comparison message from the GONOGO logic }
-  if FDataSupport.CompMsg = '' then FDataSupport.CompMsg:= '-';
-  Res_Cmp:= LeftStr(FDataSupport.CompMsg+#32#32#32#32#32#32#32#32, 8);
+  if FConsequence.ReportMessage = '' then FConsequence.ReportMessage := '-';
+  Res_Cmp:= FConsequence.ReportMessage;
 
   if FDataSupport.Latency = TimeStart then
     Lat_Cmp := #32#32#32#32#32#32 + 'NA'
@@ -259,11 +258,11 @@ begin
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
-procedure TSimpl.ComparisonMouseDown(Sender: TObject; Button: TMouseButton;
+procedure TSimpl.BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   LogEvent('BK.C' + #9 + IntToStr(X) + #9 + IntToStr(Y));
-  Inc(FDataSupport.BackgroundResponseCount); // local
+  Inc(FDataSupport.BackgroundResponses); // local
   CounterManager.OnBkgndResponse(Self); // global
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;
@@ -279,8 +278,8 @@ begin
   if not FConsequenceFired then
     FConsequenceFired := True;
 
-  { todo: The Dispenser requires working interfaces. They were not tested in the cross platform scope. }
-  Dispenser(FDataSupport.PLPCode, FDataSupport.RS232Code);
+  { todo: The Dispenser requires working hardware interfaces. They were not tested in the cross platform scope. }
+  Dispenser(FConsequence.PLPCode, FConsequence.RS232Code);
   CounterManager.OnConsequence(Sender);
   if Assigned(OnConsequence) then OnConsequence(Sender);
   EndTrial(Sender);

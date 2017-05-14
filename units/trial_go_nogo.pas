@@ -15,14 +15,8 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, LazFileUtils
 
-    //, counter
-    , dialogs
-    , config_session
-    //, countermanager
     , trial_abstract
     , trial_helpers
-    //, custom_timer
-    //, client
     , schedules_main
     , response_key
     , bass_player

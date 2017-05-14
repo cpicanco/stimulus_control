@@ -40,7 +40,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Play(ACorrection : Boolean);override;
+    procedure Play(ACorrection : Boolean=False);override;
   end;
 
 resourcestring
@@ -119,6 +119,7 @@ end;
 
 procedure TPerformanceReview.Play(ACorrection: Boolean);
 begin
+  FIscorrection := ACorrection;
   RootMedia:= GlobalContainer.RootMedia;
 
   FHitsCounter := TCounterPR.Create(Owner);

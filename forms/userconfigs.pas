@@ -19,9 +19,6 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
 
     , draw_methods
     , bass_player
-    {$IFNDEF NO_LIBZMQ}
-    , pupil_communication
-    {$ENDIF}
     , session
     , config_session
     , config_session_guiutils

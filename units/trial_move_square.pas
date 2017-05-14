@@ -18,15 +18,11 @@ uses LCLIntf, Classes, SysUtils, Forms, Graphics
     , pupil_communication
     {$ENDIF}
     , trial_abstract
+    , trial_helpers
     , draw_methods
     ;
 
 type
-
-  FDataSupport = record
-    TrialBegin : Extended;
-    TrialEnd : Extended;
-  end;
 
   { TMSQ }
 
@@ -37,7 +33,7 @@ type
   private
     FPolygon : TPoints;
     FGazePoint : TPoint;
-    FDataSupport : FDataSupport;
+    FDataSupport : TDataSupport;
     procedure None(Sender: TObject);
     {$IFNDEF NO_LIBZMQ}
     procedure UpdateSquare(Sender: TObject; AMultiPartMessage : TMPMessage);
@@ -107,7 +103,7 @@ begin
   // Trial Result
   Result := 'NONE';
   IETConsequence := 'NONE';
-  FDataSupport.TrialEnd := TickCount;
+  FDataSupport.StmEnd := TickCount;
 
   // Write Data
   WriteData(Sender);
@@ -123,7 +119,7 @@ begin
     end;
   {$ENDIF}
 
-  FDataSupport.TrialBegin := TickCount;
+  FDataSupport.StmBegin := TickCount;
   Invalidate;
 end;
 
@@ -136,8 +132,8 @@ procedure TMSQ.WriteData(Sender: TObject);
 begin
   inherited WriteData(Sender);
   Data := Data + #9 +
-          TimestampToStr(FDataSupport.TrialBegin - TimeStart) + #9 +
-          TimestampToStr(FDataSupport.TrialEnd - TimeStart);
+          TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
+          TimestampToStr(FDataSupport.StmEnd - TimeStart);
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;

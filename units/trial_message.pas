@@ -17,17 +17,11 @@ uses  LCLIntf, LCLType, Controls,
       Classes, SysUtils, StdCtrls, Graphics
 
      , trial_abstract
+     , trial_helpers
      , bass_player
      ;
 
 type
-
-  TDataSupport = record
-    //Latency,
-    //Responses,
-    TrialBegin,
-    TrialEnd : Extended;
-  end;
 
   { TMSG }
 
@@ -151,7 +145,7 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TMSG.BeforeEndTrial:'+ TObject(Sender).ClassName);
   {$endif}
-  FDataSupport.TrialEnd := TickCount;
+  FDataSupport.StmEnd := TickCount;
   WriteData(Self);
 end;
 
@@ -216,15 +210,15 @@ begin
         Visible := True;
         SetBounds((Self.Width - Width) div 2, (Self.Height - Height) - 20, Width, Height);
       end;
-  FDataSupport.TrialBegin := TickCount;
+  FDataSupport.StmBegin := TickCount;
 end;
 
 procedure TMessageTrial.WriteData(Sender: TObject);
 var aStart, aDuration : string;
 begin
   inherited WriteData(Sender);
-  aStart := TimestampToStr(FDataSupport.TrialBegin - TimeStart);
-  aDuration := TimestampToStr(FDataSupport.TrialEnd - TimeStart);
+  aStart := TimestampToStr(FDataSupport.StmBegin - TimeStart);
+  aDuration := TimestampToStr(FDataSupport.StmEnd - TimeStart);
 
   Data := Data + aStart + #9 + aDuration + #9 + FMessage.Caption;
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
