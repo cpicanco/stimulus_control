@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <RevisionNr Value="4"/>
-      <BuildNr Value="5"/>
+      <BuildNr Value="6"/>
       <Language Value="0416"/>
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control" ProductVersion=""/>
     </VersionInfo>
@@ -28,13 +28,13 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="stimulus_control.bin" ApplyConventions="False"/>
+            <Filename Value="stimulus_control_$(BuildMode).bin" ApplyConventions="False"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <Parsing>
             <SyntaxOptions>
@@ -49,6 +49,7 @@
               <StackChecks Value="True"/>
             </Checks>
             <VerifyObjMethodCallValidity Value="True"/>
+            <TargetCPU Value="x86_64"/>
             <TargetOS Value="linux"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
@@ -74,18 +75,23 @@
         </CompilerOptions>
       </Item2>
       <Item3 Name="Windows32Debug">
+        <MacroValues Count="1">
+          <Macro5 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="stimulus_control.exe" ApplyConventions="False"/>
+            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="win32"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -94,6 +100,11 @@
             <Debugging>
               <StripSymbols Value="True"/>
             </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
           </Linking>
           <Other>
             <Verbosity>
@@ -104,18 +115,23 @@
         </CompilerOptions>
       </Item3>
       <Item4 Name="Windows32Release">
+        <MacroValues Count="1">
+          <Macro4 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="stimulus_control.exe" ApplyConventions="False"/>
+            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="win32"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -139,18 +155,23 @@
         </CompilerOptions>
       </Item4>
       <Item5 Name="Windows64Debug">
+        <MacroValues Count="1">
+          <Macro3 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="stimulus_control.exe" ApplyConventions="False"/>
+            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="win64"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -159,6 +180,11 @@
             <Debugging>
               <StripSymbols Value="True"/>
             </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
           </Linking>
           <Other>
             <Verbosity>
@@ -169,18 +195,23 @@
         </CompilerOptions>
       </Item5>
       <Item6 Name="Windows64Release">
+        <MacroValues Count="1">
+          <Macro2 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="stimulus_control.exe" ApplyConventions="False"/>
+            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="win64"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -204,18 +235,23 @@
         </CompilerOptions>
       </Item6>
       <Item7 Name="Windows32NOLIBZMQ">
+        <MacroValues Count="1">
+          <Macro1 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="stimulus_control.exe" ApplyConventions="False"/>
+            <Filename Value="stimulus_control_$(BuildMode)_nozmq.exe" ApplyConventions="False"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32"/>
             <OtherUnitFiles Value="forms;units;dependency/bass"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-nozmq"/>
           </SearchPaths>
           <CodeGeneration>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="win32"/>
             <Optimizations>
               <OptimizationLevel Value="0"/>
             </Optimizations>
@@ -243,6 +279,13 @@
           </Other>
         </CompilerOptions>
       </Item7>
+      <SharedMatrixOptions Count="5">
+        <Item1 ID="804533980391" Modes="Windows32NOLIBZMQ" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item2 ID="130336211127" Modes="Windows64Release" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item3 ID="424457669770" Modes="Windows64Debug" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item4 ID="688197499528" Modes="Windows32Release" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item5 ID="595486826089" Modes="Windows32Debug" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+      </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
@@ -502,15 +545,16 @@
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="stimulus_control.bin" ApplyConventions="False"/>
+      <Filename Value="stimulus_control_$(BuildMode).bin" ApplyConventions="False"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-      <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi"/>
-      <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+      <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
     </SearchPaths>
     <CodeGeneration>
+      <TargetCPU Value="x86_64"/>
       <TargetOS Value="linux"/>
       <Optimizations>
         <OptimizationLevel Value="0"/>
