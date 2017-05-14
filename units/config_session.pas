@@ -40,25 +40,6 @@ type
     MonitorToShow : Byte;
   end;
 
-  TCircle = record
-    OuterRect : TRect;  //Left/Top
-    InnerRect : TRect;
-    gap : Boolean;
-    gap_degree : integer;
-    gap_length : integer;
-  end;
-
-  TCurrentTrial = record
-    C : array of TCircle; //circles
-    //K : array of TKey; // not implemented yet
-    i : integer; //trial index
-    NextTrial : string;
-    angle : Extended; // angle from "userconfigs_trial_mirrored" form,
-    response : string;
-    Contingency : string;
-    Result : string;
-  end;
-
   TCfgTrial = record
     Id : integer;
     Name: string;
@@ -165,7 +146,7 @@ type
 
 implementation
 
-uses strutils, constants, config_session_fileutils, config_session_global_container;
+uses constants, config_session_fileutils, config_session_global_container;
 { TCfgSes }
 
 function TCfgSes.GetCfgBlc(Ind: Integer): TCfgBlc;
@@ -198,16 +179,15 @@ begin
 end;
 
 destructor TCfgSes.Destroy;
-var a1, a2 : Integer;
+var i, j : Integer;
 begin
   FGlobalContainer.Free;
   if Length(FBlcs) > 0 then
-    for a1:= Low(FBlcs) to High(FBlcs) do
-      begin
-        if Length(FBlcs[a1].Trials) > 0 then
-          for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
-             FBlcs[a1].Trials[a2].SList.Free;
-      end;
+    for i:= Low(FBlcs) to High(FBlcs) do
+      if Length(FBlcs[i].Trials) > 0 then
+        for j:= Low(FBlcs[i].Trials) to High(FBlcs[i].Trials) do
+           FBlcs[i].Trials[j].SList.Free;
+
   inherited Destroy;
 end;
 
@@ -217,33 +197,28 @@ begin
 end;
 
 procedure TCfgSes.SetLengthVetTrial(Blc: Integer);
-var trial : integer;
+var i : integer;
 begin
   SetLength(FBlcs[Blc].Trials, FBlcs[Blc].NumTrials);
-  for trial := 0 to FBlcs[blc].NumTrials - 1 do
+  for i := 0 to FBlcs[blc].NumTrials - 1 do
     begin
-      if not Assigned(FBlcs[blc].Trials[trial].SList)then
+      if not Assigned(FBlcs[blc].Trials[i].SList)then
         begin
-          FBlcs[blc].Trials[trial].SList:= TStringList.Create;
-          FBlcs[blc].Trials[trial].SList.Sorted := False;
-          FBlcs[blc].Trials[trial].SList.Duplicates := dupIgnore;
-          FBlcs[blc].Trials[trial].SList.BeginUpdate;
-          FBlcs[blc].Trials[trial].SList.Add('new=true');
-          FBlcs[blc].Trials[trial].SList.EndUpdate;
+          FBlcs[blc].Trials[i].SList:= TStringList.Create;
+          FBlcs[blc].Trials[i].SList.Sorted := False;
+          FBlcs[blc].Trials[i].SList.Duplicates := dupIgnore;
+          FBlcs[blc].Trials[i].SList.BeginUpdate;
+          FBlcs[blc].Trials[i].SList.Add('new=true');
+          FBlcs[blc].Trials[i].SList.EndUpdate;
         end;
     end;
 end;
 
 function TCfgSes.LoadFromFile(AFileName: string; AEditMode: Boolean): Boolean;
 var
-  a1, a2, a3, a4: Integer; s1: string;
+  i, j : Integer;
+  s1: string;
   LIniFile: TConfigurationFile;
-  LNumList : TStringList;
-
-  function GetBarPosition(NowNumber, MaxNumber : integer):integer;
-  begin
-    Result := (100 * NowNumber) div MaxNumber;
-  end;
 
   procedure HandleRootPath(var APath : string);
   begin
@@ -252,112 +227,46 @@ var
     if not (APath[Length(APath)] = PathDelim) then APath:= APath + PathDelim;
   end;
 
-  procedure ListCreate;
-  begin
-    LNumList := TStringList.Create;
-    //LNumList.Sorted := False;
-    LNumList.Duplicates := dupIgnore;
-  end;
 begin
-  if FileExists(AFileName) then begin
-    FEditMode := AEditMode;
-    FFilename := AFileName;
-    LIniFile:= TConfigurationFile.Create(AFileName);
-    with LIniFile do begin
-      //frmMain.Statusbar1.Panels[0].Text := messLoading;
-      if  SectionExists(_Main) and
-          ValueExists(_Main, _Name) and
-          ValueExists(_Main, _NumBlc) then begin
+  Result := False;
+  if FileExists(AFileName) then
+    begin
+      FEditMode := AEditMode;
+      FFilename := AFileName;
+      LIniFile:= TConfigurationFile.Create(AFileName);
+      try
+        with LIniFile do
+          if SectionExists(_Main) and ValueExists(_Main, _Name) and ValueExists(_Main, _NumBlc) then
+            begin
+              FSessionName := ReadString(_Main, _Name, rsDefName);
+              FSessionSubject := ReadString(_Main, _Subject, rsDefSubject);
+              FSessionType := ReadString(_Main, _Type, T_CIC);
+              FNumBlc := ReadInteger(_Main, _NumBlc, 0);
+              FSessionServer := ReadString(_Main,_ServerAddress, rsDefAddress);
 
-        FSessionName := ReadString(_Main, _Name, rsDefName);
-        FSessionSubject := ReadString(_Main, _Subject, rsDefSubject);
-        FSessionType := ReadString(_Main, _Type, T_CIC);
-        FNumBlc := ReadInteger(_Main, _NumBlc, 0);
-        FSessionServer := ReadString(_Main,_ServerAddress, rsDefAddress);
+              // set media and data paths
+              s1 := ReadString(_Main, _RootMedia, '');
+              HandleRootPath(FGlobalContainer.RootMedia);
 
-        // set media and data paths
-        s1 := ReadString(_Main, _RootMedia, '');
-        HandleRootPath(FGlobalContainer.RootMedia);
+              s1 := ReadString(_Main, _RootData, '');
+              HandleRootPath(FGlobalContainer.RootData);
 
-        s1 := ReadString(_Main, _RootData, '');
-        HandleRootPath(FGlobalContainer.RootData);
+              SetLength(FBlcs, FNumBlc);
+              for i:= Low(FBlcs) to High(FBlcs) do
+                begin
+                  FBlcs[i] := Bloc[i+1];
+                  SetLength(FBlcs[i].Trials, FBlcs[i].NumTrials);
+                  for j:= Low(FBlcs[i].Trials) to High(FBlcs[i].Trials) do
+                    FBlcs[i].Trials[j] := Trial[i+1,j+1];
+                end;
 
-        //Fddd := GetTickCount;
-        SetLength(FBlcs, FNumBlc);
-        for a1:= Low(FBlcs) to High(FBlcs) do
-          begin
-            FBlcs[a1] := Bloc[a1+1];
-
-            SetLength(FBlcs[a1].Trials, FBlcs[a1].NumTrials);
-            for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
-              begin
-                FBlcs[a1].Trials[a2] := Trial[a1+1,a2+1];
-                Application.ProcessMessages;
-              end;
-          end;
-        //ShowMessage(FormatFloat('#####,###',GetTickCount - Fddd));
-        if AEditMode then
-          begin
-            if SectionExists(_Positions) and ValueExists(_Positions, _NumPos) then
-              begin
-                FMedia := ExtractFileName(ExcludeTrailingPathDelimiter(FGlobalContainer.RootMedia));
-                FData := ExtractFileName(ExcludeTrailingPathDelimiter(FGlobalContainer.RootData));
-                FNumPos := ReadInteger(_Positions, _NumPos, 0);
-                FRow := ReadInteger(_Positions, _Rows, 0);
-                FCol := ReadInteger(_Positions, _Cols, 0);
-                SetLength(FPositions, FNumPos);
-                for a4 := 0 to FNumPos - 1 do
-                  begin
-                    s1:= ReadString(_Positions, _Pos + IntToStr(a4 + 1), '0');
-                    with FPositions[a4] do
-                      begin
-                        Index := a4 + 1;
-                        Top:= StrToInt(ExtractDelimited(1,s1,[#32]));
-                        Left:= StrToInt(ExtractDelimited(2,s1,[#32]));
-                        Width:= StrToInt(ExtractDelimited(3,s1,[#32]));
-                        Height:= StrToInt(ExtractDelimited(4,s1,[#32]));
-                      end;
-                  end;
-                ListCreate;
-                for a4 := 0 to FNumPos - 1 do LNumList.Add(ReadString(_Positions, _Pos + IntToStr(a4 + 1), '0'));
-
-                for a1:= Low(FBlcs) to High(FBlcs) do
-                  for a2:= Low(FBlcs[a1].Trials) to High(FBlcs[a1].Trials) do
-                    begin
-                      FBlcs[a1].Trials[a2].SList.BeginUpdate;
-                      with FBlcs[a1].Trials[a2].SList do
-                        begin
-                          if LNumList.IndexOf(Values[_Samp + _cBnd]) = -1 then
-                            Values[_Samp + _cBnd] := '1'
-                          else
-                            begin
-                              Values[_Samp + _cBnd] :=
-                              IntToStr(LNumList.IndexOf(Values[_Samp + _cBnd]) + 1);
-                            end;
-                        end;
-                      if FBlcs[a1].Trials[a2].NumComp > 0 then
-                        for a3 := 0 to (FBlcs[a1].Trials[a2].NumComp - 1) do
-                            with FBlcs[a1].Trials[a2].SList do
-                              begin
-                                if LNumList.IndexOf(Values[_Comp + IntToStr(a3 + 1) + _cBnd]) = -1 then
-                                  Values[_Comp+IntToStr(a3+1)+_cBnd]:= '1'
-                                else
-                                  Values[_Comp+IntToStr(a3+1)+_cBnd]:= IntToStr(LNumList.IndexOf(Values[_Comp+IntToStr(a3+1)+_cBnd])+1);
-                              end;
-
-                      FBlcs[a1].Trials[a2].SList.EndUpdate;
-                    end;
-                LNumList.Free;
-              end;
-          end;
-        FLoaded := True; //Diferencia "Abrir Sessão" de "Nova sessão".
-        //frmMain.Statusbar1.Panels[0].Text := messReady;
-        //frmMain.Statusbar1.Panels[1].Text := FName;
+              FLoaded := True;
+              Result:= True;
+            end;
+      finally
         LIniFile.Free;
-        Result:= True;
-      end else Result:= False;
+      end;
     end;
-  end else Result:= False;
 end;
 
 function TCfgSes.LoadTreeFromFile(FileName: string; aTree: TTreeView): Boolean;

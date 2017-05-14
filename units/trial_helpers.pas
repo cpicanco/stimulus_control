@@ -18,6 +18,14 @@ type
     StmEnd : Extended;
   end;
 
+  TCircle = record
+    OuterRect : TRect;  //Left/Top
+    InnerRect : TRect;
+    gap : Boolean;
+    gap_degree : integer;
+    gap_length : integer;
+  end;
+
   TGoNoGoStyles = (
      {
        Limited hold > 0 is assumed.

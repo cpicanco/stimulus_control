@@ -17,21 +17,27 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
     , config_session
     , trial_abstract
+    , trial_helpers
     , constants
     , draw_methods
     , schedules_main
-    , response_key
+    //, response_key
     ;
 
 type
 
-  { TMRD }
-  TDataSupport = record
-    Responses : integer;
-    Latency,
-    StmBegin,
-    StmEnd : Extended;
+  TCurrentTrial = record
+    C : array of TCircle; //circles
+    //K : array of TKey; // not implemented yet
+    i : integer; //trial index
+    NextTrial : string;
+    angle : Extended; // angle from "userconfigs_trial_mirrored" form,
+    response : string;
+    Contingency : string;
+    Result : string;
   end;
+
+  { TMRD }
 
   TMRD = Class(TTrial)
   private
