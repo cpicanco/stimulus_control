@@ -30,8 +30,7 @@ core
 __history
 backup/*
 */backup/*
-lib/i386-win32/*.lfm
-lib/x86_64-linux/*.lfm
+lib/*/*.lfm
 
 # self
 debug_log/*
