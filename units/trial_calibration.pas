@@ -13,17 +13,15 @@ unit trial_calibration;
 
 interface
 
-uses LCLIntf, LCLType, Classes, SysUtils
+uses LCLIntf, LCLType, Classes, SysUtils, Graphics
     {$IFNDEF NO_LIBZMQ}
     , pupil_communication
     {$ENDIF}
     , trial_abstract
-    , Graphics
+    , trial_helpers
     ;
 
 type
-
-  { TODO -oRafael -ccalibration : Implement self driven calibration. }
 
   TDot = record
     X : integer;
@@ -31,22 +29,19 @@ type
     Size : integer;
   end;
 
-  FDataSupport = record
-    TrialBegin : Extended;
-    TrialEnd : Extended;
-    Dots : array of TDot;
-  end;
-
   { TCLB }
 
   {
-    Calibration Trial
+    Presents calibration dots
+    Starts Pupil Calibration
+    Reacts to successful Pupil Calibration
   }
   TCLB = class(TTrial)
   private
     FBlocking,
     FShowDots : Boolean;
-    FDataSupport : FDataSupport;
+    FDots : array of TDot;
+    FDataSupport : TDataSupport;
     procedure StartPupilCalibration;
     procedure None(Sender: TObject);
     {$IFNDEF NO_LIBZMQ}
@@ -115,7 +110,7 @@ begin
   // Trial Result
   Result := 'NONE';
   IETConsequence := 'NONE';
-  FDataSupport.TrialEnd := TickCount;
+  FDataSupport.StmEnd := TickCount;
 
   // Write Data
   WriteData(Sender);
@@ -123,7 +118,7 @@ end;
 
 procedure TCLB.TrialStart(Sender: TObject);
 begin
-  FDataSupport.TrialBegin := TickCount;
+  FDataSupport.StmBegin := TickCount;
   if GlobalContainer.PupilEnabled then
     StartPupilCalibration;
 end;
@@ -138,9 +133,9 @@ var
 begin
   if FShowDots then
     with Canvas do
-      for i := Low(FDataSupport.Dots) to High(FDataSupport.Dots) do
+      for i := Low(FDots) to High(FDots) do
         begin
-          with FDataSupport.Dots[i] do
+          with FDots[i] do
             begin
               aleft := X;
               atop  := Y;
@@ -163,9 +158,9 @@ procedure TCLB.WriteData(Sender: TObject);
 begin
   inherited WriteData(Sender);
   Data := Data + #9 +
-          TimestampToStr(FDataSupport.TrialBegin - TimeStart) + #9 +
-          TimestampToStr(FDataSupport.TrialEnd - TimeStart) + #9 +
-          IntToStr(Length(FDataSupport.Dots));
+          TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
+          TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
+          IntToStr(Length(FDots));
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
@@ -216,13 +211,13 @@ begin
   FBlocking := StrToBoolDef(CfgTrial.SList.Values[_Blocking], False);
   if NumComp > 0 then
     begin
-      SetLength(FDataSupport.Dots, NumComp);
-      for i := Low(FDataSupport.Dots) to High(FDataSupport.Dots) do
+      SetLength(FDots, NumComp);
+      for i := Low(FDots) to High(FDots) do
         begin
           s1 := CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
-          FDataSupport.Dots[i].Y := StrToIntDef(ExtractDelimited(1,s1,[#32]), 0); // top, left, width, height
-          FDataSupport.Dots[i].X := StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
-          FDataSupport.Dots[i].Size := StrToIntDef(ExtractDelimited(3,s1,[#32]), 0);
+          FDots[i].Y := StrToIntDef(ExtractDelimited(1,s1,[#32]), 0); // top, left, width, height
+          FDots[i].X := StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
+          FDots[i].Size := StrToIntDef(ExtractDelimited(3,s1,[#32]), 0);
         end;
     end;
 
