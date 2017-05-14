@@ -236,7 +236,10 @@ begin
     end
   else
     if Assigned(FormMTS) then
-      FormMTS.Free;
+      begin
+        FormMTS.Free;
+        FormMTS := nil;
+      end;
 
   if TMenuItem(Sender) = piBlocChaining then
     begin
