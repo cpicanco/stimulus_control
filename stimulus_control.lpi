@@ -20,11 +20,12 @@
       <RevisionNr Value="4"/>
       <BuildNr Value="6"/>
       <Language Value="0416"/>
+      <Attributes pvaPreRelease="True"/>
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control" ProductVersion=""/>
     </VersionInfo>
     <BuildModes Count="7">
-      <Item1 Name="Linux64Debug" Default="True"/>
-      <Item2 Name="Linux64Release">
+      <Item1 Name="linux_64bits_debug" Default="True"/>
+      <Item2 Name="linux_64bits">
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
@@ -33,7 +34,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <Parsing>
@@ -71,10 +72,14 @@
               <ShoLineNum Value="True"/>
             </Verbosity>
             <CustomOptions Value="-dUseCThreads"/>
+            <OtherDefines Count="2">
+              <Define0 Value="NO_LIBZMQ"/>
+              <Define1 Value="UseCThreads"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item2>
-      <Item3 Name="Windows32Debug">
+      <Item3 Name="win10_32bits_debug">
         <MacroValues Count="1">
           <Macro5 Name="LCLWidgetType" Value="win32"/>
         </MacroValues>
@@ -86,7 +91,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -114,127 +119,7 @@
           </Other>
         </CompilerOptions>
       </Item3>
-      <Item4 Name="Windows32Release">
-        <MacroValues Count="1">
-          <Macro4 Name="LCLWidgetType" Value="win32"/>
-        </MacroValues>
-        <CompilerOptions>
-          <Version Value="11"/>
-          <Target>
-            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
-          </Target>
-          <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
-          </SearchPaths>
-          <CodeGeneration>
-            <TargetCPU Value="i386"/>
-            <TargetOS Value="win32"/>
-            <Optimizations>
-              <OptimizationLevel Value="0"/>
-            </Optimizations>
-          </CodeGeneration>
-          <Linking>
-            <Debugging>
-              <StripSymbols Value="True"/>
-              <UseExternalDbgSyms Value="True"/>
-            </Debugging>
-            <Options>
-              <Win32>
-                <GraphicApplication Value="True"/>
-              </Win32>
-            </Options>
-          </Linking>
-          <Other>
-            <Verbosity>
-              <ShoLineNum Value="True"/>
-            </Verbosity>
-          </Other>
-        </CompilerOptions>
-      </Item4>
-      <Item5 Name="Windows64Debug">
-        <MacroValues Count="1">
-          <Macro3 Name="LCLWidgetType" Value="win32"/>
-        </MacroValues>
-        <CompilerOptions>
-          <Version Value="11"/>
-          <Target>
-            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
-          </Target>
-          <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
-          </SearchPaths>
-          <CodeGeneration>
-            <TargetCPU Value="x86_64"/>
-            <TargetOS Value="win64"/>
-            <Optimizations>
-              <OptimizationLevel Value="0"/>
-            </Optimizations>
-          </CodeGeneration>
-          <Linking>
-            <Debugging>
-              <StripSymbols Value="True"/>
-            </Debugging>
-            <Options>
-              <Win32>
-                <GraphicApplication Value="True"/>
-              </Win32>
-            </Options>
-          </Linking>
-          <Other>
-            <Verbosity>
-              <ShoLineNum Value="True"/>
-            </Verbosity>
-            <CustomOptions Value="-dDEBUG"/>
-          </Other>
-        </CompilerOptions>
-      </Item5>
-      <Item6 Name="Windows64Release">
-        <MacroValues Count="1">
-          <Macro2 Name="LCLWidgetType" Value="win32"/>
-        </MacroValues>
-        <CompilerOptions>
-          <Version Value="11"/>
-          <Target>
-            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
-          </Target>
-          <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
-            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
-          </SearchPaths>
-          <CodeGeneration>
-            <TargetCPU Value="x86_64"/>
-            <TargetOS Value="win64"/>
-            <Optimizations>
-              <OptimizationLevel Value="0"/>
-            </Optimizations>
-          </CodeGeneration>
-          <Linking>
-            <Debugging>
-              <StripSymbols Value="True"/>
-              <UseExternalDbgSyms Value="True"/>
-            </Debugging>
-            <Options>
-              <Win32>
-                <GraphicApplication Value="True"/>
-              </Win32>
-            </Options>
-          </Linking>
-          <Other>
-            <Verbosity>
-              <ShoLineNum Value="True"/>
-            </Verbosity>
-          </Other>
-        </CompilerOptions>
-      </Item6>
-      <Item7 Name="Windows32NOLIBZMQ">
+      <Item4 Name="win10_32bits_nozmq">
         <MacroValues Count="1">
           <Macro1 Name="LCLWidgetType" Value="win32"/>
         </MacroValues>
@@ -246,7 +131,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32"/>
-            <OtherUnitFiles Value="forms;units;dependency/bass"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-nozmq"/>
           </SearchPaths>
           <CodeGeneration>
@@ -278,13 +163,141 @@
             </OtherDefines>
           </Other>
         </CompilerOptions>
+      </Item4>
+      <Item5 Name="win10_32bits">
+        <MacroValues Count="1">
+          <Macro4 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="win32"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <OtherDefines Count="2">
+              <Define0 Value="NO_LIBZMQ"/>
+              <Define1 Value="UseCThreads"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
+      </Item5>
+      <Item6 Name="win10_64bits_debug">
+        <MacroValues Count="1">
+          <Macro3 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="win64"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <CustomOptions Value="-dDEBUG"/>
+          </Other>
+        </CompilerOptions>
+      </Item6>
+      <Item7 Name="win10_64bits">
+        <MacroValues Count="1">
+          <Macro2 Name="LCLWidgetType" Value="win32"/>
+        </MacroValues>
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="stimulus_control_$(BuildMode).exe" ApplyConventions="False"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="win64"/>
+            <Optimizations>
+              <OptimizationLevel Value="0"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <StripSymbols Value="True"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShoLineNum Value="True"/>
+            </Verbosity>
+            <OtherDefines Count="2">
+              <Define0 Value="NO_LIBZMQ"/>
+              <Define1 Value="UseCThreads"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
       </Item7>
       <SharedMatrixOptions Count="5">
-        <Item1 ID="804533980391" Modes="Windows32NOLIBZMQ" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
-        <Item2 ID="130336211127" Modes="Windows64Release" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
-        <Item3 ID="424457669770" Modes="Windows64Debug" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
-        <Item4 ID="688197499528" Modes="Windows32Release" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
-        <Item5 ID="595486826089" Modes="Windows32Debug" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item1 ID="804533980391" Modes="win10_32bits_nozmq" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item2 ID="130336211127" Modes="win10_64bits" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item3 ID="424457669770" Modes="win10_64bits_debug" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item4 ID="688197499528" Modes="win10_32bits" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
+        <Item5 ID="595486826089" Modes="win10_32bits_debug" Type="IDEMacro" MacroName="LCLWidgetType" Value="win32"/>
       </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
@@ -311,235 +324,267 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="51">
+    <Units Count="58">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="forms/background.pas"/>
+        <Filename Value="src/units/bass_player.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="src/units/bass_player_callbacks.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="src/units/blocs.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="src/units/config_session.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="src/units/config_session_fileutils.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="src/units/config_session_global_container.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="src/units/config_session_gui_comparison.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="src/units/config_session_guiutils.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="src/units/config_trial_mirrored.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="trial_mirrored_config"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="src/units/constants.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="src/units/countermanager.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="src/units/counter_performance_review.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="src/units/criatore.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="src/units/cumulative_record.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="src/units/custom_timer.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="src/units/data_logger.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="src/units/debug_logger.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="src/units/debug_logger_thread.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="src/units/draw_methods.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="src/units/escriba.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="src/units/grid_helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="src/units/ini_helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="src/units/interface_plp.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="src/units/interface_rs232.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="src/units/pupil_communication.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="src/units/regdata.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="src/units/response_key.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="src/units/schedules.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="src/units/schedules_abstract.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="src/units/schedules_main.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="src/units/session.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="src/units/timestamps.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="src/units/timestamps_helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="src/units/trial_abstract.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="src/units/trial_calibration.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="src/units/trial_dizzy_timers.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="src/units/trial_feature_positive.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit37>
+      <Unit38>
+        <Filename Value="src/units/trial_go_nogo.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="src/units/trial_helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="src/units/trial_matching.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="src/units/trial_message.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="src/units/trial_mirrored_stm.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="src/units/trial_move_square.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit43>
+      <Unit44>
+        <Filename Value="src/units/trial_performance_review.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit44>
+      <Unit45>
+        <Filename Value="src/units/trial_simple.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit45>
+      <Unit46>
+        <Filename Value="src/units/versioning_git.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit46>
+      <Unit47>
+        <Filename Value="src/units/versioning_lazarus.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit47>
+      <Unit48>
+        <Filename Value="src/units/zmq_client.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit48>
+      <Unit49>
+        <Filename Value="src/forms/background.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Background"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit1>
-      <Unit2>
-        <Filename Value="units/draw_methods.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="forms/userconfigs.pas"/>
+      </Unit49>
+      <Unit50>
+        <Filename Value="src/forms/userconfigs.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormUserConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="units/regdata.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="forms/userconfigs_trial_mirrored.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="BresenhamLineForm"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="units/constants.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="units/custom_timer.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="units/session.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="units/blocs.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="units/countermanager.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit10>
-      <Unit11>
-        <Filename Value="units/schedules.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="units/response_key.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit12>
-      <Unit13>
-        <Filename Value="units/trial_go_nogo.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit13>
-      <Unit14>
-        <Filename Value="units/trial_message.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit14>
-      <Unit15>
-        <Filename Value="units/trial_matching.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit15>
-      <Unit16>
-        <Filename Value="units/trial_simple.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit16>
-      <Unit17>
-        <Filename Value="forms/userconfigs_go_nogo.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="FormGo_NoGo"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit17>
-      <Unit18>
-        <Filename Value="forms/userconfigs_get_matrix.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="FormMatrixConfig"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit18>
-      <Unit19>
-        <Filename Value="units/criatore.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit19>
-      <Unit20>
-        <Filename Value="units/trial_abstract.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit20>
-      <Unit21>
-        <Filename Value="units/bass_player.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit21>
-      <Unit22>
-        <Filename Value="units/debug_logger.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit22>
-      <Unit23>
-        <Filename Value="units/trial_performance_review.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit23>
-      <Unit24>
-        <Filename Value="units/interface_rs232.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit24>
-      <Unit25>
-        <Filename Value="units/trial_dizzy_timers.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit25>
-      <Unit26>
-        <Filename Value="units/versioning_git.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit26>
-      <Unit27>
-        <Filename Value="units/trial_mirrored_stm.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit27>
-      <Unit28>
-        <Filename Value="units/timestamps.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit28>
-      <Unit29>
-        <Filename Value="units/schedules_main.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit29>
-      <Unit30>
-        <Filename Value="units/interface_plp.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit30>
-      <Unit31>
-        <Filename Value="units/escriba.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit31>
-      <Unit32>
-        <Filename Value="units/config_session.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit32>
-      <Unit33>
-        <Filename Value="units/debug_logger_thread.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit33>
-      <Unit34>
-        <Filename Value="units/timestamps_helpers.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit34>
-      <Unit35>
-        <Filename Value="forms/userconfigs_stimuli_sets.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="FormStimuliSets"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit35>
-      <Unit36>
-        <Filename Value="units/config_session_global_container.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit36>
-      <Unit37>
-        <Filename Value="units/grid_helpers.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit37>
-      <Unit38>
-        <Filename Value="units/bass_player_callbacks.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit38>
-      <Unit39>
-        <Filename Value="units/schedules_abstract.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit39>
-      <Unit40>
-        <Filename Value="units/trial_helpers.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit40>
-      <Unit41>
-        <Filename Value="units/counter_performance_review.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit41>
-      <Unit42>
-        <Filename Value="units/versioning_lazarus.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit42>
-      <Unit43>
-        <Filename Value="forms/userconfigs_blocs.pas"/>
+      </Unit50>
+      <Unit51>
+        <Filename Value="src/forms/userconfigs_blocs.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormBlocs"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit43>
-      <Unit44>
-        <Filename Value="units/config_session_fileutils.pas"/>
+      </Unit51>
+      <Unit52>
+        <Filename Value="src/forms/userconfigs_feature_positive.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit44>
-      <Unit45>
-        <Filename Value="units/config_session_guiutils.pas"/>
+        <ComponentName Value="FormFPE"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="src/forms/userconfigs_get_matrix.pas"/>
         <IsPartOfProject Value="True"/>
-      </Unit45>
-      <Unit46>
-        <Filename Value="forms/userconfigs_mts.pas"/>
+        <ComponentName Value="FormMatrixConfig"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="src/forms/userconfigs_go_nogo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormGo_NoGo"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="src/forms/userconfigs_positions.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormRandomizePositions"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="src/forms/userconfigs_trial_mirrored.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="BresenhamLineForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit56>
+      <Unit57>
+        <Filename Value="src/forms/userconfigs_mts.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormMTS"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit46>
-      <Unit47>
-        <Filename Value="units/config_session_gui_comparison.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit47>
-      <Unit48>
-        <Filename Value="units/trial_calibration.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit48>
-      <Unit49>
-        <Filename Value="units/pupil_communication.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit49>
-      <Unit50>
-        <Filename Value="units/zmq_client.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit50>
+      </Unit57>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -550,7 +595,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-      <OtherUnitFiles Value="forms;units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+      <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
     </SearchPaths>
     <CodeGeneration>
