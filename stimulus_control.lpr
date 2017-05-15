@@ -22,8 +22,6 @@ uses
   {$ENDIF}
   Interfaces // this includes the LCL widgetset
   , Forms
-
-  //Forms
   , userconfigs
   ;
 
