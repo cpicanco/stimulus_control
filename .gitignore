@@ -35,10 +35,9 @@ lib/*/*.lfm
 # self
 debug_log/*
 Participante*/*
-config_examples/Data/*
+docs/config_examples/Data/*
 *last.bloc.ini
 *last.blocs.ini
-
 
 # link
 stimulus_control
