@@ -1,0 +1,32 @@
+object FormBlocs: TFormBlocs
+  Left = 154
+  Height = 439
+  Top = 109
+  Width = 549
+  Caption = 'Encadeamento de Blocos'
+  ClientHeight = 439
+  ClientWidth = 549
+  Color = clBlack
+  Font.Color = clBlack
+  LCLVersion = '1.6.2.0'
+  object LvlGraphControl1: TLvlGraphControl
+    Left = 50
+    Height = 339
+    Top = 50
+    Width = 449
+    Align = alClient
+    BorderSpacing.Around = 50
+    NodeStyle.Shape = lgnsEllipse
+    NodeStyle.GapLeft = 50
+    NodeStyle.GapTop = 20
+    NodeStyle.GapRight = 50
+    NodeStyle.GapBottom = 80
+    NodeStyle.DefaultImageIndex = -1
+    NodeStyle.Coloring = lgncRGB
+    Options = [lgoAutoLayout, lgoHighLevels, lgoHighlightNodeUnderMouse, lgoHighlightEdgeNearMouse, lgoMouseSelects]
+    ParentColor = True
+    ParentShowHint = False
+    TabOrder = 0
+    TabStop = False
+  end
+end

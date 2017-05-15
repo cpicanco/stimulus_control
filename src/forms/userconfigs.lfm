@@ -6,7 +6,7 @@ object FormUserConfig: TFormUserConfig
   HorzScrollBar.Page = 600
   VertScrollBar.Page = 303
   AutoScroll = True
-  Caption = 'Configurar'
+  Caption = 'Configurar Sessão'
   ClientHeight = 482
   ClientWidth = 604
   Constraints.MinHeight = 400

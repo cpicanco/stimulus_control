@@ -1,0 +1,7 @@
+object DataModule1: TDataModule1
+  OldCreateOrder = False
+  Height = 183
+  HorizontalOffset = 475
+  VerticalOffset = 191
+  Width = 391
+end

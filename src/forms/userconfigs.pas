@@ -17,11 +17,9 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
      Graphics, Dialogs, ExtCtrls, types, StdCtrls,
      ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons, XMLPropStorage
 
-    , draw_methods
     , bass_player
     , session
     , config_session
-    , config_session_guiutils
     , escriba
     ;
 
@@ -178,6 +176,8 @@ uses background, strutils
      , versioning_git
      , versioning_lazarus
      , constants
+     , draw_methods
+     , config_session_guiutils
      {$ifdef DEBUG}
      , debug_logger
      {$endif}
@@ -273,7 +273,6 @@ end;
 
 procedure TFormUserConfig.StringGrid1Click(Sender: TObject);
 begin
-  //showmessage(inttostr(StringGrid1.Col) + ' ' + inttostr(StringGrid1.Row));
   if StringGrid1.Col <> 0 then
     begin
       FLastFocusedCol := StringGrid1.Col;
@@ -384,8 +383,6 @@ begin
 end;
 
 function TFormUserConfig.MeetCondition(aCol, aRow : integer): boolean;
-//var
-//  aRowString : string;
 begin
   //conditions needs aCol;
   Result := False;
@@ -570,7 +567,7 @@ procedure TFormUserConfig.EndSession(Sender: TObject);
 begin
   while FrmBackground.ComponentCount > 0 do
     FrmBackground.Components[0].Free;
-  //FrmBackground.Invalidate;
+  FrmBackground.Invalidate;
   FrmBackground.Hide;
   ShowMessage(rsEndSession)
 end;
@@ -1259,8 +1256,7 @@ begin
   FrmBackground := TBackground.Create(Application);
   FLastFocusedCol := -1;
   //StringGrid1.ColCount := 9;
-  Caption := Application.Title;
-  stAppTitle.Caption := Application.Title;
+  stAppTitle.Caption := 'Stimulus Control';
 
   stVersion.Caption := CurrentVersion(GetCommitTag(True));
   if stVersion.Caption = '' then
