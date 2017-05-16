@@ -150,18 +150,18 @@ begin
         if FCrtReached then
           begin
             if LLastBlc.NextBlocOnCriteria > 0 then
-              Manager.CurrentBlc := LLastBlc.NextBlocOnCriteria
+              Manager.CurrentBlc := LLastBlc.NextBlocOnCriteria-1
             else // use negative numbers to count backwards
               if LLastBlc.NextBlocOnCriteria < 0 then
-                Manager.CurrentBlc :=  (Configs.NumBlc+1) + LLastBlc.NextBlocOnCriteria;
+                Manager.CurrentBlc :=  (Configs.NumBlc+1) - LLastBlc.NextBlocOnCriteria;
           end
         else
           begin
             if LLastBlc.NextBlocOnNotCriteria > 0 then
-              Manager.CurrentBlc := LLastBlc.NextBlocOnNotCriteria
+              Manager.CurrentBlc := LLastBlc.NextBlocOnNotCriteria-1
             else // use negative numbers to count backwards
-              if LLastBlc.NextBlocOnCriteria < 0 then
-                Manager.CurrentBlc :=  (Configs.NumBlc+1) + LLastBlc.NextBlocOnNotCriteria;
+              if LLastBlc.NextBlocOnNotCriteria < 0 then
+                Manager.CurrentBlc :=  (Configs.NumBlc+1) - LLastBlc.NextBlocOnNotCriteria;
           end;
       end;
   end;

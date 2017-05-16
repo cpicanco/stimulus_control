@@ -104,8 +104,8 @@ begin
       CrtConsecutiveMiss := ReadInteger(LBlcSection, _CrtConsecutiveMiss, -1);
       CrtMaxTrials:= ReadInteger(LBlcSection, _CrtMaxTrials, -1);
       CrtKCsqHit := ReadInteger(LBlcSection, _CsqCriterion, -1);
-      NextBlocOnCriteria := ReadInteger(LBlcSection, _NextBlocOnCriteria, -1)-1;
-      NextBlocOnNotCriteria := ReadInteger(LBlcSection, _NextBlocOnNotCriteria, -1)-1;
+      NextBlocOnCriteria := ReadInteger(LBlcSection, _NextBlocOnCriteria, -1);
+      NextBlocOnNotCriteria := ReadInteger(LBlcSection, _NextBlocOnNotCriteria, -1);
       DefNextBlc:= ReadString(LBlcSection, _DefNextBlc, '');
 
       Counter:= ReadString(LBlcSection, _Counter, 'NONE');
