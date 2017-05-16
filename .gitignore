@@ -38,6 +38,8 @@ Participante*/*
 docs/config_examples/Data/*
 *last.bloc.ini
 *last.blocs.ini
+releases/*
+!releases/*.py
 
 # link
 stimulus_control
