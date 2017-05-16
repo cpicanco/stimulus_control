@@ -21,5 +21,5 @@ sudo ln -sf /usr/lib/fpc/3.0.0/ppcross386 /usr/bin/ppcross386
 cd /usr/share/fpcsrc/3.0.0
 sudo make clean all OS_TARGET=win64 CPU_TARGET=x86_64
 sudo make crossinstall OS_TARGET=win64 CPU_TARGET=x86_64 INSTALL_PREFIX=/usr
-sudo ln -sf /usr/lib/fpc/3.0.0/ppcross386 /usr/bin/ppcross386
+sudo ln -sf /usr/lib/fpc/3.0.0/ppcrossx64 /usr/bin/ppcrossx64
 ```
