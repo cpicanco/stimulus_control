@@ -82,7 +82,7 @@ if __name__ == "__main__":
         copy_folder(src_examples, dst_examples)
 
         # zip release destination
-        dst_filename = os.path.join(releases, build_name+'.zip')
+        dst_filename = os.path.join(releases, build_name)
         compress_folder(destination, dst_filename)
 
         print(build_name+' released.')
