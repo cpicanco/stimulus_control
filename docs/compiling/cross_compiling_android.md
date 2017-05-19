@@ -64,10 +64,11 @@ cd /usr/share/fpcsrc/3.0.0
 sudo make clean crossall OS_TARGET=android CPU_TARGET=arm
 sudo make crossinstall OS_TARGET=android CPU_TARGET=arm CROSSOPT="-Cparmv7a -Cfvfpv3 -OpARMv7a -OoFastMath -O3 -XX -Xs -CX" CROSSBINDIR=$ANDROID_BIN BINUTILSPREFIX=arm-linux-androideabi- INSTALL_PREFIX=/usr
 sudo ln -s /usr/lib/fpc/3.0.0/ppcrossarm /usr/bin/ppcrossarm
-```
+
 
 # check the spec of the target phone, for example:
 # http://www.gsmarena.com/alcatel_pixi_4_%284%29-7845.php
 
 # configure your lazarus build accordingly
 # -Tandroid -Parm -MObjFPC -Scghi -O1 -g -gl -l -vewnhibq -Filib/arm-android -Fl../../android/android-ndk-r11c/platforms/android-23/arch-arm/usr/lib -Fl../../android/android-ndk-r11c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/lib/gcc/arm-linux-androideabi/4.9 -Fu../../.lazarus/lib/units/arm-android/customdrawn -Fu../../.lazarus/lib/LCLBase/units/arm-android -Fu../../.lazarus/lib/LazUtils/lib/arm-android -Fu../../.lazarus/lib/units/arm-android -Fu. -FUlib/arm-android -ohello_world_android_arm -dLCL -dLCLcustomdrawn -dANDROID
+```
