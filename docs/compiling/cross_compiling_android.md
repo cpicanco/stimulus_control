@@ -56,13 +56,13 @@ sudo ln -s /usr/bin/arm-linux-androideabi-ld arm-linux-ld
 
 # configure your .bashrc
 # ANDROID_HOME=~/android/sdk
-# ANDROID_BIN=~/android/android-ndk-r11c/toolchains/x86_64-4.9/prebuilt/linux-x86_64/bin
+# ANDROID_BIN=~/android/android-ndk-r11c/toolchains/x86-4.9/prebuilt/linux-x86_64/bin
 # export PATH=$ANDROID_BIN:$ANDROID_HOME:$PATH
 
 # compile the cross-compiler
 cd /usr/share/fpcsrc/3.0.0
 sudo make clean crossall OS_TARGET=android CPU_TARGET=arm
-sudo make crossinstall OS_TARGET=android CPU_TARGET=arm CROSSOPT="-Cparmv7a -Cfvfpv3 -OpARMv7a -OoFastMath -O3 -XX -Xs -CX" CROSSBINDIR=$ANDROID_BIN BINUTILSPREFIX=arm-linux-androideabi- INSTALL_PREFIX=/usr
+sudo make crossinstall OS_TARGET=android CPU_TARGET=arm CROSSOPT="-Cparmv7a -Cfvfpv3 -OpARMv7a -OoFastMath -O3 -XX -Xs -CX" OPT=-dFPC_ARMEL CROSSBINDIR=$ANDROID_BIN BINUTILSPREFIX=arm-linux-androideabi- INSTALL_PREFIX=/usr
 sudo ln -s /usr/lib/fpc/3.0.0/ppcrossarm /usr/bin/ppcrossarm
 
 
@@ -71,4 +71,43 @@ sudo ln -s /usr/lib/fpc/3.0.0/ppcrossarm /usr/bin/ppcrossarm
 
 # configure your lazarus build accordingly
 # -Tandroid -Parm -MObjFPC -Scghi -O1 -g -gl -l -vewnhibq -Filib/arm-android -Fl../../android/android-ndk-r11c/platforms/android-23/arch-arm/usr/lib -Fl../../android/android-ndk-r11c/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/lib/gcc/arm-linux-androideabi/4.9 -Fu../../.lazarus/lib/units/arm-android/customdrawn -Fu../../.lazarus/lib/LCLBase/units/arm-android -Fu../../.lazarus/lib/LazUtils/lib/arm-android -Fu../../.lazarus/lib/units/arm-android -Fu. -FUlib/arm-android -ohello_world_android_arm -dLCL -dLCLcustomdrawn -dANDROID
+
+# compile your program
 ```
+
+# make an apk for your program using ant (Apache Ant(TM) version 1.9.4 compiled on October 7 2014)
+
+```bash
+# make sure JAVA_HOME is properly set in /etc/environment and, if not already done,
+# add the following line in your .bashrc
+# source /etc/environment
+
+# create your debug and release android keystores
+keytool -genkey -v -keystore mykey.keystore -alias mykeystore -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkey -v -keystore debug.keystore -alias mydebugkey -storepass store123 -keypass key12345 -keyalg RSA -keysize 2048 -validity 10000
+
+# copy and past the outputs and save your key finger-prints
+keytool -list -v -keystore mykey.keystore -alias mykeystore -storepass store123 -keypass key12345
+keytool -list -v -keystore debug.keystore -alias mydebugkey -storepass store123 -keypass key12345
+
+# create an android project to generate a default .build.xml for ant
+cd ~/android/sdk/tools
+./android create project --target 7 --name helloworld --package free.pascal.demo --activity helloworld --path ~/git/android_hello_world/apk
+
+#.configure your ant.properties file
+# for release
+#key.store=mykey.keystore
+#key.alias=mykeystore
+#key.store.password=store123
+#key.alias.password=store123
+
+# for debug j
+
+# check if you build successfully
+cd ~/git/android_hello_world/apk
+ant debug
+ant release
+ant clean release
+
+```
+
