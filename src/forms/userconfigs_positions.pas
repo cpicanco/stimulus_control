@@ -37,8 +37,10 @@ type
     btnOK: TButton;
     btnCancel: TButton;
     btnRandomize: TButton;
+    ButtonSave: TButton;
     ButtonBlocBackward: TButton;
     ButtonBlocFoward: TButton;
+    GroupBoxPositions: TGroupBox;
     GroupBoxBlocs: TGroupBox;
     LabelCurrentBloc: TLabel;
     LabelBeginAt: TLabel;
@@ -48,6 +50,9 @@ type
     LabelLines: TLabel;
     LabelSeqToWrite: TLabel;
     LabelTrial: TLabel;
+    ListBoxPositions: TListBox;
+    OpenDialog: TOpenDialog;
+    pRandFixedSample: TMenuItem;
     pBalancedFixedSample: TMenuItem;
     pBalanced: TMenuItem;
     pmRand: TPopupMenu;
@@ -56,6 +61,7 @@ type
     seEndAt: TSpinEdit;
     seGap: TSpinEdit;
     seSeqToWrite: TSpinEdit;
+    procedure ListBoxPositionsDblClick(Sender: TObject);
     procedure StringGridKeyPress(Sender: TObject; var Key: Char);
     procedure StringGridSetEditText(Sender: TObject; ACol, ARow: Integer; const Value: string);
     procedure StringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
@@ -96,7 +102,7 @@ var
 
 implementation
 
-uses math, strutils, FileUtil, constants;
+uses math, strutils, FileUtil, LazFileUtils,constants;
 
 {$R *.lfm}
 
@@ -158,19 +164,39 @@ var
   LNumComp: LongInt;
   LColOnset , LSquareSize: integer;
 begin
-  i:= seBeginAt.Value - 1;
-  if pRand.Checked then
-    while (i < StringGrid.RowCount -1) and (i <= seEndAt.Value - 1) do
-      begin
-        for j := 0 to seSeqToWrite.Value -1 do
-          begin
-            LNumComp := FSession.ReadTrialInteger(FBloc.ID, i+1, _NumComp);
-            Rand;
-            PutOnGrid(i + 1, LNumComp);
-            Inc(i);
-          end;
-        Inc(i, seGap.Value);
-      end;
+  if pRand.Checked or pRandFixedSample.Checked then
+    begin
+      if pRand.Checked then
+        begin
+          FPosiNames.Clear;
+          for i := 0 to FPositions.Count-1 do
+            FPosiNames.Append(FPositions.Names[i]);
+        end;
+
+      if pRandFixedSample.Checked then
+        begin
+          FPosiNames.Clear;
+          if FPositions.Count > 0 then
+            for i := 1 to FPositions.Count-1 do
+              FPosiNames.Append(FPositions.Names[i]);
+
+          for i := 1 to StringGrid.RowCount -1 do
+            StringGrid.Cells[1,i] := '1';
+        end;
+
+      i:= seBeginAt.Value - 1;
+      while (i < StringGrid.RowCount -1) and (i <= seEndAt.Value - 1) do
+        begin
+          for j := 0 to seSeqToWrite.Value -1 do
+            begin
+              LNumComp := FSession.ReadTrialInteger(FBloc.ID, i+1, _NumComp);
+              Rand;
+              PutOnGrid(i + 1, LNumComp);
+              Inc(i);
+            end;
+          Inc(i, seGap.Value);
+        end;
+    end;
 
   if pBalanced.Checked or pBalancedFixedSample.Checked then
     begin
@@ -186,13 +212,12 @@ begin
           LSquareSize:=FPositions.Count-1;
           for i := 1 to StringGrid.RowCount -1 do
             StringGrid.Cells[1,i] := '1';
-
         end;
 
       LSquareID := 0;
       LSquareLine := 0;
       Rand;
-      i := 0;
+      i:= seBeginAt.Value - 1;
       while (i < StringGrid.RowCount -1) and (i <= seEndAt.Value - 1) do
         begin
           LNumComp := FSession.ReadTrialInteger(FBloc.ID, i+1, _NumComp);
@@ -239,9 +264,7 @@ var
   var
     i : integer;
     LEmpty : string = '';
-    s : string;
   begin
-    s := FPositions.Text;
     Result := LEmpty;
     if ABndCode <> LEmpty then
       with FPositions do
@@ -312,7 +335,7 @@ begin
   SetSpin;
   FPositions.Clear;
   FSession.ReadPositionsInBloc(FBloc.ID, FPositions);
-
+  ListBoxPositions.Items := FPositions;
   FPosiNames.Clear;
   for i := 0 to FPositions.Count-1 do
     FPosiNames.Append(FPositions.Names[i]);
@@ -336,7 +359,10 @@ begin
 
   SetSpin;
   if APositions <> '' then // use custom positions
-    FPositions.Text := APositions;
+    begin
+      FPositions.Text := APositions;
+      ListBoxPositions.Items := FPositions;
+    end;
 
   FPosiNames.Clear;
   for i := 0 to FPositions.Count-1 do
@@ -348,11 +374,15 @@ end;
 procedure TFormRandomizePositions.LoadFromFile(AFilename: string);
 begin
   btnOK.OnClick := nil;
-  GroupBoxBlocs.Visible:=True;
+  GroupBoxBlocs.Visible:= True;
+  ButtonSave.Visible := True;
+  ButtonSave.OnClick := @btnOKClick;
   FSession := TConfigurationFile.Create(AFilename);
   FSession.CacheUpdates := True;
   if FSession.BlocCount > 0 then
-    LoadBloc(1);
+    LoadBloc(1)
+  else
+    ShowMessage('Nenhum Bloco foi encontrado.');
 end;
 
 procedure TFormRandomizePositions.WriteFixedSamplePosition(APosition: string);
@@ -407,17 +437,21 @@ begin
   if ATrial <= FBloc.NumTrials then
     begin
       if pRand.Checked then
-        begin
-          for n := 0 to FPosiNames.Count - 1 do
-            begin
-              if n = 0 then
-                StringGrid.Cells[n + 1, ATrial] := FPosiNames[n];
+        for n := 0 to FPosiNames.Count - 1 do
+          begin
+            if n = 0 then
+              StringGrid.Cells[n + 1, ATrial] := FPosiNames[n];
 
-              if n > 0 then
-                if n <= ANumComp then
-                  StringGrid.Cells[n + 1, ATrial] := FPosiNames[n];
-            end;
-        end;
+            if n > 0 then
+              if n <= ANumComp then
+                StringGrid.Cells[n + 1, ATrial] := FPosiNames[n];
+          end;
+
+
+      if pRandFixedSample.Checked then
+        for n := 0 to FPosiNames.Count - 1 do
+          if n+1 <= ANumComp then
+            StringGrid.Cells[n + 2, ATrial] := FPosiNames[n];
 
       if pBalanced.Checked then
         for n := 0 to Length(FLatinSquare) - 1 do
@@ -442,7 +476,9 @@ var
   LSigns : array of integer;
   i: Integer;
 begin
-  if pRand.Checked then RandSequence;
+  if pRand.Checked or pRandFixedSample.Checked then
+    RandSequence;
+
   if pBalanced.Checked then
     begin
       SetLength(LSigns,FPositions.Count);
@@ -617,7 +653,8 @@ var j : Integer;
     aRect := Rect;
     with TStringGrid(Sender) do
       begin
-        Canvas.Brush.Color := clRed;
+        //Canvas.Brush.Color := clRed;
+        Canvas.Pen.Color:=clRed;
         Canvas.FillRect(Rect);
         Canvas.Font.Color := clBlack;
         InflateRect(aRect, -2, -2);
@@ -675,6 +712,27 @@ begin
   if not CharInSet(Key, ['0'..'9', #8, #9]) then
     Key := #0;
   StringGrid.Invalidate;
+end;
+
+procedure TFormRandomizePositions.ListBoxPositionsDblClick(Sender: TObject);
+var
+  i: Integer;
+begin
+  if OpenDialog.Execute then
+    if FileExists(OpenDialog.FileName) then
+      begin
+        ListBoxPositions.Items.LoadFromFile(OpenDialog.FileName);
+        if ListBoxPositions.Items.Count > 1 then
+          begin
+            FPositions.Text:=ListBoxPositions.Items.Text;
+            FPosiNames.Clear;
+            for i := 0 to FPositions.Count-1 do
+              FPosiNames.Append(FPositions.Names[i]);
+
+            FillGrid;
+            btnRandClick(Sender);
+          end;
+      end;
 end;
 
 procedure TFormRandomizePositions.StringGridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);

@@ -1,9 +1,9 @@
 object FormRandomizePositions: TFormRandomizePositions
-  Left = 62
+  Left = 25
   Height = 256
-  Top = 237
+  Top = 185
   Width = 823
-  HorzScrollBar.Page = 652
+  HorzScrollBar.Page = 804
   VertScrollBar.Page = 63
   AutoScroll = True
   Caption = 'Aleatorizar posições dos estímulos'
@@ -15,55 +15,56 @@ object FormRandomizePositions: TFormRandomizePositions
   FormStyle = fsStayOnTop
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ShowHint = True
   LCLVersion = '1.6.2.0'
   WindowState = wsMaximized
   object LabelGap: TLabel
-    Left = 317
+    Left = 484
     Height = 13
-    Top = 13
+    Top = 15
     Width = 34
     Caption = 'e Pular'
     ParentColor = False
     Visible = False
   end
   object LabelSeqToWrite: TLabel
-    Left = 177
+    Left = 344
     Height = 13
-    Top = 13
+    Top = 15
     Width = 54
     Caption = 'Aleatorizar'
     ParentColor = False
     Visible = False
   end
   object LabelBeginAt: TLabel
-    Left = 177
+    Left = 344
     Height = 13
-    Top = 41
+    Top = 43
     Width = 59
     Caption = 'Começar na'
     ParentColor = False
   end
   object LabelEndAt: TLabel
-    Left = 306
+    Left = 473
     Height = 13
-    Top = 41
+    Top = 43
     Width = 59
     Caption = 'Terminar na'
     ParentColor = False
   end
   object LabelLines: TLabel
-    Left = 438
+    Left = 605
     Height = 13
-    Top = 13
+    Top = 15
     Width = 32
     Caption = 'linhas.'
     ParentColor = False
     Visible = False
   end
   object LabelTrial: TLabel
-    Left = 438
+    Left = 605
     Height = 13
-    Top = 41
+    Top = 43
     Width = 47
     Caption = 'tentativa.'
     ParentColor = False
@@ -80,10 +81,10 @@ object FormRandomizePositions: TFormRandomizePositions
     TabOrder = 0
   end
   object seGap: TSpinEdit
-    Left = 371
+    Left = 538
     Height = 23
     Hint = 'Valor salto'
-    Top = 10
+    Top = 12
     Width = 56
     MaxValue = 0
     ParentShowHint = False
@@ -91,10 +92,10 @@ object FormRandomizePositions: TFormRandomizePositions
     Visible = False
   end
   object seSeqToWrite: TSpinEdit
-    Left = 244
+    Left = 411
     Height = 23
     Hint = 'Valor n.'
-    Top = 10
+    Top = 12
     Width = 56
     MaxValue = 0
     ParentShowHint = False
@@ -102,10 +103,10 @@ object FormRandomizePositions: TFormRandomizePositions
     Visible = False
   end
   object seBeginAt: TSpinEdit
-    Left = 244
+    Left = 411
     Height = 23
     Hint = 'Primeira tentativa.'
-    Top = 38
+    Top = 40
     Width = 56
     MaxValue = 0
     ParentShowHint = False
@@ -114,10 +115,10 @@ object FormRandomizePositions: TFormRandomizePositions
     TabOrder = 4
   end
   object seEndAt: TSpinEdit
-    Left = 371
+    Left = 538
     Height = 23
     Hint = 'Última tentativa.'
-    Top = 38
+    Top = 40
     Width = 56
     MaxValue = 0
     ParentShowHint = False
@@ -146,8 +147,8 @@ object FormRandomizePositions: TFormRandomizePositions
     TabOrder = 6
   end
   object GroupBoxBlocs: TGroupBox
-    Left = 512
-    Height = 48
+    Left = 664
+    Height = 55
     Top = 8
     Width = 140
     AutoSize = True
@@ -158,8 +159,9 @@ object FormRandomizePositions: TFormRandomizePositions
     ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
-    ClientHeight = 33
+    ClientHeight = 40
     ClientWidth = 136
+    Constraints.MinHeight = 55
     TabOrder = 7
     Visible = False
     object ButtonBlocBackward: TButton
@@ -194,6 +196,41 @@ object FormRandomizePositions: TFormRandomizePositions
       TabOrder = 1
     end
   end
+  object ButtonSave: TButton
+    Left = 88
+    Height = 25
+    Top = 38
+    Width = 75
+    Caption = 'Salvar'
+    TabOrder = 8
+    Visible = False
+  end
+  object GroupBoxPositions: TGroupBox
+    Left = 168
+    Height = 55
+    Top = 8
+    Width = 169
+    Caption = 'Posições'
+    ClientHeight = 40
+    ClientWidth = 165
+    TabOrder = 9
+    object ListBoxPositions: TListBox
+      Left = 0
+      Height = 40
+      Hint = 'Dois cliques para carregar um arquivo com posições customizadas.'
+      Top = 0
+      Width = 165
+      Align = alClient
+      ExtendedSelect = False
+      ItemHeight = 0
+      OnDblClick = ListBoxPositionsDblClick
+      ScrollWidth = 163
+      Sorted = True
+      TabOrder = 0
+      TabStop = False
+      TopIndex = -1
+    end
+  end
   object pmRand: TPopupMenu
     left = 24
     top = 96
@@ -220,5 +257,17 @@ object FormRandomizePositions: TFormRandomizePositions
       RadioItem = True
       ShowAlwaysCheckable = True
     end
+    object pRandFixedSample: TMenuItem
+      AutoCheck = True
+      Caption = 'Aleatório (Modelo Fixo)'
+      GroupIndex = 1
+      RadioItem = True
+      ShowAlwaysCheckable = True
+    end
+  end
+  object OpenDialog: TOpenDialog
+    Filter = 'TXT|*.txt'
+    left = 112
+    top = 96
   end
 end

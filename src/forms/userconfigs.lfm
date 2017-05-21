@@ -1,7 +1,7 @@
 object FormUserConfig: TFormUserConfig
-  Left = 261
+  Left = 338
   Height = 482
-  Top = 105
+  Top = 143
   Width = 604
   HorzScrollBar.Page = 600
   VertScrollBar.Page = 303

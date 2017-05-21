@@ -192,7 +192,7 @@ procedure TConfigurationFile.ReadPositionsInBloc(ABloc: integer;
 var
   L : TStringList;
   LNumComp: LongInt;
-  LTrialSection, LCompName, S: String;
+  LTrialSection, LKeyName, S: String;
   j, i: Integer;
 begin
   L := TStringList.Create;
@@ -202,19 +202,34 @@ begin
     for i := 0 to TrialCount[ABloc]-1 do
       begin
         LTrialSection := TrialSection(ABloc,i+1);
+
+        // sample
+        if ReadString(LTrialSection,_Kind,'') = T_MTS then
+          begin
+            LKeyName := _Samp+_cBnd;
+            S := ReadString(LTrialSection,LKeyName,'');
+            if S <> '' then
+              L.Append(S);
+          end;
+
+        // comparisons
         LNumComp := ReadInteger(LTrialSection,_NumComp,0);
         if LNumComp > 0 then
           for j := 0 to  LNumComp-1 do
             begin
-              LCompName := _Comp+IntToStr(j+1)+_cBnd;
-              S := ReadString(LTrialSection,LCompName,'');
+              LKeyName := _Comp+IntToStr(j+1)+_cBnd;
+              S := ReadString(LTrialSection,LKeyName,'');
               if S <> '' then
                 L.Append(S);
             end;
       end;
 
-    for i := 0 to L.Count-1 do
-      APositionsList.Values[IntToStr(i+1)] := L[i];
+    j := 0;
+    for i := L.Count-1 downto 0 do
+      begin
+        APositionsList.Values[IntToStr(j+1)] := L[i];
+        Inc(j);
+      end;
 
   finally
     L.Free;
