@@ -37,6 +37,10 @@ type
     btnOK: TButton;
     btnCancel: TButton;
     btnRandomize: TButton;
+    ButtonBlocBackward: TButton;
+    ButtonBlocFoward: TButton;
+    GroupBoxBlocs: TGroupBox;
+    LabelCurrentBloc: TLabel;
     LabelBeginAt: TLabel;
     LabelEndAt: TLabel;
     LabelGap: TLabel;
@@ -44,6 +48,7 @@ type
     LabelLines: TLabel;
     LabelSeqToWrite: TLabel;
     LabelTrial: TLabel;
+    pBalancedFixedSample: TMenuItem;
     pBalanced: TMenuItem;
     pmRand: TPopupMenu;
     pRand: TMenuItem;
@@ -57,13 +62,12 @@ type
     procedure StringGridDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
     procedure btnRandClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
+    procedure btnBlocClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     StringGrid : TCStringGrid;
     FSession : TConfigurationFile;
-    FBlackList : TStringList;
-    FWhiteList : TStringList;
     FPositions : TStringList;
     FPosiNames : TStringList;
     FLatinSquare : array of array of integer;
@@ -71,14 +75,18 @@ type
     FOnBlcChange: TNotifyEvent;
     FOnTrialChange: TNotifyEvent;
     procedure CellsEliminator;
+    procedure FillGrid;
+    procedure LoadBloc(ABloc : integer);
     procedure PutOnGrid(ATrial : integer; ANumComp :Integer; ASquareLine : integer = 0);
     procedure Rand;
-    procedure RandLatinSquareBalanced;
+    procedure RandLatinSquare(ASize : integer; ASigns : array of integer);
     procedure RandSequence;
     procedure SetSpin;
-    function EqualPositionsInRows(ARow1, ARow2 : integer; Offset : integer):Boolean;
+    function EqualPositionsInRows(ARow1, ARow2 : integer; AColOnset, AColOffset : integer):Boolean;
   public
-    procedure LoadPositionsFromFile(AFilename: string; ABlc : Integer; APositions : string = '');
+    procedure LoadFromFile(AFilename: string; ABlc : Integer; APositions : string = '');overload;
+    procedure LoadFromFile(AFilename: string); overload;
+    procedure WriteFixedSamplePosition(APosition: string); // maybe it will move to config_session_fileutils
     property OnBlcChange : TNotifyEvent read FOnBlcChange write FOnBlcChange;
     property OnTrialChange : TNotifyEvent read FOnTrialChange write FOnTrialChange;
   end;
@@ -132,9 +140,23 @@ begin
   FSession.UpdateFile;
 end;
 
+procedure TFormRandomizePositions.btnBlocClick(Sender: TObject);
+begin
+  if Sender = ButtonBlocBackward then
+    if FBloc.ID > 1 then
+      LoadBloc(FBloc.ID-1);
+
+  if Sender = ButtonBlocFoward then
+    if FBloc.ID < FSession.BlocCount then
+      LoadBloc(FBloc.ID+1);
+end;
+
 procedure TFormRandomizePositions.btnRandClick(Sender: TObject);
-var i, j, LSquareLine , LSquareID: integer;
+var
+  i, j : integer;
+  LSquareLine , LSquareID: integer;
   LNumComp: LongInt;
+  LColOnset , LSquareSize: integer;
 begin
   i:= seBeginAt.Value - 1;
   if pRand.Checked then
@@ -150,24 +172,40 @@ begin
         Inc(i, seGap.Value);
       end;
 
-  if pBalanced.Checked then
+  if pBalanced.Checked or pBalancedFixedSample.Checked then
     begin
+      if pBalanced.Checked then
+        begin
+          LColOnset:=1;
+          LSquareSize:= FPositions.Count;
+        end;
+
+      if pBalancedFixedSample.Checked then
+        begin
+          LColOnset:=2;
+          LSquareSize:=FPositions.Count-1;
+          for i := 1 to StringGrid.RowCount -1 do
+            StringGrid.Cells[1,i] := '1';
+
+        end;
+
       LSquareID := 0;
       LSquareLine := 0;
       Rand;
+      i := 0;
       while (i < StringGrid.RowCount -1) and (i <= seEndAt.Value - 1) do
         begin
           LNumComp := FSession.ReadTrialInteger(FBloc.ID, i+1, _NumComp);
           PutOnGrid(i + 1, LNumComp, LSquareLine);
           if i > 0 then
-            if i = FPositions.Count*LSquareID then
-              while EqualPositionsInRows(i, i+1, LNumComp+1) do
+            if i = (LSquareSize*LSquareID) then
+              while EqualPositionsInRows(i, i+1, LColOnset, LNumComp+1) do
                 begin
                   Rand;
                   PutOnGrid(i + 1, LNumComp, LSquareLine);
                 end;
 
-          if LSquareLine = (FPositions.Count - 1) then
+          if LSquareLine = (LSquareSize - 1) then
             begin
               Rand;
               LSquareLine := 0;
@@ -192,35 +230,35 @@ begin
     end;
 end;
 
-
-procedure TFormRandomizePositions.LoadPositionsFromFile(AFilename: string;
-  ABlc: Integer; APositions: string);
+procedure TFormRandomizePositions.FillGrid;
 var
-  i, j : integer;
+  i : integer;
+  j : integer;
+
+  function BndCodeToPositionName(ABndCode : string) : string;
+  var
+    i : integer;
+    LEmpty : string = '';
+    s : string;
+  begin
+    s := FPositions.Text;
+    Result := LEmpty;
+    if ABndCode <> LEmpty then
+      with FPositions do
+        for i := 0 to Count-1 do
+          if Values[Names[i]] = ABndCode then
+            begin
+              Result := Names[i];
+              Break;
+            end;
+  end;
+
 begin
-  FSession := TConfigurationFile.Create(AFilename);
-  FSession.CacheUpdates := True;
-  FBloc := FSession.Bloc[ABlc];
-  SetSpin;
-
-  FPosiNames := TStringList.Create;
-  FPositions := TStringList.Create;
-  FPositions.Sorted := True;
-  //FPositions.Sorted:=True;
-  if APositions <> '' then
-    // use custom positions
-    FPositions.Text := APositions
-  else
-    // use existing positions
-    FSession.ReadPositionsInBloc(FBloc.ID,FPositions);
-
-  for i := 0 to FPositions.Count-1 do
-    FPosiNames.Append(FPositions.Names[i]);
-
   with StringGrid do
     begin
-      ColCount := FPositions.Count + 2;   // +1 for for fixed col, +1 for MTS samples
-      RowCount := FBloc.NumTrials + 1;
+      Clear;
+      ColCount := FPositions.Count + 2;   // +1 for fixed col, +1 for MTS samples
+      RowCount := FBloc.NumTrials + 1;   //+1 for fixed row
       Cells[0,0] := 'Tent\Stm';
 
       // write col names
@@ -242,11 +280,14 @@ begin
         for j := 1 to ColCount - 1 do
           begin
             if j = 1 then
-              Cells[j, i] := FSession.ReadTrialString(FBloc.ID,i,_Samp+_cBnd);
+              if FSession.Trial[FBloc.ID, i].Kind = T_MTS then
+                Cells[j, i] := BndCodeToPositionName(FSession.ReadTrialString(FBloc.ID,i,_Samp+_cBnd))
+              else
+                Cells[j, i] := 'NA';
 
             if j > 1 then
               if j-1 <= FSession.ReadTrialInteger(FBloc.ID,i,_NumComp) then
-                Cells[j, i] := FSession.ReadTrialString(FBloc.ID,i,_Comp+IntToStr(j-1)+_cBnd)
+                Cells[j, i] := BndCodeToPositionName(FSession.ReadTrialString(FBloc.ID,i,_Comp+IntToStr(j-1)+_cBnd))
               else
                 Cells[j, i] := 'NA';
 
@@ -257,8 +298,87 @@ begin
     end;
 end;
 
+procedure TFormRandomizePositions.LoadBloc(ABloc: integer);
+var
+  i: Integer;
+begin
+  FBloc := FSession.Bloc[ABloc];
+  LabelCurrentBloc.Caption := IntToStr(FBloc.ID) + ' / ' + IntToStr(FSession.BlocCount);
+  if FBloc.Name = '' then
+    Caption := 'Bloco - ' + IntToStr(FBloc.ID)
+  else
+    Caption := FBloc.Name;
+
+  SetSpin;
+  FPositions.Clear;
+  FSession.ReadPositionsInBloc(FBloc.ID, FPositions);
+
+  FPosiNames.Clear;
+  for i := 0 to FPositions.Count-1 do
+    FPosiNames.Append(FPositions.Names[i]);
+
+  FillGrid;
+end;
+
+
+procedure TFormRandomizePositions.LoadFromFile(AFilename: string;
+  ABlc: Integer; APositions: string);
+var
+  i : integer;
+begin
+  FSession := TConfigurationFile.Create(AFilename);
+  FSession.CacheUpdates := True;
+  FBloc := FSession.Bloc[ABlc];
+  if FBloc.Name = '' then
+    Caption := 'Bloco - ' + IntToStr(FBloc.ID)
+  else
+    Caption := FBloc.Name;
+
+  SetSpin;
+  if APositions <> '' then // use custom positions
+    FPositions.Text := APositions;
+
+  FPosiNames.Clear;
+  for i := 0 to FPositions.Count-1 do
+    FPosiNames.Append(FPositions.Names[i]);
+
+  FillGrid;
+end;
+
+procedure TFormRandomizePositions.LoadFromFile(AFilename: string);
+begin
+  btnOK.OnClick := nil;
+  GroupBoxBlocs.Visible:=True;
+  FSession := TConfigurationFile.Create(AFilename);
+  FSession.CacheUpdates := True;
+  if FSession.BlocCount > 0 then
+    LoadBloc(1);
+end;
+
+procedure TFormRandomizePositions.WriteFixedSamplePosition(APosition: string);
+var
+  i , j: integer;
+  LReportMessage: String;
+begin
+  for i := 0 to FSession.BlocCount-1 do
+    for j := 0 to FSession.TrialCount[i]-1 do
+      if FSession.ReadTrialString(i,j,_Kind) = T_MTS then
+          begin
+            // position
+            FSession.WriteToTrial(j,i,_Samp+_cBnd, APosition);
+
+            // position report message
+            LReportMessage:=ExtractDelimited(1,FSession.ReadTrialString(i,j,_Samp+_cStm),[#32]);
+            LReportMessage:=ExtractFileNameWithoutExt(LReportMessage);
+            FSession.WriteToTrial(j,i,_Samp+_cMsg,LReportMessage);
+          end;
+end;
+
 procedure TFormRandomizePositions.FormCreate(Sender: TObject);
 begin
+  FPosiNames := TStringList.Create;
+  FPositions := TStringList.Create;
+  FPositions.Sorted := True;
   StringGrid := TCStringGrid.Create(Self);
   with StringGrid do
     begin
@@ -274,9 +394,9 @@ procedure TFormRandomizePositions.FormDestroy(Sender: TObject);
 begin
   FPosiNames.Free;
   FPositions.Free;
-  FBlackList.Free;
-  FWhiteList.Free;
   CellsEliminator;
+  if Assigned(FSession) then
+    FSession.Free;
 end;
 
 procedure TFormRandomizePositions.PutOnGrid(ATrial: integer; ANumComp: Integer;
@@ -300,49 +420,66 @@ begin
         end;
 
       if pBalanced.Checked then
-        begin
-          for n := 0 to FPositions.Count - 1 do
-            begin
-              if n = 0 then
-                StringGrid.Cells[n + 1, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
+        for n := 0 to Length(FLatinSquare) - 1 do
+          begin
+            if n = 0 then
+              StringGrid.Cells[n + 1, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
 
-              if n > 0 then
-                if n <= ANumComp then
-                  StringGrid.Cells[n + 1, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
-            end;
-        end;
+            if n > 0 then
+              if n <= ANumComp then
+                StringGrid.Cells[n + 1, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
+          end;
+
+      if pBalancedFixedSample.Checked then
+        for n := 0 to Length(FLatinSquare) - 1 do
+          if n+1 <= ANumComp then
+            StringGrid.Cells[n + 2, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
     end;
 end;
 
 procedure TFormRandomizePositions.Rand;
+var
+  LSigns : array of integer;
+  i: Integer;
 begin
   if pRand.Checked then RandSequence;
-  if pBalanced.Checked then RandLatinSquareBalanced;
+  if pBalanced.Checked then
+    begin
+      SetLength(LSigns,FPositions.Count);
+      for i := 0 to FPositions.Count - 1 do LSigns[i] := i + 1;
+      RandLatinSquare(FPositions.Count, LSigns);
+    end;
+
+  if pBalancedFixedSample.Checked then
+    begin
+      SetLength(LSigns,FPositions.Count-1);
+      for i := 0 to FPositions.Count - 2 do LSigns[i] := i + 2;
+      RandLatinSquare(FPositions.Count-1, LSigns);
+    end;
 end;
 
-procedure TFormRandomizePositions.RandLatinSquareBalanced;
-var   jumbled, sequence, rotateS, signs: array of integer;
-      i, j, k, size : integer;
-//      s1 : string;
-//      a1 : integer;
+procedure TFormRandomizePositions.RandLatinSquare(ASize: integer;
+  ASigns: array of integer);
+var
+  jumbled, sequence, rotateS: array of integer;
+  i, j, k : integer;
 
-  procedure SetArrayLength (aSize : integer);
+  procedure SetArrayLength;
   begin
-    SetLength(signs, aSize);
-    SetLength(rotateS, aSize);
-    SetLength(jumbled, aSize);
-    SetLength(sequence, aSize);
-    SetLength(FLatinSquare, aSize, aSize);
+    SetLength(rotateS, ASize);
+    SetLength(jumbled, ASize);
+    SetLength(sequence, ASize);
+    SetLength(FLatinSquare, ASize, ASize);
   end;
 
-  procedure Shuffle(var array1 : array of integer ; aSize : integer);   //embaralhar lista
+  procedure Shuffle(var array1 : array of integer);   //embaralhar lista
   var v, aTemp, aRandom : integer;
   begin
-    for v := 0 to aSize - 1 do array1[v] := v + 1;
+    for v := 0 to ASize - 1 do array1[v] := v + 1;
 
-    for v := 0 to aSize - 1 do
+    for v := 0 to ASize - 1 do
       begin
-        aRandom := Round(Random * (aSize - 1));
+        aRandom := Round(Random * (ASize - 1));
         aTemp := array1[aRandom];
         array1[aRandom] := array1[v];
         array1[v] := aTemp;
@@ -361,24 +498,36 @@ var   jumbled, sequence, rotateS, signs: array of integer;
       end;
   end;
 
+  //procedure WriteSquare;
+  //var
+  //  i, j : integer;
+  //begin
+  //  for i := 0 to ASize - 1 do
+  //    begin
+  //      for j := 0 to ASize - 1 do
+  //        Write(FLatinSquare[j,i], #32);
+  //      WriteLn('');
+  //    end;
+  //  WriteLn('');
+  //end;
+
 begin
-  //how many?: 1 for each NumPos cicle on seSeqToWrite.
-  Size := FPositions.Count;
-  SetArrayLength(Size);
+  SetArrayLength;
 
-  shuffle(jumbled, size);                      //gerar lista de referência; aleatória
-  shuffle(rotateS, size);                      //gerar lista de rotações; aleatória
-  for i := 0 to size - 1 do signs[i] := i + 1; //gerar lista de elementos; ordenada
+  shuffle(jumbled);                      //gerar lista de referência; aleatória
+  shuffle(rotateS);                      //gerar lista de rotações; aleatória
 
-  for i := 0 to size - 1 do
+  for i := 0 to ASize - 1 do
     begin
-      for k := 0 to size - 1 do
-        sequence[k] := jumbled[k];                   //gerar lista de trabalho a partir da lista de referência
+      for k := 0 to ASize - 1 do
+        sequence[k] := jumbled[k];                     //gerar lista de trabalho a partir da lista de referência
 
-      rotate(sequence, rotateS[i]);                  //mover elementos da lista de trabalho
-      for j := 0 to size - 1 do
-        FLatinSquare[j, sequence[j] - 1] := signs[i]; //preencher Latin Square
+      rotate(sequence, rotateS[i]);                    //mover elementos da lista de trabalho
+      for j := 0 to ASize - 1 do
+        FLatinSquare[j, sequence[j] - 1] := ASigns[i]; //preencher Latin Square
     end;
+
+  //WriteSquare;
 end;
 
 
@@ -394,13 +543,13 @@ begin
 end;
 
 function TFormRandomizePositions.EqualPositionsInRows(ARow1, ARow2: integer;
-  Offset: integer): Boolean;
+  AColOnset, AColOffset: integer): Boolean;
 var
   LCol: Integer;
 begin
   Result := False;
   with StringGrid do
-    for LCol := 1 to Offset do
+    for LCol := AColOnSet to AColOffset do
       if Cells[LCol, ARow1] = Cells[LCol, ARow2] then
         begin
           Result := True;

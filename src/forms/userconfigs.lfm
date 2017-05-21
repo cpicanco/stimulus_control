@@ -1621,7 +1621,7 @@ object FormUserConfig: TFormUserConfig
   OnDestroy = FormDestroy
   ParentBiDiMode = False
   Position = poScreenCenter
-  SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Text;EditBlocChainingPath.Text;EditBlocName.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;Height;HorzScrollBar;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piMTS.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;Position;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;VertScrollBar;Width;WindowState;ComboBoxSessionType.ItemIndex;ComboBoxSessionType.Text;EditParticipant.Text;EditSessionName.Text'
+  SessionProperties = 'btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Text;ComboBoxSessionType.ItemIndex;ComboBoxSessionType.Text;EditBlocChainingPath.Text;EditBlocName.Text;EditParticipant.Text;EditSessionName.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;Height;HorzScrollBar;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piMTS.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;Position;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;VertScrollBar;Width;WindowState;EditTargetSession.Text'
   LCLVersion = '1.6.2.0'
   object btnRun: TButton
     Left = 8
@@ -1721,7 +1721,19 @@ object FormUserConfig: TFormUserConfig
     end
     object tbStimuli: TTabSheet
       Caption = 'Estímulos'
+      ClientHeight = 411
+      ClientWidth = 600
       TabVisible = False
+      object btnExportStimulus: TButton
+        Left = 8
+        Height = 25
+        Top = 8
+        Width = 115
+        Caption = 'Exportar estímulo'
+        OnClick = btnExportStimulusClick
+        TabOrder = 0
+        Visible = False
+      end
     end
     object tbBlocs: TTabSheet
       Caption = 'Blocos'
@@ -2134,28 +2146,39 @@ object FormUserConfig: TFormUserConfig
     end
     object tbTools: TTabSheet
       Caption = 'Ferramentas'
+      ChildSizing.TopBottomSpacing = 25
+      ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 1
       ClientHeight = 411
       ClientWidth = 600
-      TabVisible = False
-      object btnExportStimulus: TButton
-        Left = 8
-        Height = 25
-        Top = 8
-        Width = 140
-        Caption = 'Exportar estímulo'
-        OnClick = btnExportStimulusClick
-        TabOrder = 0
+      object LabelTargetSession: TLabel
+        Left = 175
+        Height = 15
+        Top = 25
+        Width = 250
+        Caption = 'Sessão alvo'
+        ParentColor = False
       end
-      object btnClientTest: TButton
-        AnchorSideLeft.Side = asrBottom
-        Left = 160
+      object EditTargetSession: TEdit
+        Left = 175
         Height = 25
-        Hint = 'localhost:5020'
-        Top = 8
-        Width = 163
-        Caption = 'Testar Interface Pupil'
+        Top = 40
+        Width = 250
+        Constraints.MinWidth = 250
+        OnDblClick = EditTargetSessionDblClick
         ParentShowHint = False
         ShowHint = True
+        TabOrder = 0
+        TextHint = 'Clique duas vezes para escolher a sessão alvo.'
+      end
+      object ButtonRandomizeTargetSession: TButton
+        Left = 175
+        Height = 25
+        Top = 65
+        Width = 250
+        Caption = 'Randomizar posições'
+        OnClick = ButtonRandomizeTargetSessionClick
         TabOrder = 1
       end
     end

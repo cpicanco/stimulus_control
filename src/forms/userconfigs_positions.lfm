@@ -1,9 +1,9 @@
 object FormRandomizePositions: TFormRandomizePositions
-  Left = 20
+  Left = 62
   Height = 256
-  Top = 142
+  Top = 237
   Width = 823
-  HorzScrollBar.Page = 526
+  HorzScrollBar.Page = 652
   VertScrollBar.Page = 63
   AutoScroll = True
   Caption = 'Aleatorizar posições dos estímulos'
@@ -18,7 +18,7 @@ object FormRandomizePositions: TFormRandomizePositions
   LCLVersion = '1.6.2.0'
   WindowState = wsMaximized
   object LabelGap: TLabel
-    Left = 358
+    Left = 317
     Height = 13
     Top = 13
     Width = 34
@@ -27,7 +27,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Visible = False
   end
   object LabelSeqToWrite: TLabel
-    Left = 218
+    Left = 177
     Height = 13
     Top = 13
     Width = 54
@@ -36,7 +36,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Visible = False
   end
   object LabelBeginAt: TLabel
-    Left = 218
+    Left = 177
     Height = 13
     Top = 41
     Width = 59
@@ -44,7 +44,7 @@ object FormRandomizePositions: TFormRandomizePositions
     ParentColor = False
   end
   object LabelEndAt: TLabel
-    Left = 347
+    Left = 306
     Height = 13
     Top = 41
     Width = 59
@@ -52,7 +52,7 @@ object FormRandomizePositions: TFormRandomizePositions
     ParentColor = False
   end
   object LabelLines: TLabel
-    Left = 479
+    Left = 438
     Height = 13
     Top = 13
     Width = 32
@@ -61,7 +61,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Visible = False
   end
   object LabelTrial: TLabel
-    Left = 479
+    Left = 438
     Height = 13
     Top = 41
     Width = 47
@@ -80,7 +80,7 @@ object FormRandomizePositions: TFormRandomizePositions
     TabOrder = 0
   end
   object seGap: TSpinEdit
-    Left = 412
+    Left = 371
     Height = 23
     Hint = 'Valor salto'
     Top = 10
@@ -91,7 +91,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Visible = False
   end
   object seSeqToWrite: TSpinEdit
-    Left = 285
+    Left = 244
     Height = 23
     Hint = 'Valor n.'
     Top = 10
@@ -102,7 +102,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Visible = False
   end
   object seBeginAt: TSpinEdit
-    Left = 285
+    Left = 244
     Height = 23
     Hint = 'Primeira tentativa.'
     Top = 38
@@ -114,7 +114,7 @@ object FormRandomizePositions: TFormRandomizePositions
     TabOrder = 4
   end
   object seEndAt: TSpinEdit
-    Left = 412
+    Left = 371
     Height = 23
     Hint = 'Última tentativa.'
     Top = 38
@@ -142,24 +142,81 @@ object FormRandomizePositions: TFormRandomizePositions
     Width = 75
     Caption = 'Aleatorizar'
     OnClick = btnRandClick
+    PopupMenu = pmRand
     TabOrder = 6
   end
-  object pmRand: TPopupMenu
-    left = 424
-    top = 112
-    object pRand: TMenuItem
-      AutoCheck = True
-      Caption = 'Aleatório'
-      GroupIndex = 1
-      RadioItem = True
-      ShowAlwaysCheckable = True
+  object GroupBoxBlocs: TGroupBox
+    Left = 512
+    Height = 48
+    Top = 8
+    Width = 140
+    AutoSize = True
+    Caption = 'Blocos'
+    ChildSizing.LeftRightSpacing = 5
+    ChildSizing.TopBottomSpacing = 5
+    ChildSizing.HorizontalSpacing = 10
+    ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 3
+    ClientHeight = 33
+    ClientWidth = 136
+    TabOrder = 7
+    Visible = False
+    object ButtonBlocBackward: TButton
+      Left = 5
+      Height = 23
+      Top = 5
+      Width = 50
+      Caption = '<'
+      Constraints.MaxWidth = 50
+      Constraints.MinWidth = 50
+      OnClick = btnBlocClick
+      TabOrder = 0
     end
+    object LabelCurrentBloc: TLabel
+      Left = 65
+      Height = 23
+      Top = 5
+      Width = 6
+      Caption = '0'
+      Layout = tlCenter
+      ParentColor = False
+    end
+    object ButtonBlocFoward: TButton
+      Left = 81
+      Height = 23
+      Top = 5
+      Width = 50
+      Caption = '>'
+      Constraints.MaxWidth = 50
+      Constraints.MinWidth = 50
+      OnClick = btnBlocClick
+      TabOrder = 1
+    end
+  end
+  object pmRand: TPopupMenu
+    left = 24
+    top = 96
     object pBalanced: TMenuItem
       AutoCheck = True
       Caption = 'Balanceado'
       Checked = True
       GroupIndex = 1
-      Hint = 'Evita que um estímulo apareça na mesma posição de uma tentativa para outra.'
+      Hint = 'Apresenta um estímulo em cada posição  disponível antes de uma repetição da posição.'#10'Evita que um mesmo estímulo seja apresentado na mesma posição na tentativa seguinte.'
+      RadioItem = True
+      ShowAlwaysCheckable = True
+    end
+    object pBalancedFixedSample: TMenuItem
+      AutoCheck = True
+      Caption = 'Balanceado (Modelo Fixo)'
+      GroupIndex = 1
+      Hint = 'Sempre apresenta o modelo na posição 1.'#10'Evita que uma comparação apareça na posição do modelo.'#10'Apresenta uma comparação em cada posição  disponível antes de uma repetição da posição.'#10'Evita que uma mesma comparação seja apresentada na mesma posição na tentativa seguinte.'
+      RadioItem = True
+    end
+    object pRand: TMenuItem
+      AutoCheck = True
+      Caption = 'Aleatório'
+      GroupIndex = 1
       RadioItem = True
       ShowAlwaysCheckable = True
     end

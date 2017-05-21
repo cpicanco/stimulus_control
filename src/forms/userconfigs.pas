@@ -28,13 +28,13 @@ type
   { TFormUserConfig }
 
   TFormUserConfig = class(TForm)
-    btnClientTest: TButton;
+    btnExportStimulus: TButton;
     btnFillCondition: TButton;
     btnRun: TButton;
     btnRandomize: TButton;
     btnSave: TButton;
-    btnExportStimulus: TButton;
     btnTrialsDone: TButton;
+    ButtonRandomizeTargetSession: TButton;
     chkPupilClient: TCheckBox;
     chkShowRepetitions: TCheckBox;
     btnGridType: TButton;
@@ -43,6 +43,7 @@ type
     ColorButtonBloc: TColorButton;
     ComboBoxSessionType: TComboBox;
     ComboBoxBlocCounter: TComboBox;
+    EditTargetSession: TEdit;
     EditParticipant: TEdit;
     EditBlocName: TEdit;
     EditBlocChainingPath: TEdit;
@@ -52,6 +53,7 @@ type
     gbRepetitionsBlocks: TGroupBox;
     gbTrialGroup: TGroupBox;
     Image1: TImage;
+    LabelTargetSession: TLabel;
     LabelParticipant: TLabel;
     LabelSessionName: TLabel;
     LabelSessionType: TLabel;
@@ -117,11 +119,13 @@ type
     procedure btnRandomizeClick(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
+    procedure ButtonRandomizeTargetSessionClick(Sender: TObject);
     procedure chkDrawTrialGroupChange(Sender: TObject);
     procedure chkShowRepetitionsChange(Sender: TObject);
     procedure chkUseMediaChange(Sender: TObject);
     procedure EditBlocChainingPathDblClick(Sender: TObject);
     procedure EditBlocChainingPathEditingDone(Sender: TObject);
+    procedure EditTargetSessionDblClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
@@ -941,7 +945,7 @@ begin
             begin
               FormMTS.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
               FormRandomizePositions := TFormRandomizePositions.Create(Application);
-              FormRandomizePositions.LoadPositionsFromFile(LAST_BLOC_INIFILE_PATH,1,FormMatrixConfig.Positions);
+              FormRandomizePositions.LoadFromFile(LAST_BLOC_INIFILE_PATH,1,FormMatrixConfig.Positions);
               FormRandomizePositions.btnRandomize.Click;
               if FormRandomizePositions.ShowModal = mrOK then
                 begin
@@ -1001,6 +1005,12 @@ begin
       FormBlocs.BlocsPath := EditBlocChainingPath.Text;
       StringGrid1.PopupMenu := FormBlocs.PopupMenuBlocs;
     end;
+end;
+
+procedure TFormUserConfig.EditTargetSessionDblClick(Sender: TObject);
+begin
+  if OpenDialog1.Execute then
+    EditTargetSession.Text := OpenDialog1.FileName;
 end;
 
 //procedure TFormUserConfig.FormActivate(Sender: TObject);
@@ -1338,6 +1348,21 @@ begin
 
   if SaveDialog1.Execute then
     FEscriba.SaveMemoTextToTxt(SaveDialog1.FileName);
+end;
+
+procedure TFormUserConfig.ButtonRandomizeTargetSessionClick(Sender: TObject);
+begin
+  if FileExistsUTF8(EditTargetSession.Text) then
+    begin
+      FormRandomizePositions := TFormRandomizePositions.Create(Application);
+      FormRandomizePositions.LoadFromFile(EditTargetSession.Text);
+      if FormRandomizePositions.ShowModal = mrOK then
+        begin
+          Memo1.Lines.LoadFromFile(EditTargetSession.Text);
+          pgRodar.TabIndex := 4;
+        end;
+      FormRandomizePositions.Free;
+    end;
 end;
 
 procedure TFormUserConfig.chkDrawTrialGroupChange(Sender: TObject);
