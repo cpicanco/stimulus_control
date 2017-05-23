@@ -50,7 +50,7 @@ implementation
 uses
   strutils, constants
   {$ifdef DEBUG}
-  debug_logger
+  , debug_logger
   {$endif}
   ;
 procedure TSchedule.SetKind(Kind: String);
@@ -136,14 +136,14 @@ begin
 
   FScheduleLoaded := Assigned(FSchedule);
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + 'FAbsSchLoaded:'+ BoolToStr(FAbsSchLoaded, 'True', 'False') );
+    DebugLn(mt_Debug + 'FAbsSchLoaded:'+ BoolToStr(FScheduleLoaded, 'True', 'False') );
   {$endif}
 
   if FScheduleLoaded then
     begin
       {$ifdef DEBUG}
         DebugLn(mt_Debug + 'Schedule:' + LKind + #32 +
-          Parameter1  + #32 + Parameter2  + #32
+          LParameter1  + #32 + LParameter2  + #32
           //+ Parameter3 + #32 + Parameter4
           );
       {$endif}

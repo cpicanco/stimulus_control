@@ -20,9 +20,15 @@ uses
       ,
     {$ENDIF}
   {$ENDIF}
+
   Interfaces // this includes the LCL widgetset
   , Forms
   , userconfigs
+
+  {$ifdef DEBUG}
+  , debug_logger
+  , sysutils
+  {$endif}
   ;
 
 {$R *.res}
@@ -30,7 +36,7 @@ uses
 begin
   Application.Initialize;
   {$ifdef DEBUG}
-    DebugLn(mt_Information + 'Application Title:' + ApplicationTitle);
+    DebugLn(mt_Information + 'Application Title:' + Application.Title);
     DebugLn(mt_Debug + 'Application ThreadID:' + IntToStr(ThreadID));
   {$endif}
   Application.CreateForm(TFormUserConfig, FormUserConfig);

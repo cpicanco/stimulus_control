@@ -54,6 +54,10 @@ type
 
 implementation
 
+{$ifdef DEBUG}
+uses debug_logger;
+{$endif}
+
 { TSchedules }
 
 procedure TSchedules.Consequence;
@@ -116,7 +120,7 @@ begin
 end;
 
 {$ifdef DEBUG}
-procedure TAbsSch.DebugStatus(DebugMessage : string);
+procedure TSchedules.DebugStatus(DebugMessage : string);
 begin
   DebugLn(DebugMessage);
 end;
