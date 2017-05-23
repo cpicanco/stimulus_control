@@ -13,14 +13,10 @@ unit interface_rs232;
 
 interface
 
-// this unit was not implemented yet
-
 uses Classes, SysUtils
-
     {$IFDEF WINDOWS}
-    , Windows, Registry
+    , Registry
     {$ENDIF}
-
     , Synaser
     ;
 
@@ -50,28 +46,26 @@ function TRS232.GetCommPortNumber: ShortInt;
 {$IFDEF WINDOWS}
 var
   Reg: TRegistry;
-  s1: string;
+  LKey: string;
 {$ENDIF}
 begin
+  Result := -1;
   {$IFDEF WINDOWS}
   Reg := TRegistry.Create;
   Reg.RootKey := HKEY_LOCAL_MACHINE;
-  s1 := 'HARDWARE\DEVICEMAP\SERIALCOMM';
-
-  if Reg.KeyExists(s1) then
+  LKey := 'HARDWARE\DEVICEMAP\SERIALCOMM';
+  if Reg.KeyExists(LKey) then
     begin
-      Reg.OpenKeyReadOnly (s1);
+      Reg.OpenKeyReadOnly(LKey);
       if Reg.ValueExists('\Device\VCP0') then
         begin
-          s1:= Reg.ReadString('\Device\VCP0');
-          Delete (s1, 1, 3);
-          if (StrToIntDef (s1, 17) <= 16) or (StrToIntDef (s1, 0) >= 1) then
-            Result := StrToInt (s1)
-          else Result := -1;
-        end
-      else Result := -1;
-    end
-  else Result := -1;
+          LKey := Reg.ReadString('\Device\VCP0');
+          Delete(LKey, 1, 3);
+          case StrToIntDef(LKey, -1) of
+            1..16: Result := StrToInt(LKey);
+          end;
+        end;
+    end;
   Reg.CloseKey;
   Reg.Free;
   {$ENDIF}
@@ -95,7 +89,6 @@ begin
 {$IFDEF Linux}
   Result := Format('/dev/ttyUSB%d', [PortNumber]);
 {$ENDIF}
-
 end;
 
 constructor TRS232.Create;
@@ -103,6 +96,9 @@ var ComX : shortint;
     PortName : string;
 begin
   inherited Create;
+  {$IFDEF DEBUG}
+  WriteLn( 'Ports available: ' +  GetSerialPortNames);
+  {$ENDIF}
   ComX := GetCommPortNumber;
   if ComX = -1 then
     begin
@@ -114,59 +110,28 @@ begin
       PortName := GetCommPortName; //ex.: Linux: '/dev/ttyUSB0' Windows: 'Com3'
       FBlockSerial := TBlockSerial.Create;
       //FBlockSerial.Connect(PortName);
-      FBlockSerial.Connect('/dev/ttyUSB0');
-          Sleep(1500);
+      FBlockSerial.RaiseExcept := true;
+      {$IFDEF LINUX}
+      FBlockSerial.LinuxLock := false;  // user must have full access to /var
+      {$ENDIF}
+      FBlockSerial.Connect(PortName);
       FBlockSerial.config(9600, 8, 'N', SB1, false, false);
-          Sleep(1500);
     end;
 end;
 
 destructor TRS232.Destroy;
 begin
   if Assigned(FBlockSerial) then
-  begin
-   FBlockSerial.Free;
-  end;
+    FBlockSerial.Free;
 
   inherited Destroy;
 end;
 
 procedure TRS232.Dispenser(Data: String);
-//var DispenserOutput : AnsiChar;
 begin
   if Assigned (FBlockSerial) then
-    begin
-      FBlockSerial.SendString(Data);
-    end;
+    FBlockSerial.SendString(Data);
 end;
-
-
-{deprecated methods}
-{
-function TRS232.GetUsbCsqFromValue(Value: String): ShortInt;
-var s1 : string;
-begin
-
-  Value := Value + #32;
-  s1:= Copy(Value, 0, Pos(#32, Value) -1);
-
-  Delete(Value, 1, pos(#32, Value));
-  if Length(Value)> 0 then while Value[1]= ' ' do Delete(Value, 1, 1);
-
-  if StrToIntDef(s1, -1) = -1 then Result := 0
-  else
-    begin
-      if (s1 = '1') then Result := 1
-        else
-        if (s1 = '2') then Result := 2
-          else
-            if (s1 = '3') then Result := 3
-              else
-              if (s1 = '4') then Result := 4
-                else Result := 0;
-    end
-end;
- }
 
 end.
 
