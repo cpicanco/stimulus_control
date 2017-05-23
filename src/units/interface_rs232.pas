@@ -103,6 +103,7 @@ var ComX : shortint;
     PortName : string;
 begin
   inherited Create;
+  WriteLn( 'Ports available: ' +  GetSerialPortNames);
   ComX := GetCommPortNumber;
   if ComX = -1 then
     begin
@@ -114,10 +115,10 @@ begin
       PortName := GetCommPortName; //ex.: Linux: '/dev/ttyUSB0' Windows: 'Com3'
       FBlockSerial := TBlockSerial.Create;
       //FBlockSerial.Connect(PortName);
+      FBlockSerial.RaiseExcept := true;
+      FBlockSerial.LinuxLock := false;  // user must have full access to /var
       FBlockSerial.Connect('/dev/ttyUSB0');
-          Sleep(1500);
       FBlockSerial.config(9600, 8, 'N', SB1, false, false);
-          Sleep(1500);
     end;
 end;
 
