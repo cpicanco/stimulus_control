@@ -18,8 +18,6 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils
   , trial_abstract
   , trial_helpers
   , response_key
-  //, interface_rs232
-  //, interface_plp
   ;
 
 type
@@ -50,7 +48,6 @@ type
   TSimpl = Class(TTrial)
   private
     procedure Consequence(Sender: TObject);
-    procedure Dispenser(Csq: Byte; Usb: string);
     procedure Response(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
     procedure BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
@@ -90,12 +87,6 @@ begin
                       rsReportRspTop;              // top left of all clicks (both background and comparisons)
 end;
 
-procedure TSimpl.Dispenser(Csq: Byte; Usb: string);
-begin
-  //PLP.OutPortOn (Csq);
-  //RS232.Dispenser(Usb);
-end;
-
 procedure TSimpl.Play(ACorrection: Boolean);
 var
   s1 : string;
@@ -130,7 +121,7 @@ begin
         Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]), $0000FF); //clRed
 
         Csq := StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cCsq], 0);
-        //Usb := CfgTrial.SList.Values[_Comp+IntToStr(I+1)+_cUsb];
+        Usb := CfgTrial.SList.Values[_Comp+IntToStr(I+1)+_cUsb];
         Msg := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cMsg];
         Res := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cRes];
         Nxt := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cNxt];
@@ -150,8 +141,6 @@ begin
   if Sender is TKey then
     begin
       i := TKey(Sender).Tag;
-      //FDataSupport.PLPCode:= FComparisons[i].Csq;
-      //FDataSupport.RS232Code := FComparisons[i].Usb;
       TimeOut := FComparisons[i].TO_;
       IETConsequence := FComparisons[i].IET;
 
@@ -237,8 +226,8 @@ begin
     Lat_Cmp := TimestampToStr(FDataSupport.Latency - TimeStart);
   Dur_Cmp := TimestampToStr(FDataSupport.StmEnd - FDataSupport.StmBegin);
 
-  //Disp:= RightStr(IntToBin(FDataSupport.PLPCode, 9)+#0, 8);
-  //uDisp := IntToStr(FDataSupport.RS232Code);
+  //Disp:= RightStr(IntToBin(FConsequence.PLPCode, 9)+#0, 8);
+  uDisp := FConsequence.RS232Code;
   Beg_Cmp := TimestampToStr(FDataSupport.StmBegin - TimeStart);
   End_Cmp := TimestampToStr(FDataSupport.StmEnd - TimeStart);
 
@@ -293,12 +282,20 @@ begin
 end;
 
 procedure TSimpl.Consequence(Sender: TObject);
+var
+  i: PtrInt;
 begin
   if not FConsequenceFired then
     FConsequenceFired := True;
 
-  { todo: The Dispenser requires working hardware interfaces. They were not tested in the cross platform scope. }
-  Dispenser(FConsequence.PLPCode, FConsequence.RS232Code);
+  if Sender is TKey then
+    begin
+      i := TKey(Sender).Tag;
+      FConsequence.PLPCode:= FComparisons[i].Csq;
+      FConsequence.RS232Code := FComparisons[i].Usb;
+      Dispenser(FConsequence.PLPCode, FConsequence.RS232Code);
+    end;
+
   CounterManager.OnConsequence(Sender);
   if Assigned(OnConsequence) then OnConsequence(Sender);
   EndTrial(Sender);

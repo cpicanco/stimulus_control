@@ -16,7 +16,6 @@ interface
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls
 
   , trial_simple
-  //, interface_rs232
   //, interface_plp
   ;
 

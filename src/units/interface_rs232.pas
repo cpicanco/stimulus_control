@@ -33,7 +33,6 @@ type
       constructor Create; reintroduce;
       destructor Destroy; override;
       procedure Dispenser(Data : String);
-      //function GetUsbCsqFromValue (Value : String) : ShortInt;  deprecated
   end;
 
 var RS232 : TRS232;
@@ -110,7 +109,7 @@ begin
       PortName := GetCommPortName; //ex.: Linux: '/dev/ttyUSB0' Windows: 'Com3'
       FBlockSerial := TBlockSerial.Create;
       //FBlockSerial.Connect(PortName);
-      FBlockSerial.RaiseExcept := true;
+      FBlockSerial.RaiseExcept := false;
       {$IFDEF LINUX}
       FBlockSerial.LinuxLock := false;  // user must have full access to /var
       {$ENDIF}
@@ -132,6 +131,12 @@ begin
   if Assigned (FBlockSerial) then
     FBlockSerial.SendString(Data);
 end;
+
+initialization
+  RS232 := TRS232.Create;
+
+finalization
+  RS232.Free;
 
 end.
 

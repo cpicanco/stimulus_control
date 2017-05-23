@@ -1,0 +1,42 @@
+[Main]
+
+Name=	Sessão1
+Subject= Participante1
+Type=	CIC
+RootMedia= Media
+RootData= Data
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+Counter=	performance
+ITI=	0
+NumTrials=	1 1
+
+[Blc 1 - T1]
+Name=	M1
+Kind=	SIMPLE
+
+NumComp = 2
+
+C1Bnd=500 388 200 100
+C1Stm=A2.bmp 0 200
+C1Sch=CRF
+C1IET=CSQ1.png 0 -1 -1
+C1Msg=A2 - 9
+C1Res=HIT
+C1Nxt=0
+
+; ativar a porta USB 1  
+C1USB=1
+
+; Se a chave CxUSB= não for encontrada a USB não é ativada
+C2Bnd=142 534 100 100
+C2Stm=A1.bmp 0 255
+C2Sch=EXT
+C2IET=NONE 0 -1 -1
+C2Msg=A2 - 1
+C2Res=MISS
+C2Nxt=0

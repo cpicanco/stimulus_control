@@ -18,6 +18,8 @@ uses LCLIntf, LCLType, Controls, ExtCtrls, Classes, SysUtils, LCLProc
   , config_session
   , countermanager
   , schedules_main
+  , interface_rs232
+  //, interface_plp
   ;
 
 type
@@ -111,6 +113,7 @@ type
     property OnTrialStart: TNotifyEvent read FOnTrialStart write SetOnTrialStart;
   protected
     procedure Paint; override;
+    procedure Dispenser(AParallelPort: Byte; ARS232: string);
   public
     constructor Create (ACustomControlOwner : TComponent); override;
     destructor Destroy; override;
@@ -290,6 +293,13 @@ begin
       Exit;
     end;
   if Assigned(OnTrialPaint) and FResponseEnabled then OnTrialPaint;
+end;
+
+procedure TTrial.Dispenser(AParallelPort: Byte; ARS232: string);
+begin
+    //PLP.OutPortOn(Csq);
+    if ARS232 <> '' then
+      RS232.Dispenser(ARS232);
 end;
 
 constructor TTrial.Create(ACustomControlOwner: TComponent);
