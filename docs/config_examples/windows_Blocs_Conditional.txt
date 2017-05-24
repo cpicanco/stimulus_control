@@ -1,0 +1,210 @@
+; exemplo de como configurar o bloco seguinte condicional à performance ao longo do bloco
+; neste exemplo a ordem dos blocos será: 1 -> 3 -> 4 -> 2 -> FIM
+; neste exemplo a critério é atingido:  NÃO -> SIM -> SIM -> NÃO -> FIM
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+
+; tipo de sessão com blocos condicionais
+Type=	CND
+RootMedia=	Media
+RootData=	Data
+
+; número total de blocos na sessão
+NumBlc=	4
+
+; começo do bloco 1
+[Blc 1]
+
+Name=	B1
+BkGnd=	16777215
+ITI=	0
+NumTrials=	4 1
+
+; critério de porcentagem de acertos
+Criteria.HitPorcentage= 70
+
+; LEGENDA:
+; 0 = Ir para a próximo bloco 
+; Números positivos = Ir para o bloco especificado
+; Se o número positivo especificado for maior do que o número de blocos da sessão, a sessão é encerrada.
+; -1 = Finalizar sessão
+; -2 = Ir para o último bloco
+; -3 = Ir para o penúltimo bloco 
+; -n = ... 
+
+; se o critério for atingido ir para o bloco 3
+NextBloc.OnCriteria=3
+
+; se o critério não for atingido ir para o bloco 1
+NextBloc.OnNotCriteria=1
+
+[Blc 1 - T1]
+Name=	M1
+Kind=	MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 1 - T1 Acerto!
+
+; esta tentativa contabiliza um acerto
+Res=	HIT
+
+[Blc 1 - T2]
+Name= M2
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 1 - T2 Acerto!
+
+; esta tentativa contabiliza um acerto
+Res=	HIT
+
+[Blc 1 - T3]
+Name= M3
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 1 - T3 Acerto!
+
+; esta tentativa contabiliza um acerto
+Res=	HIT
+
+[Blc 1 - T4]
+Name= M4
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 8388608
+Msg=	Blc 1 - T3 ERRO! (Argh)
+
+; esta tentativa contabiliza um erro
+Res=	MISS
+
+; fim do bloco 1 e começo do bloco 2
+[Blc 2]
+
+Name=	B2
+BkGnd=	16777215
+ITI=	0
+NumTrials=	4 1
+MaxBlcRepetition= 2
+Criteria.HitPorcentage= 70 
+NextBloc.OnCriteria=0
+NextBloc.OnNotCriteria=-1
+
+[Blc 2 - T1]
+Name=	M1
+Kind=	MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 2 - T1 Acerto!
+Res=	HIT
+
+[Blc 2 - T2]
+Name= M2
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 2 - T2 Acerto!
+Res=	HIT
+
+[Blc 2 - T3]
+Name= M3
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 8388608
+Msg=	Blc 2 - T3 ERRO! (Argh)
+Res=	MISS
+
+[Blc 2 - T4]
+Name= M4
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 8388608
+Msg=	Blc 2 - T4 ERRO! (Argh)
+Res=	MISS
+
+; fim do bloco 2 e começo do bloco 3
+[Blc 3]
+
+Name=	B2
+BkGnd=	16777215
+ITI=	0
+NumTrials=	4 1
+Criteria.HitPorcentage= 70
+NextBloc.OnCriteria=4
+NextBloc.OnNotCriteria=0
+
+[Blc 3 - T1]
+Name=	M1
+Kind=	MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 3 - T1 Acerto!
+Res=	HIT
+
+[Blc 3 - T2]
+Name= M2
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 3 - T2 Acerto!
+Res=	HIT
+
+[Blc 3 - T3]
+Name= M3
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 3 - T3 Acerto!
+Res=	HIT
+
+[Blc 3 - T4]
+Name= M4
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 3 - T4 Acerto!
+Res=	HIT
+
+[Blc 4]
+
+Name=	B2
+BkGnd=	16777215
+ITI=	0
+NumTrials=	4 1
+Criteria.HitPorcentage= 70
+NextBloc.OnCriteria=2
+NextBloc.OnNotCriteria=0
+
+[Blc 4 - T1]
+Name=	M1
+Kind=	MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 4 - T1 Acerto!
+Res=	HIT
+
+[Blc 4 - T2]
+Name= M2
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 4 - T2 Acerto!
+Res=	HIT
+
+[Blc 4 - T3]
+Name= M3
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 4 - T3 Acerto!
+Res=	HIT
+
+[Blc 4 - T4]
+Name= M4
+Kind= MSG
+LimitedHold= 500
+MsgFontColor= 32768
+Msg=	Blc 4 - T4 Acerto!
+Res=	HIT

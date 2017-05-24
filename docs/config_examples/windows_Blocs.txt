@@ -1,0 +1,72 @@
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+NumBlc=	2
+
+[Blc 1]
+
+Name=	B1
+BkGnd=	16777215
+ITI=	200
+NumTrials=	20 1
+
+[Blc 1 - T1]
+Name=	M1
+Kind=	MSG
+LimitedHold= 500
+Msg=	Blc 1 - T1
+
+[Blc 1 - T2]
+Name= M2
+Kind= MSG
+Msg=  Blc 1 - T2
+
+[Blc 1 - T3]
+Name= M3
+Kind= MSG
+LimitedHold= 500
+Msg=  Blc 1 - T3
+
+[Blc 1 - T4]
+Name= M4
+Kind= MSG
+Msg=  Blc 1 - T4
+
+[Blc 2]
+
+Name=	B1
+BkGnd=	0
+ITI=	200
+NumTrials=	20 1
+
+[Blc 2 - T1]
+Name=	M1
+Kind=	MSG
+MsgFontColor= 16777215
+LimitedHold= 500
+Msg=	Blc 2 - T1
+
+[Blc 2 - T2]
+Name= M2
+Kind= MSG
+MsgFontColor= 16777215
+LimitedHold= 500
+Msg=  Blc 2 - T2
+
+[Blc 2 - T3]
+Name= M3
+Kind= MSG
+MsgFontColor= 16777215
+LimitedHold= 500
+Msg=  Blc 2 - T3
+
+[Blc 2 - T4]
+Name= M4
+Kind= MSG
+MsgFontColor= 16777215
+Msg=  Blc 2 - T4
+

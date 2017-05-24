@@ -1,0 +1,622 @@
+[Main]
+
+Name=	Sessão 1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+ServerAddress=	127.0.1.1:5020
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	3200
+NumTrials=	10 1
+
+[Blc 1 - T1]
+
+Name=	Positiva 1
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+
+; default is to present consequences at the end and only for go events
+; Style=	GO END
+
+; present consequences for nogo events only
+; Style=	NOGO
+
+; present consequences for go and no-go events
+Style=	GO NOGO
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+
+; feature is present in positive trials
+Contingency=	Positiva
+
+NextTrial=	0
+
+; this is a distintic feature (A)
+C1Bnd=	334 899 100 100
+C1Gap=	1
+C1GapDegree=	93
+C1GapLength=	10
+
+; those are common features (B)
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T2]
+
+Name=	Negativa 2
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Style=	GO NOGO
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Negativa
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T3]
+
+Name=	Positiva 3
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Style=	GO NOGO
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Positiva
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	1
+C2GapDegree=	243
+C2GapLength=	10
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T4]
+
+Name=	Negativa 4
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Style=	GO NOGO
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Negativa
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T5]
+
+Name=	Positiva 5
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Starter= True
+Style=	GO NOGO
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Positiva
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	1
+C3GapDegree=	327
+C3GapLength=	10
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T6]
+
+Name=	Negativa 6
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Style=	GO NOGO
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Negativa
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T7]
+
+Name=	Positiva 7
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Style=	GO NOGO
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Positiva
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	1
+C4GapDegree=	197
+C4GapLength=	10
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T8]
+Style=	GO NOGO
+
+Name=	Negativa 8
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Starter= True
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Negativa
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T9]
+Name=	Positiva 9
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Style=	GO NOGO
+Starter= True
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Positiva
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	1
+C5GapDegree=	270
+C5GapLength=	10
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360
+
+[Blc 1 - T10]
+
+Name=	Negativa 10
+Kind=	FPE
+BkGnd=	16777215
+Cursor=	-1
+Style=	GO NOGO
+Starter= True
+
+NumComp=	9
+LimitedHold=	1500
+Schedule=	CRF
+Contingency=	Negativa
+NextTrial=	0
+
+C1Bnd=	334 899 100 100
+C1Gap=	0
+C1GapDegree=	1
+C1GapLength=	360
+
+C2Bnd=	533 827 100 100
+C2Gap=	0
+C2GapDegree=	1
+C2GapLength=	360
+
+C3Bnd=	638 644 100 100
+C3Gap=	0
+C3GapDegree=	1
+C3GapLength=	360
+
+C4Bnd=	602 436 100 100
+C4Gap=	0
+C4GapDegree=	1
+C4GapLength=	360
+
+C5Bnd=	440 300 100 100
+C5Gap=	0
+C5GapDegree=	1
+C5GapLength=	360
+
+C6Bnd=	228 300 100 100
+C6Gap=	0
+C6GapDegree=	1
+C6GapLength=	360
+
+C7Bnd=	66 436 100 100
+C7Gap=	0
+C7GapDegree=	1
+C7GapLength=	360
+
+C8Bnd=	30 644 100 100
+C8Gap=	0
+C8GapDegree=	1
+C8GapLength=	360
+
+C9Bnd=	135 827 100 100
+C9Gap=	0
+C9GapDegree=	1
+C9GapLength=	360

@@ -1,0 +1,56 @@
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	200
+NumTrials=	7 1
+
+[Blc 1 - T1]
+Name=	M1
+Kind=	MSG
+LimitedHold=	500
+Msg=	This is 500 ms message.
+
+[Blc 1 - T2]
+Name=	M2
+Kind=	MSG
+LimitedHold=	1000
+Msg=	This is 1000 ms message.
+
+[Blc 1 - T3]
+Name=	M6
+Kind=	MSG
+Msg=	This is a message that requires a click or a keyboard key (space) to proceed.
+
+[Blc 1 - T4]
+Name=	M6
+Kind=	MSG
+Prompt=	True
+Msg=	This is a message that has a prompt description at the bottom.
+
+[Blc 1 - T5]
+Name=	M7
+Kind=	MSG
+LimitedHold=	4000
+Msg=	Next message has a starter. It requires a keyboard key (space) to proceed.
+
+[Blc 1 - T6]
+Name=	M8
+Kind=	MSG
+Starter=	True
+Msg=	Starter removed. Press space bar.
+
+[Blc 1 - T7]
+Name=	M9
+Kind=	MSG
+LimitedHold=	500
+Msg=	End.

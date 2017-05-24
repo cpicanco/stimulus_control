@@ -1,0 +1,42 @@
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	0
+NumTrials=	3 1
+
+[Blc 1 - T1]
+Name=	M1
+Kind=	MSG
+Cursor=	-1
+Msg=	This is a test.
+Prompt= TRUE
+
+[Blc 1 - T2]
+Name=	Dizzy timers 10 20
+Kind=	DZT
+BkGnd=	16777215
+Cursor=	-1
+LimitedHold=	30000
+Schedule=	FR 3
+NextTrial=	0
+TRes=	10 20 L A
+TCsq=	HIT
+
+NumComp=	2
+C1Bnd=	319 362 130 130
+C2Bnd=	319 789 130 130
+
+[Blc 1 - T3]
+Name=	M5
+Kind=	MSG
+Msg=	End.
