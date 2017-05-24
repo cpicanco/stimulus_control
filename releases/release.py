@@ -11,8 +11,25 @@
 
 # for linux only
 
+from subprocess import check_output,CalledProcessError,STDOUT
 import os
 import shutil
+
+def get_tag_commit():
+    """
+    origial script from here:
+    https://github.com/pupil-labs/pupil/blob/master/pupil_src/shared_modules/version_utils.py
+
+    returns string: 'tag'-'commits since tag'-'7 digit commit id'
+    """
+    try:
+        return check_output(['git', 'describe', '--tags'],stderr=STDOUT,cwd=os.path.dirname(os.path.abspath(__file__)))
+    except CalledProcessError as e:
+        logger.error('Error calling git: "{}" \n output: "{}"'.format(e,e.output))
+        return None
+    except OSError as e:
+        logger.error('Could not call git, is it installed? error msg: "{}"'.format(e))
+        return None
 
 def compress_folder(src_dir, dst_filename):
     shutil.make_archive(dst_filename, 'zip', src_dir)
@@ -92,8 +109,14 @@ if __name__ == "__main__":
         dst_examples = os.path.join(destination,'Participante_1')
         copy_folder(src_examples, dst_examples)
 
-        # zip release destination
-        dst_filename = os.path.join(releases, build_name)
+        # zip release destination 
+        tag = get_tag_commit()
+        if tag:
+            tag = get_tag_commit()
+            tag = tag[:-1]
+            dst_filename = os.path.join(releases, build_name+'_'+tag)
+        else:
+            dst_filename = os.path.join(releases, build_name)
         compress_folder(destination, dst_filename)
 
         print(build_name+' released.')
