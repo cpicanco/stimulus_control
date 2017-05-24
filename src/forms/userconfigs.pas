@@ -173,7 +173,7 @@ uses background, strutils
      , userconfigs_trial_mirrored
      , userconfigs_feature_positive
      , userconfigs_go_nogo
-     , userconfigs_mts
+     , userconfigs_mts_simple
      , userconfigs_blocs
      , userconfigs_positions
      , userconfigs_get_matrix
@@ -940,9 +940,9 @@ begin
         begin
           SetupDefaultsFromGui;
           FormMatrixConfig := TFormMatrixConfig.Create(Application);
-          FormMatrixConfig.btnShowMatrix.Click;
           if FormMatrixConfig.ShowModal = mrOK then
             begin
+              FormMatrixConfig.btnShowMatrix.Click;
               FormMTS.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
               FormRandomizePositions := TFormRandomizePositions.Create(Application);
               FormRandomizePositions.LoadFromFile(LAST_BLOC_INIFILE_PATH,1,FormMatrixConfig.Positions);

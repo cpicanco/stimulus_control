@@ -304,6 +304,7 @@ resourcestring
   rsMediaSound = 'Som';
   rsTimeOut = 'TimeOut';
   rsNextTrial = 'Tentativa Seguinte';
+  rsUSBPort = 'Porta USB';
   rsDelay = 'Atraso';
   rsDuration = 'Duração';
   rsStyle = 'Estilo';
@@ -311,7 +312,7 @@ resourcestring
   rsFillTypeAxes = 'Eixos';
   rsFillTypeMatriz = 'FP/FN';
   rsFillTypeGoNoGo = 'Go/No-Go';
-  rsFillTypeMTS = 'MTS';
+  rsFillTypeMTS = 'MTS e Simples';
   rsFillTypeBlocChaining = 'Encadear Blocos';
   rsHintBlocsAvailableRightClick = 'Clique com o botão direito e selecione os blocos disponíveis';
   rsBlocs = 'Bloco';

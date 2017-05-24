@@ -181,7 +181,10 @@ begin
               FPosiNames.Append(FPositions.Names[i]);
 
           for i := 1 to StringGrid.RowCount -1 do
-            StringGrid.Cells[1,i] := '1';
+            if FSession.Trial[FBloc.ID, i].Kind = T_MTS then
+              StringGrid.Cells[1,i] := '1'
+            else
+              StringGrid.Cells[1,i] := 'NA';
         end;
 
       i:= seBeginAt.Value - 1;
@@ -208,10 +211,12 @@ begin
 
       if pBalancedFixedSample.Checked then
         begin
-          LColOnset:=2;
           LSquareSize:=FPositions.Count-1;
           for i := 1 to StringGrid.RowCount -1 do
-            StringGrid.Cells[1,i] := '1';
+            if FSession.Trial[FBloc.ID, i].Kind = T_MTS then
+              StringGrid.Cells[1,i] := '1'
+            else
+              StringGrid.Cells[1,i] := 'NA';
         end;
 
       LSquareID := 0;
@@ -224,10 +229,32 @@ begin
           PutOnGrid(i + 1, LNumComp, LSquareLine);
           if i > 0 then
             if i = (LSquareSize*LSquareID) then
-              while EqualPositionsInRows(i, i+1, LColOnset, LNumComp+1) do
+              if FSession.Trial[FBloc.ID, i].Kind = FSession.Trial[FBloc.ID, i+1].Kind then
                 begin
-                  Rand;
-                  PutOnGrid(i + 1, LNumComp, LSquareLine);
+                  case FSession.Trial[FBloc.ID, i].Kind of
+                    T_Simple :
+                      begin
+                        LColOnset:=2;
+
+
+                      end;
+
+                    T_MTS :
+                      begin
+                        if pBalanced.Checked then
+                          LColOnset := 1;
+
+                        if pBalancedFixedSample.Checked then
+                          LColOnset := 2;
+
+                        while EqualPositionsInRows(i, i+1, LColOnset, LNumComp+1) do
+                          begin
+                            Rand;
+                            PutOnGrid(i + 1, LNumComp, LSquareLine);
+                          end;
+                      end;
+                  end;
+
                 end;
 
           if LSquareLine = (LSquareSize - 1) then
@@ -436,38 +463,56 @@ var
 begin
   if ATrial <= FBloc.NumTrials then
     begin
+      //////////////////////////// FPositions.Count >2 ///////////////////////////
+
       if pRand.Checked then
         for n := 0 to FPosiNames.Count - 1 do
           begin
-            if n = 0 then
-              StringGrid.Cells[n + 1, ATrial] := FPosiNames[n];
+            if FSession.Trial[FBloc.ID, ATrial].Kind = T_MTS then
+              begin
+                if n = 0 then
+                  StringGrid.Cells[n + 1, ATrial] := FPosiNames[n];
 
-            if n > 0 then
-              if n <= ANumComp then
-                StringGrid.Cells[n + 1, ATrial] := FPosiNames[n];
+                if n > 0 then
+                  if n <= ANumComp then
+                    StringGrid.Cells[n + 1, ATrial] := FPosiNames[n];
+              end;
+
+            if FSession.Trial[FBloc.ID, ATrial].Kind = T_Simple then
+              if (n + 1) <= ANumComp then
+                StringGrid.Cells[n + 2, ATrial] := FPosiNames[n];
           end;
-
-
-      if pRandFixedSample.Checked then
-        for n := 0 to FPosiNames.Count - 1 do
-          if n+1 <= ANumComp then
-            StringGrid.Cells[n + 2, ATrial] := FPosiNames[n];
 
       if pBalanced.Checked then
         for n := 0 to Length(FLatinSquare) - 1 do
           begin
-            if n = 0 then
-              StringGrid.Cells[n + 1, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
+            if FSession.Trial[FBloc.ID, ATrial].Kind = T_MTS then
+              if n = 0 then
+                StringGrid.Cells[n + 1, ATrial] := IntToStr(FLatinSquare[n, ASquareLine])
+              else
+                if n <= ANumComp then
+                  StringGrid.Cells[n + 1, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
 
-            if n > 0 then
-              if n <= ANumComp then
-                StringGrid.Cells[n + 1, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
+            if FSession.Trial[FBloc.ID, ATrial].Kind = T_Simple then
+              if (n + 1) <= ANumComp then
+                StringGrid.Cells[n + 2, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
           end;
 
-      if pBalancedFixedSample.Checked then
-        for n := 0 to Length(FLatinSquare) - 1 do
-          if n+1 <= ANumComp then
-            StringGrid.Cells[n + 2, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
+      ////////////////////////////////// MTS only //////////////////////////////////
+
+      if FSession.Trial[FBloc.ID, ATrial].Kind = T_MTS then
+        begin
+          if pBalancedFixedSample.Checked then
+            for n := 0 to Length(FLatinSquare) - 1 do
+              if n+1 <= ANumComp then
+                StringGrid.Cells[n + 2, ATrial] := IntToStr(FLatinSquare[n, ASquareLine]);
+
+          if pRandFixedSample.Checked then
+            for n := 0 to FPosiNames.Count - 1 do
+              if n+1 <= ANumComp then
+                StringGrid.Cells[n + 2, ATrial] := FPosiNames[n];
+
+        end;
     end;
 end;
 
@@ -591,6 +636,21 @@ begin
           Result := True;
           Break
         end;
+  with StringGrid do
+  for LCol := AColOnSet to AColOffset do
+    if Cells[LCol, ARow1] = Cells[LCol, ARow2] then
+      begin
+        Write(Cells[LCol, ARow1]+' ');
+      end;
+  WriteLn('');
+  with StringGrid do
+  for LCol := AColOnSet to AColOffset do
+    if Cells[LCol, ARow1] = Cells[LCol, ARow2] then
+      begin
+        Write(Cells[LCol, ARow2]+' ');
+      end;
+  WriteLn('');
+  WriteLn('');
 end;
 
 procedure TFormRandomizePositions.SetSpin;

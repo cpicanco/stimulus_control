@@ -56,6 +56,9 @@ type
       LabelCColor : TLabel;
       ButtonCColor : TColorButton;
 
+      LabelUSB : TLabel;
+      RadioGroupUSB : TRadioGroup;
+
       LabelNextTrial : TLabel;
       EditNextTrial : TEdit;
 
@@ -243,6 +246,10 @@ begin
 
           if (Sender = EditCFilename) or (Sender = ComboCRepeat) or (Sender = ButtonCColor) or (Sender = EditConsequenceDuration) then
             UpdateCFilename;
+
+          if Sender = RadioGroupUSB then
+            if RadioGroupUSB.ItemIndex > 0 then
+              ConfigList.Values[_Comp+IntToStr(Tag)+_cUsb] := IntToStr(RadioGroupUSB.ItemIndex);
 
           if Sender = EditNextTrial then
             ConfigList.Values[_Comp+IntToStr(Tag)+_cNxt] := EditNextTrial.Text;
@@ -544,6 +551,30 @@ begin
         end;
 
       //////////////////////////////////////////////////////////////////////////////
+      LabelUSB := TLabel.Create(Self);
+      with LabelUSB do
+        begin
+          Caption := rsUSBPort;
+          Hint := 'Qual porta USB ativar?';
+          Parent := GBConseque;
+        end;
+
+      RadioGroupUSB := TRadioGroup.Create(Self);
+      with RadioGroupUSB do
+        begin
+          Caption := '';
+          Columns:=4;
+          Items.Append('0');
+          Items.Append('1');
+          Items.Append('2');
+          Items.Append('3');
+          Items.Append('4');
+          Hint := 'Qual porta USB ativar?';
+          Parent := GBConseque;
+          OnClick:=@ControlEditingDone;
+        end;
+
+      //////////////////////////////////////////////////////////////////////////////
 
       LabelNextTrial := TLabel.Create(Self);
       with LabelNextTrial do
@@ -689,6 +720,7 @@ begin
       ButtonCColor.ButtonColor := StrToIntDef(ExtractDelimited(3,S,[#32]),clRed);
       EditConsequenceDuration.Text := ExtractDelimited(4,S,[#32]);
 
+      RadioGroupUSB.ItemIndex := StrToIntDef(ConfigList.Values[_Comp+IntToStr(Tag)+_cUsb],-1);
       EditNextTrial.Text := ConfigList.Values[_Comp+IntToStr(Tag)+_cNxt];
       EditTimeOut.Text := ConfigList.Values[_Comp+IntToStr(Tag)+_cTO];
     end;

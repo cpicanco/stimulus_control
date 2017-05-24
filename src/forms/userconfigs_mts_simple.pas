@@ -7,7 +7,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit userconfigs_mts;
+unit userconfigs_mts_simple;
 
 {$mode objfpc}{$H+}
 
@@ -33,6 +33,7 @@ type
   private
 
   public
+    HasSample : Boolean;
     Sample : TStimulus;
     Comparisons : array of TStimulus;
     procedure Assign(Source: TSimpleMTSTrial); overload;
@@ -45,9 +46,12 @@ type
     btnClose: TButton;
     btnMinimizeTopTab: TButton;
     btnOk: TButton;
+    ComboBoxTrialType: TComboBox;
     EditDefaultCsqHIT: TEdit;
     EditDefaultCsqMISS: TEdit;
     gbStimuli: TGroupBox;
+    gbStimuli1: TGroupBox;
+    LabelTrialType: TLabel;
     LabelDefaultCsqHIT: TLabel;
     LabelDefaultCsqMISS: TLabel;
     LabelDefaultCursor: TLabel;
@@ -59,6 +63,7 @@ type
     SpinPresentations: TSpinEdit;
     SpinComparisons: TSpinEdit;
     XMLPropStorage1: TXMLPropStorage;
+    procedure ComboBoxTrialTypeEditingDone(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure SpinComparisonsEditingDone(Sender: TObject);
@@ -99,7 +104,7 @@ var
   i : integer;
   LComparisons : integer;
 begin
-  // We need to copy lists only
+  HasSample := Source.HasSample;
   if Assigned(Source.Sample.List) then
     begin
       Sample.List := TStringList.Create;
@@ -184,6 +189,24 @@ begin
   WindowState:=wsMaximized;
 end;
 
+procedure TFormMTS.ComboBoxTrialTypeEditingDone(Sender: TObject);
+begin
+  Caption := ComboBoxTrialType.Text;
+  case ComboBoxTrialType.ItemIndex of
+    0 :
+      begin
+        FTrial.HasSample:=True;
+        FTrial.Sample.Key.Show;
+      end;
+    1 :
+      begin
+        FSample.Hide;
+        FTrial.HasSample:=False;
+        FTrial.Sample.Key.Hide;
+      end;
+  end;
+end;
+
 procedure TFormMTS.SpinComparisonsEditingDone(Sender: TObject);
 begin
   UpdateComparisons(FTrial);
@@ -198,6 +221,7 @@ end;
 procedure TFormMTS.XMLPropStorage1RestoreProperties(Sender: TObject);
 begin
   UpdateComparisons(FTrial);
+  ComboBoxTrialTypeEditingDone(Self);
 end;
 
 procedure TFormMTS.UpdateComparisons(ATrial: TSimpleMTSTrial);
@@ -341,7 +365,7 @@ end;
 
 procedure TFormMTS.AddTrialsToGui(ATrialGrid: TStringGrid);
 var
-  LRow, i: Integer;
+  LRow, i,j : Integer;
   LTrial : TSimpleMTSTrial;
 begin
   // we must create a copy here
@@ -354,13 +378,22 @@ begin
         LRow := RowCount-1
       else
         LRow := RowCount;
+
       for i := 0 to SpinPresentations.Value-1 do
         begin
           if LRow >= RowCount then
             RowCount := LRow + 1;
-          Objects[0, LRow] := LTrial; // and assign our copy here
+          Objects[0, LRow] := LTrial;          // and assign our copy here
           Cells[0, LRow] := IntToStr(LRow);
-          Cells[1, LRow] := FTrial.Sample.Key.ShortName+'->'+FTrial.Comparisons[0].Key.ShortName;
+          if LTrial.HasSample then             // SAMPLE->C1+
+            Cells[1, LRow] := FTrial.Sample.Key.ShortName+'->'+FTrial.Comparisons[0].Key.ShortName
+          else                                 // C1+C2- .. Cn-
+            for j := Low(FTrial.Comparisons) to High(FTrial.Comparisons) do
+              if j = 0 then
+                Cells[1, LRow] := FTrial.Comparisons[j].Key.ShortName+'+'
+              else
+                Cells[1, LRow] := Cells[1, LRow]+FTrial.Comparisons[j].Key.ShortName+'-';
+
           Cells[2, LRow] := FTrial.Comparisons[0].List.Values[_Comp+'1'+_cRes];
           Inc(LRow);
         end;
@@ -386,10 +419,15 @@ begin
         LTrial := TSimpleMTSTrial(Objects[0,LRow]);
         with LTrial do
           begin
-            FNewBloc.WriteToTrial(LRow,_Kind, T_MTS);
-            FNewBloc.WriteToTrial(LRow,_Name, Cells[1, LRow]);
+            FNewBloc.WriteToTrial(LRow, _Name, Cells[1, LRow]);
             FNewBloc.WriteToTrial(LRow, _Cursor, IntToStr(SpinCursor.Value));
-            FNewBloc.WriteToTrial(LRow, Sample.List);
+            if LTrial.HasSample then
+              begin
+                FNewBloc.WriteToTrial(LRow,_Kind, T_MTS);
+                FNewBloc.WriteToTrial(LRow, Sample.List);
+              end
+            else
+              FNewBloc.WriteToTrial(LRow,_Kind, T_Simple);
             FNewBloc.WriteToTrial(LRow,_NumComp,IntToStr(Length(Comparisons)));
             for i := Low(Comparisons) to High(Comparisons) do
               FNewBloc.WriteToTrial(LRow, Comparisons[i].List);

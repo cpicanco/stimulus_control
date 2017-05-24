@@ -1,18 +1,18 @@
 object FormMTS: TFormMTS
-  Left = 97
+  Left = 90
   Height = 496
-  Top = 125
+  Top = 159
   Width = 1046
-  HorzScrollBar.Page = 313
+  HorzScrollBar.Page = 678
   VertScrollBar.Page = 160
   AutoScroll = True
-  Caption = 'FormMTS'
+  Caption = 'Pareamento ao Modelo'
   ClientHeight = 496
   ClientWidth = 1046
   OnActivate = FormActivate
   OnCreate = FormCreate
-  SessionProperties = 'EditDefaultCsqHIT.Text;EditDefaultCsqMISS.Text;OpenDialog.InitialDir;SpinComparisons.Value;SpinPresentations.Value;SpinCursor.Value'
-  LCLVersion = '1.6.2.0'
+  SessionProperties = 'ComboBoxTrialType.ItemIndex;ComboBoxTrialType.Text;EditDefaultCsqHIT.Text;EditDefaultCsqMISS.Text;OpenDialog.InitialDir;SpinComparisons.Value;SpinCursor.Value;SpinPresentations.Value;Caption'
+  LCLVersion = '1.8.0.1'
   object Panel1: TPanel
     Left = 0
     Height = 160
@@ -56,9 +56,10 @@ object FormMTS: TFormMTS
     end
     object gbStimuli: TGroupBox
       Left = 8
-      Height = 144
+      Height = 127
       Top = 8
-      Width = 304
+      Width = 350
+      AutoSize = True
       Caption = 'Configurações gerais da tentativa'
       ChildSizing.LeftRightSpacing = 5
       ChildSizing.TopBottomSpacing = 5
@@ -66,15 +67,15 @@ object FormMTS: TFormMTS
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 127
-      ClientWidth = 300
+      ClientHeight = 110
+      ClientWidth = 346
       TabOrder = 3
       object LabelPresentations: TLabel
         Left = 5
         Height = 25
         Hint = 'Quantas vezes cada estímulo será apresentado?'
         Top = 5
-        Width = 183
+        Width = 156
         Alignment = taCenter
         Caption = 'Número de apresentações'
         Layout = tlCenter
@@ -83,11 +84,11 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinPresentations: TSpinEdit
-        Left = 188
+        Left = 161
         Height = 25
         Hint = 'Quantas vezes cada estímulo será apresentado?'
         Top = 5
-        Width = 107
+        Width = 180
         Alignment = taCenter
         MinValue = 1
         ParentShowHint = False
@@ -100,7 +101,7 @@ object FormMTS: TFormMTS
         Height = 25
         Hint = 'Quantos estímulos de comparação?'
         Top = 30
-        Width = 183
+        Width = 156
         Alignment = taCenter
         Caption = 'Número de Comparações'
         Layout = tlCenter
@@ -109,11 +110,11 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinComparisons: TSpinEdit
-        Left = 188
+        Left = 161
         Height = 25
         Hint = 'Quantos estímulos de comparação?'
         Top = 30
-        Width = 107
+        Width = 180
         Alignment = taCenter
         MaxValue = 8
         MinValue = 2
@@ -123,58 +124,12 @@ object FormMTS: TFormMTS
         TabOrder = 1
         Value = 2
       end
-      object LabelDefaultCsqHIT: TLabel
-        Left = 5
-        Height = 25
-        Hint = 'Consequência padrão para acerto'
-        Top = 55
-        Width = 183
-        Alignment = taCenter
-        Caption = 'Consequência (acerto)'
-        Layout = tlCenter
-        ParentColor = False
-        ParentShowHint = False
-        ShowHint = True
-      end
-      object EditDefaultCsqHIT: TEdit
-        Left = 188
-        Height = 25
-        Hint = 'Consequência padrão para acerto'
-        Top = 55
-        Width = 107
-        TabOrder = 2
-        Text = 'CSQ1.wav 0 0 1000'
-        TextHint = 'Clique duas vezes para escolher o arquivo'
-      end
-      object LabelDefaultCsqMISS: TLabel
-        Left = 5
-        Height = 25
-        Hint = 'Consequência padrão para erro'
-        Top = 80
-        Width = 183
-        Alignment = taCenter
-        Caption = 'Consequência (erro)'
-        Layout = tlCenter
-        ParentColor = False
-        ParentShowHint = False
-        ShowHint = True
-      end
-      object EditDefaultCsqMISS: TEdit
-        Left = 188
-        Height = 25
-        Hint = 'Consequência padrão para erro'
-        Top = 80
-        Width = 107
-        TabOrder = 3
-        Text = 'CSQ2.wav 0 0 1000'
-        TextHint = 'Clique duas vezes para escolher o arquivo'
-      end
       object LabelDefaultCursor: TLabel
         Left = 5
         Height = 25
         Hint = 'Imagem do cursor do mouse'
-        Top = 105
-        Width = 183
+        Top = 55
+        Width = 156
         Alignment = taCenter
         Caption = 'Cursor'
         Layout = tlCenter
@@ -183,19 +138,112 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinCursor: TSpinEdit
-        Left = 188
+        Left = 161
         Height = 25
         Hint = 'Imagem do cursor do mouse'
-        Top = 105
-        Width = 107
+        Top = 55
+        Width = 180
         Alignment = taCenter
         MaxValue = 42
         MinValue = -1
         OnEditingDone = SpinCursorEditingDone
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 4
+        TabOrder = 2
         Value = -1
+      end
+      object LabelTrialType: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Tipo de tentativa'
+        Top = 80
+        Width = 156
+        Alignment = taCenter
+        Caption = 'Tipo'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object ComboBoxTrialType: TComboBox
+        Left = 161
+        Height = 25
+        Top = 80
+        Width = 180
+        Constraints.MinWidth = 180
+        ItemHeight = 0
+        ItemIndex = 0
+        Items.Strings = (
+          'Pareamento ao Modelo'
+          'Discriminação Simples'
+        )
+        OnEditingDone = ComboBoxTrialTypeEditingDone
+        TabOrder = 3
+        Text = 'Pareamento ao Modelo'
+      end
+    end
+    object gbStimuli1: TGroupBox
+      Left = 384
+      Height = 77
+      Top = 8
+      Width = 293
+      AutoSize = True
+      Caption = 'Consequência'
+      ChildSizing.LeftRightSpacing = 5
+      ChildSizing.TopBottomSpacing = 5
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 60
+      ClientWidth = 289
+      TabOrder = 4
+      object LabelDefaultCsqHIT: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Consequência padrão para acerto'
+        Top = 5
+        Width = 129
+        Alignment = taCenter
+        Caption = 'Durante o IET (Acerto)'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object EditDefaultCsqHIT: TEdit
+        Left = 134
+        Height = 25
+        Hint = 'Arquivo, Cor, Repetições, Tempo'
+        Top = 5
+        Width = 150
+        TabOrder = 0
+        Text = 'CSQ1.wav 0 0 1000'
+        TextHint = 'Clique duas vezes para escolher o arquivo'
+      end
+      object LabelDefaultCsqMISS: TLabel
+        Left = 5
+        Height = 25
+        Hint = 'Consequência padrão para erro'
+        Top = 30
+        Width = 129
+        Alignment = taCenter
+        Caption = 'Durante o IET (Erro)'
+        Layout = tlCenter
+        ParentColor = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object EditDefaultCsqMISS: TEdit
+        Left = 134
+        Height = 25
+        Hint = 'Arquivo, Cor, Repetições, Tempo'
+        Top = 30
+        Width = 150
+        Constraints.MinWidth = 150
+        TabOrder = 1
+        Text = 'CSQ2.wav 0 0 1000'
+        TextHint = 'Clique duas vezes para escolher o arquivo'
       end
     end
   end

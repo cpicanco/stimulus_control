@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
@@ -18,10 +18,10 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <RevisionNr Value="4"/>
-      <BuildNr Value="8"/>
+      <BuildNr Value="9"/>
       <Language Value="0416"/>
       <Attributes pvaPreRelease="True"/>
-      <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control" ProductVersion=""/>
+      <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control"/>
     </VersionInfo>
     <BuildModes Count="7">
       <Item1 Name="linux_64bits_debug" Default="True"/>
@@ -302,6 +302,7 @@
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
+      <DestinationDirectory Value=""/>
       <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
       <ExcludeFileFilter Value="*.(bak|ppu|o|so);*~;backup"/>
     </PublishOptions>
@@ -324,7 +325,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="58">
+    <Units Count="57">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -507,84 +508,80 @@
         <IsPartOfProject Value="True"/>
       </Unit44>
       <Unit45>
-        <Filename Value="src/units/trial_simple.pas"/>
+        <Filename Value="src/units/versioning_git.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit45>
       <Unit46>
-        <Filename Value="src/units/versioning_git.pas"/>
+        <Filename Value="src/units/versioning_lazarus.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit46>
       <Unit47>
-        <Filename Value="src/units/versioning_lazarus.pas"/>
+        <Filename Value="src/units/zmq_client.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit47>
       <Unit48>
-        <Filename Value="src/units/zmq_client.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit48>
-      <Unit49>
         <Filename Value="src/forms/background.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Background"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit49>
-      <Unit50>
+      </Unit48>
+      <Unit49>
         <Filename Value="src/forms/userconfigs.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormUserConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit50>
-      <Unit51>
+      </Unit49>
+      <Unit50>
         <Filename Value="src/forms/userconfigs_blocs.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormBlocs"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit51>
-      <Unit52>
+      </Unit50>
+      <Unit51>
         <Filename Value="src/forms/userconfigs_feature_positive.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormFPE"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit52>
-      <Unit53>
+      </Unit51>
+      <Unit52>
         <Filename Value="src/forms/userconfigs_get_matrix.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormMatrixConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit53>
-      <Unit54>
+      </Unit52>
+      <Unit53>
         <Filename Value="src/forms/userconfigs_go_nogo.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormGo_NoGo"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit54>
-      <Unit55>
+      </Unit53>
+      <Unit54>
         <Filename Value="src/forms/userconfigs_positions.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormRandomizePositions"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit55>
-      <Unit56>
+      </Unit54>
+      <Unit55>
         <Filename Value="src/forms/userconfigs_trial_mirrored.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BresenhamLineForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit56>
-      <Unit57>
-        <Filename Value="src/forms/userconfigs_mts.pas"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="src/forms/userconfigs_mts_simple.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormMTS"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit57>
+      </Unit56>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

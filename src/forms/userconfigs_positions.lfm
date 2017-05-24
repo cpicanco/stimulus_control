@@ -16,7 +16,7 @@ object FormRandomizePositions: TFormRandomizePositions
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   ShowHint = True
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.8.0.1'
   WindowState = wsMaximized
   object LabelGap: TLabel
     Left = 484
@@ -216,7 +216,7 @@ object FormRandomizePositions: TFormRandomizePositions
     TabOrder = 9
     object ListBoxPositions: TListBox
       Left = 0
-      Height = 40
+      Height = 38
       Hint = 'Dois cliques para carregar um arquivo com posições customizadas.'
       Top = 0
       Width = 165
@@ -224,6 +224,7 @@ object FormRandomizePositions: TFormRandomizePositions
       ExtendedSelect = False
       ItemHeight = 0
       OnDblClick = ListBoxPositionsDblClick
+      Options = [lboDrawFocusRect]
       ScrollWidth = 163
       Sorted = True
       TabOrder = 0
