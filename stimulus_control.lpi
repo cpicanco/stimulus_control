@@ -18,10 +18,10 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <RevisionNr Value="4"/>
-      <BuildNr Value="9"/>
+      <BuildNr Value="10"/>
       <Language Value="0416"/>
       <Attributes pvaPreRelease="True"/>
-      <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control"/>
+      <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control" ProductVersion="0.0.4.9"/>
     </VersionInfo>
     <BuildModes Count="7">
       <Item1 Name="linux_64bits_debug" Default="True"/>
@@ -74,8 +74,8 @@
             <CustomOptions Value="-dUseCThreads
 -dZMQ_STATIC_LINK"/>
             <OtherDefines Count="3">
-              <Define0 Value="NO_LIBZMQ"/>
-              <Define1 Value="UseCThreads"/>
+              <Define0 Value="UseCThreads"/>
+              <Define1 Value="DEBUG"/>
               <Define2 Value="ZMQ_STATIC_LINK"/>
             </OtherDefines>
           </Other>
