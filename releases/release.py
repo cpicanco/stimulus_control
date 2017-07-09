@@ -114,7 +114,7 @@ if __name__ == "__main__":
         if tag:
             tag = get_tag_commit()
             tag = tag[:-1]
-            dst_filename = os.path.join(releases, build_name+'_'+tag)
+            dst_filename = os.path.join(releases, build_name+'_'+tag.decode('utf-8'))
         else:
             dst_filename = os.path.join(releases, build_name)
         compress_folder(destination, dst_filename)
