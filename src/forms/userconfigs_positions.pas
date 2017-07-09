@@ -636,21 +636,21 @@ begin
           Result := True;
           Break
         end;
-  with StringGrid do
-  for LCol := AColOnSet to AColOffset do
-    if Cells[LCol, ARow1] = Cells[LCol, ARow2] then
-      begin
-        Write(Cells[LCol, ARow1]+' ');
-      end;
-  WriteLn('');
-  with StringGrid do
-  for LCol := AColOnSet to AColOffset do
-    if Cells[LCol, ARow1] = Cells[LCol, ARow2] then
-      begin
-        Write(Cells[LCol, ARow2]+' ');
-      end;
-  WriteLn('');
-  WriteLn('');
+  //with StringGrid do
+  //for LCol := AColOnSet to AColOffset do
+  //  if Cells[LCol, ARow1] = Cells[LCol, ARow2] then
+  //    begin
+  //      Write(Cells[LCol, ARow1]+' ');
+  //    end;
+  //WriteLn('');
+  //with StringGrid do
+  //for LCol := AColOnSet to AColOffset do
+  //  if Cells[LCol, ARow1] = Cells[LCol, ARow2] then
+  //    begin
+  //      Write(Cells[LCol, ARow2]+' ');
+  //    end;
+  //WriteLn('');
+  //WriteLn('');
 end;
 
 procedure TFormRandomizePositions.SetSpin;
