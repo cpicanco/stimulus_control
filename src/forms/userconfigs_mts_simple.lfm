@@ -12,7 +12,7 @@ object FormMTS: TFormMTS
   OnActivate = FormActivate
   OnCreate = FormCreate
   SessionProperties = 'ComboBoxTrialType.ItemIndex;ComboBoxTrialType.Text;EditDefaultCsqHIT.Text;EditDefaultCsqMISS.Text;OpenDialog.InitialDir;SpinComparisons.Value;SpinCursor.Value;SpinPresentations.Value;Caption'
-  LCLVersion = '1.8.0.1'
+  LCLVersion = '1.8.0.3'
   object Panel1: TPanel
     Left = 0
     Height = 160
@@ -174,12 +174,12 @@ object FormMTS: TFormMTS
         ItemHeight = 0
         ItemIndex = 0
         Items.Strings = (
-          'Pareamento ao Modelo'
           'Discriminação Simples'
+          'Pareamento ao Modelo'
         )
         OnEditingDone = ComboBoxTrialTypeEditingDone
         TabOrder = 3
-        Text = 'Pareamento ao Modelo'
+        Text = 'Discriminação Simples'
       end
     end
     object gbStimuli1: TGroupBox

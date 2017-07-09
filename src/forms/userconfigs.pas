@@ -41,6 +41,9 @@ type
     chkDrawTrialGroup: TCheckBox;
     chkPlayOnSecondMonitor: TCheckBox;
     ColorButtonBloc: TColorButton;
+    ComboBoxRandomize: TComboBox;
+    ComboBoxGridType: TComboBox;
+    ComboBoxFillTargetColumn: TComboBox;
     ComboBoxSessionType: TComboBox;
     ComboBoxBlocCounter: TComboBox;
     EditTargetSession: TEdit;
@@ -48,7 +51,6 @@ type
     EditBlocName: TEdit;
     EditBlocChainingPath: TEdit;
     EditSessionName: TEdit;
-    edtTrialGroup: TEdit;
     gbRepetitions: TGroupBox;
     gbRepetitionsBlocks: TGroupBox;
     gbTrialGroup: TGroupBox;
@@ -70,24 +72,10 @@ type
     leFillValue: TLabeledEdit;
     Memo1: TMemo;
     MemoAppInfo: TMemo;
-    piMTS: TMenuItem;
-    piBlocChaining: TMenuItem;
-    piGo_NoGo: TMenuItem;
-    piTrialsWithConstraints: TMenuItem;
     PanelHeader: TPanel;
-    piFillEven: TMenuItem;
-    piFillOdd: TMenuItem;
-    piFillAll: TMenuItem;
-    piFPE: TMenuItem;
-    piAxes: TMenuItem;
     OpenDialog1: TOpenDialog;
-    piTrials: TMenuItem;
-    piExpectedResponse: TMenuItem;
     OpenPictureDialog1: TOpenPictureDialog;
     pgRodar: TPageControl;
-    pmRandomize: TPopupMenu;
-    pmGridType: TPopupMenu;
-    pmFillCondition: TPopupMenu;
     SaveDialog1: TSaveDialog;
     seBlocMaxRepetition: TSpinEdit;
     seBlocMaxCorrection: TSpinEdit;
@@ -97,6 +85,7 @@ type
     seBlocCrtHitPorcentage: TSpinEdit;
     seBlocVirtualTrial: TSpinEdit;
     seBlocCrtConsecutiveHit: TSpinEdit;
+    seTrialGroup: TSpinEdit;
     SelectDirectoryDialog1: TSelectDirectoryDialog;
     stAppTitle: TStaticText;
     stVersion: TStaticText;
@@ -123,13 +112,13 @@ type
     procedure chkDrawTrialGroupChange(Sender: TObject);
     procedure chkShowRepetitionsChange(Sender: TObject);
     procedure chkUseMediaChange(Sender: TObject);
+    procedure ComboBoxGridTypeChange(Sender: TObject);
     procedure EditBlocChainingPathDblClick(Sender: TObject);
     procedure EditBlocChainingPathEditingDone(Sender: TObject);
     procedure EditTargetSessionDblClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ImageDblClick(Sender: TObject);
-    procedure piClick(Sender: TObject);
     procedure StringGrid1Click(Sender: TObject);
     procedure StringGrid1ColRowMoved(Sender: TObject; IsColumn: Boolean;
       sIndex, tIndex: Integer);
@@ -140,6 +129,7 @@ type
   published
 
   private
+    FLastGridTypeItem : integer;
     FRepetitionMatrix : array of array of boolean;
     FLastFocusedCol : integer;
     FSession : TSession;
@@ -200,79 +190,6 @@ procedure TFormUserConfig.ImageDblClick(Sender: TObject);
 begin
   if OpenPictureDialog1.Execute then
     TImage(Sender).Picture.LoadFromFile(OpenPictureDialog1.FileName);
-end;
-
-procedure TFormUserConfig.piClick(Sender: TObject);
-begin
-  if (TMenuItem(Sender) = piAxes) and (btnGridType.Caption <> rsFillTypeAxes) then
-    begin
-      btnGridType.Caption := rsFillTypeAxes;
-      SetGridHeader(StringGrid1,rsFillTypeAxes);
-      ResetRepetionMatrix;
-    end;
-
-  if (TMenuItem(Sender) = piFPE) and (btnGridType.Caption <> rsFillTypeMatriz) then
-    begin
-      btnGridType.Caption := rsFillTypeMatriz;
-      SetGridHeader(StringGrid1,rsFillTypeMatriz);
-      ResetRepetionMatrix;
-    end;
-
-  if (TMenuItem(Sender) = piGo_NoGo) and (btnGridType.Caption <> rsFillTypeGoNoGo) then
-    begin
-      btnGridType.Caption := rsFillTypeGoNoGo;
-      SetGridHeader(StringGrid1,rsFillTypeGoNoGo);
-      ResetRepetionMatrix;
-    end;
-
-  if TMenuItem(Sender) = piMTS then
-    begin
-      if btnGridType.Caption <> rsFillTypeMTS then
-        begin
-          btnGridType.Caption := rsFillTypeMTS;
-          SetGridHeader(StringGrid1,rsFillTypeMTS);
-          ResetRepetionMatrix;
-          FormMTS := TFormMTS.Create(Application);
-        end;
-    end
-  else
-    if Assigned(FormMTS) then
-      begin
-        FormMTS.Free;
-        FormMTS := nil;
-      end;
-
-  if TMenuItem(Sender) = piBlocChaining then
-    begin
-      if btnGridType.Caption <> rsFillTypeBlocChaining then
-        begin
-          btnGridType.Caption := rsFillTypeBlocChaining;
-          SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
-          ResetRepetionMatrix;
-          CreateFormBloc;
-          StringGrid1.Hint := rsHintBlocsAvailableRightClick;
-        end;
-    end
-  else
-    if Assigned(FormBlocs) then
-      begin
-        StringGrid1.Hint := '';
-        FormBlocs.Free;
-        FormBlocs := nil;
-        StringGrid1.PopupMenu := nil
-      end;
-
-  // Randomize Buttom
-  if TMenuItem(Sender) = piTrials then
-      btnRandomize.Hint := rsRandomizeTrials;
-
-  if TMenuItem(Sender) = piExpectedResponse then
-      btnRandomize.Hint := rsRandomizeResponses;
-
-  if TMenuItem(Sender) = piTrialsWithConstraints then
-      btnRandomize.Hint := rsRandomizeTrialsWithConstraints;
-
-  TMenuItem(Sender).Checked := True;
 end;
 
 procedure TFormUserConfig.StringGrid1Click(Sender: TObject);
@@ -339,7 +256,7 @@ begin
   if chkDrawTrialGroup.Checked then
     begin
       StringGrid1.Canvas.Pen.Color := clBlue;
-      aInc := StrToInt(edtTrialGroup.Text);
+      aInc := seTrialGroup.Value;
       i := 0;
 
       while i <= StringGrid1.RowCount -1 do
@@ -368,20 +285,23 @@ procedure TFormUserConfig.XMLPropStorage1RestoreProperties(Sender: TObject);
 begin
   if FileExistsUTF8('stringgrid.csv') then
     StringGrid1.LoadFromCSVFile('stringgrid.csv',',',True,0,False);
-  if btnGridType.Caption = rsFillTypeBlocChaining then
-    CreateFormBloc;
-  if btnGridType.Caption = rsFillTypeMTS then
-    begin
-      FormMTS := TFormMTS.Create(Application);
-      // todo: Load stringgrid objects
-    end;
+
+  case ComboBoxGridType.ItemIndex of
+    5 : CreateFormBloc;
+    3..4 :
+      begin
+        FormMTS := TFormMTS.Create(Application);
+        // todo: Load stringgrid objects
+      end;
+  end;
   ResetRepetionMatrix;
 end;
 
 procedure TFormUserConfig.XMLPropStorage1SaveProperties(Sender: TObject);
 begin
-  if btnGridType.Caption = rsFillTypeMTS then
-    SetGridHeader(StringGrid1,rsFillTypeMTS);
+  case ComboBoxGridType.ItemIndex of
+    3..4 : SetGridHeader(StringGrid1,rsFillTypeMTS);
+  end;
 
   StringGrid1.SaveToCSVFile('stringgrid.csv');
 end;
@@ -390,17 +310,17 @@ function TFormUserConfig.MeetCondition(aCol, aRow : integer): boolean;
 begin
   //conditions needs aCol;
   Result := False;
+  case ComboBoxFillTargetColumn.ItemIndex of
+    0 : Result := True;
 
-  if piFillAll.Checked then
-    Result := piFillAll.Checked;
+    1 :
+      if (StrToIntDef(StringGrid1.Cells[0, aRow], 2) mod 2) <> 0 then
+        Result := True;
 
-  if piFillOdd.Checked then
-    if (StrToIntDef(StringGrid1.Cells[0, aRow], 2) mod 2) <> 0 then
-      Result := piFillOdd.Checked;
-
-  if piFillEven.Checked then
-    if (StrToIntDef(StringGrid1.Cells[0, aRow], 1) mod 2) = 0 then
-      Result := piFillEven.Checked;
+    2 :
+      if (StrToIntDef(StringGrid1.Cells[0, aRow], 1) mod 2) = 0 then
+        Result := True;
+  end;
 end;
 
 function TFormUserConfig.SaneConstraints: Boolean;
@@ -582,7 +502,7 @@ var
   LBeginRow, LEndRow: integer;
   procedure RandomTrialGroup(AWithConstraints : Boolean);
   begin
-    LRow {increment} := StrToInt(edtTrialGroup.Text);
+    LRow {increment} := seTrialGroup.Value;
     LBeginRow := 1;
     LEndRow :=  LRow {increment} + 1;
     while LEndRow <= StringGrid1.RowCount - 1 do
@@ -605,22 +525,24 @@ begin
     begin
       if chkDrawTrialGroup.Checked then
         begin
-          RandomTrialGroup(piTrialsWithConstraints.Checked);
+          RandomTrialGroup(ComboBoxRandomize.ItemIndex = 1);
           Exit;
         end;
 
-      if piTrials.Checked then
-        RandTrialOrder(1, StringGrid1.RowCount -1);
+      case ComboBoxRandomize.ItemIndex of
+        0 : RandTrialOrder(1, StringGrid1.RowCount -1);
 
-      if piTrialsWithConstraints.Checked and SaneConstraints then
-        repeat
-          RandTrialOrder(1, StringGrid1.RowCount -1);
-        until RepetitionBlocksMeetsConstraints(1,StringGrid1.RowCount -2);
 
-      if piExpectedResponse.Checked then
-        with StringGrid1 do
-          for LRow := 1 to RowCount -1 do
-            Cells[6, LRow] := IntToStr(Round(Random * 1));
+        1 :
+          repeat
+            RandTrialOrder(1, StringGrid1.RowCount -1);
+          until RepetitionBlocksMeetsConstraints(1,StringGrid1.RowCount -2);
+
+        2:
+          with StringGrid1 do
+            for LRow := 1 to RowCount -1 do
+              Cells[6, LRow] := IntToStr(Round(Random * 1));
+      end;
 
       ResetRepetionMatrix;
       CheckRepetitionCol(FLastFocusedCol);
@@ -806,182 +728,183 @@ begin
   Memo1.Clear;
   aNumTrials := StringGrid1.RowCount -1;
   FEscriba.SessionServer := CSESSION_SERVER;
-  if piAxes.Checked then
-    begin
-      aBlc := 0;
+  case ComboBoxGridType.ItemIndex of
+    0 :
+      begin
+        aBlc := 0;
 
-      FEscriba.SessionName := EditSessionName.Text;
-      FEscriba.SessionSubject := EditParticipant.Text;
-      FEscriba.Blcs[aBlc].ITI := 1000;
-      FEscriba.SessionType  := T_CIC;
-      FEscriba.Data := 'Data';
-      FEscriba.Media:= 'Media';
-     // FEscriba.SetVariables;
-      FEscriba.SetMain;
+        FEscriba.SessionName := EditSessionName.Text;
+        FEscriba.SessionSubject := EditParticipant.Text;
+        FEscriba.Blcs[aBlc].ITI := 1000;
+        FEscriba.SessionType  := T_CIC;
+        FEscriba.Data := 'Data';
+        FEscriba.Media:= 'Media';
+       // FEscriba.SetVariables;
+        FEscriba.SetMain;
 
-      B := FEscriba.Blcs[aBlc];
-      with B do
-        begin
-          Name := rsDefBlc;
-          BkGnd := clWhite;
-          VirtualTrialValue:= 1;
-          NumTrials := aNumTrials;
-        end;
-      FEscriba.Blcs[aBlc] := B;
-      FEscriba.SetBlc(aBlc, True);
-      FEscriba.SetLengthVetTrial(aBlc);
-      B := FEscriba.Blcs[aBlc];
+        B := FEscriba.Blcs[aBlc];
+        with B do
+          begin
+            Name := rsDefBlc;
+            BkGnd := clWhite;
+            VirtualTrialValue:= 1;
+            NumTrials := aNumTrials;
+          end;
+        FEscriba.Blcs[aBlc] := B;
+        FEscriba.SetBlc(aBlc, True);
+        FEscriba.SetLengthVetTrial(aBlc);
+        B := FEscriba.Blcs[aBlc];
 
-      for aTrial := Low(B.Trials) to High(B.Trials) do
-        begin
-          T := FEscriba.Blcs[aBlc].Trials[aTrial];
-          with T do
+        for aTrial := Low(B.Trials) to High(B.Trials) do
+          begin
+            T := FEscriba.Blcs[aBlc].Trials[aTrial];
+            with T do
+              begin
+                Id := aTrial + 1;
+                Kind := T_MRD;
+                NumComp := 2;
+                Name := SList.Values[_Angle] + #32 + IntToStr(Id);
+
+                SList.BeginUpdate;
+                SList.Values[_BkGnd] := IntToStr (clWhite);
+                SList.Values[_Cursor] := IntToStr (crNone);
+                SList.Values[_UseMedia] := BoolToStr(False, '1','0');
+                SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
+                SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
+                SList.Values[_Schedule] := StringGrid1.Cells[8, aTrial + 1];
+                SList.Values[_NextTrial] := '0';
+
+                for aStm := 1 to 2 do
+                  begin
+                    SList.Values[_Comp + IntToStr(aStm) + _cBnd] := GetBndString(aStm);
+                    SList.Values[_Comp + IntToStr(aStm) + _cGap] := GetGapString(aStm);
+                    SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := '0';
+                    SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := '360'
+                  end;
+                SList.EndUpdate;
+
+              end;
+            FEscriba.Blcs[aBlc].Trials[aTrial] := T;
+            FEscriba.SetTrial(aTrial);
+          end;
+      end;
+
+    1 :
+      begin
+          aBlc := 0;
+
+          FEscriba.SessionName := EditSessionName.Text;
+          FEscriba.SessionSubject := EditParticipant.Text;
+          FEscriba.Blcs[aBlc].ITI := 2300;
+          FEscriba.SessionType  := 'CIC';
+          FEscriba.Data := 'Data';
+          FEscriba.Media:= 'Media';
+          // FEscriba.SetVariables;
+          FEscriba.SetMain;
+
+          B := FEscriba.Blcs[aBlc];
+          with B do
             begin
-              Id := aTrial + 1;
-              Kind := T_MRD;
-              NumComp := 2;
-              Name := SList.Values[_Angle] + #32 + IntToStr(Id);
-
-              SList.BeginUpdate;
-              SList.Values[_BkGnd] := IntToStr (clWhite);
-              SList.Values[_Cursor] := IntToStr (crNone);
-              SList.Values[_UseMedia] := BoolToStr(False, '1','0');
-              SList.Values[_ShowStarter] := BoolToStr(True, '1','0');
-              SList.Values[_Angle] := StringGrid1.Cells[1, aTrial + 1];
-              SList.Values[_Schedule] := StringGrid1.Cells[8, aTrial + 1];
-              SList.Values[_NextTrial] := '0';
-
-              for aStm := 1 to 2 do
-                begin
-                  SList.Values[_Comp + IntToStr(aStm) + _cBnd] := GetBndString(aStm);
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap] := GetGapString(aStm);
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := '0';
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := '360'
-                end;
-              SList.EndUpdate;
-
+              Name := rsDefBlc;
+              BkGnd := clWhite;
+              VirtualTrialValue:= 1;
+              NumTrials := aNumTrials;
             end;
-          FEscriba.Blcs[aBlc].Trials[aTrial] := T;
-          FEscriba.SetTrial(aTrial);
-        end;
-    end;
+          FEscriba.Blcs[aBlc] := B;
+          FEscriba.SetBlc(aBlc, True);
+          FEscriba.SetLengthVetTrial(aBlc);
+          B := FEscriba.Blcs[aBlc];
 
-  if piFPE.Checked then
-    begin
-      aBlc := 0;
-
-      FEscriba.SessionName := EditSessionName.Text;
-      FEscriba.SessionSubject := EditParticipant.Text;
-      FEscriba.Blcs[aBlc].ITI := 2300;
-      FEscriba.SessionType  := 'CIC';
-      FEscriba.Data := 'Data';
-      FEscriba.Media:= 'Media';
-      // FEscriba.SetVariables;
-      FEscriba.SetMain;
-
-      B := FEscriba.Blcs[aBlc];
-      with B do
-        begin
-          Name := rsDefBlc;
-          BkGnd := clWhite;
-          VirtualTrialValue:= 1;
-          NumTrials := aNumTrials;
-        end;
-      FEscriba.Blcs[aBlc] := B;
-      FEscriba.SetBlc(aBlc, True);
-      FEscriba.SetLengthVetTrial(aBlc);
-      B := FEscriba.Blcs[aBlc];
-
-      for aTrial := Low(B.Trials) to High(B.Trials) do
-        begin
-          T := FEscriba.Blcs[aBlc].Trials[aTrial];
-          with T do
+          for aTrial := Low(B.Trials) to High(B.Trials) do
             begin
-              Id := aTrial + 1;
-              Kind := T_FPE;
-              NumComp := GetNumComp;
-              Name := StringGrid1.Cells[1, aTrial + 1] + #32 + IntToStr(Id);
-
-              SList.BeginUpdate;
-              SList.Values[_BkGnd] := IntToStr(clWhite);
-              SList.Values[_Cursor] := IntToStr(crNone);
-              SList.Values[_ShowStarter] := BoolToStr(False, '1','0');
-              SList.Values[_LimitedHold] := '1700';
-              SList.Values[_Schedule] := 'CRF';
-              SList.Values[_Contingency] := StringGrid1.Cells[1, aTrial + 1];
-              SList.Values[_NextTrial] := '0';
-
-              for aStm := 1 to NumComp do
+              T := FEscriba.Blcs[aBlc].Trials[aTrial];
+              with T do
                 begin
-                  SList.Values[_Comp + IntToStr(aStm) + _cBnd] := StringGrid1.Cells[aStm + 1 + NumComp, aTrial + 1];
-                  aValues :=  StringGrid1.Cells[aStm + 1, aTrial + 1] + #32;
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap] := ExtractDelimited(1,aValues,[#32]);
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := ExtractDelimited(2,aValues,[#32]);
-                  SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := ExtractDelimited(3,aValues,[#32]);
+                  Id := aTrial + 1;
+                  Kind := T_FPE;
+                  NumComp := GetNumComp;
+                  Name := StringGrid1.Cells[1, aTrial + 1] + #32 + IntToStr(Id);
+
+                  SList.BeginUpdate;
+                  SList.Values[_BkGnd] := IntToStr(clWhite);
+                  SList.Values[_Cursor] := IntToStr(crNone);
+                  SList.Values[_ShowStarter] := BoolToStr(False, '1','0');
+                  SList.Values[_LimitedHold] := '1700';
+                  SList.Values[_Schedule] := 'CRF';
+                  SList.Values[_Contingency] := StringGrid1.Cells[1, aTrial + 1];
+                  SList.Values[_NextTrial] := '0';
+
+                  for aStm := 1 to NumComp do
+                    begin
+                      SList.Values[_Comp + IntToStr(aStm) + _cBnd] := StringGrid1.Cells[aStm + 1 + NumComp, aTrial + 1];
+                      aValues :=  StringGrid1.Cells[aStm + 1, aTrial + 1] + #32;
+                      SList.Values[_Comp + IntToStr(aStm) + _cGap] := ExtractDelimited(1,aValues,[#32]);
+                      SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := ExtractDelimited(2,aValues,[#32]);
+                      SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := ExtractDelimited(3,aValues,[#32]);
+                    end;
+                  SList.EndUpdate;
                 end;
-              SList.EndUpdate;
+              FEscriba.Blcs[aBlc].Trials[aTrial] := T;
+              FEscriba.SetTrial(aTrial);
             end;
-          FEscriba.Blcs[aBlc].Trials[aTrial] := T;
-          FEscriba.SetTrial(aTrial);
-        end;
-    end;
+      end;
 
-  if piGo_NoGo.Checked then
-    begin
-      SetupDefaultsFromGui;
-      FormGo_NoGo.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
-      Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
-      FreeDefaults;
-    end;
+    2 :
+      begin
+        SetupDefaultsFromGui;
+        FormGo_NoGo.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
+        Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
+        FreeDefaults;
+      end;
 
-  if piMTS.Checked then
-    begin
-      if StringGrid1.RowCount > 2 then
-        begin
-          SetupDefaultsFromGui;
-          FormMatrixConfig := TFormMatrixConfig.Create(Application);
-          if FormMatrixConfig.ShowModal = mrOK then
-            begin
-              FormMatrixConfig.btnShowMatrix.Click;
-              FormMTS.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
-              FormRandomizePositions := TFormRandomizePositions.Create(Application);
-              FormRandomizePositions.LoadFromFile(LAST_BLOC_INIFILE_PATH,1,FormMatrixConfig.Positions);
-              FormRandomizePositions.btnRandomize.Click;
-              if FormRandomizePositions.ShowModal = mrOK then
-                begin
-                  FormRandomizePositions.Free;
-                  FormMatrixConfig.Free;
-                end
-              else
-                begin
-                  FormRandomizePositions.Free;
-                  FormMatrixConfig.Free;
-                  Exit;
-                end;
-            end
-          else
-            begin
-              FormMatrixConfig.Free;
-              Exit;
-            end;
-        end
-      else
-        begin
-          ShowMessage('Não foi possível continuar, pois a tabela de tentativas está vazia.');
-          Exit;
-        end;
-      Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
-      FreeDefaults;
-    end;
+    3..4 :
+      begin
+        if StringGrid1.RowCount > 2 then
+          begin
+            SetupDefaultsFromGui;
+            FormMatrixConfig := TFormMatrixConfig.Create(Application);
+            if FormMatrixConfig.ShowModal = mrOK then
+              begin
+                FormMatrixConfig.btnShowMatrix.Click;
+                FormMTS.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
+                FormRandomizePositions := TFormRandomizePositions.Create(Application);
+                FormRandomizePositions.LoadFromFile(LAST_BLOC_INIFILE_PATH,1,FormMatrixConfig.Positions);
+                FormRandomizePositions.btnRandomize.Click;
+                if FormRandomizePositions.ShowModal = mrOK then
+                  begin
+                    FormRandomizePositions.Free;
+                    FormMatrixConfig.Free;
+                  end
+                else
+                  begin
+                    FormRandomizePositions.Free;
+                    FormMatrixConfig.Free;
+                    Exit;
+                  end;
+              end
+            else
+              begin
+                FormMatrixConfig.Free;
+                Exit;
+              end;
+          end
+        else
+          begin
+            ShowMessage('Não foi possível continuar, pois a tabela de tentativas está vazia.');
+            Exit;
+          end;
+        Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
+        FreeDefaults;
+      end;
 
-  if piBlocChaining.Checked then
-    begin
-      SetupDefaultsFromGui;
-      FormBlocs.WriteToDisk(LDefaultMain,LDefaultBloc);
-      Memo1.Lines.LoadFromFile(FormBlocs.BlocsPath+DirectorySeparator+LAST_BLOCS_INI_FILENAME);
-      FreeDefaults;
+    5 :
+      begin
+        SetupDefaultsFromGui;
+        FormBlocs.WriteToDisk(LDefaultMain,LDefaultBloc);
+        Memo1.Lines.LoadFromFile(FormBlocs.BlocsPath+DirectorySeparator+LAST_BLOCS_INI_FILENAME);
+        FreeDefaults;
+      end;
     end;
-
   pgRodar.TabIndex := 4;
 end;
 
@@ -992,6 +915,67 @@ begin
   //Image2.Visible := chkUseMedia.Checked
 end;
 
+procedure TFormUserConfig.ComboBoxGridTypeChange(Sender: TObject);
+  procedure CleanUp;
+  begin
+    if Assigned(FormMTS) then
+     begin
+       FormMTS.Free;
+       FormMTS := nil;
+     end;
+
+   if Assigned(FormBlocs) then
+     begin
+       StringGrid1.Hint := '';
+       FormBlocs.Free;
+       FormBlocs := nil;
+       StringGrid1.PopupMenu := nil
+     end;
+  end;
+
+begin
+  if FLastGridTypeItem <> ComboBoxGridType.ItemIndex then
+    begin
+      FLastGridTypeItem := ComboBoxGridType.ItemIndex;
+      CleanUp;
+    end;
+
+  case ComboBoxGridType.ItemIndex of
+    0:
+      begin
+        SetGridHeader(StringGrid1,rsFillTypeAxes);
+        ResetRepetionMatrix;
+      end;
+
+    1:
+      begin
+        SetGridHeader(StringGrid1,rsFillTypeMatriz);
+        ResetRepetionMatrix;
+      end;
+
+    2:
+      begin
+        SetGridHeader(StringGrid1,rsFillTypeGoNoGo);
+        ResetRepetionMatrix;
+      end;
+
+    3..4:
+      begin
+        SetGridHeader(StringGrid1,rsFillTypeMTS);
+        ResetRepetionMatrix;
+        FormMTS := TFormMTS.Create(Application);
+      end;
+
+    5:
+      begin
+        SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
+        ResetRepetionMatrix;
+        CreateFormBloc;
+        StringGrid1.Hint := rsHintBlocsAvailableRightClick;
+      end;
+    end;
+end;
+
 procedure TFormUserConfig.EditBlocChainingPathDblClick(Sender: TObject);
 begin
   if SelectDirectoryDialog1.Execute then
@@ -1000,11 +984,13 @@ end;
 
 procedure TFormUserConfig.EditBlocChainingPathEditingDone(Sender: TObject);
 begin
-  if btnGridType.Caption = rsFillTypeBlocChaining then
-    begin
-      FormBlocs.BlocsPath := EditBlocChainingPath.Text;
-      StringGrid1.PopupMenu := FormBlocs.PopupMenuBlocs;
-    end;
+  case ComboBoxGridType.ItemIndex of
+    5 :
+      begin
+        FormBlocs.BlocsPath := EditBlocChainingPath.Text;
+        StringGrid1.PopupMenu := FormBlocs.PopupMenuBlocs;
+      end;
+  end;
 end;
 
 procedure TFormUserConfig.EditTargetSessionDblClick(Sender: TObject);
@@ -1119,83 +1105,86 @@ begin
     GGlobalContainer.MonitorToShow := 1
   else
     GGlobalContainer.MonitorToShow := 0;
-  {
-    Example:
 
-    4 axis: 0, 45, 90, 135
-    3 nodes per axis
-    2 trials per node
-    ______________________________
+  case ComboBoxGridType.ItemIndex of
+    {
+      Example:
 
-    Equals to a Group of 24 trials to repeat.
+      4 axis: 0, 45, 90, 135
+      3 nodes per axis
+      2 trials per node
+      ______________________________
 
-    It gives 96 trials repeating by 4.
-    ______________________________
+      Equals to a Group of 24 trials to repeat.
 
-  }
-  if piAxes.Checked then
-  begin
-    aRow := 1;
-    FrmBresenhamLine := TBresenhamLineForm.Create(Application);
-    FrmBresenhamLine.MonitorToShow := GGlobalContainer.MonitorToShow;
-    if FrmBresenhamLine.ShowModal = mrOk then
+      It gives 96 trials repeating by 4.
+      ______________________________
+
+    }
+    0:
       begin
-        for aRepeat := 0 to FrmBresenhamLine.seRepeat.Value -1 do
-          with FrmBresenhamLine.Axis do
-            for aAxis := Low(List) to High(List) do
-              begin
-                cAngle := List[aAxis].Angle;
-                cSize := IntToStr(List[aAxis].Size);
-                for aNode := Low(List[aAxis].Line) to High(List[aAxis].Line) do
-                  for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] - 1 do AddAxesToGrid;
-              end;
+        aRow := 1;
+        FrmBresenhamLine := TBresenhamLineForm.Create(Application);
+        FrmBresenhamLine.MonitorToShow := GGlobalContainer.MonitorToShow;
+        if FrmBresenhamLine.ShowModal = mrOk then
+          begin
+            for aRepeat := 0 to FrmBresenhamLine.seRepeat.Value -1 do
+              with FrmBresenhamLine.Axis do
+                for aAxis := Low(List) to High(List) do
+                  begin
+                    cAngle := List[aAxis].Angle;
+                    cSize := IntToStr(List[aAxis].Size);
+                    for aNode := Low(List[aAxis].Line) to High(List[aAxis].Line) do
+                      for aTrial := 0 to List[aAxis].TrialsPerNode[aNode] - 1 do AddAxesToGrid;
+                  end;
 
-        //FNumTrials := aRow - 1;
-        {$ifdef DEBUG}
-          DebugLn(mt_Information + FrmBresenhamLine.ClassName +  ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
-        {$endif}
-        FrmBresenhamLine.Free;
-        ResetRepetionMatrix;
-        FLastFocusedCol := -1;
-      end
-    else FrmBresenhamLine.Free;
-  end;
-  {
-    Example:
+            //FNumTrials := aRow - 1;
+            {$ifdef DEBUG}
+              DebugLn(mt_Information + FrmBresenhamLine.ClassName +  ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
+            {$endif}
+            FrmBresenhamLine.Free;
+            ResetRepetionMatrix;
+            FLastFocusedCol := -1;
+          end
+        else FrmBresenhamLine.Free;
+      end;
 
-    3 x 3 matriz = 9 positions
-    2 trials per position
-    ______________________________
+    {
+      Example:
 
-    Equals to a Group of 18 trials to repeat.
+      3 x 3 matriz = 9 positions
+      2 trials per position
+      ______________________________
 
-    It gives 72 trials repeating it by 4.
-    ______________________________
+      Equals to a Group of 18 trials to repeat.
 
-  }
+      It gives 72 trials repeating it by 4.
+      ______________________________
 
-  aRow := 1;
-  if piFPE.Checked then
-    begin
-      aCol := 0;
-      FormFPE := TFormFPE.Create(Application);
-      FormFPE.MonitorToShow := GGlobalContainer.MonitorToShow;
-      if FormFPE.ShowModal = mrOk then
-        begin
-          for aTrial := Low(FormFPE.Trials) to High(FormFPE.Trials) do AddMatrixTrialToGrid;
+    }
+    1:
+      begin
+        aRow := 1;
+        aCol := 0;
+        FormFPE := TFormFPE.Create(Application);
+        FormFPE.MonitorToShow := GGlobalContainer.MonitorToShow;
+        if FormFPE.ShowModal = mrOk then
+          begin
+            for aTrial := Low(FormFPE.Trials) to High(FormFPE.Trials) do AddMatrixTrialToGrid;
 
-          //FNumTrials := aRow - 1;
-          {$ifdef DEBUG}
-            DebugLn(mt_Information + FormFPE.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
-          {$endif}
-          FormFPE.Free;
-          ResetRepetionMatrix;
-          FLastFocusedCol := -1;
-        end
-      else FormFPE.Free;
-    end;
+            //FNumTrials := aRow - 1;
+            {$ifdef DEBUG}
+              DebugLn(mt_Information + FormFPE.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
+            {$endif}
+            FormFPE.Free;
+            ResetRepetionMatrix;
+            FLastFocusedCol := -1;
+          end
+        else FormFPE.Free;
+      end;
 
-  if piGo_NoGo.Checked then
+
+  2:
     begin
       FormGo_NoGo := TFormGo_NoGo.Create(Application);
       FormGo_NoGo.MonitorToShow := GGlobalContainer.MonitorToShow;
@@ -1208,9 +1197,10 @@ begin
         end;
     end;
 
-  if piMTS.Checked then
+  3..4:
     begin
       FormMTS.MonitorToShow := GGlobalContainer.MonitorToShow;
+      FormMTS.ComboBoxTrialType.ItemIndex:=ComboBoxGridType.ItemIndex-3;
       if FormMTS.ShowModal = mrOK then
         begin
           FormMTS.AddTrialsToGui(StringGrid1);
@@ -1220,7 +1210,7 @@ begin
         end;
     end;
 
-  if piBlocChaining.Checked then
+  5:
     begin
       if (EditBlocChainingPath.Text <> '') and DirectoryExistsUTF8(EditBlocChainingPath.Text) then
         begin
@@ -1236,6 +1226,7 @@ begin
             end;
         end;
     end;
+  end;
   GGlobalContainer.Free;
 end;
 

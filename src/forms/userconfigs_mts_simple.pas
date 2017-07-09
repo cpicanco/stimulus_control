@@ -195,14 +195,14 @@ begin
   case ComboBoxTrialType.ItemIndex of
     0 :
       begin
-        FTrial.HasSample:=True;
-        FTrial.Sample.Key.Show;
-      end;
-    1 :
-      begin
         FSample.Hide;
         FTrial.HasSample:=False;
         FTrial.Sample.Key.Hide;
+      end;
+    1 :
+      begin
+        FTrial.HasSample:=True;
+        FTrial.Sample.Key.Show;
       end;
   end;
 end;
