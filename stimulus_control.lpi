@@ -33,7 +33,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;src/prototypes"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <Parsing>
@@ -332,41 +332,49 @@
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
-        <Filename Value="src/units/bass_player.pas"/>
+        <Filename Value="src/units/audio.bass_nonfree.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Audio.Bass_nonfree"/>
       </Unit1>
       <Unit2>
-        <Filename Value="src/units/bass_player_callbacks.pas"/>
+        <Filename Value="src/units/audio.basscallbacks.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Audio.BassCallbacks"/>
       </Unit2>
       <Unit3>
-        <Filename Value="src/units/blocs.pas"/>
+        <Filename Value="src/units/session.blocs.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.Blocs"/>
       </Unit3>
       <Unit4>
-        <Filename Value="src/units/config_session.pas"/>
+        <Filename Value="src/units/session.configuration.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.Configuration"/>
       </Unit4>
       <Unit5>
-        <Filename Value="src/units/config_session_fileutils.pas"/>
+        <Filename Value="src/units/session.configurationfile.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.ConfigurationFile"/>
       </Unit5>
       <Unit6>
-        <Filename Value="src/units/config_session_global_container.pas"/>
+        <Filename Value="src/units/session.configuration.globalcontainer.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.Configuration.GlobalContainer"/>
       </Unit6>
       <Unit7>
-        <Filename Value="src/units/config_session_gui_comparison.pas"/>
+        <Filename Value="src/units/gui.controls.keysettings.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="GUI.Controls.KeySettings"/>
       </Unit7>
       <Unit8>
-        <Filename Value="src/units/config_session_guiutils.pas"/>
+        <Filename Value="src/units/gui.helpers.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="GUI.Helpers"/>
       </Unit8>
       <Unit9>
-        <Filename Value="src/units/config_trial_mirrored.pas"/>
+        <Filename Value="src/prototypes/prototypes.mirroredcircles.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="trial_mirrored_config"/>
+        <UnitName Value="Prototypes.MirroredCircles"/>
       </Unit9>
       <Unit10>
         <Filename Value="src/units/constants.pas"/>
@@ -377,148 +385,181 @@
         <IsPartOfProject Value="True"/>
       </Unit11>
       <Unit12>
-        <Filename Value="src/units/counter_performance_review.pas"/>
+        <Filename Value="src/units/controls.counters.performancereview.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Counters.PerformanceReview"/>
       </Unit12>
       <Unit13>
-        <Filename Value="src/units/criatore.pas"/>
+        <Filename Value="src/units/gui.controls.positionsgrid.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="GUI.Controls.PositionsGrid"/>
       </Unit13>
       <Unit14>
-        <Filename Value="src/units/cumulative_record.pas"/>
+        <Filename Value="src/units/prototypes.controls.cummulativerecord.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Prototypes.Controls.CummulativeRecord"/>
       </Unit14>
       <Unit15>
         <Filename Value="src/units/custom_timer.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit15>
       <Unit16>
-        <Filename Value="src/units/data_logger.pas"/>
+        <Filename Value="src/units/loggers.reports.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.Reports"/>
       </Unit16>
       <Unit17>
-        <Filename Value="src/units/debug_logger.pas"/>
+        <Filename Value="src/units/loggers.debug.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.Debug"/>
       </Unit17>
       <Unit18>
-        <Filename Value="src/units/debug_logger_thread.pas"/>
+        <Filename Value="src/units/loggers.debugutils.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.DebugUtils"/>
       </Unit18>
       <Unit19>
-        <Filename Value="src/units/draw_methods.pas"/>
+        <Filename Value="src/units/canvas.helpers.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Canvas.Helpers"/>
       </Unit19>
       <Unit20>
         <Filename Value="src/units/escriba.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit20>
       <Unit21>
-        <Filename Value="src/units/grid_helpers.pas"/>
+        <Filename Value="src/units/gui.helpers.grids.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="GUI.Helpers.Grids"/>
       </Unit21>
       <Unit22>
         <Filename Value="src/units/ini_helpers.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit22>
       <Unit23>
-        <Filename Value="src/units/interface_plp.pas"/>
+        <Filename Value="src/units/devices.plpi.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Devices.PLPi"/>
       </Unit23>
       <Unit24>
-        <Filename Value="src/units/interface_rs232.pas"/>
+        <Filename Value="src/units/devices.rs232i.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Devices.RS232i"/>
       </Unit24>
       <Unit25>
-        <Filename Value="src/units/pupil_communication.pas"/>
+        <Filename Value="src/units/zmq.pupilcommunication.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ZMQ.PupilCommunication"/>
       </Unit25>
       <Unit26>
-        <Filename Value="src/units/regdata.pas"/>
+        <Filename Value="src/units/loggers.datafile.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.DataFile"/>
       </Unit26>
       <Unit27>
-        <Filename Value="src/units/response_key.pas"/>
+        <Filename Value="src/units/controls.stimuli.key.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Stimuli.Key"/>
       </Unit27>
       <Unit28>
-        <Filename Value="src/units/schedules.pas"/>
+        <Filename Value="src/units/schedules.classes.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules.Classes"/>
       </Unit28>
       <Unit29>
-        <Filename Value="src/units/schedules_abstract.pas"/>
+        <Filename Value="src/units/schedules.abstract.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules.Abstract"/>
       </Unit29>
       <Unit30>
-        <Filename Value="src/units/schedules_main.pas"/>
+        <Filename Value="src/units/schedules.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules"/>
       </Unit30>
       <Unit31>
         <Filename Value="src/units/session.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Session"/>
       </Unit31>
       <Unit32>
         <Filename Value="src/units/timestamps.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Timestamps"/>
       </Unit32>
       <Unit33>
-        <Filename Value="src/units/timestamps_helpers.pas"/>
+        <Filename Value="src/units/timestamps.helpers.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Timestamps.Helpers"/>
       </Unit33>
       <Unit34>
-        <Filename Value="src/units/trial_abstract.pas"/>
+        <Filename Value="src/units/controls.trials.abstract.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.Abstract"/>
       </Unit34>
       <Unit35>
-        <Filename Value="src/units/trial_calibration.pas"/>
+        <Filename Value="src/units/controls.trials.pupilcalibration.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.PupilCalibration"/>
       </Unit35>
       <Unit36>
-        <Filename Value="src/units/trial_dizzy_timers.pas"/>
+        <Filename Value="src/units/controls.trials.dizzytimers.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.DizzyTimers"/>
       </Unit36>
       <Unit37>
-        <Filename Value="src/units/trial_feature_positive.pas"/>
+        <Filename Value="src/units/controls.trials.fpfn.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.FPFN"/>
       </Unit37>
       <Unit38>
-        <Filename Value="src/units/trial_go_nogo.pas"/>
+        <Filename Value="src/units/controls.trials.gonogo.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.GoNoGo"/>
       </Unit38>
       <Unit39>
-        <Filename Value="src/units/trial_helpers.pas"/>
+        <Filename Value="src/units/controls.trials.helpers.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.Helpers"/>
       </Unit39>
       <Unit40>
-        <Filename Value="src/units/trial_matching.pas"/>
+        <Filename Value="src/units/controls.trials.matchingtosample.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.MatchingToSample"/>
       </Unit40>
       <Unit41>
-        <Filename Value="src/units/trial_message.pas"/>
+        <Filename Value="src/units/controls.trials.textmessage.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.TextMessage"/>
       </Unit41>
       <Unit42>
-        <Filename Value="src/units/trial_mirrored_stm.pas"/>
+        <Filename Value="src/units/controls.trials.customcircles.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.CustomCircles"/>
       </Unit42>
       <Unit43>
-        <Filename Value="src/units/trial_move_square.pas"/>
+        <Filename Value="src/units/controls.trials.movesquare.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.MoveSquare"/>
       </Unit43>
       <Unit44>
-        <Filename Value="src/units/trial_performance_review.pas"/>
+        <Filename Value="src/units/controls.trials.performancereview.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.PerformanceReview"/>
       </Unit44>
       <Unit45>
-        <Filename Value="src/units/versioning_git.pas"/>
+        <Filename Value="src/units/versioning.git.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Versioning.Git"/>
       </Unit45>
       <Unit46>
-        <Filename Value="src/units/versioning_lazarus.pas"/>
+        <Filename Value="src/units/versioning.lazarus.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Versioning.Lazarus"/>
       </Unit46>
       <Unit47>
-        <Filename Value="src/units/zmq_client.pas"/>
+        <Filename Value="src/units/zmq.client.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ZMQ.Client"/>
       </Unit47>
       <Unit48>
         <Filename Value="src/forms/background.pas"/>

@@ -26,7 +26,7 @@ uses
   , userconfigs
 
   {$ifdef DEBUG}
-  , debug_logger
+  , Loggers.Debug
   , sysutils
   {$endif}
   ;
