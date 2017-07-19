@@ -7,7 +7,7 @@ object Form1: TForm1
   ClientHeight = 456
   ClientWidth = 713
   OnCreate = FormCreate
-  LCLVersion = '1.6.0.4'
+  LCLVersion = '1.8.0.3'
   object btnStart: TButton
     Left = 0
     Height = 25
@@ -52,7 +52,7 @@ object Form1: TForm1
     Top = 0
     Width = 192
     Caption = 'FClock'
-    ClientHeight = 45
+    ClientHeight = 47
     ClientWidth = 188
     TabOrder = 4
     object LabelCounter: TLabel
@@ -60,7 +60,7 @@ object Form1: TForm1
       Left = 8
       Height = 34
       Top = 8
-      Width = 156
+      Width = 157
       Caption = 'No Instance'
       Font.Height = -29
       ParentColor = False
@@ -98,7 +98,7 @@ object Form1: TForm1
   end
   object edtRestart: TEdit
     Left = 470
-    Height = 27
+    Height = 25
     Top = 72
     Width = 75
     TabOrder = 8
@@ -109,10 +109,10 @@ object Form1: TForm1
     AnchorSideLeft.Control = btnStart2
     AnchorSideTop.Control = btnRestart2
     AnchorSideRight.Control = btnRestart2
-    Left = 395
-    Height = 17
+    Left = 404
+    Height = 15
     Top = 49
-    Width = 70
+    Width = 61
     Anchors = [akTop, akRight]
     BorderSpacing.Top = 5
     BorderSpacing.Right = 5

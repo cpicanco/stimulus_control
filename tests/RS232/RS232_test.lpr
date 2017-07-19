@@ -1,6 +1,6 @@
 program RS232_test;
 
-uses sysutils, interface_rs232;
+uses sysutils, Devices.RS232i;
 
 var RS232 : TRS232;
 

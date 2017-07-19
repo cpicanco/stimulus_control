@@ -205,12 +205,9 @@ end;
 procedure TForm1.OnClockTerminateEX(Sender: TObject);
 var
   Host : TObject;
-  i : integer;
 begin
   Host := TClockThread(Sender).Host;
-  i := TLabel(Host).Tag;
   TLabel(Host).Caption := IntToStr(TClockThread(Sender).ThreadID);
-
 end;
 
 

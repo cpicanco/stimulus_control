@@ -15,7 +15,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls
-  , bass_player
+  , Audio.Bass_nonfree
   ;
 
 type
@@ -43,7 +43,7 @@ var
 implementation
 
 const
-  CSOUND_PATH = '/home/rafael/git/stimulus_control/config_examples/Media/CSQ1.wav';
+  CSOUND_PATH = '../../docs/config_examples/Media/CSQ1.wav';
 
 {$R *.lfm}
 
@@ -62,7 +62,7 @@ end;
 
 procedure TForm1.ButtonPlayLoopClick(Sender: TObject);
 begin
-  F := TBassStream.Create(CSOUND_PATH,True);
+  F := TBassStream.Create(CSOUND_PATH,1);
   F.Play;
 end;
 

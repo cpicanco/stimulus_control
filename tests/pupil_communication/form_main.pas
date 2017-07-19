@@ -15,7 +15,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, pupil_communication
+  ExtCtrls
+  , ZMQ.PupilCommunication
   ;
 
 type

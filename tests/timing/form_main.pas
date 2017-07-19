@@ -16,7 +16,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs
   , custom_timer
-  , draw_methods
+  , Canvas.Helpers
   ;
 
 type
@@ -43,6 +43,8 @@ implementation
 
 {$R *.lfm}
 
+uses Types;
+
 { TForm1 }
 
 procedure TForm1.FormActivate(Sender: TObject);
@@ -66,18 +68,38 @@ begin
 end;
 
 procedure TForm1.FormPaint(Sender: TObject);
-var i : integer;
+var
+  i , LTop: integer;
+  function LLeft: integer;
+  begin
+    Result := 10 + (122*i);
+  end;
+
+  function LRect1: TRect;
+  begin
+    Result := Rect(LLeft, LTop, LLeft+120,LTop+120);
+  end;
+
+  function LRect2: TRect;
+  begin
+    Result := Rect(LLeft, LTop, LLeft+120,LTop+120);
+    InflateRect(Result,-50,-50);
+  end;
+
 begin
   if FCanDraw then
      begin
+       LTop := 10;
        for i := 0 to 5 do
-     		 DrawCircle(Canvas, 10 + (122*i), 10, 120, True, 90, 2);
+     		 DrawCustomEllipse(Canvas, LRect1, LRect2, True, 90, 2);
 
+       LTop := 130;
        for i := 0 to 5 do
-     		 DrawCircle(Canvas, 10 + (122*i), 130, 120, True, 90, 2);
+     		 DrawCustomEllipse(Canvas, LRect1, LRect2, True, 90, 2);
 
+       LTop := 250;
        for i := 0 to 5 do
-     		 DrawCircle(Canvas, 10 + (122*i), 250, 120, True, 90, 2);
+     		 DrawCustomEllipse(Canvas, LRect1, LRect2, True, 90, 2);
 
      end;
 end;

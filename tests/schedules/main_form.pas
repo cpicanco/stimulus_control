@@ -17,11 +17,11 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
   StdCtrls, ExtCtrls
 
-, LCLIntf, LCLType, TAGraph, TASeries, TATypes, Menus
+, LCLIntf, LCLType, TATools, TAGraph, TASeries, TATypes, Menus
 
 , custom_timer
-, schedules_main
-, cumulative_record
+, Schedules
+, Prototypes.Controls.CummulativeRecord
 ;
 
 type
@@ -63,7 +63,7 @@ type
     FTimeConsequence : cardinal;
     FThreadMethod : TThreadMethod;
     FClock : TClockThread;
-    FSchedule : TSchMan;
+    FSchedule : TSchedule;
     FCumulativeRecord : TCummulativeRecord;
     procedure ClockOnTimer(Sender : TObject);
     procedure Response(Sender : TObject);
@@ -151,7 +151,7 @@ end;
 procedure TFormSchedules.miAlgorithmTestClick(Sender: TObject);
 var
   //hMin, hMax, hInterval,
-  i, x, y : integer;
+  {i,} x, y : integer;
   FormChart : TForm;
   aPlot : TChart;
   aSerie : TLineSeries;
@@ -266,7 +266,7 @@ procedure TFormSchedules.FormCreate(Sender: TObject);
 begin
   Randomize;
 
-  FSchedule := TSchMan.Create(PanelOperandum);
+  FSchedule := TSchedule.Create(PanelOperandum);
   FSchedule.OnResponse := @Response;
   FSchedule.OnConsequence := @Consequence;
   FSchedule.Kind := 'EXT';
@@ -329,7 +329,7 @@ begin
   i := 1;
   aFilename := ExtractFilePath(Application.ExeName);
   aFilename := aFilename + 'cummulative_record_' + Format('%.3d', [i]) + '.bmp';
-  while FileExistsUTF8(aFilename) do
+  while FileExists(aFilename) do
    begin
      Inc(i);
      aFilename := 'cummulative_record_' + Format('%.3d', [i]) + '.bmp';

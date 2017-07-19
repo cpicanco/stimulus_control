@@ -6,6 +6,6 @@ object Form1: TForm1
   Caption = 'Form1'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '1.6.2.0'
+  LCLVersion = '1.8.0.3'
   WindowState = wsFullScreen
 end
