@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="9"/>
+    <Version Value="10"/>
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
       <Title Value="vlc_test"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
-      <Icon Value="0"/>
     </General>
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <VersionInfo>
-      <StringTable ProductVersion=""/>
-    </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
@@ -57,7 +53,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-      <OtherUnitFiles Value="../../units;../../dependency/bass"/>
+      <OtherUnitFiles Value="../../dependency/bass;../../src/units;../../dependency/delphizmq;../../dependency/msgpack-delphi"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
@@ -69,9 +65,6 @@
     </Linking>
     <Other>
       <CustomOptions Value="-dUseCThreads"/>
-      <OtherDefines Count="1">
-        <Define0 Value="UseCThreads"/>
-      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>

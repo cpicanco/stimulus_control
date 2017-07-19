@@ -5,10 +5,8 @@ unit main_form;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls
-  , response_key
-  , lclvlc
-  , vlc
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  ExtCtrls, lclvlc, vlc
   ;
 
 type
@@ -17,13 +15,16 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
+    Panel1: TPanel;
+    Timer1: TTimer;
     procedure Button1Click(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
+    procedure Timer2Timer(Sender: TObject);
   private
-    FForm : TForm;
-    ResponseKey : TKey;
+    VLCMediaItems : TVLCMediaItems;
     VLCMediaItem : TVLCMediaItem;
     LCLVLCPlayer1 : TLCLVLCPlayer;
     procedure LCLVLCPlayerBackward(Sender: TObject);
@@ -52,7 +53,7 @@ var
   Form1: TForm1;
 
 const
-  CFILE = '/home/rafael/git/stimulus_control/Participante1/Media/V1.avi';
+  CFILE = '/home/rafael/git/stimulus_control/Participante1/Media/V1.mp4';
 
 implementation
 
@@ -60,16 +61,9 @@ implementation
 
 { TForm1 }
 
-
-
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-
   LCLVLCPlayer1.Play(VLCMediaItem);
-  while not LCLVLCPlayer1.Playing do
-    Sleep(10);
-  ResponseKey.SetBounds(10, 10, LCLVLCPlayer1.VideoWidth, LCLVLCPlayer1.VideoHeight);
-
 end;
 
 procedure TForm1.FormActivate(Sender: TObject);
@@ -80,21 +74,9 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  ResponseKey := TKey.Create(Self);
-  ResponseKey.SetBounds(10,10,Width -10,300);
-  ResponseKey.Parent := Self;
-  ResponseKey.Show;
-
-  // hack: LCLWIDGET will fallback to response key handle...
-  FForm := TForm.Create(ResponseKey);
-  FForm.BorderStyle := bsNone;
-  FForm.Color := clBlue;
-  FForm.Parent := ResponseKey;
-  FForm.Show;
-
-  LCLVLCPlayer1 := TLCLVLCPlayer.Create(FForm);
+  LCLVLCPlayer1 := TLCLVLCPlayer.Create(Self);
   LCLVLCPlayer1.FitWindow := True;
-  LCLVLCPlayer1.ParentWindow := FForm;
+  LCLVLCPlayer1.ParentWindow := Self;
   LCLVLCPlayer1.UseEvents := True;
   with LCLVLCPlayer1 do
     begin
@@ -117,14 +99,31 @@ begin
       OnTimeChanged:=@LCLVLCPlayerTimeChanged;
       OnTitleChanged:=@LCLVLCPlayerTitleChanged;
     end;
-
   VLCMediaItem := TVLCMediaItem.Create(nil);
   VLCMediaItem.Path := CFILE;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  VLCMediaItem.Free;
+  VLCMediaItems.Free;
+end;
+
+procedure TForm1.Timer1Timer(Sender: TObject);
+begin
+  Timer1.Enabled:=False;
+  LCLVLCPlayer1.Pause;
+  Timer1.OnTimer:=@Timer2Timer;
+  Timer1.Interval:= 2000;
+  Timer1.Enabled:=True;
+end;
+
+procedure TForm1.Timer2Timer(Sender: TObject);
+begin
+  Timer1.Enabled:=False;
+  LCLVLCPlayer1.Resume;
+  Timer1.OnTimer:=@Timer1Timer;
+  Timer1.Interval:= 2000;
+  Timer1.Enabled:=True;
 end;
 
 procedure TForm1.LCLVLCPlayerBackward(Sender: TObject);
@@ -183,9 +182,17 @@ begin
 end;
 
 procedure TForm1.LCLVLCPlayerPlaying(Sender: TObject);
+var
+  LVideoDuration : LongInt;
 begin
-  //WriteLn('SIZE',#32,LCLVLCPlayer1.VideoWidth,#32, LCLVLCPlayer1.VideoHeight);
-  //WriteLn(Sender.ClassName,#32,'Playing');
+  // get time in miliseconds;
+  LVideoDuration := DateTimeToTimeStamp(LCLVLCPlayer1.VideoDuration).Time;
+
+  // set timer interval to one third of the video duration time
+  Timer1.Interval:= LVideoDuration div 3;
+
+  // start timer
+  Timer1.Enabled := True;
 end;
 
 procedure TForm1.LCLVLCPlayerPositionChanged(Sender: TObject; const APos: Double
