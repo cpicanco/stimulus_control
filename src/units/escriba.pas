@@ -14,7 +14,7 @@ unit escriba;
 interface
 
 uses Dialogs, Classes, StdCtrls, Graphics, SysUtils, Forms, LazFileUtils
-    , config_session
+    , Session.Configuration
     , constants
     ;
 
@@ -304,7 +304,7 @@ const
   begin
     Result := -1;
     if Kind = T_MRD then Result := 0;
-    if Kind = T_FPE then Result := 1;
+    if Kind = T_FPFN then Result := 1;
     if Kind = T_Simple then Result := 2;
     if Kind = T_MTS then Result := 3;
   end;
@@ -393,7 +393,7 @@ begin
 
     end;
 
-  if kind = T_FPE then
+  if kind = T_FPFN then
     begin
       NumComp := IntToStr(FBlcs[FIndBlc].Trials[FIndTrial].NumComp);
       FText.Add(

@@ -14,8 +14,8 @@ interface
 uses
   LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Spin, ExtCtrls, Menus, StdCtrls, Grids
-  , config_session_fileutils
-  , config_session
+  , Session.Configuration
+  , Session.ConfigurationFile
   ;
 
 type

@@ -109,7 +109,7 @@ operator in (const A: TSimpleBlc; const B: TSimpleBlcs): boolean;
 
 implementation
 
-uses config_session, config_session_fileutils, strutils,FileUtil, LazFileUtils, constants;
+uses Session.Configuration, Session.ConfigurationFile, strutils, FileUtil, LazFileUtils, constants;
 
 const
    ADDRESS_SEP : Char = #31;

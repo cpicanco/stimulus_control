@@ -1661,7 +1661,7 @@ object FormUserConfig: TFormUserConfig
       ClientHeight = 435
       ClientWidth = 748
       object LabelSessionName: TLabel
-        Left = 25
+        Left = 74
         Height = 25
         Top = 25
         Width = 127
@@ -1669,7 +1669,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object EditSessionName: TEdit
-        Left = 177
+        Left = 275
         Height = 25
         Top = 25
         Width = 400
@@ -1678,7 +1678,7 @@ object FormUserConfig: TFormUserConfig
         Text = 'Sessão 1'
       end
       object LabelParticipant: TLabel
-        Left = 25
+        Left = 74
         Height = 25
         Top = 50
         Width = 127
@@ -1686,7 +1686,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object EditParticipant: TEdit
-        Left = 177
+        Left = 275
         Height = 25
         Top = 50
         Width = 400
@@ -1695,7 +1695,7 @@ object FormUserConfig: TFormUserConfig
         Text = 'Participante 1'
       end
       object LabelSessionType: TLabel
-        Left = 25
+        Left = 74
         Height = 25
         Top = 75
         Width = 127
@@ -1703,7 +1703,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object ComboBoxSessionType: TComboBox
-        Left = 177
+        Left = 275
         Height = 25
         Top = 75
         Width = 400
@@ -1744,7 +1744,7 @@ object FormUserConfig: TFormUserConfig
       ClientHeight = 435
       ClientWidth = 748
       object LabelBlocChainingPath: TLabel
-        Left = 136
+        Left = 107
         Height = 25
         Top = 25
         Width = 178
@@ -1752,7 +1752,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object EditBlocChainingPath: TEdit
-        Left = 450
+        Left = 392
         Height = 25
         Top = 25
         Width = 250
@@ -1765,7 +1765,7 @@ object FormUserConfig: TFormUserConfig
         TextHint = 'Clique duas vezes para escolher a pasta'
       end
       object LabelBlocName: TLabel
-        Left = 136
+        Left = 107
         Height = 25
         Top = 50
         Width = 178
@@ -1773,7 +1773,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object EditBlocName: TEdit
-        Left = 450
+        Left = 392
         Height = 25
         Top = 50
         Width = 250
@@ -1784,7 +1784,7 @@ object FormUserConfig: TFormUserConfig
         TextHint = 'Clique para editar'
       end
       object LabelBlocCrtHitPorcentage: TLabel
-        Left = 136
+        Left = 107
         Height = 25
         Top = 75
         Width = 178
@@ -1792,7 +1792,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object seBlocCrtHitPorcentage: TSpinEdit
-        Left = 450
+        Left = 392
         Height = 25
         Top = 75
         Width = 100
@@ -1800,7 +1800,7 @@ object FormUserConfig: TFormUserConfig
         TabOrder = 2
       end
       object LabelBlocCrtConsecutiveHit: TLabel
-        Left = 136
+        Left = 107
         Height = 25
         Top = 100
         Width = 178
@@ -1808,7 +1808,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object seBlocCrtConsecutiveHit: TSpinEdit
-        Left = 450
+        Left = 392
         Height = 25
         Top = 100
         Width = 100
@@ -1817,7 +1817,7 @@ object FormUserConfig: TFormUserConfig
         TabOrder = 3
       end
       object LabelBlocITI: TLabel
-        Left = 136
+        Left = 107
         Height = 25
         Top = 125
         Width = 178
@@ -1825,7 +1825,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object seBlocITI: TSpinEdit
-        Left = 450
+        Left = 392
         Height = 25
         Top = 125
         Width = 100
@@ -1834,7 +1834,7 @@ object FormUserConfig: TFormUserConfig
         TabOrder = 4
       end
       object LabelBlocVirtualTrial: TLabel
-        Left = 136
+        Left = 107
         Height = 25
         Top = 150
         Width = 178
@@ -1842,7 +1842,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object seBlocVirtualTrial: TSpinEdit
-        Left = 450
+        Left = 392
         Height = 25
         Top = 150
         Width = 100
@@ -1851,7 +1851,7 @@ object FormUserConfig: TFormUserConfig
         TabOrder = 5
       end
       object LabelBlocMaxCorrection: TLabel
-        Left = 136
+        Left = 107
         Height = 25
         Top = 175
         Width = 178
@@ -1859,7 +1859,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object seBlocMaxCorrection: TSpinEdit
-        Left = 450
+        Left = 392
         Height = 25
         Top = 175
         Width = 100
@@ -1868,7 +1868,7 @@ object FormUserConfig: TFormUserConfig
         TabOrder = 6
       end
       object LabelBlocMaxRepetition: TLabel
-        Left = 136
+        Left = 107
         Height = 25
         Top = 200
         Width = 178
@@ -1876,7 +1876,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object seBlocMaxRepetition: TSpinEdit
-        Left = 450
+        Left = 392
         Height = 25
         Top = 200
         Width = 100
@@ -1885,7 +1885,7 @@ object FormUserConfig: TFormUserConfig
         TabOrder = 7
       end
       object LabelBlocCounter: TLabel
-        Left = 136
+        Left = 107
         Height = 23
         Top = 225
         Width = 178
@@ -1893,7 +1893,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object ComboBoxBlocCounter: TComboBox
-        Left = 450
+        Left = 392
         Height = 23
         Top = 225
         Width = 250
@@ -1908,7 +1908,7 @@ object FormUserConfig: TFormUserConfig
         Text = 'Não'
       end
       object LabelBlocBkGnd: TLabel
-        Left = 136
+        Left = 107
         Height = 20
         Top = 248
         Width = 178
@@ -1916,7 +1916,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object ColorButtonBloc: TColorButton
-        Left = 450
+        Left = 392
         Height = 20
         Top = 248
         Width = 250
@@ -2178,9 +2178,9 @@ object FormUserConfig: TFormUserConfig
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 40
-        Top = 387
-        Width = 836
+        Height = 43
+        Top = 384
+        Width = 748
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Salvar'
         Font.Style = [fsBold]
@@ -2193,7 +2193,7 @@ object FormUserConfig: TFormUserConfig
         Left = 0
         Height = 380
         Top = 0
-        Width = 836
+        Width = 748
         BorderSpacing.Bottom = 55
         ScrollBars = ssAutoVertical
         TabOrder = 1
@@ -2208,7 +2208,7 @@ object FormUserConfig: TFormUserConfig
       ClientHeight = 435
       ClientWidth = 748
       object LabelTargetSession: TLabel
-        Left = 175
+        Left = 249
         Height = 15
         Top = 25
         Width = 250
@@ -2216,7 +2216,7 @@ object FormUserConfig: TFormUserConfig
         ParentColor = False
       end
       object EditTargetSession: TEdit
-        Left = 175
+        Left = 249
         Height = 25
         Top = 40
         Width = 250
@@ -2228,7 +2228,7 @@ object FormUserConfig: TFormUserConfig
         TextHint = 'Clique duas vezes para escolher a sessão alvo.'
       end
       object ButtonRandomizeTargetSession: TButton
-        Left = 175
+        Left = 249
         Height = 25
         Top = 65
         Width = 250
@@ -3900,9 +3900,9 @@ object FormUserConfig: TFormUserConfig
         AnchorSideBottom.Control = tbVersion
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 283
+        Height = 307
         Top = 128
-        Width = 600
+        Width = 748
         Align = alCustom
         Anchors = [akTop, akLeft, akRight, akBottom]
         ReadOnly = True

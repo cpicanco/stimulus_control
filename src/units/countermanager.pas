@@ -19,7 +19,12 @@ type
 
   { TCounterManager }
 
-  TCounterManager = class (TComponent)
+  {
+
+    Requires refactoring
+
+  }
+  TCounterManager = class(TComponent)
   private
   {Current Session}
     FBkGndResponses : integer;
@@ -347,7 +352,7 @@ begin
   FTrialStmResponses := 0;
 end;
 
-//cada Trial.Consequence pode produzir um 'acerto' ou um 'erro' (uTrialMTS e uTrialSimpl);
+//cada Trial.Consequence pode produzir um 'acerto' ou um 'erro';
 //TBlc.TrialTerminate, TCounterManager.Hit, TCounterManager.NotCorrection,
 //permitem definir quando incrementar um acerto tendo como base os valores dos contadores:
 //FVirtualTrialValue, FVirtualTrialLoop, FVirtualHitLoop e FVirtualTrial

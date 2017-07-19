@@ -16,7 +16,7 @@ interface
 uses LCLIntf, LCLType, Controls, Classes, SysUtils
 
     {$ifdef DEBUG}
-    , debug_logger
+    , Loggers.Debug
     {$endif}
     ;
 

@@ -15,7 +15,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, ExtCtrls, Forms, Controls, Graphics, Dialogs
-  , draw_methods
+  , Canvas.Helpers
   ;
 
 type

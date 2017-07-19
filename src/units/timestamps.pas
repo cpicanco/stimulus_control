@@ -7,7 +7,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit timestamps;
+unit Timestamps;
 
 {$mode objfpc}{$H+}
 
@@ -22,7 +22,7 @@ function TickCount : Extended;
 
 implementation
 
-uses timestamps_helpers;
+uses Timestamps.Helpers;
 
 function TimestampToStr(ATimestamp: Extended): string;
 begin

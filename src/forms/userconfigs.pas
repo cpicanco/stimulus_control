@@ -17,9 +17,9 @@ uses Classes, SysUtils, LazFileUtils, Forms, Controls,
      Graphics, Dialogs, ExtCtrls, types, StdCtrls,
      ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons, XMLPropStorage
 
-    , bass_player
-    , session
-    , config_session
+    , Audio.Bass_nonfree
+    , Session
+    , Session.Configuration
     , escriba
     ;
 
@@ -135,7 +135,7 @@ type
     FSession : TSession;
     FConfigs : TCfgSes;
     FAudioDevice : TBassAudioDevice;
-    FEscriba : TEscriba;
+    FEscriba : TEscriba deprecated 'Use Session.ConfigurationFile.TConfigurationFile instead.';
     //FGuiMain : TGuiMain;
     //FGuiBloc : TGuiBloc;
     function MeetCondition(aCol, aRow : integer): boolean;
@@ -159,7 +159,7 @@ implementation
 {$R *.lfm}
 
 uses background, strutils
-     , config_session_global_container
+     , Session.Configuration.GlobalContainer
      , userconfigs_trial_mirrored
      , userconfigs_feature_positive
      , userconfigs_go_nogo
@@ -167,13 +167,13 @@ uses background, strutils
      , userconfigs_blocs
      , userconfigs_positions
      , userconfigs_get_matrix
-     , versioning_git
-     , versioning_lazarus
+     , Versioning.Git
+     , Versioning.Lazarus
      , constants
-     , draw_methods
-     , config_session_guiutils
+     , Canvas.Helpers
+     , GUI.Helpers
      {$ifdef DEBUG}
-     , debug_logger
+     , Loggers.Debug
      {$endif}
      ;
 
@@ -821,7 +821,7 @@ begin
               with T do
                 begin
                   Id := aTrial + 1;
-                  Kind := T_FPE;
+                  Kind := T_FPFN;
                   NumComp := GetNumComp;
                   Name := StringGrid1.Cells[1, aTrial + 1] + #32 + IntToStr(Id);
 

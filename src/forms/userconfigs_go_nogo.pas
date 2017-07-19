@@ -15,7 +15,7 @@ interface
 
 uses LCLIntf, LCLType, Classes, SysUtils, Forms, Controls, Graphics,
      Dialogs, ExtCtrls, StdCtrls, Spin, ActnList, ExtDlgs, Grids, XMLPropStorage
-     , response_key
+     , Controls.Stimuli.Key
      ;
 
 type
@@ -87,7 +87,7 @@ implementation
 
 {$R *.lfm}
 
-uses LazFileUtils, config_session_fileutils, constants;
+uses LazFileUtils, Session.ConfigurationFile, constants;
 
 { TFormGo_NoGo }
 

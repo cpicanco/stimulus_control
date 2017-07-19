@@ -15,8 +15,8 @@ interface
 
 uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
      Dialogs, ExtCtrls, StdCtrls, Spin, ActnList
-     , grid_helpers
-     , draw_methods
+     , GUI.Helpers.Grids
+     , Canvas.Helpers
      ;
 
 type

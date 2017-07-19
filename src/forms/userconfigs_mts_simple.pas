@@ -16,8 +16,8 @@ interface
 uses
   Classes, SysUtils, FileUtil, IDEWindowIntf, Forms, Controls, Graphics,
   Dialogs, ExtCtrls, StdCtrls, Spin, Grids, XMLPropStorage
-  , config_session_gui_comparison
-  , response_key
+  , GUI.Controls.KeySettings
+  , Controls.Stimuli.Key
   ;
 
 type
@@ -95,7 +95,7 @@ implementation
 
 {$R *.lfm}
 
-uses constants, config_session_fileutils, LazFileUtils;
+uses constants, Session.ConfigurationFile, LazFileUtils;
 
 { TSimpleMTSTrial }
 

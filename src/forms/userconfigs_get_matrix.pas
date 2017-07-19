@@ -16,7 +16,7 @@ interface
 uses LCLIntf, LCLType, SysUtils, Variants, Classes, Graphics,
      Controls, Forms, Dialogs, StdCtrls, ExtCtrls, Menus, XMLPropStorage
 
-     , criatore
+     , GUI.Controls.PositionsGrid
      , constants
      ;
 

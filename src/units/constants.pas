@@ -196,7 +196,7 @@ const
   T_MSQ = 'MSQ';
   T_DZT = 'DZT';
   T_CLB = 'CLB';
-  T_FPE = 'FPE';
+  T_FPFN = 'FPFN';
   T_MRD = 'MRD';
   T_MSG = 'MSG';
   T_MTS = 'MTS';

@@ -7,7 +7,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit session;
+unit Session;
 
 {$mode objfpc}{$H+}
 
@@ -16,14 +16,14 @@ interface
 uses Classes, Controls, SysUtils, LCLIntf, FileUtil
      //,dialogs
      , constants
-     , bass_player
-     , config_session
+     , Audio.Bass_nonfree
+     , Session.Configuration
      , countermanager
-     , blocs
+     , Session.Blocs
      {$IFNDEF NO_LIBZMQ}
-     , pupil_communication
+     , ZMQ.PupilCommunication
      {$ENDIF}
-     , timestamps
+     , Timestamps
      ;
 
 type
@@ -106,9 +106,9 @@ type
 implementation
 
 uses
-  data_logger
+  Loggers.Reports
 {$ifdef DEBUG}
-  , debug_logger
+  , Loggers.Debug
 {$endif}
   ;
 
