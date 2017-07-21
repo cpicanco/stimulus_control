@@ -15,7 +15,7 @@ interface
 
 uses Classes, SysUtils, LazFileUtils, Forms, Controls,
      Graphics, Dialogs, ExtCtrls, types, StdCtrls,
-     ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons, XMLPropStorage
+     ComCtrls, Spin, ExtDlgs, Grids, Menus, Buttons, XMLPropStorage, LCLTranslator
 
     , Audio.Bass_nonfree
     , Session
@@ -46,6 +46,7 @@ type
     ComboBoxFillTargetColumn: TComboBox;
     ComboBoxSessionType: TComboBox;
     ComboBoxBlocCounter: TComboBox;
+    ComboBoxLanguage: TComboBox;
     EditTargetSession: TEdit;
     EditParticipant: TEdit;
     EditBlocName: TEdit;
@@ -55,6 +56,7 @@ type
     gbRepetitionsBlocks: TGroupBox;
     gbTrialGroup: TGroupBox;
     Image1: TImage;
+    LabelLanguage: TLabel;
     LabelTargetSession: TLabel;
     LabelParticipant: TLabel;
     LabelSessionName: TLabel;
@@ -113,6 +115,7 @@ type
     procedure chkShowRepetitionsChange(Sender: TObject);
     procedure chkUseMediaChange(Sender: TObject);
     procedure ComboBoxGridTypeChange(Sender: TObject);
+    procedure ComboBoxLanguageChange(Sender: TObject);
     procedure EditBlocChainingPathDblClick(Sender: TObject);
     procedure EditBlocChainingPathEditingDone(Sender: TObject);
     procedure EditTargetSessionDblClick(Sender: TObject);
@@ -294,6 +297,7 @@ begin
         // todo: Load stringgrid objects
       end;
   end;
+  ComboBoxLanguageChange(Self);
   ResetRepetionMatrix;
 end;
 
@@ -547,7 +551,7 @@ begin
       ResetRepetionMatrix;
       CheckRepetitionCol(FLastFocusedCol);
     end
-  else ShowMessage('Escolha o alvo da randomização clicando sobre uma célula de uma coluna.');
+  else ShowMessage(rsMessChooseRandomzieTargetCol);
 end;
 
 procedure TFormUserConfig.btnCheckClick(Sender: TObject);
@@ -890,7 +894,7 @@ begin
           end
         else
           begin
-            ShowMessage('Não foi possível continuar, pois a tabela de tentativas está vazia.');
+            ShowMessage(rsMessCantContinueTableIsEmpty);
             Exit;
           end;
         Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
@@ -974,6 +978,47 @@ begin
         StringGrid1.Hint := rsHintBlocsAvailableRightClick;
       end;
     end;
+end;
+
+procedure TFormUserConfig.ComboBoxLanguageChange(Sender: TObject);
+begin
+  case ComboBoxLanguage.ItemIndex of
+    0 : SetDefaultLang('pt-br');
+    1 : SetDefaultLang('en');
+  end;
+  ComboBoxLanguage.Items[0] := rsLanguagePTBR;
+  ComboBoxLanguage.Items[1] := rsLanguageEN;
+
+  ComboBoxGridType.Items[0] := rsComboGridTypeEyeOrientationTask;
+  ComboBoxGridType.Items[1] := rsComboGridTypeFPE;
+  ComboBoxGridType.Items[2] := rsComboGridTypeGONOGO;
+  ComboBoxGridType.Items[3] := rsComboGridTypeSD;
+  ComboBoxGridType.Items[4] := rsComboGridTypeCD;
+  ComboBoxGridType.Items[5] := rsComboGridTypeBlocChain;
+
+  ComboBoxRandomize.Items[0] := rsComboBoxRandomizeTrialOrder;
+  ComboBoxRandomize.Items[1] := rsComboBoxRandomizeTrialOrderConstraints;
+  ComboBoxRandomize.Items[2] := rsComboBoxRandomizeResponses;
+
+  ComboBoxBlocCounter.Items[0] := rsComboBoxBlocCounterNone;
+  ComboBoxBlocCounter.Items[1] := rsComboBoxBlocCounterShowHitMiss;
+
+  LabelBlocName.Caption := rsBlocName;
+  LabelBlocCrtHitPorcentage.Caption := rsBlocCrtHitPorcentage;
+  LabelBlocCrtConsecutiveHit.Caption := rsBlocCrtConsecutiveHit;
+  LabelBlocMaxRepetition.Caption := rsBlocMaxBlcRepetition;
+  LabelBlocITI.Caption := rsBlocITI;
+  LabelBlocBkGnd.Caption := rsBlocBkGnd;
+  LabelBlocCounter.Caption := rsBlocCounter;
+  LabelBlocVirtualTrial.Caption := rsBlocVirtualTrialValue;
+  LabelBlocMaxCorrection.Caption := rsBlocMaxCorrection;
+  case ComboBoxGridType.ItemIndex of
+    -1..0: SetGridHeader(StringGrid1,rsFillTypeAxes);
+    1: SetGridHeader(StringGrid1,rsFillTypeMatriz);
+    2: SetGridHeader(StringGrid1,rsFillTypeGoNoGo);
+    3..4: SetGridHeader(StringGrid1,rsFillTypeMTS);
+    5: SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
+  end;
 end;
 
 procedure TFormUserConfig.EditBlocChainingPathDblClick(Sender: TObject);
@@ -1240,18 +1285,6 @@ begin
   OpenDialog1.InitialDir := LInitialDirectory;
   SaveDialog1.InitialDir:=LInitialDirectory;
   SelectDirectoryDialog1.InitialDir := LInitialDirectory;
-
-  LabelBlocName.Caption := rsBlocName;
-  LabelBlocCrtHitPorcentage.Caption := rsBlocCrtHitPorcentage;
-  LabelBlocCrtConsecutiveHit.Caption := rsBlocCrtConsecutiveHit;
-  LabelBlocMaxRepetition.Caption := rsBlocMaxBlcRepetition;
-  LabelBlocITI.Caption := rsBlocITI;
-  LabelBlocBkGnd.Caption := rsBlocBkGnd;
-  LabelBlocCounter.Caption := rsBlocCounter;
-  LabelBlocVirtualTrial.Caption := rsBlocVirtualTrialValue;
-  LabelBlocMaxCorrection.Caption := rsBlocMaxCorrection;
-  //LabelBlocName.Caption := rsBlocNextBlocOnCriteria;
-  //LabelBlocName.Caption := rsBlocNextBlocOnNotCriteria;
 
   FAudioDevice := TBassAudioDevice.Create(WindowHandle);
   FrmBackground := TBackground.Create(Application);

@@ -253,7 +253,7 @@ begin
               FPopupMenuBlocs.Items[s].Add(FSessions[s].Blocs[i].MenuItem);
             end;
             M := TMenuItem.Create(FPopupMenuBlocs);
-            M.Caption:='Blocos';
+            M.Caption:=rsCaptionBlocs;
             M.Enabled:=False;
             FPopupMenuBlocs.Items[s].Insert(0,M);
             Inc(s);
@@ -261,7 +261,7 @@ begin
      LConfigurationFile.Free;
     end;
     M := TMenuItem.Create(FPopupMenuBlocs);
-    M.Caption:='Sessões';
+    M.Caption:=rsCaptionSessions;
     M.Enabled:=False;
     FPopupMenuBlocs.Items.Insert(0,M);
 end;
@@ -388,7 +388,7 @@ var
             else
               // end bloc
               if n > RowCount-1 then
-                Result := 'FIM';
+                Result := rsCaptionNodeEnd;
           end;
       end;
   end;
@@ -403,7 +403,7 @@ begin
         LTarget1 := TargetEdge(2);
         LTarget2 := TargetEdge(3);
         if LRow = 1 then
-          LvlGraphControl1.Graph.GetEdge('INÍCIO', LSource, True);
+          LvlGraphControl1.Graph.GetEdge(rsCaptionNodeBegin, LSource, True);
         if (LTarget1 <> '') and (LTarget2 <> '') then
           begin
             LvlGraphControl1.Graph.GetEdge(LSource, LTarget1, True);

@@ -114,6 +114,10 @@ type
 var
   FormStimuliSets: TFormStimuliSets;
 
+resourcestring
+  RSStimuliSetCellTrialsStimuli = 'Tent/Stm';
+  RSDEFAULT_STM_NAME = 'Estímulo.bmp';
+
 implementation
 
 {$R *.lfm}
@@ -315,7 +319,7 @@ begin
       OnSelectCell := strngrd1SelectCell;
       OnKeyPress := strngrd1KeyPress;
       Parent := tbShow;
-      Cells[0, 0] := 'Tent\Stm';
+      Cells[0, 0] := RSStimuliSetCellTrialsStimuli;
       Width := Parent.Width - Left;
       Height := Parent.Height - Top;
     end;
@@ -605,7 +609,7 @@ var i, j, blc : Integer;
   begin
     Escriba.Blcs[b].Trials[i].SList.Add(_Delayed + '=' + '-1');
     Escriba.Blcs[b].Trials[i].SList.Add(_Delay + '=' + '0');
-    Escriba.Blcs[b].Trials[i].SList.Add(_Samp + _cStm + '=' + 'Escolher');
+    Escriba.Blcs[b].Trials[i].SList.Add(_Samp + _cStm + '=' + RSDEFAULT_STM_NAME);
     Escriba.Blcs[b].Trials[i].SList.Add(_Samp + _cBnd + '=' + '1');
     Escriba.Blcs[b].Trials[i].SList.Add(_Samp + _cSch + '=' + T_CRF);
     Escriba.Blcs[b].Trials[i].SList.Add(_Samp + _cMsg + '=' + 'AUTO');
@@ -615,8 +619,8 @@ var i, j, blc : Integer;
   procedure SaveStandardStmParameters(b, i, j: integer);
   begin
     Escriba.Blcs[b].Trials[i].SList.Add (_Comp + IntToStr(j) + _cBnd  + '=' + IntToStr(j));
-    Escriba.Blcs[b].Trials[i].SList.Add (_Comp + IntToStr(j) + _cStm  + '=' + 'Escolher 0 255');
-    Escriba.Blcs[b].Trials[i].SList.Add (_Comp + IntToStr(j) + _cIET  + '=' + 'Escolher 0 255');
+    Escriba.Blcs[b].Trials[i].SList.Add (_Comp + IntToStr(j) + _cStm  + '=' + RSDEFAULT_STM_NAME+' 0 255');
+    Escriba.Blcs[b].Trials[i].SList.Add (_Comp + IntToStr(j) + _cIET  + '=' + RSDEFAULT_STM_NAME+' 0 255');
     Escriba.Blcs[b].Trials[i].SList.Add (_Comp + IntToStr(j) + _cCsq  + '=' + '0');
     Escriba.Blcs[b].Trials[i].SList.Add (_Comp + IntToStr(j) + _cUsb  + '=' + '0');
     Escriba.Blcs[b].Trials[i].SList.Add (_Comp + IntToStr(j) + _cSch  + '=' + T_CRF);

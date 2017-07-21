@@ -93,7 +93,7 @@ uses LazFileUtils, Session.ConfigurationFile, constants;
 
 procedure TFormGo_NoGo.FormCreate(Sender: TObject);
 begin
-  ButtonStimuli.Caption := 'Adicionar'+LineEnding+'Estímulos';
+  ButtonStimuli.Caption := rsButtonAdd+LineEnding+rsStimuli;
   Canvas.Pen.Width:=10;
   OpenPictureDialog.InitialDir := ExtractFilePath(Application.ExeName);
   FCurrentTrial := 0;
@@ -212,13 +212,13 @@ var
 begin
   LPositive := TStringList.Create;
   LNegative := TStringList.Create;
-  OpenPictureDialog.Title:='Escolhas as figuras positivas';
+  OpenPictureDialog.Title:=rsWindowTitleChoosePositive;
   if OpenPictureDialog.Execute then
     if OpenPictureDialog.Files.Count > 0 then
       for i := 0 to (OpenPictureDialog.Files.Count - 1) do
         LPositive.Append(OpenPictureDialog.Files.Strings[i]);
 
-  OpenPictureDialog.Title:='Escolhas as figuras negativas';
+  OpenPictureDialog.Title:=rsWindowTitleChooseNegative;
   if OpenPictureDialog.Execute then
     if OpenPictureDialog.Files.Count > 0 then
       for i := 0 to (OpenPictureDialog.Files.Count - 1) do

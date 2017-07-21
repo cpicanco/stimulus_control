@@ -184,7 +184,7 @@ begin
             if FSession.Trial[FBloc.ID, i].Kind = T_MTS then
               StringGrid.Cells[1,i] := '1'
             else
-              StringGrid.Cells[1,i] := 'NA';
+              StringGrid.Cells[1,i] := RSNA;
         end;
 
       i:= seBeginAt.Value - 1;
@@ -216,7 +216,7 @@ begin
             if FSession.Trial[FBloc.ID, i].Kind = T_MTS then
               StringGrid.Cells[1,i] := '1'
             else
-              StringGrid.Cells[1,i] := 'NA';
+              StringGrid.Cells[1,i] := RSNA;
         end;
 
       LSquareID := 0;
@@ -309,13 +309,13 @@ begin
       Clear;
       ColCount := FPositions.Count + 2;   // +1 for fixed col, +1 for MTS samples
       RowCount := FBloc.NumTrials + 1;   //+1 for fixed row
-      Cells[0,0] := 'Tent\Stm';
+      Cells[0,0] := RS_CELL_TRIALS_STM;
 
       // write col names
       for j := 1 to ColCount- 1 do
         begin
           if j = 1 then
-            Cells[j, 0] := 'Modelo';
+            Cells[j, 0] := RS_COL_SAMPLE;
 
           if j > 1 then
             Cells[j, 0] := 'C' + IntToStr(j - 1);
@@ -333,13 +333,13 @@ begin
               if FSession.Trial[FBloc.ID, i].Kind = T_MTS then
                 Cells[j, i] := BndCodeToPositionName(FSession.ReadTrialString(FBloc.ID,i,_Samp+_cBnd))
               else
-                Cells[j, i] := 'NA';
+                Cells[j, i] := RSNA;
 
             if j > 1 then
               if j-1 <= FSession.ReadTrialInteger(FBloc.ID,i,_NumComp) then
                 Cells[j, i] := BndCodeToPositionName(FSession.ReadTrialString(FBloc.ID,i,_Comp+IntToStr(j-1)+_cBnd))
               else
-                Cells[j, i] := 'NA';
+                Cells[j, i] := RSNA;
 
             if Cells[j, i] = '' then
               Cells[j, i] := '1';
@@ -355,7 +355,7 @@ begin
   FBloc := FSession.Bloc[ABloc];
   LabelCurrentBloc.Caption := IntToStr(FBloc.ID) + ' / ' + IntToStr(FSession.BlocCount);
   if FBloc.Name = '' then
-    Caption := 'Bloco - ' + IntToStr(FBloc.ID)
+    Caption := rsBlocs + ' - ' + IntToStr(FBloc.ID)
   else
     Caption := FBloc.Name;
 
@@ -380,7 +380,7 @@ begin
   FSession.CacheUpdates := True;
   FBloc := FSession.Bloc[ABlc];
   if FBloc.Name = '' then
-    Caption := 'Bloco - ' + IntToStr(FBloc.ID)
+    Caption := rsBlocs + ' - ' + IntToStr(FBloc.ID)
   else
     Caption := FBloc.Name;
 
@@ -409,7 +409,7 @@ begin
   if FSession.BlocCount > 0 then
     LoadBloc(1)
   else
-    ShowMessage('Nenhum Bloco foi encontrado.');
+    ShowMessage(rsMessNoBlocFound);
 end;
 
 procedure TFormRandomizePositions.WriteFixedSamplePosition(APosition: string);
@@ -751,7 +751,7 @@ var j : Integer;
   end;
 begin
   with TStringGrid(Sender) do
-    if Cells[ACol,ARow] = 'NA' then
+    if Cells[ACol,ARow] = rsNA then
       PaintBlack
     else
       begin

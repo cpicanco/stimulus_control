@@ -1,0 +1,833 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: en\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Rafael Picanço <cpicanco42@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.10\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
+
+#: constants.exceptionconfigurationnotallowed
+msgid "A configuração não é permitida."
+msgstr "This option is not allowed."
+
+#: constants.exceptionnoschedulefound
+msgid "Nenhum esquema de reforço encontrado, revise o arquivo de configuração."
+msgstr "No reinforcement schedule was found, review your configuration file."
+
+#: constants.messlevel_01
+msgctxt "constants.messlevel_01"
+msgid "Sessão 1"
+msgstr "Session 1"
+
+#: constants.messlevel_04_m
+msgctxt "constants.messlevel_04_m"
+msgid "Mensagem"
+msgstr "Message"
+
+#: constants.messloading
+msgid "Carregando..."
+msgstr "Loading..."
+
+#: constants.messready
+msgid "Pronto."
+msgstr "Ready."
+
+#: constants.messroot
+msgid "Estrutura"
+msgstr "Structure"
+
+#: constants.messucfgsessionmainerror
+msgid "Valor não encontrado: Main, Name or NumBlc."
+msgstr "Value not found: Main, Name or NumBlc."
+
+#: constants.rsangle
+msgid "Ângulo"
+msgstr "Angle"
+
+#: constants.rsblocaddress
+msgid "Endereço"
+msgstr "Address"
+
+#: constants.rsblocbkgnd
+msgid "Cor do Fundo"
+msgstr "Background color"
+
+#: constants.rsbloccounter
+msgid "Mostrar contador ao final?"
+msgstr "Show counter at the end?"
+
+#: constants.rsbloccrtconsecutivehit
+msgid "Critério (acertos consecutivos)"
+msgstr "Criterium (consecutive hits)"
+
+#: constants.rsbloccrthitporcentage
+msgid "Critério (% de acertos)"
+msgstr "Criterium (hit %)"
+
+#: constants.rsblociti
+msgid "Intervalo entre tentativas"
+msgstr "Inter Trial Interval"
+
+#: constants.rsblocmaxblcrepetition
+msgid "Número máximo de repetições seguidas do bloco"
+msgstr "Max number of successive bloc repetitions"
+
+#: constants.rsblocmaxcorrection
+msgid "Número máximo de correções por tentativa"
+msgstr "Max number of trial corrections"
+
+#: constants.rsblocname
+msgid "Nome"
+msgstr "Name"
+
+#: constants.rsblocnextbloconcriteria
+msgid "Bloco seguinte se critério for atingido"
+msgstr "Next bloc if criterium"
+
+#: constants.rsblocnextbloconnotcriteria
+msgid "Bloco seguinte se critério não for atingido"
+msgstr "Next bloc if not criterium"
+
+#: constants.rsblocs
+msgid "Bloco"
+msgstr "Bloc"
+
+#: constants.rsblocvirtualtrialvalue
+msgid "Quantas tarefas contabilizam uma tentativa?"
+msgstr "How many tasks counts one trial?"
+
+#: constants.rsbuttonadd
+msgid "Adicionar"
+msgstr "Add"
+
+#: constants.rscaptionblocs
+msgctxt "constants.rscaptionblocs"
+msgid "Blocos"
+msgstr "Blocs"
+
+#: constants.rscaptionnodebegin
+msgid "INÍCIO"
+msgstr "START"
+
+#: constants.rscaptionnodeend
+msgid "FIM"
+msgstr "END"
+
+#: constants.rscaptionsessions
+msgid "Sessões"
+msgstr "Sessions"
+
+#: constants.rscolor
+msgid "Cor"
+msgstr "Color"
+
+#: constants.rscomboboxbloccounternone
+msgctxt "constants.rscomboboxbloccounternone"
+msgid "Não"
+msgstr "No"
+
+#: constants.rscomboboxbloccountershowhitmiss
+msgid "Mostrar número de acertos e erros"
+msgstr "Show hit and miss counts"
+
+#: constants.rscomboboxrandomizeresponses
+msgid "Respostas"
+msgstr "Responses"
+
+#: constants.rscomboboxrandomizetrialorder
+msgctxt "constants.rscomboboxrandomizetrialorder"
+msgid "Ordem das tentativas"
+msgstr "Trial ordering"
+
+#: constants.rscomboboxrandomizetrialorderconstraints
+msgid "Ordem das tentativas (com restrições)"
+msgstr "Trial order (with restrictions)"
+
+#: constants.rscombogridtypeblocchain
+msgid "Encadeamento de blocos"
+msgstr "Bloc chaining"
+
+#: constants.rscombogridtypecd
+msgid "Discriminações simultâneas (condicional, MTS)"
+msgstr "Simultaneous Discriminations (MTS)"
+
+#: constants.rscombogridtypeeyeorientationtask
+msgctxt "constants.rscombogridtypeeyeorientationtask"
+msgid "Tarefa de orientação visual"
+msgstr "Eye orientation task"
+
+#: constants.rscombogridtypefpe
+msgid "Discriminações sucessivas (feature positive effect)"
+msgstr "Successive discriminations (feature positive effect)"
+
+#: constants.rscombogridtypegonogo
+msgid "Discriminações sucessivas (go/no-go)"
+msgstr "Successive discriminations (go/no-go)"
+
+#: constants.rscombogridtypesd
+msgid "Discriminações simultâneas (simples)"
+msgstr "Simultaneos discriminations (simple)"
+
+#: constants.rscomparison
+msgid "C"
+msgstr "C"
+
+#: constants.rsconsequence
+msgid "Consequência"
+msgstr "Consequence"
+
+#: constants.rscontingency
+msgid "Contingência"
+msgstr "Contingency"
+
+#: constants.rscount
+msgid "Contar"
+msgstr "Count"
+
+#: constants.rsdefaddress
+msgid "127.0.1.1:5020"
+msgstr "127.0.1.1:5020"
+
+#: constants.rsdefblc
+msgid "Bloco 1"
+msgstr "Bloc 1"
+
+#: constants.rsdefname
+msgid "No name"
+msgstr "No name"
+
+#: constants.rsdefsubject
+msgid "No subject"
+msgstr "No subject"
+
+#: constants.rsdelay
+msgid "Atraso"
+msgstr "Delay"
+
+#: constants.rsduration
+msgid "Duração"
+msgstr "Duration"
+
+#: constants.rsendsession
+msgid "Fim."
+msgstr "The end."
+
+#: constants.rsexpectedresponse
+msgid "Resposta"
+msgstr "Response"
+
+#: constants.rsfilename
+msgid "Nome do arquivo"
+msgstr "Filename"
+
+#: constants.rsfilltypeaxes
+msgid "Eixos"
+msgstr "Axis"
+
+#: constants.rsfilltypeblocchaining
+msgid "Encadear Blocos"
+msgstr "Chaining Blocs"
+
+#: constants.rsfilltypegonogo
+msgid "Go/No-Go"
+msgstr "Go/No-Go"
+
+#: constants.rsfilltypematriz
+msgid "FP/FN"
+msgstr "FP/FN"
+
+#: constants.rsfilltypemts
+msgid "MTS e Simples"
+msgstr "MTS and Simple"
+
+#: constants.rshintblocsavailablerightclick
+msgid "Clique com o botão direito e selecione os blocos disponíveis"
+msgstr "Left click to select from available blocs"
+
+#: constants.rslanguageen
+msgid "Inglês"
+msgstr "English"
+
+#: constants.rslanguageptbr
+msgid "Português (Brasil)"
+msgstr "Portuguese (Brazil)"
+
+#: constants.rslimitedhold
+msgid "Tempo/Estímulo"
+msgstr "Time/Stimulus"
+
+#: constants.rsmediasound
+msgid "Som"
+msgstr "Sound"
+
+#: constants.rsmesscantcontinuetableisempty
+msgid "Não foi possível continuar, pois a tabela de tentativas está vazia."
+msgstr "Can't proceed because trial table is empty."
+
+#: constants.rsmesschooserandomzietargetcol
+msgid "Escolha o alvo da randomização clicando sobre uma célula de uma coluna."
+msgstr "Left click into a cell to choose a target column for randomization."
+
+#: constants.rsmessnoblocfound
+msgid "Nenhum Bloco foi encontrado."
+msgstr "No bloc was found."
+
+#: constants.rsmtsrelation
+msgid "Relação"
+msgstr "Relation"
+
+#: constants.rsna
+msgid "NA"
+msgstr "NA"
+
+#: constants.rsnegative
+msgid "Negativa"
+msgstr "Negative"
+
+#: constants.rsnexttrial
+msgid "Tentativa Seguinte"
+msgstr "Next Trial"
+
+#: constants.rsposition
+msgid "Bnd"
+msgstr "Background"
+
+#: constants.rspositive
+msgid "Positiva"
+msgstr "Positive"
+
+#: constants.rsrandomizegrouptrial
+msgid "Randomizar em grupos ordem das tentativas"
+msgstr "Randomize trials inside groups"
+
+#: constants.rsrandomizeresponses
+msgid "Randomizar respostas"
+msgstr "Randomize response"
+
+#: constants.rsrandomizetrials
+msgid "Randomizar ordem das tentativas"
+msgstr "Randomize trial order"
+
+#: constants.rsrandomizetrialswithconstraints
+msgid "Randomizar ordem das tentativas com restrições."
+msgstr "Randomize trial order with constraints"
+
+#: constants.rsreportblocid
+msgid "Bloco.ID"
+msgstr "Bloc.ID"
+
+#: constants.rsreportblocname
+msgid "Bloco.Nome"
+msgstr "Bloc.Name"
+
+#: constants.rsreportcsqplp
+msgid "C.PLP"
+msgstr "C.PLP"
+
+#: constants.rsreportcsqres
+msgid "C.Resultado"
+msgstr "C.Result"
+
+#: constants.rsreportcsqusb
+msgid "C.USB"
+msgstr "C.USB"
+
+#: constants.rsreportevent
+msgid "Evento"
+msgstr "Event"
+
+#: constants.rsreportiti
+msgid "IET"
+msgstr "ITI"
+
+#: constants.rsreportitibeg
+msgid "IET.Inicio"
+msgstr "ITI.Begin"
+
+#: constants.rsreportitiend
+msgid "IET.Fim"
+msgstr "ITI.End"
+
+#: constants.rsreportmsgtxt
+msgctxt "constants.rsreportmsgtxt"
+msgid "Mensagem"
+msgstr "Message"
+
+#: constants.rsreportrspcmp
+msgid "R.Comparacao.Escolhida"
+msgstr "R.Comparison.Chosen"
+
+#: constants.rsreportrspcmpfrq
+msgid "R.Comparacoes.Frequencia"
+msgstr "R.Comparison.Frequency"
+
+#: constants.rsreportrspcmplat
+msgid "R.Comparacao.Escolhida.Latencia"
+msgstr "R.Comparison.Chosen.Latency"
+
+#: constants.rsreportrspexp
+msgid "R.Prevista"
+msgstr "R.Target"
+
+#: constants.rsreportrspfrq
+msgid "R.Frequencia"
+msgstr "R.Frequency"
+
+#: constants.rsreportrsplat
+msgid "R.Latencia"
+msgstr "R.Latency"
+
+#: constants.rsreportrsplft
+msgid "Lft.Cmp."
+msgstr "Left.Comparison"
+
+#: constants.rsreportrspmodfrq
+msgid "R.Modelo.Frequencia"
+msgstr "R.Sample.Frequency"
+
+#: constants.rsreportrspmodlat
+msgid "R.Modelo.Latencia"
+msgstr "R.Sample.Latency"
+
+#: constants.rsreportrsptop
+msgid "Top.Cmp."
+msgstr "Top.Comparison"
+
+#: constants.rsreportstmbeg
+msgid "S.Inicio"
+msgstr "S.Begin"
+
+#: constants.rsreportstmcmp
+msgid "S.Comparacoes"
+msgstr "S.Comparisons"
+
+#: constants.rsreportstmcmpbeg
+msgid "S.Comparacoes.Inicio"
+msgstr "S.Comparisons.Begin"
+
+#: constants.rsreportstmcmpdur
+msgid "S.Comparacoes.Duracao"
+msgstr "S.Comparisons.Duration"
+
+#: constants.rsreportstmcmpend
+msgid "S.Comparacoes.Fim"
+msgstr "S.Comparisons.End"
+
+#: constants.rsreportstmdur
+msgid "S.Duracao"
+msgstr "S.Duration"
+
+#: constants.rsreportstmend
+msgid "S.Fim"
+msgstr "S.End"
+
+#: constants.rsreportstmmod
+msgid "S.Modelo"
+msgstr "S.Sample"
+
+#: constants.rsreportstmmodbeg
+msgid "S.Modelo.Inicio"
+msgstr "S.Sample.Begin"
+
+#: constants.rsreportstmmoddel
+msgid "S.Modelo.Atraso"
+msgstr "S.Sample.Delay"
+
+#: constants.rsreportstmmoddur
+msgid "S.Modelo.Duracao"
+msgstr "S.Sample.Duration"
+
+#: constants.rsreportstmmodend
+msgid "S.Modelo.Fim"
+msgstr "S.Sample.End"
+
+#: constants.rsreporttime
+msgid "Tempo"
+msgstr "Time"
+
+#: constants.rsreporttrialid
+msgid "Tentativa.ID"
+msgstr "Trial.ID"
+
+#: constants.rsreporttrialname
+msgid "Tentativa.Nome"
+msgstr "Trial.Name"
+
+#: constants.rsreporttrialno
+msgid "Tentativa.Contador"
+msgstr "Trial.Count"
+
+#: constants.rssample
+msgctxt "constants.rssample"
+msgid "Modelo"
+msgstr "Sample"
+
+#: constants.rsschedule
+msgctxt "constants.rsschedule"
+msgid "Esquema"
+msgstr "Schedule"
+
+#: constants.rssize
+msgid "Tamanho"
+msgstr "Size"
+
+#: constants.rsstimuli
+msgctxt "constants.rsstimuli"
+msgid "Estímulos"
+msgstr "Stimuli"
+
+#: constants.rsstimulus
+msgid "Figura"
+msgstr "Image"
+
+#: constants.rsstyle
+msgid "Estilo"
+msgstr "Style"
+
+#: constants.rstimeout
+msgid "TimeOut"
+msgstr "Time-Out"
+
+#: constants.rstrials
+msgctxt "constants.rstrials"
+msgid "Tentativas"
+msgstr "Trials"
+
+#: constants.rsusbport
+msgid "Porta USB"
+msgstr "USB"
+
+#: constants.rswindowtitlechoosenegative
+msgid "Escolhas as figuras negativas"
+msgstr "Negative images"
+
+#: constants.rswindowtitlechoosepositive
+msgid "Escolhas as figuras positivas"
+msgstr "Positive images"
+
+#: constants.rs_cell_trials_stm
+msgid "Tent\\Stm"
+msgstr "Trial\\Stm"
+
+#: constants.rs_col_sample
+msgctxt "constants.rs_col_sample"
+msgid "Modelo"
+msgstr "Sample"
+
+#: controls.trials.abstract.session_canceled
+msgid "(Sessão cancelada)"
+msgstr "(Session Canceled)"
+
+#: controls.trials.textmessage.messageprompt1
+msgid "Pressione  o botão  para avançar."
+msgstr "Press space to continue."
+
+#: session.hbegin_time
+msgid "Início:"
+msgstr "Begin:"
+
+#: session.hend_time
+msgid "Término:"
+msgstr "End:"
+
+#: session.hfirst_timestamp
+msgid "Primeira_Timestamp:"
+msgstr "First_Timestamp:"
+
+#: session.hsession_name
+msgid "Nome_Sessão:"
+msgstr "Session_Name:"
+
+#: session.hsubject_name
+msgid "Nome_Sujeito:"
+msgstr "Subject_Name:"
+
+#: session.htest_mode
+msgid "(Modo de Teste)"
+msgstr "(Test Mode)"
+
+#: tformuserconfig.btnexportstimulus.caption
+msgid "Exportar estímulo"
+msgstr "Export Stimuli"
+
+#: tformuserconfig.btnfillcondition.caption
+msgid "Preencher"
+msgstr "Fill"
+
+#: tformuserconfig.btnfillcondition.hint
+msgid ""
+"Clique com o botão direito e selecione o tipo de preenchimento da coluna "
+"selecionada"
+msgstr "Right click to select filling type of the target column."
+
+#: tformuserconfig.btngridtype.caption
+msgid "Configurar"
+msgstr "Configure"
+
+#: tformuserconfig.btngridtype.hint
+msgid "Abrir janela de configuração"
+msgstr "Open configurations"
+
+#: tformuserconfig.btnrandomize.caption
+msgid "Randomizar"
+msgstr "Randomize"
+
+#: tformuserconfig.btnrandomize.hint
+msgid "Randomizar elementos da tabela"
+msgstr "Randomize table elements"
+
+#: tformuserconfig.btnrun.caption
+msgid "Rodar"
+msgstr "Run"
+
+#: tformuserconfig.btnsave.caption
+msgctxt "tformuserconfig.btnsave.caption"
+msgid "Salvar"
+msgstr "Save"
+
+#: tformuserconfig.btntrialsdone.caption
+msgid "Escrever"
+msgstr "Write"
+
+#: tformuserconfig.buttonrandomizetargetsession.caption
+msgid "Randomizar posições"
+msgstr "Randomize positions"
+
+#: tformuserconfig.caption
+msgid "Configurar Sessão"
+msgstr "Configure Session"
+
+#: tformuserconfig.chkdrawtrialgroup.caption
+msgctxt "tformuserconfig.chkdrawtrialgroup.caption"
+msgid "Mostrar"
+msgstr "Show"
+
+#: tformuserconfig.chkplayonsecondmonitor.caption
+msgid "no Monitor 2"
+msgstr "in Monitor 2"
+
+#: tformuserconfig.chkpupilclient.caption
+msgid "Interface Pupil"
+msgstr "Pupil Interface"
+
+#: tformuserconfig.chkshowrepetitions.caption
+msgctxt "tformuserconfig.chkshowrepetitions.caption"
+msgid "Mostrar"
+msgstr "Show"
+
+#: tformuserconfig.chkshowrepetitions.hint
+msgid "Mostrar repetições na coluna selecionada."
+msgstr "Show repetitions in target column"
+
+#: tformuserconfig.comboboxbloccounter.text
+msgctxt "tformuserconfig.comboboxbloccounter.text"
+msgid "Não"
+msgstr "No"
+
+#: tformuserconfig.comboboxfilltargetcolumn.text
+msgid "todas as linhas"
+msgstr "all rows"
+
+#: tformuserconfig.comboboxgridtype.text
+msgctxt "tformuserconfig.comboboxgridtype.text"
+msgid "Tarefa de orientação visual"
+msgstr "Eye orientation task"
+
+#: tformuserconfig.comboboxrandomize.text
+msgctxt "tformuserconfig.comboboxrandomize.text"
+msgid "Ordem das tentativas"
+msgstr "Trial ordering"
+
+#: tformuserconfig.comboboxsessiontype.text
+msgid "independente de critérios"
+msgstr "independent of criteria"
+
+#: tformuserconfig.editblocchainingpath.texthint
+msgid "Clique duas vezes para escolher a pasta"
+msgstr "Double click to choose a folder"
+
+#: tformuserconfig.editblocname.texthint
+msgid "Clique para editar"
+msgstr "Left click to edit"
+
+#: tformuserconfig.editparticipant.text
+msgid "Participante 1"
+msgstr "Participant 1"
+
+#: tformuserconfig.editsessionname.text
+msgctxt "tformuserconfig.editsessionname.text"
+msgid "Sessão 1"
+msgstr "Session 1"
+
+#: tformuserconfig.edittargetsession.texthint
+msgid "Clique duas vezes para escolher a sessão alvo."
+msgstr "Double click to choose the target session."
+
+#: tformuserconfig.gbrepetitions.caption
+msgid "Repetições"
+msgstr "Repetitions"
+
+#: tformuserconfig.gbrepetitions.hint
+msgid "Permitir no máximo quantas repetições ao randomizar com restrições?"
+msgstr "When randomizing with constraints, allow how many repetitions?"
+
+#: tformuserconfig.gbrepetitionsblocks.caption
+msgid "Grupo de repetições"
+msgstr "Repetition group"
+
+#: tformuserconfig.gbrepetitionsblocks.hint
+msgid ""
+"Permitir no máximo quantos grupos de repetições ao randomizar com restrições?"
+msgstr "When randomizing with constraints, allow how many groups?"
+
+#: tformuserconfig.gbtrialgroup.caption
+msgid "Grupo de Tentativas"
+msgstr "Trial group"
+
+#: tformuserconfig.gbtrialgroup.hint
+msgid "Agrupar tentativas antes de randomizar? (Evita que os se misturem)"
+msgstr "Group trials before randomization? (Avoid mix them)"
+
+#: tformuserconfig.labelblocbkgnd.caption
+msgid "LabelBlocBkGnd"
+msgstr "LabelBlocBkGnd"
+
+#: tformuserconfig.labelblocchainingpath.caption
+msgid "Pasta com blocos de encadear"
+msgstr "Folder for chaining blocs"
+
+#: tformuserconfig.labelbloccounter.caption
+msgid "LabelBlocCounter"
+msgstr "LabelBlocCounter"
+
+#: tformuserconfig.labelbloccrtconsecutivehit.caption
+msgid "LabelBlocCrtConsecutiveHit"
+msgstr "LabelBlocCrtConsecutiveHit"
+
+#: tformuserconfig.labelbloccrthitporcentage.caption
+msgid "LabelBlocCrtHitPorcentage"
+msgstr "LabelBlocCrtHitPorcentage"
+
+#: tformuserconfig.labelblociti.caption
+msgid "LabelBlocITI"
+msgstr "LabelBlocITI"
+
+#: tformuserconfig.labelblocmaxcorrection.caption
+msgid "LabelBlocMaxCorrection"
+msgstr "LabelBlocMaxCorrection"
+
+#: tformuserconfig.labelblocmaxrepetition.caption
+msgid "LabelBlocMaxRepetition"
+msgstr "LabelBlocMaxRepetition"
+
+#: tformuserconfig.labelblocname.caption
+msgid "LabelBlocName"
+msgstr "LabelBlocName"
+
+#: tformuserconfig.labelblocvirtualtrial.caption
+msgid "LabelBlocVirtualTrial"
+msgstr "LabelBlocVirtualTrial"
+
+#: tformuserconfig.labellanguage.caption
+msgid "Idioma"
+msgstr "Language"
+
+#: tformuserconfig.labelparticipant.caption
+msgid "Nome do Participante"
+msgstr "Participant name"
+
+#: tformuserconfig.labelsessionname.caption
+msgid "Nome da Sessão"
+msgstr "Session name"
+
+#: tformuserconfig.labelsessiontype.caption
+msgid "Avançar blocos"
+msgstr "Pass blocs"
+
+#: tformuserconfig.labeltargetsession.caption
+msgid "Sessão alvo"
+msgstr "Target session"
+
+#: tformuserconfig.lefillvalue.editlabel.caption
+msgctxt "tformuserconfig.lefillvalue.editlabel.caption"
+msgid "Esquema"
+msgstr "Schedule"
+
+#: tformuserconfig.lefillvalue.text
+msgid "FT 20"
+msgstr "FT 20"
+
+#: tformuserconfig.seblockscount.hint
+msgctxt "tformuserconfig.seblockscount.hint"
+msgid "Blocos"
+msgstr "Blocs"
+
+#: tformuserconfig.stapptitle.caption
+msgid "Stimulus Control"
+msgstr "Stimulus Control"
+
+#: tformuserconfig.stversion.caption
+msgid "v0.0.0.0-0-0000000"
+msgstr "v0.0.0.0-0-0000000"
+
+#: tformuserconfig.tbblocs.caption
+msgctxt "tformuserconfig.tbblocs.caption"
+msgid "Blocos"
+msgstr "Blocs"
+
+#: tformuserconfig.tbgeneral.caption
+msgid "Geral"
+msgstr "General"
+
+#: tformuserconfig.tbsave.caption
+msgctxt "tformuserconfig.tbsave.caption"
+msgid "Salvar"
+msgstr "Save"
+
+#: tformuserconfig.tbstimuli.caption
+msgctxt "tformuserconfig.tbstimuli.caption"
+msgid "Estímulos"
+msgstr "Stimuli"
+
+#: tformuserconfig.tbtools.caption
+msgid "Ferramentas"
+msgstr "Tools"
+
+#: tformuserconfig.tbtrials.caption
+msgctxt "tformuserconfig.tbtrials.caption"
+msgid "Tentativas"
+msgstr "Trials"
+
+#: tformuserconfig.tbversion.caption
+msgid "Sobre o programa"
+msgstr "About"
+
+#: userconfigs_get_matrix.ccustomresdefleft
+msgid "1024"
+msgstr "1024"
+
+#: userconfigs_get_matrix.ccustomresdeftop
+msgid "768"
+msgstr "768"
+
+#: userconfigs_get_matrix.cmatrizdefault
+msgid "1"
+msgstr "1"
+
+#: userconfigs_get_matrix.csizedefault
+msgid "100"
+msgstr "100"
+
+#: zmq.pupilcommunication.error_not_implemented
+msgid "Commando Pupil não implementado:"
+msgstr "Pupil command not implemented:"
+
+#: zmq.pupilcommunication.error_unknown_command
+msgid "Commando Pupil desconhecido: "
+msgstr "Unknown pupil command:"

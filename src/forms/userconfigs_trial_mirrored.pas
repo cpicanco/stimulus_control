@@ -143,6 +143,8 @@ implementation
 
 {$R *.lfm}
 
+uses constants;
+
 { TBresenhamLineForm }
 
 procedure TBresenhamLineForm.FormPaint(Sender: TObject);
@@ -490,7 +492,7 @@ begin
                   end;
               else
                   begin
-                    Cells[0, Row] := 'NA';
+                    Cells[0, Row] := RSNA;
                   end;
 
             end;

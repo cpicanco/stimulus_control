@@ -274,8 +274,11 @@ resourcestring
   rsReportRspLft = 'Lft.Cmp.';
   rsReportRspTop = 'Top.Cmp.';
 
+  rsNA = 'NA';
+  RS_COL_SAMPLE = 'Modelo';
+  RS_CELL_TRIALS_STM = 'Tent\Stm';
 
-resourcestring
+
   ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
   ExceptionConfigurationNotAllowed = 'A configuração não é permitida.';
 
@@ -297,6 +300,12 @@ resourcestring
   rsEndSession = 'Fim.';
   rsSchedule = 'Esquema';
   rsSample = 'Modelo';
+  rsStimuli = 'Estímulos';
+  rsButtonAdd = 'Adicionar';
+  rsCaptionBlocs = 'Blocos';
+  rsCaptionSessions = 'Sessões';
+  rsCaptionNodeEnd= 'FIM';
+  rsCaptionNodeBegin= 'INÍCIO';
 
   rsFilename = 'Nome do arquivo';
   rsColor = 'Cor';
@@ -329,10 +338,16 @@ resourcestring
   rsBlocVirtualTrialValue = 'Quantas tarefas contabilizam uma tentativa?';
   rsBlocMaxCorrection = 'Número máximo de correções por tentativa';
 
+  rsWindowTitleChoosePositive = 'Escolhas as figuras positivas';
+  rsWindowTitleChooseNegative = 'Escolhas as figuras negativas';
+
 
   //rsBlocDefNextBlc
   //rsBlocCrtConsecutiveMiss
   //rsBlocCrtMaxTrials
+  rsMessCantContinueTableIsEmpty = 'Não foi possível continuar, pois a tabela de tentativas está vazia.';
+  rsMessChooseRandomzieTargetCol = 'Escolha o alvo da randomização clicando sobre uma célula de uma coluna.';
+  rsMessNoBlocFound = 'Nenhum Bloco foi encontrado.';
 
   rsRandomizeTrials = 'Randomizar ordem das tentativas';
   rsRandomizeResponses = 'Randomizar respostas';
@@ -349,6 +364,21 @@ resourcestring
   rsDefName = 'No name';
   rsDefSubject = 'No subject';
   rsDefAddress = '127.0.1.1:5020';
+  rsLanguagePTBR = 'Português (Brasil)';
+  rsLanguageEN = 'Inglês';
+
+  rsComboGridTypeEyeOrientationTask = 'Tarefa de orientação visual';
+  rsComboGridTypeFPE = 'Discriminações sucessivas (feature positive effect)';
+  rsComboGridTypeGONOGO = 'Discriminações sucessivas (go/no-go)';
+  rsComboGridTypeSD = 'Discriminações simultâneas (simples)';
+  rsComboGridTypeCD = 'Discriminações simultâneas (condicional, MTS)';
+  rsComboGridTypeBlocChain = 'Encadeamento de blocos';
+  rsComboBoxRandomizeTrialOrder =  'Ordem das tentativas';
+  rsComboBoxRandomizeTrialOrderConstraints = 'Ordem das tentativas (com restrições)';
+  rsComboBoxRandomizeResponses = 'Respostas';
+  rsComboBoxBlocCounterNone = 'Não';
+  rsComboBoxBlocCounterShowHitMiss = 'Mostrar número de acertos e erros';
+
 
 implementation
 
