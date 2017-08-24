@@ -524,6 +524,14 @@ msgstr "Sample"
 msgid "(Sessão cancelada)"
 msgstr "(Session Canceled)"
 
+#: controls.trials.performancereview.rslabelhits
+msgid "Acertos:"
+msgstr ""
+
+#: controls.trials.performancereview.rslabelmiss
+msgid "Erros:"
+msgstr ""
+
 #: controls.trials.textmessage.messageprompt1
 msgid "Pressione  o botão  para avançar."
 msgstr "Press space to continue."
@@ -561,9 +569,7 @@ msgid "Preencher"
 msgstr "Fill"
 
 #: tformuserconfig.btnfillcondition.hint
-msgid ""
-"Clique com o botão direito e selecione o tipo de preenchimento da coluna "
-"selecionada"
+msgid "Clique com o botão direito e selecione o tipo de preenchimento da coluna selecionada"
 msgstr "Right click to select filling type of the target column."
 
 #: tformuserconfig.btngridtype.caption
@@ -682,8 +688,7 @@ msgid "Grupo de repetições"
 msgstr "Repetition group"
 
 #: tformuserconfig.gbrepetitionsblocks.hint
-msgid ""
-"Permitir no máximo quantos grupos de repetições ao randomizar com restrições?"
+msgid "Permitir no máximo quantos grupos de repetições ao randomizar com restrições?"
 msgstr "When randomizing with constraints, allow how many groups?"
 
 #: tformuserconfig.gbtrialgroup.caption
@@ -831,3 +836,4 @@ msgstr "Pupil command not implemented:"
 #: zmq.pupilcommunication.error_unknown_command
 msgid "Commando Pupil desconhecido: "
 msgstr "Unknown pupil command:"
+

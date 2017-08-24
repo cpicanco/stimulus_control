@@ -18,8 +18,7 @@ msgstr "A configuração não é permitida."
 
 #: constants.exceptionnoschedulefound
 msgid "Nenhum esquema de reforço encontrado, revise o arquivo de configuração."
-msgstr ""
-"Nenhum esquema de reforço encontrado, revise o arquivo de configuração."
+msgstr "Nenhum esquema de reforço encontrado, revise o arquivo de configuração."
 
 #: constants.messlevel_01
 msgctxt "constants.messlevel_01"
@@ -273,8 +272,7 @@ msgstr "Não foi possível continuar, pois a tabela de tentativas está vazia."
 
 #: constants.rsmesschooserandomzietargetcol
 msgid "Escolha o alvo da randomização clicando sobre uma célula de uma coluna."
-msgstr ""
-"Escolha o alvo da randomização clicando sobre uma célula de uma coluna."
+msgstr "Escolha o alvo da randomização clicando sobre uma célula de uma coluna."
 
 #: constants.rsmessnoblocfound
 msgid "Nenhum Bloco foi encontrado."
@@ -526,6 +524,14 @@ msgstr "Modelo"
 msgid "(Sessão cancelada)"
 msgstr "(Sessão cancelada)"
 
+#: controls.trials.performancereview.rslabelhits
+msgid "Acertos:"
+msgstr ""
+
+#: controls.trials.performancereview.rslabelmiss
+msgid "Erros:"
+msgstr ""
+
 #: controls.trials.textmessage.messageprompt1
 msgid "Pressione  o botão  para avançar."
 msgstr "Pressione  o botão  para avançar."
@@ -563,12 +569,8 @@ msgid "Preencher"
 msgstr "Preencher"
 
 #: tformuserconfig.btnfillcondition.hint
-msgid ""
-"Clique com o botão direito e selecione o tipo de preenchimento da coluna "
-"selecionada"
-msgstr ""
-"Clique com o botão direito e selecione o tipo de preenchimento da coluna "
-"selecionada"
+msgid "Clique com o botão direito e selecione o tipo de preenchimento da coluna selecionada"
+msgstr "Clique com o botão direito e selecione o tipo de preenchimento da coluna selecionada"
 
 #: tformuserconfig.btngridtype.caption
 msgid "Configurar"
@@ -686,10 +688,8 @@ msgid "Grupo de repetições"
 msgstr "Grupo de repetições"
 
 #: tformuserconfig.gbrepetitionsblocks.hint
-msgid ""
-"Permitir no máximo quantos grupos de repetições ao randomizar com restrições?"
-msgstr ""
-"Permitir no máximo quantos grupos de repetições ao randomizar com restrições?"
+msgid "Permitir no máximo quantos grupos de repetições ao randomizar com restrições?"
+msgstr "Permitir no máximo quantos grupos de repetições ao randomizar com restrições?"
 
 #: tformuserconfig.gbtrialgroup.caption
 msgid "Grupo de Tentativas"
@@ -836,3 +836,4 @@ msgstr "Commando Pupil não implementado:"
 #: zmq.pupilcommunication.error_unknown_command
 msgid "Commando Pupil desconhecido: "
 msgstr "Commando Pupil desconhecido: "
+
