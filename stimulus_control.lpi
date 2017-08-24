@@ -58,7 +58,6 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <UseHeaptrc Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <Options>
@@ -73,10 +72,9 @@
             </Verbosity>
             <CustomOptions Value="-dUseCThreads
 -dZMQ_STATIC_LINK"/>
-            <OtherDefines Count="3">
-              <Define0 Value="UseCThreads"/>
-              <Define1 Value="DEBUG"/>
-              <Define2 Value="ZMQ_STATIC_LINK"/>
+            <OtherDefines Count="2">
+              <Define0 Value="NO_LIBZMQ"/>
+              <Define1 Value="UseCThreads"/>
             </OtherDefines>
           </Other>
         </CompilerOptions>

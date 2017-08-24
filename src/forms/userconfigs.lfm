@@ -3,8 +3,8 @@ object FormUserConfig: TFormUserConfig
   Height = 506
   Top = 146
   Width = 752
-  HorzScrollBar.Page = 494
-  VertScrollBar.Page = 231
+  HorzScrollBar.Page = 533
+  VertScrollBar.Page = 221
   AutoScroll = True
   Caption = 'Configurar Sessão'
   ClientHeight = 506
@@ -1622,7 +1622,7 @@ object FormUserConfig: TFormUserConfig
   ParentBiDiMode = False
   Position = poScreenCenter
   SessionProperties = 'btnFillCondition.Caption;btnRandomize.Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Checked;chkPupilClient.Checked;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Text;ComboBoxFillTargetColumn.ItemIndex;ComboBoxFillTargetColumn.Text;ComboBoxGridType.ItemIndex;ComboBoxGridType.Text;ComboBoxRandomize.ItemIndex;ComboBoxRandomize.Text;ComboBoxSessionType.ItemIndex;ComboBoxSessionType.Text;EditBlocChainingPath.Text;EditBlocName.Text;EditParticipant.Text;EditSessionName.Text;EditTargetSession.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;Height;HorzScrollBar;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piMTS.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;Position;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;seTrialGroup.Value;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;VertScrollBar;Width;WindowState;ComboBoxLanguage.Text;ComboBoxLanguage.Items;ComboBoxLanguage.ItemIndex'
-  LCLVersion = '1.8.0.3'
+  LCLVersion = '1.8.0.4'
   object btnRun: TButton
     Left = 8
     Height = 25
@@ -1647,10 +1647,10 @@ object FormUserConfig: TFormUserConfig
     Height = 468
     Top = 0
     Width = 754
-    ActivePage = tbVersion
+    ActivePage = tbGeneral
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 40
-    TabIndex = 6
+    TabIndex = 0
     TabOrder = 2
     object tbGeneral: TTabSheet
       Caption = 'Geral'
@@ -1720,7 +1720,7 @@ object FormUserConfig: TFormUserConfig
       end
       object LabelLanguage: TLabel
         Left = 74
-        Height = 27
+        Height = 23
         Top = 100
         Width = 127
         Caption = 'Idioma'
@@ -1728,11 +1728,15 @@ object FormUserConfig: TFormUserConfig
       end
       object ComboBoxLanguage: TComboBox
         Left = 275
-        Height = 27
+        Height = 23
         Top = 100
         Width = 400
         Constraints.MinWidth = 400
         ItemHeight = 0
+        Items.Strings = (
+          'en'
+          'pt-br'
+        )
         OnChange = ComboBoxLanguageChange
         Style = csDropDownList
         TabOrder = 3
