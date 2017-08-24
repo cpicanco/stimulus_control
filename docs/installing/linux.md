@@ -12,6 +12,23 @@ sudo chmod a+rx /usr/local/lib/libbass.so
 sudo ldconfig
 ```
 
+# build and install libzmq
+```
+// do not clone the main master
+// git clone https://github.com/zeromq/libzmq.git
+
+// must use 3.2.5 repository
+// zeromq3-x is a git submodule of the stimulus_control repository 
+// the following assumes you are in the dependency folder
+sudo apt-get install libtool-bin
+cd zeromq3-x
+./autogen.sh
+./configure --enable-static
+make
+sudo make install
+sudo ldconfig
+```
+
 # authorize Kaleb Interface
 
 ```
@@ -32,4 +49,14 @@ ls -al /dev/ttyUSB0
 
 # you should reboot your system
 sudo reboot
+```
+
+# optional
+
+```
+# to install the python bindings (necessary to the Pupil Server side)
+# use a command that will not mess up with your custom zeromq setup:
+
+# https://github.com/zeromq/pyzmq
+pip install --no-use-wheel pyzmq
 ```
