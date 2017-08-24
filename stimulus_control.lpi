@@ -18,7 +18,7 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <RevisionNr Value="4"/>
-      <BuildNr Value="11"/>
+      <BuildNr Value="12"/>
       <Language Value="0416"/>
       <Attributes pvaPreRelease="True"/>
       <StringTable Comments="cpicanco@ufpa.br" CompanyName="Universidade Federal do Pará." FileDescription="A teaching machine for free behavioral experiments." InternalName="stimulus_control" LegalCopyright="GPL3" OriginalFilename="stimulus_control" ProductName="Stimulus Control" ProductVersion="0.0.4.9"/>
