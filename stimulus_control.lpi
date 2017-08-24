@@ -93,7 +93,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;dependency/epiktimer"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -133,7 +133,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/epiktimer"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-nozmq"/>
           </SearchPaths>
           <CodeGeneration>
@@ -159,9 +159,10 @@
               <ShoLineNum Value="True"/>
             </Verbosity>
             <CustomOptions Value="-dNO_LIBZMQ"/>
-            <OtherDefines Count="2">
-              <Define0 Value="NO_LIBZMQ"/>
-              <Define1 Value="UseCThreads"/>
+            <OtherDefines Count="3">
+              <Define0 Value="UseCThreads"/>
+              <Define1 Value="DEBUG"/>
+              <Define2 Value="ZMQ_STATIC_LINK"/>
             </OtherDefines>
           </Other>
         </CompilerOptions>
@@ -178,7 +179,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;dependency/epiktimer"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -222,7 +223,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;dependency/epiktimer"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -262,7 +263,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;dependency/epiktimer"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>

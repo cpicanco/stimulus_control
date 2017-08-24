@@ -14,6 +14,7 @@
 from subprocess import check_output,CalledProcessError,STDOUT
 import os
 import shutil
+from glob import glob
 
 def get_tag_commit():
     """
@@ -43,14 +44,18 @@ def copy_folder(src, dst):
 def copy_file(src, dst):
     shutil.copyfile(src,dst)
 
-RELEASES_FOLDER = 'releases';
+LANGUAGES_FOLDER = 'languages'
+RELEASES_FOLDER = 'releases'
 CONFIG_EXAMPLES_FOLDER = os.path.join('docs','config_examples')
-APPLICATION_FILENAME = 'stimulus_control';
+APPLICATION_FILENAME = 'stimulus_control'
 
 if __name__ == "__main__":
     root_path = os.path.dirname(os.path.abspath(__file__))
     root_path = os.path.dirname(root_path)
+    language_path = os.path.join(root_path, LANGUAGES_FOLDER)
     print(root_path)
+
+    src_language_files = glob(os.path.join(language_path,'*.po'))
 
     src_win32_nozmq_libraries = [
         os.path.join(root_path, 'dependency/lbass/windows/32/bass.dll')
@@ -81,12 +86,13 @@ if __name__ == "__main__":
         # use build name as root for each release
         releases = os.path.join(root_path, RELEASES_FOLDER)
         destination = os.path.join(releases, build_name) 
+        dst_lang_path = os.path.join(destination, LANGUAGES_FOLDER)
         if os.path.exists(destination):
             delete_folder(destination)
-            os.makedirs(destination)
-        else:
-            os.makedirs(destination)
-
+        
+        os.makedirs(destination)
+        os.makedirs(dst_lang_path)
+        
         # copy build.exe as app_name.exe
         if 'win' in build_name:
             src = build_name+'.exe'
@@ -108,6 +114,20 @@ if __name__ == "__main__":
         src_examples = os.path.join(root_path, CONFIG_EXAMPLES_FOLDER)
         dst_examples = os.path.join(destination,'Participante_1')
         copy_folder(src_examples, dst_examples)
+
+        # copy language files
+        for src_lang in src_language_files:
+            _, po_ext = os.path.splitext(src_lang)
+            _, lang_ext = os.path.splitext(_)
+
+            if lang_ext:
+                ext = lang_ext+po_ext
+            else:
+                ext = po_ext
+
+            dst_lang = os.path.join(dst_lang_path, APPLICATION_FILENAME+ext)
+            copy_file(src_lang, dst_lang)
+            # print(src_lang, dst_lang)
 
         # zip release destination 
         tag = get_tag_commit()
