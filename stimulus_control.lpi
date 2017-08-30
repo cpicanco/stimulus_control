@@ -33,8 +33,8 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;src/prototypes"/>
+            <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/;/usr/local/lib/"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;src/prototypes;dependency/fpc-zmq"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <Parsing>
@@ -91,7 +91,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;dependency/epiktimer"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -177,7 +177,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;dependency/epiktimer"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -221,7 +221,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;dependency/epiktimer"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -261,7 +261,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq;dependency/epiktimer"/>
+            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -435,9 +435,9 @@
         <UnitName Value="Devices.RS232i"/>
       </Unit22>
       <Unit23>
-        <Filename Value="src/units/zmq.pupilcommunication.pas"/>
+        <Filename Value="src/units/pupil.client.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ZMQ.PupilCommunication"/>
+        <UnitName Value="Pupil.Client"/>
       </Unit23>
       <Unit24>
         <Filename Value="src/units/loggers.datafile.pas"/>
@@ -622,7 +622,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-      <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/delphizmq"/>
+      <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/fpc-zmq"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
     </SearchPaths>
     <CodeGeneration>
