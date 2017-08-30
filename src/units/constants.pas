@@ -363,7 +363,7 @@ resourcestring
   messLevel_04_M = 'Mensagem';
   rsDefName = 'No name';
   rsDefSubject = 'No subject';
-  rsDefAddress = '127.0.1.1:5020';
+  rsDefAddress = '127.0.1.1:50020';
   rsLanguagePTBR = 'Português (Brasil)';
   rsLanguageEN = 'Inglês';
 
