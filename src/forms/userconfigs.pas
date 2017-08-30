@@ -181,7 +181,7 @@ uses background, strutils
      ;
 
 const
-  CSESSION_SERVER = '127.0.1.1:5020';
+  CSESSION_SERVER = '127.0.1.1:50020';
 
 var
   LAST_BLOC_INIFILE_PATH : string;
@@ -560,11 +560,11 @@ begin
 end;
 
 //procedure TFormUserConfig.btnClientTestClick(Sender: TObject);
-//var PupilClient : TPupilCommunication;
+//var PupilClient : TPupilClient;
 //begin
 //  if chkPupilClient.Checked then
 //    begin
-//      PupilClient := TPupilCommunication.Create('127.0.1.1:5020');
+//      PupilClient := TPupilClient.Create('127.0.1.1:50020');
 //      PupilClient.OnRequestReceived := @ReceiveTimestamp;
 //
 //      PupilClient.Start;

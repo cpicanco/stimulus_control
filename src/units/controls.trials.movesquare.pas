@@ -19,7 +19,7 @@ uses LCLIntf, Classes, SysUtils, Forms, Graphics
   , Controls.Trials.Helpers
   , Canvas.Helpers
   {$IFNDEF NO_LIBZMQ}
-  , ZMQ.PupilCommunication
+  , Pupil.Client
   {$ENDIF}
   ;
 
@@ -37,7 +37,7 @@ type
     FDataSupport : TDataSupport;
     procedure None(Sender: TObject);
     {$IFNDEF NO_LIBZMQ}
-    procedure UpdateSquare(Sender: TObject; AMultiPartMessage : TMPMessage);
+    procedure UpdateSquare(Sender: TObject; APupilMessage : TPupilMessage);
     {$ENDIF}
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
@@ -72,12 +72,12 @@ begin
 end;
 
 {$IFNDEF NO_LIBZMQ}
-procedure TMSQ.UpdateSquare(Sender: TObject; AMultiPartMessage: TMPMessage);
+procedure TMSQ.UpdateSquare(Sender: TObject; APupilMessage: TPupilMessage);
 var
   LX,LY : Double;
 begin
-  if AMultiPartMessage.Topic = 'surface' then
-    with AMultiPartMessage.Message do
+  if APupilMessage.Topic = 'surface' then
+    with APupilMessage.Payload do
       if LowerCase(S['name']) = 'screen' then
 		    if O['gaze_on_srf'].Count > 0 then
   		    { 'topic':'gaze',

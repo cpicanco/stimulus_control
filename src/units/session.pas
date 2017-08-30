@@ -21,7 +21,7 @@ uses Classes, Controls, SysUtils, LCLIntf, FileUtil
      , countermanager
      , Session.Blocs
      {$IFNDEF NO_LIBZMQ}
-     , ZMQ.PupilCommunication
+     , Pupil.Client
      {$ENDIF}
      , Timestamps
      ;
@@ -57,8 +57,8 @@ type
     procedure Play; overload;
     procedure PlayBlc(Sender: TObject);
     {$IFNDEF NO_LIBZMQ}
-    procedure PupilMultipartReceived(Sender: TObject; AMultipart : TMPMessage);
-    procedure PupilRecordingStarted(Sender: TObject; AMultipart : TMPMessage);
+    procedure PupilMultipartReceived(Sender: TObject; APupilMessage : TPupilMessage);
+    procedure PupilRecordingStarted(Sender: TObject; APupilMessage : TPupilMessage);
     {$ENDIF}
     procedure PupilRequestReceived(Sender: TObject; ARequest, AResponse : string);
     procedure SetBackGround(BackGround: TWinControl);
@@ -248,17 +248,17 @@ begin
 end;
 {$IFNDEF NO_LIBZMQ}
 procedure TSession.PupilMultipartReceived(Sender: TObject;
-  AMultipart: TMPMessage);
+  APupilMessage: TPupilMessage);
 begin
   {$ifdef DEBUG}
-    DebugLn(mt_Information + AMultipart.Topic );
+    DebugLn(mt_Information + APupilMessage.Topic );
   {$endif}
 end;
 
 procedure TSession.PupilRecordingStarted(Sender: TObject;
-  AMultipart: TMPMessage);
+  APupilMessage: TPupilMessage);
 begin
-  FGlobalContainer.RootData := AMultipart.Message.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim;
+  FGlobalContainer.RootData := APupilMessage.Payload.S[KEY_RECORDING_PATH] + 'stimulus_control' + PathDelim;
   Play;
 end;
 {$ENDIF}
@@ -269,7 +269,6 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Information + ARequest + #32 + AResponse);
   {$endif}
-  Write(AResponse);
 end;
 
 procedure TSession.SetBackGround(BackGround: TWinControl);
@@ -283,7 +282,7 @@ begin
   {$IFNDEF NO_LIBZMQ}
   if AValue then
     begin
-      FGlobalContainer.PupilClient := TPupilCommunication.Create(FServerAddress);
+      FGlobalContainer.PupilClient := TPupilClient.Create(FServerAddress);
     end
   else FGlobalContainer.PupilClient.Terminate;
 
@@ -388,12 +387,7 @@ begin
           Start;
           StartSubscriber(True);
           Subscribe(SUB_ALL_NOTIFICATIONS);
-          //Request(REQ_SYNCHRONIZE_TIME+#32+TimestampToStr(TickCount - FGlobalContainer.TimeStart + Extended(0.000376039992485)),True);
-          //for i := 0 to 1000 do begin
-          //Request(REQ_TIMESTAMP, True);
-          //Write(#9+TimestampToStr(TickCount - FGlobalContainer.TimeStart)+#10);
-          //end;
-          Request(REQ_SHOULD_START_RECORDING); // must be non-blocking
+          Request(REQ_SHOULD_START_RECORDING);
         end
       {$ENDIF}
     end

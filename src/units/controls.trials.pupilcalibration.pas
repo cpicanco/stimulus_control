@@ -18,7 +18,7 @@ uses LCLIntf, LCLType, Classes, SysUtils, Graphics
   , Controls.Trials.Abstract
   , Controls.Trials.Helpers
   {$IFNDEF NO_LIBZMQ}
-  , ZMQ.PupilCommunication
+  , Pupil.Client
   {$ENDIF}
   ;
 
@@ -46,7 +46,7 @@ type
     procedure StartPupilCalibration;
     procedure None(Sender: TObject);
     {$IFNDEF NO_LIBZMQ}
-    procedure PupilCalibrationSuccessful(Sender: TObject; AMultiPartMessage : TMPMessage);
+    procedure PupilCalibrationSuccessful(Sender: TObject; APupilMessage : TPupilMessage);
     {$ENDIF}
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
@@ -74,7 +74,7 @@ uses strutils, constants, timestamps
 
 {$IFNDEF NO_LIBZMQ}
 procedure TCLB.PupilCalibrationSuccessful(Sender: TObject;
-  AMultiPartMessage: TMPMessage);
+  APupilMessage: TPupilMessage);
 begin
   FrmBackground.Show;
   FrmBackground.SetFullScreen(True);

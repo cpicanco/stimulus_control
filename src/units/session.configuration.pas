@@ -15,7 +15,7 @@ interface
 
 uses Classes, ComCtrls, SysUtils,  Dialogs, Forms
     {$IFNDEF NO_LIBZMQ}
-    , ZMQ.PupilCommunication
+    , Pupil.Client
     {$ENDIF}
     , countermanager
     ;
@@ -29,7 +29,7 @@ type
 
   TGlobalContainer = class //(TObject)
     {$IFNDEF NO_LIBZMQ}
-    PupilClient: TPupilCommunication;
+    PupilClient: TPupilClient;
     {$ENDIF}
     PupilEnabled : Boolean;
     CounterManager : TCounterManager;
