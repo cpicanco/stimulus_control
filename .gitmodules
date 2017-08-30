@@ -16,3 +16,9 @@
 [submodule "dependency/zeromq3-x"]
 	path = dependency/zeromq3-x
 	url = https://github.com/zeromq/zeromq3-x
+[submodule "dependency/fpc-zmq"]
+	path = dependency/fpc-zmq
+	url = git@github.com:cpicanco/fpc-zmq.git
+[submodule "dependency/pupil-fpc"]
+	path = dependency/pupil-fpc
+	url = git@github.com:cpicanco/pupil-fpc.git
