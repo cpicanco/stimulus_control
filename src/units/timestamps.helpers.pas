@@ -7,16 +7,13 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-
-// Timing
-// https://github.com/graemeg/epiktimer/blob/master/epiktimer.pas
-{ TODO -oRafael -cCrossplatform : Implement clock_gettime() alternative for windows. }
-
 unit Timestamps.Helpers;
 
 {$mode objfpc}{$H+}
 
 interface
+
+{ DONE -oRafael -cCrossplatform : On windows, implement EpikTimer as alternative for clock_gettime. }
 
 uses
   Classes, SysUtils
