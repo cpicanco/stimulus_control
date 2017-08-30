@@ -1,6 +1,3 @@
-[submodule "dependency/delphizmq"]
-	path = dependency/delphizmq
-	url = git@github.com:cpicanco/delphizmq.git
 [submodule "dependency/msgpack-delphi"]
 	path = dependency/msgpack-delphi
 	url = git@github.com:cpicanco/msgpack-delphi.git
@@ -19,3 +16,6 @@
 [submodule "dependency/pupil-fpc"]
 	path = dependency/pupil-fpc
 	url = git@github.com:cpicanco/pupil-fpc.git
+[submodule "dependency/libzmq"]
+	path = dependency/libzmq
+	url = https://github.com/zeromq/libzmq.git
