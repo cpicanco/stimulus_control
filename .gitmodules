@@ -13,9 +13,6 @@
 [submodule "dependency/travis-lazarus"]
 	path = dependency/travis-lazarus
 	url = https://github.com/nielsAD/travis-lazarus.git
-[submodule "dependency/zeromq3-x"]
-	path = dependency/zeromq3-x
-	url = https://github.com/zeromq/zeromq3-x
 [submodule "dependency/fpc-zmq"]
 	path = dependency/fpc-zmq
 	url = git@github.com:cpicanco/fpc-zmq.git
