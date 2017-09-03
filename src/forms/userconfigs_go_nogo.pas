@@ -83,6 +83,14 @@ type
 var
   FormGo_NoGo: TFormGo_NoGo;
 
+resourcestring
+  rsPositive = 'Positiva';
+  rsNegative = 'Negativa';
+  rsStimuli = 'Estímulos';
+  rsButtonAdd = 'Adicionar';
+  rsWindowTitleChoosePositive = 'Escolhas as figuras positivas';
+  rsWindowTitleChooseNegative = 'Escolhas as figuras negativas';
+
 implementation
 
 {$R *.lfm}

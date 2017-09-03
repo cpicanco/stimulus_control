@@ -95,6 +95,25 @@ type
     property OnShow : TNotifyEvent read FOnShow write FOnShow;
   end;
 
+resourcestring
+  rsSample = 'Modelo';
+  rsComparison = 'C';
+  rsStimulus = 'Figura';
+  rsSchedule = 'Esquema';
+  rsFilename = 'Nome do arquivo';
+  rsColor = 'Cor';
+  rsCount = 'Contar';
+  rsMediaSound = 'Som';
+  rsTimeOut = 'TimeOut';
+  rsNextTrial = 'Tentativa Seguinte';
+  rsUSBPort = 'Porta USB';
+  rsDelay = 'Atraso';
+  rsDuration = 'Duração';
+  rsStyle = 'Estilo';
+  rsExpectedResponse = 'Resposta';
+  rsConsequence = 'Consequência';
+
+
 implementation
 
 uses strutils, constants;

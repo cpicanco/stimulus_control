@@ -100,6 +100,12 @@ type
 var
   FormRandomizePositions: TFormRandomizePositions;
 
+resourcestring
+  rs_COL_SAMPLE = 'Modelo';
+  rs_CELL_TRIALS_STM = 'Tent\Stm';
+  rsBlocs = 'Bloco';
+  rsMessNoBlocFound = 'Nenhum Bloco foi encontrado.';
+
 implementation
 
 uses math, strutils, FileUtil, LazFileUtils,constants;

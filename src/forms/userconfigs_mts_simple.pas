@@ -69,6 +69,7 @@ type
     procedure SpinComparisonsEditingDone(Sender: TObject);
     procedure SpinCursorEditingDone(Sender: TObject);
     procedure XMLPropStorage1RestoreProperties(Sender: TObject);
+    procedure XMLPropStorage1SaveProperties(Sender: TObject);
   private
     FMonitor: integer;
     FTrial : TSimpleMTSTRial;
@@ -82,7 +83,9 @@ type
     procedure KeyClick(Sender : TObject);
     procedure AllEditsDone(Sender : TObject);
   public
+    procedure UpdateLanguage;
     procedure AddTrialsToGui(ATrialGrid : TStringGrid);
+    procedure SetType(AValue : Integer);
     procedure WriteToDisk(ADefaultMainSection: TStrings; ADefaultBlocSection : TStrings;
             ATrialGrid : TStringGrid; AFilename : string);
     property MonitorToShow : integer read FMonitor write SetMonitor;
@@ -90,6 +93,10 @@ type
 
 var
   FormMTS: TFormMTS;
+
+resourcestring
+  rsComboBoxTrialTypeItem0 = 'Discriminação simples';
+  rsComboBoxTrialTypeItem1 = 'Discriminação condicional';
 
 implementation
 
@@ -143,6 +150,7 @@ end;
 
 procedure TFormMTS.FormCreate(Sender: TObject);
 begin
+  UpdateLanguage;
   OpenDialog.InitialDir := ExtractFilePath(Application.ExeName);
   OnClick:=@KeyClick;
   FTrial := TSimpleMTSTrial.Create(Self);
@@ -222,6 +230,11 @@ procedure TFormMTS.XMLPropStorage1RestoreProperties(Sender: TObject);
 begin
   UpdateComparisons(FTrial);
   ComboBoxTrialTypeEditingDone(Self);
+end;
+
+procedure TFormMTS.XMLPropStorage1SaveProperties(Sender: TObject);
+begin
+
 end;
 
 procedure TFormMTS.UpdateComparisons(ATrial: TSimpleMTSTrial);
@@ -363,6 +376,12 @@ begin
   TEdit(Sender).Text := TEdit(Sender).Text + ' 0 0 1000';
 end;
 
+procedure TFormMTS.UpdateLanguage;
+begin
+  ComboBoxTrialType.Items[0] := rsComboBoxTrialTypeItem0;
+  ComboBoxTrialType.Items[1] := rsComboBoxTrialTypeItem1;
+end;
+
 procedure TFormMTS.AddTrialsToGui(ATrialGrid: TStringGrid);
 var
   LRow, i,j : Integer;
@@ -398,6 +417,12 @@ begin
           Inc(LRow);
         end;
     end;
+end;
+
+procedure TFormMTS.SetType(AValue: Integer);
+begin
+  ComboBoxTrialType.ItemIndex:=AValue;
+  ComboBoxTrialTypeEditingDone(Self);
 end;
 
 procedure TFormMTS.WriteToDisk(ADefaultMainSection: TStrings;

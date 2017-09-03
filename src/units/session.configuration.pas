@@ -119,7 +119,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function LoadFromFile(AFileName: string; AEditMode : Boolean): Boolean;
-    function LoadTreeFromFile(FileName:string; aTree : TTreeView):Boolean;
+    //function LoadTreeFromFile(FileName:string; aTree : TTreeView):Boolean;
     procedure SetLengthVetBlc;
     procedure SetLengthVetTrial(Blc : Integer);
     property EditMode : Boolean read FEditMode;
@@ -145,6 +145,16 @@ type
     property Row : integer read FRow write FRow;
   end;
 
+resourcestring
+  rsDefName = 'Nome';
+  rsDefSubject = 'Participante';
+
+  //rsKeyError = 'Valor não encontrado: Main, Name or NumBlc.';
+  //messLoading = 'Carregando...';
+  //messReady = 'Pronto.';
+  //messRoot = 'Estrutura';
+  //messLevel_01 = 'Sessão 1';
+  //messLevel_04_M = 'Mensagem';
 implementation
 
 uses constants, Session.ConfigurationFile, Session.Configuration.GlobalContainer;
@@ -250,7 +260,7 @@ begin
               FSessionSubject := ReadString(_Main, _Subject, rsDefSubject);
               FSessionType := ReadString(_Main, _Type, T_CIC);
               FNumBlc := ReadInteger(_Main, _NumBlc, 0);
-              FSessionServer := ReadString(_Main,_ServerAddress, rsDefAddress);
+              FSessionServer := ReadString(_Main,_ServerAddress, DefaultAddress);
 
               // set media and data paths
               s1 := ReadString(_Main, _RootMedia, '');
@@ -279,104 +289,104 @@ begin
     end;
 end;
 
-function TCfgSes.LoadTreeFromFile(FileName: string; aTree: TTreeView): Boolean;
-//from INI like files,  encoded as UTF-8 without BOM (Ansi as UTF-8)
-//this functionality is not finished yet
-{TODO -oRafael -cFunctionality: Load Config File From Tree List View Component}
-var
-
-  i1, i2, i3, aNumBlc, aNumTrials, aNumComp : Integer;
-  ANode : TTreeNode;
-  CurrStr, aux: string;
-  LIniFile : TConfigurationFile;
-begin
-  Result:= False;
-  if FileExists(FileName) then
-    begin
-      LIniFile:= TConfigurationFile.Create(FileName);
-      aTree.BeginUpdate;
-      with LIniFile do
-        try
-          if  SectionExists(_Main) and
-              ValueExists(_Main, _Name) and
-              ValueExists(_Main, _NumBlc) then
-            begin
-              aTree.Items.Clear;
-              CurrStr := messRoot;
-              ANode := aTree.Items.AddChild(nil, CurrStr);   //Level 0
-
-              CurrStr := ReadString(_Main, _Name, messLevel_01);
-              ANode := aTree.Items.AddChild(ANode, CurrStr); //Level 1
-
-              aNumBlc := ReadInteger(_Main, _NumBlc, 0);
-              for i1 := 0 to aNumBlc - 1 do
-                begin
-                  aux := _Blc + #32 + IntToStr(i1 + 1);
-                  CurrStr :=  ReadString(aux, _Name, aux);
-                  while ANode.Level > 1 do ANode := ANode.Parent; //Level 2
-                  ANode := aTree.Items.AddChild(ANode, CurrStr);
-
-                  aux:= ReadString(_Blc + #32 + IntToStr(i1 + 1), _NumTrials, '0 0');
-                  aNumTrials:= StrToIntDef(Copy(aux, 0, pos(' ', aux)-1), 0);
-                  for i2 := 0 to aNumTrials -1 do
-                    begin
-                       aux := _Blc + #32 + IntToStr(i1 + 1) + ' - ' + _Trial + IntToStr(i2 + 1);
-                       CurrStr := ReadString(aux,_Name, aux);
-                       while ANode.Level > 2 do ANode := ANode.Parent; //Level 3
-                           ANode := aTree.Items.AddChild(ANode, CurrStr);
-
-                       if ReadString(aux,_Kind, T_NONE) = T_Simple then
-                          begin
-                            aNumComp := ReadInteger(_Blc + #32 + IntToStr(i1 + 1) + ' - ' + _Trial + IntToStr(i2 + 1), _NumComp, 0);
-                            for i3 := 0 to aNumComp -1 do
-                              begin
-                                CurrStr:= ReadString(aux,_Comp + IntToStr(i3 + 1) + _cStm,_Comp + IntToStr(i3 + 1) + _cStm);
-                                while ANode.Level > 3 do ANode := ANode.Parent;
-                                ANode := aTree.Items.AddChild(ANode,CurrStr); //Level 4
-                              end;
-                          end
-                        else if ReadString(aux,_Kind, T_NONE) = T_MTS then
-                          begin
-                            aNumComp := ReadInteger(_Blc + #32 + IntToStr(i1 + 1) + ' - ' + _Trial + IntToStr(i2 + 1), _NumComp, 0);
-                            for i3 := 0 to aNumComp do
-                              begin
-                                if i3 = 0 then
-                                  begin
-                                    CurrStr:= ReadString(aux,_Samp + _cStm, _Samp + _cStm);
-                                    while ANode.Level > 3 do ANode := ANode.Parent;  //Level 4
-                                    ANode := aTree.Items.AddChild(ANode,CurrStr);
-                                  end
-                                else
-                                  begin
-                                    CurrStr:= ReadString(aux,_Comp + IntToStr(i3) + _cStm,_Comp + IntToStr(i3) + _cStm);
-                                    while ANode.Level > 3 do ANode := ANode.Parent; //Level 4
-                                    ANode := aTree.Items.AddChild(ANode.Parent,CurrStr);
-                                  end;
-                              end;
-                          end
-                        else if ReadString(aux,_Kind, T_NONE) = T_MSG then
-                          begin
-                            CurrStr:= messLevel_04_M;
-                            while ANode.Level > 3 do ANode := ANode.Parent;    //Level 4
-                            ANode := aTree.Items.AddChild(ANode,CurrStr);
-                          end
-                        else if ReadString(aux,_Kind, T_NONE) = T_NONE then
-                          begin
-                            CurrStr:= T_NONE;
-                            while ANode.Level > 3 do ANode := ANode.Parent;   //Level 4
-                            ANode := aTree.Items.AddChild(ANode,CurrStr);
-                          end
-                    end;
-                end;
-              Result := True;
-            end
-          else ShowMessage(messuCfgSessionMainError);
-        finally
-          LIniFile.Free;
-          aTree.EndUpdate;
-        end;
-  end;
-end;
+//function TCfgSes.LoadTreeFromFile(FileName: string; aTree: TTreeView): Boolean;
+////from INI like files,  encoded as UTF-8 without BOM (Ansi as UTF-8)
+////this functionality is not finished yet
+//{TODO -oRafael -cFunctionality: Load Config File From Tree List View Component}
+//var
+//
+//  i1, i2, i3, aNumBlc, aNumTrials, aNumComp : Integer;
+//  ANode : TTreeNode;
+//  CurrStr, aux: string;
+//  LIniFile : TConfigurationFile;
+//begin
+//  Result:= False;
+//  if FileExists(FileName) then
+//    begin
+//      LIniFile:= TConfigurationFile.Create(FileName);
+//      aTree.BeginUpdate;
+//      with LIniFile do
+//        try
+//          if  SectionExists(_Main) and
+//              ValueExists(_Main, _Name) and
+//              ValueExists(_Main, _NumBlc) then
+//            begin
+//              aTree.Items.Clear;
+//              CurrStr := messRoot;
+//              ANode := aTree.Items.AddChild(nil, CurrStr);   //Level 0
+//
+//              CurrStr := ReadString(_Main, _Name, messLevel_01);
+//              ANode := aTree.Items.AddChild(ANode, CurrStr); //Level 1
+//
+//              aNumBlc := ReadInteger(_Main, _NumBlc, 0);
+//              for i1 := 0 to aNumBlc - 1 do
+//                begin
+//                  aux := _Blc + #32 + IntToStr(i1 + 1);
+//                  CurrStr :=  ReadString(aux, _Name, aux);
+//                  while ANode.Level > 1 do ANode := ANode.Parent; //Level 2
+//                  ANode := aTree.Items.AddChild(ANode, CurrStr);
+//
+//                  aux:= ReadString(_Blc + #32 + IntToStr(i1 + 1), _NumTrials, '0 0');
+//                  aNumTrials:= StrToIntDef(Copy(aux, 0, pos(' ', aux)-1), 0);
+//                  for i2 := 0 to aNumTrials -1 do
+//                    begin
+//                       aux := _Blc + #32 + IntToStr(i1 + 1) + ' - ' + _Trial + IntToStr(i2 + 1);
+//                       CurrStr := ReadString(aux,_Name, aux);
+//                       while ANode.Level > 2 do ANode := ANode.Parent; //Level 3
+//                           ANode := aTree.Items.AddChild(ANode, CurrStr);
+//
+//                       if ReadString(aux,_Kind, T_NONE) = T_Simple then
+//                          begin
+//                            aNumComp := ReadInteger(_Blc + #32 + IntToStr(i1 + 1) + ' - ' + _Trial + IntToStr(i2 + 1), _NumComp, 0);
+//                            for i3 := 0 to aNumComp -1 do
+//                              begin
+//                                CurrStr:= ReadString(aux,_Comp + IntToStr(i3 + 1) + _cStm,_Comp + IntToStr(i3 + 1) + _cStm);
+//                                while ANode.Level > 3 do ANode := ANode.Parent;
+//                                ANode := aTree.Items.AddChild(ANode,CurrStr); //Level 4
+//                              end;
+//                          end
+//                        else if ReadString(aux,_Kind, T_NONE) = T_MTS then
+//                          begin
+//                            aNumComp := ReadInteger(_Blc + #32 + IntToStr(i1 + 1) + ' - ' + _Trial + IntToStr(i2 + 1), _NumComp, 0);
+//                            for i3 := 0 to aNumComp do
+//                              begin
+//                                if i3 = 0 then
+//                                  begin
+//                                    CurrStr:= ReadString(aux,_Samp + _cStm, _Samp + _cStm);
+//                                    while ANode.Level > 3 do ANode := ANode.Parent;  //Level 4
+//                                    ANode := aTree.Items.AddChild(ANode,CurrStr);
+//                                  end
+//                                else
+//                                  begin
+//                                    CurrStr:= ReadString(aux,_Comp + IntToStr(i3) + _cStm,_Comp + IntToStr(i3) + _cStm);
+//                                    while ANode.Level > 3 do ANode := ANode.Parent; //Level 4
+//                                    ANode := aTree.Items.AddChild(ANode.Parent,CurrStr);
+//                                  end;
+//                              end;
+//                          end
+//                        else if ReadString(aux,_Kind, T_NONE) = T_MSG then
+//                          begin
+//                            CurrStr:= messLevel_04_M;
+//                            while ANode.Level > 3 do ANode := ANode.Parent;    //Level 4
+//                            ANode := aTree.Items.AddChild(ANode,CurrStr);
+//                          end
+//                        else if ReadString(aux,_Kind, T_NONE) = T_NONE then
+//                          begin
+//                            CurrStr:= T_NONE;
+//                            while ANode.Level > 3 do ANode := ANode.Parent;   //Level 4
+//                            ANode := aTree.Items.AddChild(ANode,CurrStr);
+//                          end
+//                    end;
+//                end;
+//              Result := True;
+//            end
+//          else ShowMessage(rsKeyError);
+//        finally
+//          LIniFile.Free;
+//          aTree.EndUpdate;
+//        end;
+//  end;
+//end;
 
 end.
 

@@ -14,6 +14,9 @@ unit constants;
 interface
 
 const
+  DefaultAddress = '127.0.1.1:50020';
+
+const
   // Posições
   _Positions = 'Positions';
   _Cols = 'Cols';
@@ -232,6 +235,9 @@ const
 
 // report headers
 resourcestring
+  ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
+  ExceptionConfigurationNotAllowed = 'A configuração não é permitida.';
+
   rsReportMsgTxt = 'Mensagem';
   rsReportStmBeg = 'S.Inicio';
   rsReportStmDur = 'S.Duracao';
@@ -275,111 +281,6 @@ resourcestring
   rsReportRspTop = 'Top.Cmp.';
 
   rsNA = 'NA';
-  RS_COL_SAMPLE = 'Modelo';
-  RS_CELL_TRIALS_STM = 'Tent\Stm';
-
-
-  ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
-  ExceptionConfigurationNotAllowed = 'A configuração não é permitida.';
-
-  // user configs
-  rsPosition = 'Bnd';
-  rsComparison = 'C';
-  rsMTSRelation = 'Relação';
-  rsTrials = 'Tentativas';
-  rsConsequence = 'Consequência';
-  rsAngle = 'Ângulo';
-  rsExpectedResponse = 'Resposta';
-  rsContingency = 'Contingência';
-  rsPositive = 'Positiva';
-  rsNegative = 'Negativa';
-  rsStimulus = 'Figura';
-  rsLimitedHold = 'Tempo/Estímulo';
-  rsSize = 'Tamanho';
-  rsDefBlc = 'Bloco 1';
-  rsEndSession = 'Fim.';
-  rsSchedule = 'Esquema';
-  rsSample = 'Modelo';
-  rsStimuli = 'Estímulos';
-  rsButtonAdd = 'Adicionar';
-  rsCaptionBlocs = 'Blocos';
-  rsCaptionSessions = 'Sessões';
-  rsCaptionNodeEnd= 'FIM';
-  rsCaptionNodeBegin= 'INÍCIO';
-
-  rsFilename = 'Nome do arquivo';
-  rsColor = 'Cor';
-  rsCount = 'Contar';
-  rsMediaSound = 'Som';
-  rsTimeOut = 'TimeOut';
-  rsNextTrial = 'Tentativa Seguinte';
-  rsUSBPort = 'Porta USB';
-  rsDelay = 'Atraso';
-  rsDuration = 'Duração';
-  rsStyle = 'Estilo';
-
-  rsFillTypeAxes = 'Eixos';
-  rsFillTypeMatriz = 'FP/FN';
-  rsFillTypeGoNoGo = 'Go/No-Go';
-  rsFillTypeMTS = 'MTS e Simples';
-  rsFillTypeBlocChaining = 'Encadear Blocos';
-  rsHintBlocsAvailableRightClick = 'Clique com o botão direito e selecione os blocos disponíveis';
-  rsBlocs = 'Bloco';
-  rsBlocName = 'Nome';
-  rsBlocCrtHitPorcentage = 'Critério (% de acertos)';
-  rsBlocCrtConsecutiveHit = 'Critério (acertos consecutivos)';
-  rsBlocMaxBlcRepetition = 'Número máximo de repetições seguidas do bloco';
-  rsBlocNextBlocOnCriteria = 'Bloco seguinte se critério for atingido';
-  rsBlocNextBlocOnNotCriteria = 'Bloco seguinte se critério não for atingido';
-  rsBlocAddress = 'Endereço';
-  rsBlocITI = 'Intervalo entre tentativas';
-  rsBlocBkGnd = 'Cor do Fundo';
-  rsBlocCounter = 'Mostrar contador ao final?';
-  rsBlocVirtualTrialValue = 'Quantas tarefas contabilizam uma tentativa?';
-  rsBlocMaxCorrection = 'Número máximo de correções por tentativa';
-
-  rsWindowTitleChoosePositive = 'Escolhas as figuras positivas';
-  rsWindowTitleChooseNegative = 'Escolhas as figuras negativas';
-
-
-  //rsBlocDefNextBlc
-  //rsBlocCrtConsecutiveMiss
-  //rsBlocCrtMaxTrials
-  rsMessCantContinueTableIsEmpty = 'Não foi possível continuar, pois a tabela de tentativas está vazia.';
-  rsMessChooseRandomzieTargetCol = 'Escolha o alvo da randomização clicando sobre uma célula de uma coluna.';
-  rsMessNoBlocFound = 'Nenhum Bloco foi encontrado.';
-
-  rsRandomizeTrials = 'Randomizar ordem das tentativas';
-  rsRandomizeResponses = 'Randomizar respostas';
-  rsRandomizeGroupTrial = 'Randomizar em grupos ordem das tentativas';
-  rsRandomizeTrialsWithConstraints = 'Randomizar ordem das tentativas com restrições.';
-
-  // config_session
-  messuCfgSessionMainError = 'Valor não encontrado: Main, Name or NumBlc.';
-  messLoading = 'Carregando...';
-  messReady = 'Pronto.';
-  messRoot = 'Estrutura';
-  messLevel_01 = 'Sessão 1';
-  messLevel_04_M = 'Mensagem';
-  rsDefName = 'No name';
-  rsDefSubject = 'No subject';
-  rsDefAddress = '127.0.1.1:50020';
-  rsLanguagePTBR = 'Português (Brasil)';
-  rsLanguageEN = 'Inglês';
-
-  rsComboGridTypeEyeOrientationTask = 'Tarefa de orientação visual';
-  rsComboGridTypeFPE = 'Discriminações sucessivas (feature positive effect)';
-  rsComboGridTypeGONOGO = 'Discriminações sucessivas (go/no-go)';
-  rsComboGridTypeSD = 'Discriminações simultâneas (simples)';
-  rsComboGridTypeCD = 'Discriminações simultâneas (condicional, MTS)';
-  rsComboGridTypeBlocChain = 'Encadeamento de blocos';
-  rsComboBoxRandomizeTrialOrder =  'Ordem das tentativas';
-  rsComboBoxRandomizeTrialOrderConstraints = 'Ordem das tentativas (com restrições)';
-  rsComboBoxRandomizeResponses = 'Respostas';
-  rsComboBoxBlocCounterNone = 'Não';
-  rsComboBoxBlocCounterShowHitMiss = 'Mostrar número de acertos e erros';
-
-
 implementation
 
 

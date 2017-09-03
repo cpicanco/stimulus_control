@@ -129,6 +129,7 @@ type
       Rect: TRect; aState: TGridDrawState);
     procedure XMLPropStorage1RestoreProperties(Sender: TObject);
     procedure XMLPropStorage1SaveProperties(Sender: TObject);
+    procedure XMLPropStorage1SavingProperties(Sender: TObject);
   published
 
   private
@@ -157,6 +158,37 @@ type
 var
   FormUserConfig: TFormUserConfig;
 
+resourcestring
+  rsHintBlocsAvailableRightClick = 'Clique com o botão direito e selecione os blocos disponíveis';
+
+  rsMessCantContinueTableIsEmpty = 'Não foi possível continuar, pois a tabela de tentativas está vazia.';
+  rsMessChooseRandomzieTargetCol = 'Escolha o alvo da randomização clicando sobre uma célula de uma coluna.';
+  rsMessEndSession = 'Fim.';
+
+  rsRandomizeTrials = 'Randomizar ordem das tentativas';
+  rsRandomizeResponses = 'Randomizar respostas';
+  rsRandomizeGroupTrial = 'Randomizar em grupos ordem das tentativas';
+  rsRandomizeTrialsWithConstraints = 'Randomizar ordem das tentativas com restrições.';
+
+  rsLanguagePTBR = 'Português (Brasil)';
+  rsLanguageEN = 'Inglês';
+
+  rsComboGridTypeEyeOrientationTask = 'Tarefa de orientação visual';
+  rsComboGridTypeFPE = 'Discriminações sucessivas (feature positive effect)';
+  rsComboGridTypeGONOGO = 'Discriminações sucessivas (go/no-go)';
+  rsComboGridTypeSD = 'Discriminações simultâneas (simples)';
+  rsComboGridTypeCD = 'Discriminações simultâneas (condicional, MTS)';
+  rsComboGridTypeBlocChain = 'Encadeamento de blocos';
+  rsComboBoxRandomizeTrialOrder =  'Ordem das tentativas';
+  rsComboBoxRandomizeTrialOrderConstraints = 'Ordem das tentativas (com restrições)';
+  rsComboBoxRandomizeResponses = 'Respostas';
+  rsComboBoxBlocCounterNone = 'Não';
+  rsComboBoxBlocCounterShowHitMiss = 'Mostrar número de acertos e erros';
+  rsComboBoxFillTargetColumnAllRows = 'todas as linhas';
+  rsComboBoxFillTargetColumnOddRows = 'linhas ímpares';
+  rsComboBoxFillTargetColumnEvenRows = 'linhas pares';
+
+  rsDefBlc = 'Bloco 1';
 implementation
 
 {$R *.lfm}
@@ -179,9 +211,6 @@ uses background, strutils
      , Loggers.Debug
      {$endif}
      ;
-
-const
-  CSESSION_SERVER = '127.0.1.1:50020';
 
 var
   LAST_BLOC_INIFILE_PATH : string;
@@ -285,29 +314,58 @@ begin
 end;
 
 procedure TFormUserConfig.XMLPropStorage1RestoreProperties(Sender: TObject);
+var
+  Texts : array [0..4] of string;
+  ItemIndexes : array [0..4] of integer;
+  ComboBoxes : array [0..4] of TComboBox;
+  i: Integer;
 begin
-  if FileExistsUTF8('stringgrid.csv') then
-    StringGrid1.LoadFromCSVFile('stringgrid.csv',',',True,0,False);
+  ComboBoxes[0] := ComboBoxLanguage;
+  ComboBoxes[1] := ComboBoxGridType;
+  ComboBoxes[2] := ComboBoxRandomize;
+  ComboBoxes[3] := ComboBoxFillTargetColumn;
+  ComboBoxes[4] := ComboBoxBlocCounter;
 
+  for i := Low(ComboBoxes) to High(ComboBoxes) do
+  begin
+    ItemIndexes[i] := ComboBoxes[i].ItemIndex;
+    Texts[i] := ComboBoxes[i].Text;
+  end;
+  SetDefaultLang(XMLPropStorage1.StoredValue['language']);
+  for i := Low(ComboBoxes) to High(ComboBoxes) do
+  begin
+    ComboBoxes[i].ItemIndex := ItemIndexes[i];
+    ComboBoxes[i].Text := Texts[i];
+  end;
   case ComboBoxGridType.ItemIndex of
     5 : CreateFormBloc;
     3..4 :
       begin
-        FormMTS := TFormMTS.Create(Application);
+        //FormMTS := TFormMTS.Create(Application);
         // todo: Load stringgrid objects
       end;
   end;
-  ComboBoxLanguageChange(Self);
   ResetRepetionMatrix;
+  if FileExistsUTF8('stringgrid.csv') then
+    StringGrid1.LoadFromCSVFile('stringgrid.csv',',',True,0,False);
 end;
 
 procedure TFormUserConfig.XMLPropStorage1SaveProperties(Sender: TObject);
 begin
+  // now we can't save stringgrind for mts/ds
   case ComboBoxGridType.ItemIndex of
     3..4 : SetGridHeader(StringGrid1,rsFillTypeMTS);
   end;
 
   StringGrid1.SaveToCSVFile('stringgrid.csv');
+end;
+
+procedure TFormUserConfig.XMLPropStorage1SavingProperties(Sender: TObject);
+begin
+  case ComboBoxLanguage.ItemIndex of
+    0 : XMLPropStorage1.StoredValue['language'] := 'pt-br';
+    1 : XMLPropStorage1.StoredValue['language'] := 'en';
+  end;
 end;
 
 function TFormUserConfig.MeetCondition(aCol, aRow : integer): boolean;
@@ -497,7 +555,7 @@ begin
     FrmBackground.Components[0].Free;
   FrmBackground.Invalidate;
   FrmBackground.Hide;
-  ShowMessage(rsEndSession)
+  ShowMessage(rsMessEndSession)
 end;
 
 procedure TFormUserConfig.btnRandomizeClick(Sender: TObject);
@@ -731,7 +789,7 @@ var
 begin
   Memo1.Clear;
   aNumTrials := StringGrid1.RowCount -1;
-  FEscriba.SessionServer := CSESSION_SERVER;
+  FEscriba.SessionServer := DefaultAddress;
   case ComboBoxGridType.ItemIndex of
     0 :
       begin
@@ -862,6 +920,7 @@ begin
       end;
 
     3..4 :
+      if Assigned(FormMTS) then
       begin
         if StringGrid1.RowCount > 2 then
           begin
@@ -938,46 +997,48 @@ procedure TFormUserConfig.ComboBoxGridTypeChange(Sender: TObject);
   end;
 
 begin
-  if FLastGridTypeItem <> ComboBoxGridType.ItemIndex then
-    begin
-      FLastGridTypeItem := ComboBoxGridType.ItemIndex;
-      CleanUp;
-    end;
-
   case ComboBoxGridType.ItemIndex of
     0:
       begin
+        CleanUp;
         SetGridHeader(StringGrid1,rsFillTypeAxes);
         ResetRepetionMatrix;
       end;
 
     1:
       begin
+        CleanUp;
         SetGridHeader(StringGrid1,rsFillTypeMatriz);
         ResetRepetionMatrix;
       end;
 
     2:
       begin
+        CleanUp;
         SetGridHeader(StringGrid1,rsFillTypeGoNoGo);
         ResetRepetionMatrix;
       end;
 
     3..4:
-      begin
-        SetGridHeader(StringGrid1,rsFillTypeMTS);
-        ResetRepetionMatrix;
-        FormMTS := TFormMTS.Create(Application);
-      end;
+      if (FLastGridTypeItem = 3) or
+         (FLastGridTypeItem = 4) then // do nothing
+      else
+        begin
+          CleanUp;
+          SetGridHeader(StringGrid1,rsFillTypeMTS);
+          ResetRepetionMatrix;
+        end;
 
     5:
       begin
+        CleanUp;
         SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
         ResetRepetionMatrix;
         CreateFormBloc;
         StringGrid1.Hint := rsHintBlocsAvailableRightClick;
       end;
     end;
+  FLastGridTypeItem := ComboBoxGridType.ItemIndex;
 end;
 
 procedure TFormUserConfig.ComboBoxLanguageChange(Sender: TObject);
@@ -986,38 +1047,49 @@ begin
     0 : SetDefaultLang('pt-br');
     1 : SetDefaultLang('en');
   end;
-  ComboBoxLanguage.Items[0] := rsLanguagePTBR;
-  ComboBoxLanguage.Items[1] := rsLanguageEN;
 
-  ComboBoxGridType.Items[0] := rsComboGridTypeEyeOrientationTask;
-  ComboBoxGridType.Items[1] := rsComboGridTypeFPE;
-  ComboBoxGridType.Items[2] := rsComboGridTypeGONOGO;
-  ComboBoxGridType.Items[3] := rsComboGridTypeSD;
-  ComboBoxGridType.Items[4] := rsComboGridTypeCD;
-  ComboBoxGridType.Items[5] := rsComboGridTypeBlocChain;
-
-  ComboBoxRandomize.Items[0] := rsComboBoxRandomizeTrialOrder;
-  ComboBoxRandomize.Items[1] := rsComboBoxRandomizeTrialOrderConstraints;
-  ComboBoxRandomize.Items[2] := rsComboBoxRandomizeResponses;
-
-  ComboBoxBlocCounter.Items[0] := rsComboBoxBlocCounterNone;
-  ComboBoxBlocCounter.Items[1] := rsComboBoxBlocCounterShowHitMiss;
-
-  LabelBlocName.Caption := rsBlocName;
-  LabelBlocCrtHitPorcentage.Caption := rsBlocCrtHitPorcentage;
-  LabelBlocCrtConsecutiveHit.Caption := rsBlocCrtConsecutiveHit;
-  LabelBlocMaxRepetition.Caption := rsBlocMaxBlcRepetition;
-  LabelBlocITI.Caption := rsBlocITI;
-  LabelBlocBkGnd.Caption := rsBlocBkGnd;
-  LabelBlocCounter.Caption := rsBlocCounter;
-  LabelBlocVirtualTrial.Caption := rsBlocVirtualTrialValue;
-  LabelBlocMaxCorrection.Caption := rsBlocMaxCorrection;
-  case ComboBoxGridType.ItemIndex of
-    -1..0: SetGridHeader(StringGrid1,rsFillTypeAxes);
-    1: SetGridHeader(StringGrid1,rsFillTypeMatriz);
-    2: SetGridHeader(StringGrid1,rsFillTypeGoNoGo);
-    3..4: SetGridHeader(StringGrid1,rsFillTypeMTS);
-    5: SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
+  // load from resource strings
+  with ComboBoxLanguage do
+    begin
+      Items[0] := rsLanguagePTBR;
+      Items[1] := rsLanguageEN;
+    end;
+  with ComboBoxGridType do
+    begin
+      Items[0] := rsComboGridTypeEyeOrientationTask;
+      Items[1] := rsComboGridTypeFPE;
+      Items[2] := rsComboGridTypeGONOGO;
+      Items[3] := rsComboGridTypeSD;
+      Items[4] := rsComboGridTypeCD;
+      Items[5] := rsComboGridTypeBlocChain;
+      case ItemIndex of
+        -1..0: SetGridHeader(StringGrid1,rsFillTypeAxes);
+        1: SetGridHeader(StringGrid1,rsFillTypeMatriz);
+        2: SetGridHeader(StringGrid1,rsFillTypeGoNoGo);
+        3..4: SetGridHeader(StringGrid1,rsFillTypeMTS);
+        5: SetGridHeader(StringGrid1,rsFillTypeBlocChaining);
+      end;
+    end;
+  with ComboBoxRandomize do
+    begin
+      Items[0] := rsComboBoxRandomizeTrialOrder;
+      Items[1] := rsComboBoxRandomizeTrialOrderConstraints;
+      Items[2] := rsComboBoxRandomizeResponses;
+    end;
+  with ComboBoxFillTargetColumn do
+    begin
+      Items[0] := rsComboBoxFillTargetColumnAllRows;
+      Items[1] := rsComboBoxFillTargetColumnOddRows;
+      Items[2] := rsComboBoxFillTargetColumnEvenRows;
+    end;
+  with ComboBoxBlocCounter do
+    begin
+      Items[0] := rsComboBoxBlocCounterNone;
+      Items[1] := rsComboBoxBlocCounterShowHitMiss;
+    end;
+  if Assigned(FormMTS) then
+  begin
+    FormMTS.UpdateLanguage;
   end;
 end;
 
@@ -1244,10 +1316,12 @@ begin
 
   3..4:
     begin
+      FormMTS := TFormMTS.Create(Application);
       FormMTS.MonitorToShow := GGlobalContainer.MonitorToShow;
-      FormMTS.ComboBoxTrialType.ItemIndex:=ComboBoxGridType.ItemIndex-3;
+      FormMTS.SetType(ComboBoxGridType.ItemIndex-3);
       if FormMTS.ShowModal = mrOK then
         begin
+          ComboBoxGridType.ItemIndex:=FormMTS.ComboBoxTrialType.ItemIndex+3;
           FormMTS.AddTrialsToGui(StringGrid1);
           FormMTS.Hide;
           ResetRepetionMatrix;

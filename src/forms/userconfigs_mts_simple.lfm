@@ -12,7 +12,7 @@ object FormMTS: TFormMTS
   OnActivate = FormActivate
   OnCreate = FormCreate
   SessionProperties = 'ComboBoxTrialType.ItemIndex;ComboBoxTrialType.Text;EditDefaultCsqHIT.Text;EditDefaultCsqMISS.Text;OpenDialog.InitialDir;SpinComparisons.Value;SpinCursor.Value;SpinPresentations.Value;Caption'
-  LCLVersion = '1.8.0.3'
+  LCLVersion = '1.8.0.4'
   object Panel1: TPanel
     Left = 0
     Height = 160
@@ -257,6 +257,7 @@ object FormMTS: TFormMTS
   object XMLPropStorage1: TXMLPropStorage
     StoredValues = <>
     FileName = 'session.xml'
+    OnSaveProperties = XMLPropStorage1SaveProperties
     OnRestoreProperties = XMLPropStorage1RestoreProperties
     left = 176
     top = 184

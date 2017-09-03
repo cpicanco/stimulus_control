@@ -47,6 +47,32 @@ procedure TrialFromGui(var ATrialSection : TStrings; ATrialType : string; ATrial
 procedure BlocFromGui(var ABlocSection : TStringList; AGuiBloc : TGuiBloc);
 procedure MainFromGui(var AMainSection : TStringList; AGuiMain : TGuiMain);
 
+resourcestring
+  rsFillTypeAxes = 'Eixos';
+  rsFillTypeMatriz = 'FP/FN';
+  rsFillTypeGoNoGo = 'Go/No-Go';
+  rsFillTypeMTS = 'MTS e Simples';
+  rsFillTypeBlocChaining = 'Encadear Blocos';
+
+  rsPosition = 'Bnd';
+  rsMTSRelation = 'Relação';
+  rsTrials = 'Tentativas';
+  rsConsequence = 'Consequência';
+  rsAngle = 'Ângulo';
+  rsExpectedResponse = 'Resposta';
+  rsContingency = 'Contingência';
+
+  rsSize = 'Tamanho';
+  rsSchedule = 'Esquema';
+  rsStimulus = 'Figura';
+  rsLimitedHold = 'Tempo/Estímulo';
+
+
+  rsBlocs = 'Bloco';
+  rsBlocName = 'Nome';
+  rsBlocNextBlocOnCriteria = 'Bloco seguinte se critério for atingido';
+  rsBlocNextBlocOnNotCriteria = 'Bloco seguinte se critério não for atingido';
+  rsBlocAddress = 'Endereço';
 implementation
 
 uses constants, Graphics;
@@ -247,7 +273,7 @@ begin
       if Assigned(PupilAddress) then
         AMainSection.Values[_ServerAddress] := PupilAddress.Text
       else
-        AMainSection.Values[_ServerAddress] := rsDefAddress;
+        AMainSection.Values[_ServerAddress] := DefaultAddress;
     end;
   AMainSection.EndUpdate;
 end;
