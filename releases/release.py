@@ -15,10 +15,11 @@ from subprocess import check_output,CalledProcessError,STDOUT
 import os
 import shutil
 from glob import glob
+import fnmatch
 
 def get_tag_commit():
     """
-    origial script from here:
+    original script from here:
     https://github.com/pupil-labs/pupil/blob/master/pupil_src/shared_modules/version_utils.py
 
     returns string: 'tag'-'commits since tag'-'7 digit commit id'
@@ -38,8 +39,22 @@ def compress_folder(src_dir, dst_filename):
 def delete_folder(dir_name):
     shutil.rmtree(dir_name)
 
-def copy_folder(src, dst):
-    shutil.copytree(src, dst)
+def _copy_folder(src, dst, sfilter):
+    matches = []
+    for root, dirnames, filenames in os.walk(src):
+        for filename in fnmatch.filter(filenames, sfilter):
+            matches.append(os.path.join(root, filename))
+
+    for filename in matches:
+        if not os.path.exists(dst):
+            os.makedirs(dst)
+        shutil.copyfile(filename, os.path.join(dst, os.path.basename(filename)))
+
+def copy_folder(src, dst, sfilter=None):
+    if sfilter == None:
+      shutil.copytree(src, dst)  
+    else:
+      _copy_folder(src, dst, sfilter)  
 
 def copy_file(src, dst):
     shutil.copyfile(src,dst)
@@ -63,12 +78,12 @@ if __name__ == "__main__":
 
     src_win32_libraries = [
         os.path.join(root_path, 'dependency/lbass/windows/32/bass.dll'),
-        os.path.join(root_path, 'dependency/libzmq/win10-32/libzmq.dll')
+        os.path.join(root_path, 'dependency/libzmq-builds/windows/32/libzmq.dll')
     ]
 
     src_win64_libraries = [
         os.path.join(root_path, 'dependency/lbass/windows/64/bass.dll'),
-        os.path.join(root_path, 'dependency/libzmq/win10-64/libzmq.dll')
+        os.path.join(root_path, 'dependency/libzmq-builds/windows/64/libzmq.dll')
     ]
 
     src_linux64_libraries = [
@@ -110,10 +125,19 @@ if __name__ == "__main__":
             dst_library = os.path.join(destination,os.path.basename(src_library))
             copy_file(src_library, dst_library)
 
-        # copy config_examples as Participante_1
+        # copy config_examples as examples
         src_examples = os.path.join(root_path, CONFIG_EXAMPLES_FOLDER)
-        dst_examples = os.path.join(destination,'Participante_1')
-        copy_folder(src_examples, dst_examples)
+        dst_examples = os.path.join(destination,'examples')
+        if 'win' in build_name:
+            copy_folder(src_examples, dst_examples, 'windows*.txt')
+
+        if 'linux' in build_name:
+            copy_folder(src_examples, dst_examples, 'linux*.txt')
+
+        # copy media as media
+        src_media = os.path.join(root_path, 'media')
+        dst_media = os.path.join(destination,'media')
+        copy_folder(src_media, dst_media)        
 
         # copy language files
         for src_lang in src_language_files:

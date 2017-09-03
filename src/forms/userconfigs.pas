@@ -1338,6 +1338,7 @@ begin
 
       FSession := TSession.Create(FrmBackground);
       FConfigs := TCfgSes.Create(FSession);
+      FConfigs.GlobalContainer.ExeName := Application.ExeName;
       if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
         begin
           FConfigs.GlobalContainer.MonitorToShow := 1;

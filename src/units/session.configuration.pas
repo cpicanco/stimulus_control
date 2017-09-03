@@ -35,6 +35,7 @@ type
     CounterManager : TCounterManager;
     RootData: string;
     RootMedia: string;
+    ExeName : string;
     TimeStart : Extended;
     TestMode : Boolean;
     MonitorToShow : Byte;
@@ -147,6 +148,7 @@ type
 implementation
 
 uses constants, Session.ConfigurationFile, Session.Configuration.GlobalContainer;
+
 { TCfgSes }
 
 function TCfgSes.GetCfgBlc(Ind: Integer): TCfgBlc;
@@ -227,6 +229,12 @@ var
     if not (APath[Length(APath)] = PathDelim) then APath:= APath + PathDelim;
   end;
 
+  function DefaultMediaPath: string;
+  begin
+    Result := ConcatPaths([ExtractFilePath(FGlobalContainer.ExeName), 'media']);
+    Result := IncludeTrailingPathDelimiter(Result);
+  end;
+
 begin
   Result := False;
   if FileExists(AFileName) then
@@ -247,6 +255,8 @@ begin
               // set media and data paths
               s1 := ReadString(_Main, _RootMedia, '');
               HandleRootPath(FGlobalContainer.RootMedia);
+              if not DirectoryExists(FGlobalContainer.RootMedia) then
+                 FGlobalContainer.RootMedia := DefaultMediaPath;
 
               s1 := ReadString(_Main, _RootData, '');
               HandleRootPath(FGlobalContainer.RootData);
