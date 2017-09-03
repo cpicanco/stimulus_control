@@ -179,6 +179,7 @@ msgid "C"
 msgstr "C"
 
 #: constants.rsconsequence
+msgctxt "constants.rsconsequence"
 msgid "Consequência"
 msgstr "Consequência"
 
@@ -191,7 +192,9 @@ msgid "Contar"
 msgstr "Contar"
 
 #: constants.rsdefaddress
-msgid "127.0.1.1:5020"
+#, fuzzy
+#| msgid "127.0.1.1:5020"
+msgid "127.0.1.1:50020"
 msgstr "127.0.1.1:5020"
 
 #: constants.rsdefblc
@@ -536,6 +539,16 @@ msgstr ""
 msgid "Pressione  o botão  para avançar."
 msgstr "Pressione  o botão  para avançar."
 
+#: pupil.client.error_not_implemented
+#, fuzzy
+msgctxt "pupil.client.error_not_implemented"
+msgid "Commando Pupil não implementado:"
+msgstr "Commando Pupil não implementado:"
+
+#: pupil.client.error_unknown_command
+msgid "Commando Pupil desconhecido:"
+msgstr ""
+
 #: session.hbegin_time
 msgid "Início:"
 msgstr "Início:"
@@ -559,6 +572,138 @@ msgstr "Nome_Sujeito:"
 #: session.htest_mode
 msgid "(Modo de Teste)"
 msgstr "(Modo de Teste)"
+
+#: tformmts.btnclose.caption
+msgid "Fechar"
+msgstr ""
+
+#: tformmts.btnminimizetoptab.caption
+msgid "Minimizar Aba"
+msgstr ""
+
+#: tformmts.btnminimizetoptab.hint
+msgid "Aperte barra de espaço para alternar a aba"
+msgstr ""
+
+#: tformmts.btnok.caption
+msgid "Adicionar à Lista"
+msgstr ""
+
+#: tformmts.caption
+msgid "Pareamento ao Modelo"
+msgstr ""
+
+#: tformmts.comboboxtrialtype.text
+msgid "Discriminação Simples"
+msgstr ""
+
+#: tformmts.editdefaultcsqhit.hint
+msgctxt "tformmts.editdefaultcsqhit.hint"
+msgid "Arquivo, Cor, Repetições, Tempo"
+msgstr ""
+
+#: tformmts.editdefaultcsqhit.text
+msgid "CSQ1.wav 0 0 1000"
+msgstr ""
+
+#: tformmts.editdefaultcsqhit.texthint
+msgctxt "tformmts.editdefaultcsqhit.texthint"
+msgid "Clique duas vezes para escolher o arquivo"
+msgstr ""
+
+#: tformmts.editdefaultcsqmiss.hint
+msgctxt "tformmts.editdefaultcsqmiss.hint"
+msgid "Arquivo, Cor, Repetições, Tempo"
+msgstr ""
+
+#: tformmts.editdefaultcsqmiss.text
+msgid "CSQ2.wav 0 0 1000"
+msgstr ""
+
+#: tformmts.editdefaultcsqmiss.texthint
+msgctxt "tformmts.editdefaultcsqmiss.texthint"
+msgid "Clique duas vezes para escolher o arquivo"
+msgstr ""
+
+#: tformmts.gbstimuli.caption
+msgid "Configurações gerais da tentativa"
+msgstr ""
+
+#: tformmts.gbstimuli1.caption
+#, fuzzy
+msgctxt "tformmts.gbstimuli1.caption"
+msgid "Consequência"
+msgstr "Consequência"
+
+#: tformmts.labelcomparisons.caption
+msgid "Número de Comparações"
+msgstr ""
+
+#: tformmts.labelcomparisons.hint
+msgctxt "tformmts.labelcomparisons.hint"
+msgid "Quantos estímulos de comparação?"
+msgstr ""
+
+#: tformmts.labeldefaultcsqhit.caption
+msgid "Durante o IET (Acerto)"
+msgstr ""
+
+#: tformmts.labeldefaultcsqhit.hint
+msgid "Consequência padrão para acerto"
+msgstr ""
+
+#: tformmts.labeldefaultcsqmiss.caption
+msgid "Durante o IET (Erro)"
+msgstr ""
+
+#: tformmts.labeldefaultcsqmiss.hint
+msgid "Consequência padrão para erro"
+msgstr ""
+
+#: tformmts.labeldefaultcursor.caption
+msgid "Cursor"
+msgstr ""
+
+#: tformmts.labeldefaultcursor.hint
+msgctxt "tformmts.labeldefaultcursor.hint"
+msgid "Imagem do cursor do mouse"
+msgstr ""
+
+#: tformmts.labelpresentations.caption
+msgid "Número de apresentações"
+msgstr ""
+
+#: tformmts.labelpresentations.hint
+msgctxt "tformmts.labelpresentations.hint"
+msgid "Quantas vezes cada estímulo será apresentado?"
+msgstr ""
+
+#: tformmts.labeltrialtype.caption
+msgid "Tipo"
+msgstr ""
+
+#: tformmts.labeltrialtype.hint
+msgid "Tipo de tentativa"
+msgstr ""
+
+#: tformmts.opendialog.title
+msgid "Selecionar arquivo de estímulo"
+msgstr ""
+
+#: tformmts.spincomparisons.hint
+msgctxt "tformmts.spincomparisons.hint"
+msgid "Quantos estímulos de comparação?"
+msgstr ""
+
+#: tformmts.spincursor.hint
+msgctxt "tformmts.spincursor.hint"
+msgid "Imagem do cursor do mouse"
+msgstr ""
+
+#: tformmts.spinpresentations.hint
+msgctxt "tformmts.spinpresentations.hint"
+msgid "Quantas vezes cada estímulo será apresentado?"
+msgstr ""
 
 #: tformuserconfig.btnexportstimulus.caption
 msgid "Exportar estímulo"
@@ -830,6 +975,7 @@ msgid "100"
 msgstr "100"
 
 #: zmq.pupilcommunication.error_not_implemented
+msgctxt "zmq.pupilcommunication.error_not_implemented"
 msgid "Commando Pupil não implementado:"
 msgstr "Commando Pupil não implementado:"
 
