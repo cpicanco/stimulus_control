@@ -88,8 +88,8 @@ resourcestring
   rsNegative = 'Negativa';
   rsStimuli = 'Estímulos';
   rsButtonAdd = 'Adicionar';
-  rsWindowTitleChoosePositive = 'Escolhas as figuras positivas';
-  rsWindowTitleChooseNegative = 'Escolhas as figuras negativas';
+  rsWindowTitleChoosePositive = 'Escolha as figuras positivas';
+  rsWindowTitleChooseNegative = 'Escolha as figuras negativas';
 
 implementation
 

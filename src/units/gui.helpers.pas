@@ -54,7 +54,6 @@ resourcestring
   rsFillTypeMTS = 'MTS e Simples';
   rsFillTypeBlocChaining = 'Encadear Blocos';
 
-  rsPosition = 'Bnd';
   rsMTSRelation = 'Relação';
   rsTrials = 'Tentativas';
   rsConsequence = 'Consequência';

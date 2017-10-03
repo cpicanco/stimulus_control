@@ -742,18 +742,6 @@ var
       end;
   end;
 
-  function GetNumComp : integer;
-  var TopRightCell : string;
-  begin
-    with StringGrid1 do
-      begin
-        TopRightCell := Cells[ColCount - 1, 0];
-        Delete(TopRightCell, Pos(rsPosition, TopRightCell), Length(rsPosition));
-        Delete(TopRightCell, Pos(rsComparison, TopRightCell), Length(rsComparison));
-        Result := StrToInt(TopRightCell);
-      end;
-  end;
-
   procedure SetupDefaultsFromGui;
   begin
     LGuiMain.Blocs := StringGrid1;
@@ -803,7 +791,6 @@ begin
         FEscriba.Media:= 'Media';
        // FEscriba.SetVariables;
         FEscriba.SetMain;
-
         B := FEscriba.Blcs[aBlc];
         with B do
           begin
@@ -853,62 +840,10 @@ begin
 
     1 :
       begin
-          aBlc := 0;
-
-          FEscriba.SessionName := EditSessionName.Text;
-          FEscriba.SessionSubject := EditParticipant.Text;
-          FEscriba.Blcs[aBlc].ITI := 2300;
-          FEscriba.SessionType  := 'CIC';
-          FEscriba.Data := 'Data';
-          FEscriba.Media:= 'Media';
-          // FEscriba.SetVariables;
-          FEscriba.SetMain;
-
-          B := FEscriba.Blcs[aBlc];
-          with B do
-            begin
-              Name := rsDefBlc;
-              BkGnd := clWhite;
-              VirtualTrialValue:= 1;
-              NumTrials := aNumTrials;
-            end;
-          FEscriba.Blcs[aBlc] := B;
-          FEscriba.SetBlc(aBlc, True);
-          FEscriba.SetLengthVetTrial(aBlc);
-          B := FEscriba.Blcs[aBlc];
-
-          for aTrial := Low(B.Trials) to High(B.Trials) do
-            begin
-              T := FEscriba.Blcs[aBlc].Trials[aTrial];
-              with T do
-                begin
-                  Id := aTrial + 1;
-                  Kind := T_FPFN;
-                  NumComp := GetNumComp;
-                  Name := StringGrid1.Cells[1, aTrial + 1] + #32 + IntToStr(Id);
-
-                  SList.BeginUpdate;
-                  SList.Values[_BkGnd] := IntToStr(clWhite);
-                  SList.Values[_Cursor] := IntToStr(crNone);
-                  SList.Values[_ShowStarter] := BoolToStr(False, '1','0');
-                  SList.Values[_LimitedHold] := '1700';
-                  SList.Values[_Schedule] := 'CRF';
-                  SList.Values[_Contingency] := StringGrid1.Cells[1, aTrial + 1];
-                  SList.Values[_NextTrial] := '0';
-
-                  for aStm := 1 to NumComp do
-                    begin
-                      SList.Values[_Comp + IntToStr(aStm) + _cBnd] := StringGrid1.Cells[aStm + 1 + NumComp, aTrial + 1];
-                      aValues :=  StringGrid1.Cells[aStm + 1, aTrial + 1] + #32;
-                      SList.Values[_Comp + IntToStr(aStm) + _cGap] := ExtractDelimited(1,aValues,[#32]);
-                      SList.Values[_Comp + IntToStr(aStm) + _cGap_Degree] := ExtractDelimited(2,aValues,[#32]);
-                      SList.Values[_Comp + IntToStr(aStm) + _cGap_Length] := ExtractDelimited(3,aValues,[#32]);
-                    end;
-                  SList.EndUpdate;
-                end;
-              FEscriba.Blcs[aBlc].Trials[aTrial] := T;
-              FEscriba.SetTrial(aTrial);
-            end;
+        SetupDefaultsFromGui;
+        FormFPE.WriteToDisk(LDefaultMain,LDefaultBloc,StringGrid1,LAST_BLOC_INIFILE_PATH);
+        Memo1.Lines.LoadFromFile(LAST_BLOC_INIFILE_PATH);
+        FreeDefaults;
       end;
 
     2 :
@@ -1169,53 +1104,6 @@ var
       end;
   end;
 
-  procedure AddMatrixTrialToGrid;
-  var
-    aComp, LowComp, HighComp : integer;
-    aContingency, aPosition : string;
-
-  begin
-    if FormFPE.Trials[aTrial].Positive then
-      aContingency := rsPositive
-    else
-      aContingency := rsNegative;
-
-
-    with StringGrid1 do
-      begin
-        if (aRow + 1) > RowCount then RowCount := aRow + 1;
-        Cells[0, aRow] := IntToStr(aRow);    //Trial Number
-        Cells[1, aRow] := aContingency;
-        aCol := 2;
-
-        LowComp := Low(FormFPE.Trials[aTrial].Comps);
-        HighComp := High(FormFPE.Trials[aTrial].Comps);
-        //ShowMessage(IntToStr(LowComp) + ' ' + IntToStr(HighComp));
-        for aComp := LowComp to HighComp do
-          begin
-            if (aCol + 1) > ColCount then ColCount := aCol + 1;
-            Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1);
-            Cells[aCol, aRow] := FormFPE.Trials[aTrial].Comps[aComp].Path;
-            Inc(aCol);
-          end;
-
-        LowComp := Low(FormFPE.Trials[aTrial].Comps);
-        HighComp := High(FormFPE.Trials[aTrial].Comps);
-        for aComp := LowComp to HighComp do
-          begin
-            if (aCol + 1) > ColCount then ColCount := aCol + 1;
-            Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1) + rsPosition;
-            aPosition := IntToStr(FormFPE.Trials[aTrial].Comps[aComp].Top) + #32 +
-                         IntToStr(FormFPE.Trials[aTrial].Comps[aComp].Left) + #32 +
-                         IntToStr(FormFPE.Trials[aTrial].Comps[aComp].Width) + #32 +
-                         IntToStr(FormFPE.Trials[aTrial].Comps[aComp].Height);
-
-            Cells[aCol, aRow] := aPosition;
-            Inc(aCol);
-          end;
-        Inc(aRow);
-      end;
-  end;
 begin
   GGlobalContainer := TGlobalContainer.Create;
   if chkPlayOnSecondMonitor.Checked and (Screen.MonitorCount > 1) then
@@ -1266,40 +1154,23 @@ begin
         else FrmBresenhamLine.Free;
       end;
 
-    {
-      Example:
-
-      3 x 3 matriz = 9 positions
-      2 trials per position
-      ______________________________
-
-      Equals to a Group of 18 trials to repeat.
-
-      It gives 72 trials repeating it by 4.
-      ______________________________
-
-    }
     1:
       begin
-        aRow := 1;
-        aCol := 0;
         FormFPE := TFormFPE.Create(Application);
         FormFPE.MonitorToShow := GGlobalContainer.MonitorToShow;
         if FormFPE.ShowModal = mrOk then
           begin
-            for aTrial := Low(FormFPE.Trials) to High(FormFPE.Trials) do AddMatrixTrialToGrid;
-
-            //FNumTrials := aRow - 1;
-            {$ifdef DEBUG}
-              DebugLn(mt_Information + FormFPE.ClassName + ' instance returned ' + IntToStr(aRow - 1) + ' trials.');
-            {$endif}
+            FormFPE.AddTrialsToGrid(StringGrid1);
+            case FormFPE.RadioGroupEffect.ItemIndex of
+              0: EditBlocName.Text := 'FP';
+              1: EditBlocName.Text := 'FN';
+            end;
             FormFPE.Free;
             ResetRepetionMatrix;
             FLastFocusedCol := -1;
           end
         else FormFPE.Free;
       end;
-
 
   2:
     begin
@@ -1311,7 +1182,8 @@ begin
           FormGo_NoGo.Free;
           ResetRepetionMatrix;
           FLastFocusedCol := -1;
-        end;
+        end
+      else FormGo_NoGo.Free;
     end;
 
   3..4:

@@ -107,7 +107,6 @@ operator in (const A: TSimpleSession; const B: TSessions): boolean;
 operator in (const A: TSimpleBlc; const B: TSimpleBlcs): boolean;
 
 resourcestring
-  rsComparison = 'C';
   rsCaptionBlocs = 'Blocos';
   rsCaptionSessions = 'Sessões';
   rsCaptionNodeEnd= 'FIM';

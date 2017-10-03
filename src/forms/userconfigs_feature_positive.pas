@@ -14,7 +14,7 @@ unit userconfigs_feature_positive;
 interface
 
 uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
-     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList
+     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList, Grids
      , GUI.Helpers.Grids
      , Canvas.Helpers
      ;
@@ -85,27 +85,35 @@ type
       function GetCircleGrid(AMonitor : integer) : TStmCircleGrid;
       procedure SetMonitor(AValue: integer);
     public
+      procedure AddTrialsToGrid(ATrialGrid : TStringGrid);
       procedure SetMatrix(AStmMatrix: TStmMatrix);
       procedure SetCircleGrid(AStmCircleGrid : TStmCircleGrid);
       procedure SetFullScreen(TurnOn : Boolean);
-      property Trials : TTrials read FTrials write FTrials;
+      procedure WriteToDisk(ADefaultMainSection: TStrings; ADefaultBlocSection : TStrings;
+        ATrialGrid : TStringGrid; AFilename : string);
       property MonitorToShow : integer read FMonitor write SetMonitor;
     end;
 
 var
   FormFPE: TFormFPE;
 
+resourcestring
+  rsPositive = 'Positiva';
+  rsNegative = 'Negativa';
+  rsComparison = 'C';
+  rsPosition = 'Bnd';
+
 implementation
 
 {$R *.lfm}
 
+uses LazFileUtils, Session.ConfigurationFile, GUI.Helpers, strutils, constants;
 { TFormFPE }
 
 procedure TFormFPE.FormActivate(Sender: TObject);
 begin
-  BorderStyle := bsNone;
-  WindowState := wsFullScreen;
-  Left := Screen.Monitors[MonitorToShow].Left;
+  //BorderStyle := bsNone;
+  WindowState := wsMaximized;
   FCurrentTrial := 0;
   //SetMatrix(GetMatrix(MonitorToShow));
   SetCircleGrid(GetCircleGrid(MonitorToShow));
@@ -166,16 +174,16 @@ begin
         //DrawCircle(Canvas, 300, 300, 100, True, 50, 5 );
         if RadioGroupGrids.ItemIndex <> -1 then
           begin
-            for i := Low(Trials[FCurrentTrial].Comps) to Length(Trials[FCurrentTrial].Comps)-1 do
+            for i := Low(FTrials[FCurrentTrial].Comps) to Length(FTrials[FCurrentTrial].Comps)-1 do
               begin
-                aR.Left := Trials[FCurrentTrial].Comps[i].Left;
-                aR.Top := Trials[FCurrentTrial].Comps[i].Top;
-                aWidth := Trials[FCurrentTrial].Comps[i].Width;
+                aR.Left := FTrials[FCurrentTrial].Comps[i].Left;
+                aR.Top := FTrials[FCurrentTrial].Comps[i].Top;
+                aWidth := FTrials[FCurrentTrial].Comps[i].Width;
                 aR.Right := aR.Left + aWidth;
-                aHeight := Trials[FCurrentTrial].Comps[i].Height;
+                aHeight := FTrials[FCurrentTrial].Comps[i].Height;
                 aR.Bottom := aR.Top + aHeight;
 
-                aGapValues := Trials[FCurrentTrial].Comps[i].Path;
+                aGapValues := FTrials[FCurrentTrial].Comps[i].Path;
                 //WriteLn(aGapValues);
                 aGap := StrToBoolDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),False);
                 NextValue(aGapValues);
@@ -190,8 +198,8 @@ begin
                 end;
               end;
             i := FCurrentTrial + 1;
-            Canvas.TextOut(Trials[i-1].Comps[0].Left - 10, Trials[i-1].Comps[0].Top - 10 , IntToStr(i));
-            Canvas.TextOut(Trials[i-1].Comps[0].Left - 20, Trials[i-1].Comps[0].Top - 30 , BoolToStr(Trials[FCurrentTrial].Positive, 'Positive', 'Negative'));
+            Canvas.TextOut(FTrials[i-1].Comps[0].Left - 10, FTrials[i-1].Comps[0].Top - 10 , IntToStr(i));
+            Canvas.TextOut(FTrials[i-1].Comps[0].Left - 20, FTrials[i-1].Comps[0].Top - 30 , BoolToStr(FTrials[FCurrentTrial].Positive, 'Positive', 'Negative'));
           end;
 
       finally
@@ -203,7 +211,7 @@ end;
 
 procedure TFormFPE.PreviewTimerTimer(Sender: TObject);
 begin
-  if FCurrentTrial < High(Trials) then
+  if FCurrentTrial < High(FTrials) then
     Inc(FCurrentTrial)
   else FCurrentTrial := 0;
   Invalidate;
@@ -277,6 +285,69 @@ procedure TFormFPE.SetMonitor(AValue: integer);
 begin
   if FMonitor = AValue then Exit;
   FMonitor := AValue;
+  Left := Screen.Monitors[FMonitor].Left;
+end;
+
+procedure TFormFPE.AddTrialsToGrid(ATrialGrid: TStringGrid);
+var
+  aComp, LowComp, HighComp : integer;
+  aContingency, aPosition : string;
+  aCol, aRow, aTrial : integer;
+begin
+  {
+    Example:
+
+    3 x 3 matriz = 9 positions
+    2 trials per position
+    ______________________________
+
+    Equals to a Group of 18 trials to repeat.
+
+    It gives 72 trials repeating it by 4.
+    ______________________________
+
+  }
+  aRow := 1;
+  aCol := 0;
+  for aTrial := Low(FTrials) to High(FTrials) do
+  begin
+    if FTrials[aTrial].Positive then
+      aContingency := rsPositive
+    else
+      aContingency := rsNegative;
+
+    with ATrialGrid do
+      begin
+        if (aRow + 1) > RowCount then RowCount := aRow + 1;
+        Cells[0, aRow] := IntToStr(aRow);    //Trial Number
+        Cells[1, aRow] := aContingency;
+        aCol := 2;
+
+        LowComp := Low(FTrials[aTrial].Comps);
+        HighComp := High(FTrials[aTrial].Comps);
+        for aComp := LowComp to HighComp do
+        begin
+          if (aCol + 1) > ColCount then ColCount := aCol + 1;
+          Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1);
+          Cells[aCol, aRow] := FTrials[aTrial].Comps[aComp].Path;
+          Inc(aCol);
+        end;
+
+        for aComp := LowComp to HighComp do
+        begin
+          if (aCol + 1) > ColCount then ColCount := aCol + 1;
+          Cells[aCol, 0] := rsComparison + IntToStr(aComp + 1) + rsPosition;
+          aPosition := IntToStr(FTrials[aTrial].Comps[aComp].Top) + #32 +
+                       IntToStr(FTrials[aTrial].Comps[aComp].Left) + #32 +
+                       IntToStr(FTrials[aTrial].Comps[aComp].Width) + #32 +
+                       IntToStr(FTrials[aTrial].Comps[aComp].Height);
+
+          Cells[aCol, aRow] := aPosition;
+          Inc(aCol);
+        end;
+        Inc(aRow);
+      end;
+    end;
 end;
 
 procedure TFormFPE.SetMatrix(AStmMatrix : TStmMatrix);
@@ -296,7 +367,7 @@ begin
   SetLength( FTrials, (seTrials.Value*LCount)*2);
 
   // set coordenates to memory
-  for LTrial := Low(Trials) to High(Trials) do
+  for LTrial := Low(FTrials) to High(FTrials) do
     begin
       SetLength(FTrials[LTrial].Comps, LCount);
 
@@ -313,8 +384,8 @@ begin
 
       LHasGap := (LTrial mod 2) = 0;
       case RadioGroupEffect.ItemIndex of
-       0: Trials[LTrial].Positive := LHasGap;
-       1: Trials[LTrial].Positive := not LHasGap;
+       0: FTrials[LTrial].Positive := LHasGap;
+       1: FTrials[LTrial].Positive := not LHasGap;
       end;
 
       for LComp := 0 to LCount -1 do
@@ -323,10 +394,10 @@ begin
             begin
               LGapDegree := 1+Random(360);
               LGapLength := seGapLength.Value;
-              Trials[LTrial].Comps[LComp].Path := '1' + #32 + IntToStr(LGapDegree) + #32 + IntToStr(LGapLength) + #32;
+              FTrials[LTrial].Comps[LComp].Path := '1' + #32 + IntToStr(LGapDegree) + #32 + IntToStr(LGapLength) + #32;
             end
           else
-            Trials[LTrial].Comps[LComp].Path := '0' + #32 + '1' + #32 + '360' + #32;
+            FTrials[LTrial].Comps[LComp].Path := '0' + #32 + '1' + #32 + '360' + #32;
         end;
 
       if LHasGap then
@@ -358,14 +429,14 @@ begin
   SetLength(FTrials, (seTrials.Value*LCount)*2);
 
   // set coordenates to memory
-  for LTrial := Low(Trials) to High(Trials) do
+  for LTrial := Low(FTrials) to High(FTrials) do
     begin
       SetLength(FTrials[LTrial].Comps, LCount);
 
       LHasGap := (LTrial mod 2) = 0;
       case RadioGroupEffect.ItemIndex of
-       0: Trials[LTrial].Positive := LHasGap;
-       1: Trials[LTrial].Positive := not LHasGap;
+       0: FTrials[LTrial].Positive := LHasGap;
+       1: FTrials[LTrial].Positive := not LHasGap;
       end;
 
       for i := Low(AStmCircleGrid) to High(AStmCircleGrid) do
@@ -379,10 +450,10 @@ begin
             begin
               LGapDegree := 1+Random(360);
               LGapLength := seGapLength.Value;
-              Trials[LTrial].Comps[i].Path := '1' + #32 + IntToStr(LGapDegree) + #32 + IntToStr(LGapLength) + #32;
+              FTrials[LTrial].Comps[i].Path := '1' + #32 + IntToStr(LGapDegree) + #32 + IntToStr(LGapLength) + #32;
             end
           else // no gap
-            Trials[LTrial].Comps[i].Path := '0' + #32 + '1' + #32 + '360' + #32;
+            FTrials[LTrial].Comps[i].Path := '0' + #32 + '1' + #32 + '360' + #32;
         end;
 
       if LHasGap then
@@ -446,6 +517,66 @@ begin
       {$ENDIF}
     end;
   FFullScreen := TurnOn;
+end;
+
+procedure TFormFPE.WriteToDisk(ADefaultMainSection: TStrings;
+  ADefaultBlocSection: TStrings; ATrialGrid: TStringGrid; AFilename: string);
+var
+  LRow : integer;
+  LNewBloc : TConfigurationFile;
+  LNumComp : Integer;
+  LValues : string;
+  i : integer;
+  function GetNumComp : integer;
+  var TopRightCell : string;
+  begin
+    with ATrialGrid do
+      begin
+        TopRightCell := Cells[ColCount - 1, 0];
+        Delete(TopRightCell, Pos(rsPosition, TopRightCell), Length(rsPosition));
+        Delete(TopRightCell, Pos(rsComparison, TopRightCell), Length(rsComparison));
+        Result := StrToInt(TopRightCell);
+      end;
+  end;
+begin
+  if FileExistsUTF8(AFilename) then
+    DeleteFileUTF8(AFilename);
+
+  LNewBloc := TConfigurationFile.Create(AFilename);
+  LNewBloc.CacheUpdates:=True;
+  LNewBloc.WriteMain(ADefaultMainSection);
+  LNewBloc.WriteBlocIfEmpty(1,ADefaultBlocSection);
+
+  with ATrialGrid do
+    for LRow := 1 to RowCount-1 do
+      begin
+         //SList.Values[_BkGnd] := IntToStr(clWhite);
+          LNewBloc.WriteToTrial(LRow, _Kind, T_FPFN);
+          LNewBloc.WriteToTrial(LRow, _Name,           Cells[1, LRow] + #32 + IntToStr(LRow));
+          LNewBloc.WriteToTrial(LRow, _Contingency,    Cells[1, LRow]);
+          LNewBloc.WriteToTrial(LRow, _Schedule,       T_CRF);
+          LNewBloc.WriteToTrial(LRow, _ShowStarter,    BoolToStr(False, '1','0'));
+          LNewBloc.WriteToTrial(LRow, _Cursor,         IntToStr(crNone));
+          LNewBloc.WriteToTrial(LRow, _LimitedHold,    '1700');
+          LNewBloc.WriteToTrial(LRow, _NextTrial,      '0');
+
+          LNumComp := GetNumComp;
+          for i := 1 to LNumComp do
+            begin
+              LNewBloc.WriteToTrial(LRow,_Comp+IntToStr(i)+_cBnd, Cells[i+1+LNumComp, LRow]);
+              LValues :=  Cells[i + 1, LRow] + #32;
+              LNewBloc.WriteToTrial(LRow,_Comp + IntToStr(i) + _cGap, ExtractDelimited(1,LValues,[#32]));
+              LNewBloc.WriteToTrial(LRow,_Comp + IntToStr(i) + _cGap_Degree, ExtractDelimited(2,LValues,[#32]));
+              LNewBloc.WriteToTrial(LRow,_Comp + IntToStr(i) + _cGap_Length, ExtractDelimited(3,LValues,[#32]));
+            end;
+      end;
+
+  // update numblc and numtrials
+  LNewBloc.Invalidate;
+
+  // Save changes to disk
+  LNewBloc.UpdateFile;
+  LNewBloc.Free;
 end;
 
 end.
