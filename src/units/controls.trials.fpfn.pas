@@ -292,8 +292,7 @@ begin
           end;
       end;
 
-  if not TBackground(Self.Parent).DrawMask then
-    TBackground(Self.Parent).DrawMask:=True;
+  TBackground(Self.Parent).DrawMask:=True;
 
   DrawForeground(LCircles, FFeaturesToDraw);
 

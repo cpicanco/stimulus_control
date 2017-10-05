@@ -89,17 +89,15 @@ end;
 procedure TBackground.SetDrawMask(AValue: Boolean);
 begin
   if FDrawMask=AValue then Exit;
-  if DynamicMask then
-    FTimer.Enabled:=AValue
-  else
-    FTimer.Enabled:=False;
   FDrawMask:=AValue;
 end;
 
 procedure TBackground.SetDynamicMask(AValue: Boolean);
 begin
   if FDynamicMask=AValue then Exit;
+  if not DrawMask then Exit;
   FDynamicMask:=AValue;
+  FTimer.Enabled:=AValue;
 end;
 
 procedure TBackground.SetBorder(AValue: integer);
