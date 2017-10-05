@@ -551,8 +551,10 @@ end;
 
 procedure TFormUserConfig.EndSession(Sender: TObject);
 begin
+  FrmBackground.DrawMask:=False;
   while FrmBackground.ComponentCount > 0 do
     FrmBackground.Components[0].Free;
+
   FrmBackground.Invalidate;
   FrmBackground.Hide;
   ShowMessage(rsMessEndSession)
@@ -709,7 +711,7 @@ end;
 procedure TFormUserConfig.btnTrialsDoneClick(Sender: TObject);
 var
   aTrial, aStm, aBlc, aNumTrials : integer;
-  aValues : string;
+
   T : TCfgTrial;
   B : TCfgBlc;
   LDefaultMain : TStringList;
@@ -777,10 +779,15 @@ var
 begin
   Memo1.Clear;
   aNumTrials := StringGrid1.RowCount -1;
-  FEscriba.SessionServer := DefaultAddress;
   case ComboBoxGridType.ItemIndex of
     0 :
       begin
+        FEscriba := TEscriba.Create(nil);
+        FEscriba.Memo := Memo1;
+        FEscriba.NumBlc := 1;
+        FEscriba.SetLengthVetBlc;
+        FEscriba.SessionServer := DefaultAddress;
+
         aBlc := 0;
 
         FEscriba.SessionName := EditSessionName.Text;
@@ -835,7 +842,9 @@ begin
               end;
             FEscriba.Blcs[aBlc].Trials[aTrial] := T;
             FEscriba.SetTrial(aTrial);
+
           end;
+        FEscriba.Free;
       end;
 
     1 :
@@ -1258,11 +1267,6 @@ begin
   );
   Randomize;
   ResetRepetionMatrix;
-
-  FEscriba := TEscriba.Create(Application);
-  FEscriba.Memo := Memo1;
-  FEscriba.NumBlc := 1;
-  FEscriba.SetLengthVetBlc;
 end;
 
 procedure TFormUserConfig.FormDestroy(Sender: TObject);
@@ -1312,13 +1316,36 @@ end;
 
 procedure TFormUserConfig.btnSaveClick(Sender: TObject);
 var aDirectory : string;
+  procedure SaveFile(AFileName: string);
+  var
+    LFilePath, LExtension, LBasename: string;
+    i : Integer;
+  begin
+    LFilePath := ExtractFilePath(AFilename);
+    LBasename := ExtractFileNameOnly(AFilename);
+    LExtension := ExtractFileExt(AFilename);
+
+    case LExtension of
+    '', '.ini' : LExtension:='.txt';
+    end;
+
+    i := 0;
+    while FileExists(AFilename) do
+     begin
+       Inc(i);
+       AFilename := LFilePath+LBasename+'_'+Format('%.3d', [i])+LExtension;
+     end;
+
+    Memo1.Lines.SaveToFile(AFilename);
+  end;
+
 begin
   aDirectory := GetCurrentDirUTF8 + PathDelim + EditParticipant.Text;
   if ForceDirectoriesUTF8(aDirectory) then
     SaveDialog1.InitialDir := aDirectory;
 
   if SaveDialog1.Execute then
-    FEscriba.SaveMemoTextToTxt(SaveDialog1.FileName);
+    SaveFile(SaveDialog1.FileName);
 end;
 
 procedure TFormUserConfig.ButtonRandomizeTargetSessionClick(Sender: TObject);
