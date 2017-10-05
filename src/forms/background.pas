@@ -73,6 +73,8 @@ end;
 
 procedure TBackground.FormCreate(Sender: TObject);
 begin
+  Width := Screen.Width;
+  Height := Screen.Height;
   FTimer := TTimer.Create(Self);
   FTimer.Enabled := False;
   FTimer.Interval := 100;
