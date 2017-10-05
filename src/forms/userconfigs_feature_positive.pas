@@ -561,6 +561,7 @@ begin
           LNewBloc.WriteToTrial(LRow, _NextTrial,      '0');
 
           LNumComp := GetNumComp;
+          LNewBloc.WriteToTrial(LRow, _NumComp,        IntToStr(LNumComp));
           for i := 1 to LNumComp do
             begin
               LNewBloc.WriteToTrial(LRow,_Comp+IntToStr(i)+_cBnd, Cells[i+1+LNumComp, LRow]);
