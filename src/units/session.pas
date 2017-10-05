@@ -60,7 +60,7 @@ type
     procedure PupilMultipartReceived(Sender: TObject; APupilMessage : TPupilMessage);
     procedure PupilRecordingStarted(Sender: TObject; APupilMessage : TPupilMessage);
     {$ENDIF}
-    procedure PupilRequestReceived(Sender: TObject; ARequest, AResponse : string);
+    procedure PupilReplyReceived(Sender: TObject; ARequest, AReply : string);
     procedure SetBackGround(BackGround: TWinControl);
     procedure SetPupilClient(AValue: Boolean);
     procedure StmResponse(Sender:TObject);
@@ -263,8 +263,8 @@ begin
 end;
 {$ENDIF}
 
-procedure TSession.PupilRequestReceived(Sender: TObject; ARequest,
-  AResponse: string);
+procedure TSession.PupilReplyReceived(Sender: TObject; ARequest,
+  AReply: string);
 begin
   {$ifdef DEBUG}
     DebugLn(mt_Information + ARequest + #32 + AResponse);
@@ -380,7 +380,7 @@ begin
       {$IFNDEF NO_LIBZMQ}
       with FGlobalContainer.PupilClient do
         begin
-          OnRequestReceived := @PupilRequestReceived;
+          OnReplyReceived := @PupilReplyReceived;
           OnMultiPartMessageReceived := @PupilMultipartReceived;
           OnRecordingStarted := @PupilRecordingStarted;
           //OnCalibrationSuccessful := @PupilCalibrationSuccessful;
