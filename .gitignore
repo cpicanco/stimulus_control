@@ -42,6 +42,7 @@ docs/config_examples/Data/*
 releases/*
 !releases/*.py
 
+languages/*win10*.po
 # link
 stimulus_control
 
