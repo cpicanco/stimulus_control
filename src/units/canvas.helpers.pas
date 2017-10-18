@@ -244,10 +244,7 @@ begin
       Brush.Style := bsClear;
       Brush.Color:=clWhite;
       //Ellipse(AR);
-      if gap then
-        Arc(AR.Left,AR.Top,AR.Right,AR.Bottom, gap_degree*16, (360-gap_length)*28)
-      else
-        Arc(AR.Left,AR.Top,AR.Right,AR.Bottom, 0, 360*16);
+      Arc(AR.Left,AR.Top,AR.Right,AR.Bottom, gap_degree, gap_length)
     end;
 end;
 

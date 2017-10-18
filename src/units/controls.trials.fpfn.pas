@@ -287,7 +287,7 @@ begin
               fpfnFullOuterInnerCircles.:InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
             end;
             gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(i+1) + _cGap], False );
-            gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], 1+Random(360));
+            gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], Random(361));
             gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 );
           end;
       end;
