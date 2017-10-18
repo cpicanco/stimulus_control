@@ -194,7 +194,7 @@ begin
                 aGapLength := 16*(360-StrToIntDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),360));
                 case RadioGroupGrids.ItemIndex of
                  0: DrawCustomEllipse(Canvas,aR,GetInnerRect(aR,aWidth,aHeight),aGap,aGapDegree,aGapLength);
-                 1: DrawCustomEllipse(Canvas,AR,aGap,aGapDegree,aGapLength);
+                 1: DrawCustomEllipse(Canvas,AR,aGapDegree,aGapLength);
                 end;
               end;
             i := FCurrentTrial + 1;

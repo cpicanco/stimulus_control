@@ -229,7 +229,7 @@ begin
     with ACircles[i] do
       case AFeaturesToDraw of
         fpfnClearCircles:
-          DrawCustomEllipse(FForeground.Canvas, OuterRect, gap, gap_degree, gap_length);
+          DrawCustomEllipse(FForeground.Canvas, OuterRect, gap_degree, gap_length);
         fpfnFullOuterInnerCircles:
           DrawCustomEllipse(FForeground.Canvas, OuterRect, InnerRect, gap, gap_degree, gap_length);
       end;
@@ -288,7 +288,7 @@ begin
             end;
             gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(i+1) + _cGap], False );
             gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], Random(361));
-            gap_length := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 );
+            gap_length := 16 * (360-StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 ));
           end;
       end;
 
