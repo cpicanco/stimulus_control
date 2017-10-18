@@ -267,7 +267,7 @@ procedure TSession.PupilReplyReceived(Sender: TObject; ARequest,
   AReply: string);
 begin
   {$ifdef DEBUG}
-    DebugLn(mt_Information + ARequest + #32 + AResponse);
+    DebugLn(mt_Information + ARequest + #32 + AReply);
   {$endif}
 end;
 
