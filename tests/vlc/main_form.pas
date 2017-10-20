@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, lclvlc, vlc
+  ExtCtrls, Video.VLC
   ;
 
 type
@@ -16,17 +16,12 @@ type
   TForm1 = class(TForm)
     Button1: TButton;
     Panel1: TPanel;
-    Timer1: TTimer;
     procedure Button1Click(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure Timer2Timer(Sender: TObject);
   private
-    VLCMediaItems : TVLCMediaItems;
-    VLCMediaItem : TVLCMediaItem;
-    LCLVLCPlayer1 : TLCLVLCPlayer;
+    FPlayer : TVLCVideoPlayer;
     procedure LCLVLCPlayerBackward(Sender: TObject);
     procedure LCLVLCPlayerBuffering(Sender: TObject);
     procedure LCLVLCPlayerEOF(Sender: TObject);
@@ -53,7 +48,7 @@ var
   Form1: TForm1;
 
 const
-  CFILE = '/home/rafael/git/stimulus_control/Participante1/Media/V1.mp4';
+  CFILE = '../../Participante1/Media/V1.mp4';
 
 implementation
 
@@ -63,67 +58,31 @@ implementation
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  LCLVLCPlayer1.Play(VLCMediaItem);
-end;
-
-procedure TForm1.FormActivate(Sender: TObject);
-begin
-  //LCLVLCPlayer1.PlayFile(CFILE); slower
-  //LCLVLCPlayer1.Play(VLCMediaItem);
+  FPlayer.Play;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  LCLVLCPlayer1 := TLCLVLCPlayer.Create(Self);
-  LCLVLCPlayer1.FitWindow := True;
-  LCLVLCPlayer1.ParentWindow := Self;
-  LCLVLCPlayer1.UseEvents := True;
-  with LCLVLCPlayer1 do
-    begin
-      OnBackward:=@LCLVLCPlayerBackward;
-      OnBuffering:=@LCLVLCPlayerBuffering;
-      OnEOF:=@LCLVLCPlayerEOF;
-      OnError:=@LCLVLCPlayerError;
-      OnForward:=@LCLVLCPlayerForward;
-      OnLengthChanged:=@LCLVLCPlayerLengthChanged;
-      OnMediaChanged:=@LCLVLCPlayerMediaChanged;
-      OnNothingSpecial:=@LCLVLCPlayerNothingSpecial;
-      OnOpening:=@LCLVLCPlayerOpening;
-      OnPausableChanged:=@LCLVLCPlayerPausableChanged;
-      OnPause:=@LCLVLCPlayerPause;
-      OnPlaying:=@LCLVLCPlayerPlaying;
-      OnPositionChanged:=@LCLVLCPlayerPositionChanged;
-      OnSeekableChanged:=@LCLVLCPlayerSeekableChanged;
-      OnSnapshot:=@LCLVLCPlayerSnapshot;
-      OnStop := @LCLVLCPlayerStop;
-      OnTimeChanged:=@LCLVLCPlayerTimeChanged;
-      OnTitleChanged:=@LCLVLCPlayerTitleChanged;
-    end;
-  VLCMediaItem := TVLCMediaItem.Create(nil);
-  VLCMediaItem.Path := CFILE;
-end;
-
-procedure TForm1.FormDestroy(Sender: TObject);
-begin
-  VLCMediaItems.Free;
+  FPlayer := TVLCVideoPlayer.Create(Self);
+  FPlayer.LoadFromFile(CFILE);
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);
 begin
-  Timer1.Enabled:=False;
-  LCLVLCPlayer1.Pause;
-  Timer1.OnTimer:=@Timer2Timer;
-  Timer1.Interval:= 2000;
-  Timer1.Enabled:=True;
+  //Timer1.Enabled:=False;
+  //LCLVLCPlayer1.Pause;
+  //Timer1.OnTimer:=@Timer2Timer;
+  //Timer1.Interval:= 2000;
+  //Timer1.Enabled:=True;
 end;
 
 procedure TForm1.Timer2Timer(Sender: TObject);
 begin
-  Timer1.Enabled:=False;
-  LCLVLCPlayer1.Resume;
-  Timer1.OnTimer:=@Timer1Timer;
-  Timer1.Interval:= 2000;
-  Timer1.Enabled:=True;
+  //Timer1.Enabled:=False;
+  //LCLVLCPlayer1.Resume;
+  //Timer1.OnTimer:=@Timer1Timer;
+  //Timer1.Interval:= 2000;
+  //Timer1.Enabled:=True;
 end;
 
 procedure TForm1.LCLVLCPlayerBackward(Sender: TObject);
@@ -185,14 +144,14 @@ procedure TForm1.LCLVLCPlayerPlaying(Sender: TObject);
 var
   LVideoDuration : LongInt;
 begin
-  // get time in miliseconds;
-  LVideoDuration := DateTimeToTimeStamp(LCLVLCPlayer1.VideoDuration).Time;
-
-  // set timer interval to one third of the video duration time
-  Timer1.Interval:= LVideoDuration div 3;
-
-  // start timer
-  Timer1.Enabled := True;
+  //// get time in miliseconds;
+  //LVideoDuration := DateTimeToTimeStamp(LCLVLCPlayer1.VideoDuration).Time;
+  //
+  //// set timer interval to one third of the video duration time
+  //Timer1.Interval:= LVideoDuration div 3;
+  //
+  //// start timer
+  //Timer1.Enabled := True;
 end;
 
 procedure TForm1.LCLVLCPlayerPositionChanged(Sender: TObject; const APos: Double

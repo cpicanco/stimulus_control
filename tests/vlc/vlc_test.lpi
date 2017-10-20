@@ -31,7 +31,7 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="2">
+    <Units Count="5">
       <Unit0>
         <Filename Value="vlc_test.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -43,6 +43,21 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit1>
+      <Unit2>
+        <Filename Value="video.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Video"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="video.alternatives.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Video.Alternatives"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="video.vlc.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Video.VLC"/>
+      </Unit4>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -18,6 +18,7 @@ uses LCLIntf, LCLType, SysUtils, Variants, Classes,
 
     , Dialogs
     , Audio.Bass_nonfree
+    , Video
     , Schedules
     , Session.Configuration.GlobalContainer
     ;
@@ -38,7 +39,8 @@ type
     FSchedule: TSchedule;
     FStimulus: TBitmap;
     //FGifImage: TJvGIFAnimator;
-    //FMedia : TWindowsMediaPlayer;
+
+    FVideoPlayer : IVideoPlayer;
     FEdge: TColor;
     FFileName: string;
     FKind: TKind;
@@ -46,7 +48,7 @@ type
     FResponseCount: Integer;
     FLoopNumber: Integer;
     FLastResponseLog : string;
-    procedure SetFileName(Path: string);
+    procedure SetFileName(AFilename: string);
   private
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
@@ -112,11 +114,9 @@ end;
 
 destructor TKey.Destroy;
 begin
-  {if Assigned(FMedia) then
-    begin
-      Stop;
-      FreeAndNil(FMedia);
-    end;}
+  if FVideoPlayer.Assigned then
+    FVideoPlayer.Stop;
+
   if Assigned(FAudioPlayer) then FAudioPlayer.Free;
   if Assigned(FStimulus) then FStimulus.Free;
   //if Assigned(FGifImage) then FreeAndNil (FGifImage);
@@ -132,12 +132,9 @@ begin
       Height := ClientHeight;
       FStimulus.SetSize(Width,Height)
     end;
-  {if (FKind.stmImage = stmVideo) then
-    begin
-      repeat Application.ProcessMessages until FMedia.playState = 3;
-      if (FMedia.playState = 3) then
-      FMedia.fullScreen := True;
-    end;  }
+
+  if FKind.stmImage = stmVideo then
+    FVideoPlayer.FullScreen(True);
   Invalidate;
 end;
 
@@ -194,7 +191,7 @@ begin
     stmPicture:Canvas.StretchDraw(ClientRect, FStimulus);
     //stmAnimation:PaintGIF;
     stmNone:PaintKey(Color);
-    stmVideo:;
+    stmVideo:{ do nothing };
   end;
 end;
 
@@ -211,7 +208,7 @@ begin
       FAudioPlayer.Stop;
 end;
 
-procedure TKey.SetFileName(Path: string);                 //Review required
+procedure TKey.SetFileName(AFilename: string);                 //Review required
 var
   s1 : String;
 
@@ -227,8 +224,13 @@ var
     if Assigned(FStimulus) then
       FStimulus.Free;
     FStimulus := TBitmap.Create;
-    FStimulus.Width:=Width;
-    FStimulus.Height:=Height;
+    with FStimulus do
+      begin
+        Width := Self.Width;
+        Height := Self.Height;
+        Canvas.Brush.Color := Self.Color;
+        Canvas.Rectangle(ClientRect);
+      end;
   end;
 
   procedure SetKind(Audio : boolean; Image : TImage);
@@ -253,177 +255,102 @@ var
     FGifImage.Cursor := Self.Cursor;
     FGifImage.Animate := True; }
 
-
-
-  // Create_VID;
-    {
-    FMedia := TWindowsMediaPlayer.Create(self);
-    if OnlyAudio then FMedia.ParentWindow := Application.Handle
-    else FMedia.Parent := Self;
-    FMedia.Align:= alClient;
-    FMedia.stretchToFit := True;
-    //FMedia.enableContextMenu := False;
-    //FMedia.windowlessVideo := True;
-    //FMedia.ControlInterface.stretchToFit := True;
-    //FMedia.DefaultInterface.stretchToFit := True;
-    //FMedia.Top := 0;
-    //FMedia.Left := 0;
-    //FMedia.Width  := Width;
-    //FMedia.Height := Height;
-    FMedia.settings.autoStart := False;
-    FMedia.settings.setMode('loop', false);
-    FMedia.settings.setMode('autoRewind', false);
-    FMedia.settings.invokeURLs := False;
-    FMedia.ControlInterface.enableContextMenu := False;
-    FMedia.ControlInterface.windowlessVideo := True;
-    FMedia.Cursor := Self.Cursor;
-    FMedia.OnMouseDown := MouseDown; //3
-    FMedia.uiMode := 'none';
-    }
-
-  function Load_PNG(AFilename:string; Audio: Boolean=False) : boolean;
+  procedure Load_PNG(AF:string=AFilename; Audio: Boolean=False);
   var LPNG : TPortableNetworkGraphic;
   begin
-    Result := False;
-    try
-      CreateBitmap;
-      LPNG := TPortableNetworkGraphic.Create;
-      LPNG.LoadFromFile(AFilename);
-      FStimulus.Assign(LPNG);
-      FStimulus.Transparent:=True;
-      FStimulus.TransparentColor:=clFuchsia;
-      LPNG.Free;
-      SetKind(Audio, stmPicture);
-    except
-      on Exception do
-        Exit;
-
-    end;
-    Result := True;
+    CreateBitmap;
+    LPNG := TPortableNetworkGraphic.Create;
+    LPNG.LoadFromFile(AF);
+    FStimulus.Assign(LPNG);
+    FStimulus.Transparent:=True;
+    FStimulus.TransparentColor:=clFuchsia;
+    LPNG.Free;
+    SetKind(Audio, stmPicture);
   end;
 
-  function Load_BMP(AFilename:string; Audio: Boolean=False) : boolean;
+  procedure Load_BMP(AF:string=AFilename; Audio: Boolean=False);
   begin
-    Result := False;
-    try
-      CreateBitmap;
-      FStimulus.LoadFromFile(AFilename);
-      SetKind(Audio, stmPicture);
-    except
-      on Exception do
-        Exit;
-    end;
-    Result := True;
+    CreateBitmap;
+    FStimulus.LoadFromFile(AF);
+    SetKind(Audio, stmPicture);
   end;
 
-  function Load_JPG(AFilename:string; Audio: Boolean=False) : boolean;
+  procedure Load_JPG(AF:string=AFilename; Audio: Boolean=False);
   var LJPG : TJPEGImage;
   begin
-    Result := False;
-    try
-      CreateBitmap;
-      LJPG := TJPEGImage.Create;
-      LJPG.LoadFromFile(AFilename);
-      FStimulus.Assign(LJPG);
-      LJPG.Free;
-      SetKind(Audio, stmPicture);
-    except
-      on Exception do
-        Exit;
-    end;
-    Result := True;
+    CreateBitmap;
+    LJPG := TJPEGImage.Create;
+    LJPG.LoadFromFile(AF);
+    FStimulus.Assign(LJPG);
+    LJPG.Free;
+    SetKind(Audio, stmPicture);
   end;
 
-  //function Load_GIF(Audio: boolean) : boolean;
-  //begin
-  //  Result := False;
-  //
-  //
-  //  try
-  //    FGifImage.Image.LoadFromFile (s2);
-  //  except
-  //    on Exception do Exit;
-  //  end;
-  //
-  //  SetKind (Audio, stmAnimation);
-  //  Result := True;
-  //
-  //
-  //end;
-
-  function Load_AUD(AFilename : string): boolean;
+  procedure Load_AUD;
   begin
-    Result := False;
     if Loops > 0 then
       FAudioPlayer := TBassStream.Create(AFilename,Loops)
     else
       FAudioPlayer := TBassStream.Create(AFilename);
     SetKind(True, TImage.stmNone);
-    Result := True;
   end;
 
-  //function Load_VID (Audio : boolean) : boolean;
-  //begin
-  //  Result := False;
-  //
-  //  try
-  //    if EditMode then FMedia.settings.playCount := 1
-  //    else if FLoopNumber = 0 then FMedia.settings.playCount := MaxInt
-  //    else if FLoopNumber > 0 then FMedia.settings.playCount := FLoopNumber
-  //    else if FLoopNumber < 0 then FMedia.settings.playCount := Abs(FLoopNumber);
-  //    FMedia.URL := s2;
-  //  except
-  //    on Exception do Exit;
-  //
-  //  end;
-  //  FMPlayer.OnNotify:= MPlayerLoopNotify;
-  //  SetKind (Audio, Image);
-  //  Result := True;
-  //end;
+  procedure Load_VID;
+  begin
+    FVideoPlayer := GetVideoInterface;
+    FVideoPlayer.Load(AFilename);
+    SetKind(False, TImage.stmVideo);
+  end;
+
 begin
-  if FFileName = Path then Exit;
+  if FFileName = AFilename then Exit;
   FFileName := '';
-  if FileExists(Path) then
+  if FileExists(AFilename) then
     begin
-      s1:= UpperCase(ExtractFileExt(Path));
+      s1:= UpperCase(ExtractFileExt(AFilename));
       case s1 of
         // images
-        '.BMP' : Load_BMP(Path);
-        '.JPG' : Load_JPG(Path);
-        '.PNG' : Load_PNG(Path);
+        '.BMP' : Load_BMP;
+        '.JPG' : Load_JPG;
+        '.PNG' : Load_PNG;
 
         // animation
-        // '.GIF': Load_GIF(Path);
+        //'.GIF' :
+        //  begin
+        //    FGifImage.Image.LoadFromFile (AFilename);
+        //    SetKind(Audio, stmAnimation);
+        //  end;
 
         // video
-        //'.MPG', '.AVI',
-        //'.MOV', '.FLV',
-        //'.WMV', '.MP4': Load_VID;
+        '.MPG', '.AVI',
+        '.MOV', '.FLV',
+        '.WMV', '.MP4': Load_VID;
+        // audio
         '.WAV','.AIFF','.MP3','.OGG':
-          if Load_AUD(Path) then
-            begin
-              // note that at this point we already loaded the audio file
-              // the user can associate an image with each audio file sound
-              // the user can place an image file with the same name as the audio file inside rootmedia
-              // we load the image here
-              s1:= Path;
-              Delete(s1, pos(Copy(Path,Length(Path)- 3,4),s1), 4);
+          begin
+            Load_AUD;
+            // note that at this point we already loaded the audio file
+            // the user can associate an image with each audio file sound
+            // the user can place an image file with the same name as the audio file inside rootmedia
+            // we load the image here
+            s1:= AFilename;
+            Delete(s1, pos(Copy(AFilename,Length(AFilename)- 3,4),s1), 4);
 
-              for LExtension in LGuessedExtensions do
-                if FileExists(s1 + LExtension) then
-                  begin
-                    case UpperCase(LExtension) of
-                      // images
-                      '.BMP' : Load_BMP(s1 + LExtension, True);
-                      '.JPG' : Load_JPG(s1 + LExtension, True);
-                      '.PNG' : Load_PNG(s1 + LExtension, True);
-                    end;
-                    Break;
+            for LExtension in LGuessedExtensions do
+              if FileExists(s1 + LExtension) then
+                begin
+                  case UpperCase(LExtension) of
+                    // images
+                    '.BMP' : Load_BMP(s1 + LExtension, True);
+                    '.JPG' : Load_JPG(s1 + LExtension, True);
+                    '.PNG' : Load_PNG(s1 + LExtension, True);
                   end;
-            end;
+                  Break;
+                end;
+          end;
       end;
 
-      FFileName := Path;
+      FFileName := AFilename;
       Invalidate;
     end;
 end;
@@ -450,7 +377,7 @@ end;
 //******
 procedure TKey.Consequence(Sender: TObject);
 begin
-  if Assigned(OnConsequence) then FOnConsequence(Self);   //Necessariamente Self
+  if Assigned(OnConsequence) then FOnConsequence(Self);   //must be Self
 end;
 
 function TKey.GetShortName: string;
@@ -463,7 +390,7 @@ end;
 
 procedure TKey.Response(Sender: TObject);
 begin
-  if Assigned(OnResponse) then FOnResponse(Self);   //Necessariamente  SELF
+  if Assigned(OnResponse) then FOnResponse(Self);   //must be Self
 end;
 
 

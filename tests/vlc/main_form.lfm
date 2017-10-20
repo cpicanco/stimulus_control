@@ -6,10 +6,8 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 459
   ClientWidth = 824
-  OnActivate = FormActivate
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
-  LCLVersion = '1.8.0.3'
+  LCLVersion = '1.8.0.4'
   object Panel1: TPanel
     Left = 0
     Height = 59
@@ -29,11 +27,5 @@ object Form1: TForm1
       OnClick = Button1Click
       TabOrder = 0
     end
-  end
-  object Timer1: TTimer
-    Enabled = False
-    OnTimer = Timer1Timer
-    left = 31
-    top = 40
   end
 end
