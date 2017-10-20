@@ -70,6 +70,7 @@ type
       procedure FormKeyPress(Sender: TObject; var Key: char);
       procedure FormPaint(Sender: TObject);
       procedure PreviewTimerTimer(Sender: TObject);
+      procedure seGapLengthEditingDone(Sender: TObject);
     private
     // fullscreen
       FFullScreen : Boolean;
@@ -88,7 +89,6 @@ type
       procedure AddTrialsToGrid(ATrialGrid : TStringGrid);
       procedure SetMatrix(AStmMatrix: TStmMatrix);
       procedure SetCircleGrid(AStmCircleGrid : TStmCircleGrid);
-      procedure SetFullScreen(TurnOn : Boolean);
       procedure WriteToDisk(ADefaultMainSection: TStrings; ADefaultBlocSection : TStrings;
         ATrialGrid : TStringGrid; AFilename : string);
       property MonitorToShow : integer read FMonitor write SetMonitor;
@@ -113,8 +113,8 @@ uses LazFileUtils, Session.ConfigurationFile, GUI.Helpers, strutils, constants;
 procedure TFormFPE.FormActivate(Sender: TObject);
 begin
   //BorderStyle := bsNone;
-  WindowState := wsMaximized;
   FCurrentTrial := 0;
+  WindowState:=wsMaximized;
   //SetMatrix(GetMatrix(MonitorToShow));
   SetCircleGrid(GetCircleGrid(MonitorToShow));
 end;
@@ -188,13 +188,13 @@ begin
                 aGap := StrToBoolDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),False);
                 NextValue(aGapValues);
 
-                aGapDegree := 16 * StrToIntDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),1);
+                aGapDegree := 16*StrToIntDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),1);
                 NextValue(aGapValues);
 
-                aGapLength := 16 * StrToIntDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),360);
+                aGapLength := 16*(360-StrToIntDef(Copy(aGapValues,0,pos(#32,aGapValues)-1),360));
                 case RadioGroupGrids.ItemIndex of
                  0: DrawCustomEllipse(Canvas,aR,GetInnerRect(aR,aWidth,aHeight),aGap,aGapDegree,aGapLength);
-                 1: DrawCustomEllipse(Canvas,AR,aGap,aGapDegree,aGapLength);
+                 1: DrawCustomEllipse(Canvas,AR,aGapDegree,aGapLength);
                 end;
               end;
             i := FCurrentTrial + 1;
@@ -215,6 +215,14 @@ begin
     Inc(FCurrentTrial)
   else FCurrentTrial := 0;
   Invalidate;
+end;
+
+procedure TFormFPE.seGapLengthEditingDone(Sender: TObject);
+begin
+  case RadioGroupGrids.ItemIndex of
+   0: SetMatrix(GetMatrix(MonitorToShow));
+   1: SetCircleGrid(GetCircleGrid(MonitorToShow));
+  end;
 end;
 
 function TFormFPE.GetMatrix(AMonitor: integer): TStmMatrix;
@@ -392,12 +400,12 @@ begin
         begin
           if LHasGap and (i = LStimulusToGap) then
             begin
-              LGapDegree := 1+Random(360);
+              LGapDegree := Random(361);
               LGapLength := seGapLength.Value;
               FTrials[LTrial].Comps[LComp].Path := '1' + #32 + IntToStr(LGapDegree) + #32 + IntToStr(LGapLength) + #32;
             end
           else
-            FTrials[LTrial].Comps[LComp].Path := '0' + #32 + '1' + #32 + '360' + #32;
+            FTrials[LTrial].Comps[LComp].Path := '0' + #32 + '0' + #32 + '0' + #32;
         end;
 
       if LHasGap then
@@ -448,12 +456,12 @@ begin
 
           if LHasGap and (i = LStimulusToGap) then  // there is a gap
             begin
-              LGapDegree := 1+Random(360);
+              LGapDegree := Random(361);
               LGapLength := seGapLength.Value;
               FTrials[LTrial].Comps[i].Path := '1' + #32 + IntToStr(LGapDegree) + #32 + IntToStr(LGapLength) + #32;
             end
           else // no gap
-            FTrials[LTrial].Comps[i].Path := '0' + #32 + '1' + #32 + '360' + #32;
+            FTrials[LTrial].Comps[i].Path := '0' + #32 + '0' + #32 + '0' + #32;
         end;
 
       if LHasGap then
@@ -490,33 +498,6 @@ begin
   PreviewTimer.Enabled := not PreviewTimer.Enabled;
   //ShowMessage(BoolToStr(PreviewTimer.Enabled));
   Invalidate;
-end;
-
-procedure TFormFPE.SetFullScreen(TurnOn: Boolean);
-begin
-  if TurnOn then
-    begin
-      //fullscreen true
-      {$IFDEF MSWINDOWS}
-      // to do
-      {$ENDIF}
-
-      {$IFDEF LINUX}
-      WindowState := wsFullScreen;
-      {$ENDIF}
-    end
-  else
-    begin
-      //fullscreen false
-      {$IFDEF MSWINDOWS}
-      // to do
-      {$ENDIF}
-
-      {$IFDEF LINUX}
-      WindowState := wsNormal;
-      {$ENDIF}
-    end;
-  FFullScreen := TurnOn;
 end;
 
 procedure TFormFPE.WriteToDisk(ADefaultMainSection: TStrings;

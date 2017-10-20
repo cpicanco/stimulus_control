@@ -115,8 +115,8 @@ object FormFPE: TFormFPE
         Height = 27
         Top = 1
         Width = 71
-        MaxValue = 359
-        MinValue = 1
+        MaxValue = 360
+        OnEditingDone = seGapLengthEditingDone
         TabOrder = 0
         Value = 10
       end
@@ -148,7 +148,7 @@ object FormFPE: TFormFPE
       Left = 128
       Height = 80
       Top = 64
-      Width = 97
+      Width = 112
       AutoFill = True
       Caption = 'Efeito'
       ChildSizing.LeftRightSpacing = 6
@@ -159,7 +159,7 @@ object FormFPE: TFormFPE
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
       ClientHeight = 61
-      ClientWidth = 93
+      ClientWidth = 108
       ItemIndex = 0
       Items.Strings = (
         'Positivo'
