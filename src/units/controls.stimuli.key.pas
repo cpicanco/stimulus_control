@@ -186,12 +186,14 @@ procedure TKey.Paint;
                    Caption);
         end;
     end;
+
+
 begin
   case FKind.stmImage of
     stmPicture:Canvas.StretchDraw(ClientRect, FStimulus);
     //stmAnimation:PaintGIF;
     stmNone:PaintKey(Color);
-    stmVideo:{ do nothing };
+    stmVideo: { do nothing };
   end;
 end;
 
@@ -313,12 +315,9 @@ var
   procedure Load_VID;
   begin
     FVideoPlayer := VideoPlayer(Parent);
-    if Assigned(FVideoPlayer) then
-    begin
-      FVideoPlayer.SetBounds(Left, Top, Width, Height);
-      FVideoPlayer.LoadFromFile(AFilename);
-      SetKind(False, TImage.stmVideo);
-    end;
+    FVideoPlayer.SetBounds(Left, Top, Width, Height);
+    FVideoPlayer.LoadFromFile(AFilename);
+    SetKind(False, TImage.stmVideo);
   end;
 
 begin

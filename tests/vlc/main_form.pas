@@ -14,14 +14,13 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
-    Button1: TButton;
-    Panel1: TPanel;
-    procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure Timer2Timer(Sender: TObject);
   private
     FKey : TKey;
+
+    FKey2 : TKey;
   public
     { public declarations }
   end;
@@ -38,18 +37,20 @@ implementation
 
 { TForm1 }
 
-procedure TForm1.Button1Click(Sender: TObject);
-begin
-  FKey.Play;
-end;
-
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   FKey := TKey.Create(Self);
-  FKey.Width := 100;
+  FKey.Left := 400;
+  FKey.Width := 300;
   FKey.Height:= 300;
   FKey.Parent := Self;
   FKey.Filename := CFILE;
+
+  FKey2 := TKey.Create(Self);
+  FKey2.Width := 300;
+  FKey2.Height:= 300;
+  FKey2.Parent := Self;
+  FKey2.Filename := CFILE;
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);

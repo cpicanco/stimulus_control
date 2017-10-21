@@ -24,7 +24,7 @@ type
 
 implementation
 
-uses Video.VLC;
+uses SysUtils, Video.VLC;
 
 function VideoPlayer(AWinControl: TWinControl): IVideoPlayer;
 begin
@@ -34,6 +34,9 @@ begin
       Result := TVLCVideoPlayer.Create(AWinControl);
       exit;
     end;
+
+  if not Assigned(Result) then
+    raise Exception.Create('Video Player not found');
 end;
 
 

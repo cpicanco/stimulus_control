@@ -5,7 +5,7 @@ unit Video.VLC;
 interface
 
 uses
-  Classes, Video, Controls, lclvlc, vlc;
+  Classes, Video, StdCtrls, Controls, lclvlc, vlc;
 
 type
 
@@ -17,6 +17,8 @@ type
     FHack : TWinControl;
     FPlayer : TLCLVLCPlayer;
     FCurrentVideoItem : TVLCMediaItem;
+    FButton : TButton;
+    procedure Click(Sender : TObject);
   public
     constructor Create(AWinControl : TWinControl); reintroduce;
     destructor Destroy; override;
@@ -33,6 +35,19 @@ implementation
 uses SysUtils;
 { TVLCVideoPlayer }
 
+procedure TVLCVideoPlayer.Click(Sender: TObject);
+begin
+  if FPlayer.Playing then
+  begin
+    Stop;
+    FButton.Caption := '>';
+  end else
+  begin
+    Play;
+    FButton.Caption := '#';
+  end;
+end;
+
 constructor TVLCVideoPlayer.Create(AWinControl : TWinControl);
 begin
   inherited Create(AWinControl);
@@ -44,6 +59,17 @@ begin
   FBounds.Parent := AWinControl;
   FBounds.Color:=$00000;
 
+  FButton := TButton.Create(Self);
+  FButton.Caption:='>';
+  FButton.Width:=100;
+  FButton.Height:=30;
+  FButton.Parent := AWinControl;
+  FButton.AnchorSide[akLeft].Side := asrCenter;
+  FButton.AnchorSide[akLeft].Control := FBounds;
+  FButton.Anchors := FButton.Anchors + [akLeft];
+  FButton.AnchorToNeighbour(akTop, 5, FBounds);
+  FButton.OnClick:=@Click;
+
   FHack := TWinControl.Create(Self);
   FHack.Parent := FBounds;
 
@@ -51,7 +77,7 @@ begin
 
   // for some unknown reason we need
   // one more ParentWindow layer on top
-  // to have full control over
+  // to have easy control over
   // video top left
   FPlayer.ParentWindow := FHack;
 
@@ -109,8 +135,6 @@ end;
 procedure TVLCVideoPlayer.LoadFromFile(AFilename: string);
 begin
   FCurrentVideoItem.Path := AFilename;
-  //FBounds.Width := FPlayer.VideoWidth;
-  //FBounds.Height := FPlayer.VideoHeight;
 end;
 
 procedure TVLCVideoPlayer.Play;
