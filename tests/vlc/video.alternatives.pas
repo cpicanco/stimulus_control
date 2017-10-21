@@ -5,7 +5,9 @@ unit Video.Alternatives;
 interface
 
 uses
-  Classes, SysUtils;
+  Video.VLC;
+
+  function CreateCurrentVideoPlayerAlternative :
 
 implementation
 

@@ -79,7 +79,12 @@
       </Options>
     </Linking>
     <Other>
-      <CustomOptions Value="-dUseCThreads"/>
+      <CustomOptions Value="-dUseCThreads
+-dNO_LIBZMQ"/>
+      <OtherDefines Count="2">
+        <Define0 Value="UseCThreads"/>
+        <Define1 Value="NO_LIBZMQ"/>
+      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>

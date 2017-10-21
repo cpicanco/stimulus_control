@@ -71,7 +71,7 @@ type
     property Schedule : TSchedule read FSchedule;
     property Edge : TColor read FEdge write FEdge;
     property EditMode: Boolean read FEditMode write FEditMode;
-    property FullPath: string read FFileName write SetFileName;
+    property Filename : string read FFileName write SetFileName;
     property Loops : Integer read FLoopNumber write FLoopNumber;
     property Kind: TKind read FKind;
     property LastResponseLog : string read FLastResponseLog;
@@ -114,7 +114,7 @@ end;
 
 destructor TKey.Destroy;
 begin
-  if FVideoPlayer.Assigned then
+  if Assigned(FVideoPlayer) then
     FVideoPlayer.Stop;
 
   if Assigned(FAudioPlayer) then FAudioPlayer.Free;
@@ -134,7 +134,7 @@ begin
     end;
 
   if FKind.stmImage = stmVideo then
-    FVideoPlayer.FullScreen(True);
+    FVideoPlayer.FullScreen;
   Invalidate;
 end;
 
@@ -198,7 +198,15 @@ end;
 procedure TKey.Play;
 begin
   if FKind.stmAudio then
-    FAudioPlayer.Play;
+    if Assigned(FAudioPlayer) then
+      FAudioPlayer.Play;
+
+  case FKind.stmImage of
+    //stmAnimation : ;
+    //stmNone : ;
+    //stmPicture : ;
+    stmVideo: if Assigned(FVideoPlayer) then FVideoPlayer.Play;
+  end;
 end;
 
 procedure TKey.Stop;
@@ -206,6 +214,13 @@ begin
   if FKind.stmAudio then
     if Assigned(FAudioPlayer) then
       FAudioPlayer.Stop;
+
+  case FKind.stmImage of
+    //stmAnimation : ;
+    //stmNone : ;
+    //stmPicture : ;
+    stmVideo: if Assigned(FVideoPlayer) then FVideoPlayer.Stop;
+  end;
 end;
 
 procedure TKey.SetFileName(AFilename: string);                 //Review required
@@ -255,7 +270,7 @@ var
     FGifImage.Cursor := Self.Cursor;
     FGifImage.Animate := True; }
 
-  procedure Load_PNG(AF:string=AFilename; Audio: Boolean=False);
+  procedure Load_PNG(AF:string; Audio: Boolean=False);
   var LPNG : TPortableNetworkGraphic;
   begin
     CreateBitmap;
@@ -268,14 +283,14 @@ var
     SetKind(Audio, stmPicture);
   end;
 
-  procedure Load_BMP(AF:string=AFilename; Audio: Boolean=False);
+  procedure Load_BMP(AF:string; Audio: Boolean=False);
   begin
     CreateBitmap;
     FStimulus.LoadFromFile(AF);
     SetKind(Audio, stmPicture);
   end;
 
-  procedure Load_JPG(AF:string=AFilename; Audio: Boolean=False);
+  procedure Load_JPG(AF:string; Audio: Boolean=False);
   var LJPG : TJPEGImage;
   begin
     CreateBitmap;
@@ -297,9 +312,13 @@ var
 
   procedure Load_VID;
   begin
-    FVideoPlayer := GetVideoInterface;
-    FVideoPlayer.Load(AFilename);
-    SetKind(False, TImage.stmVideo);
+    FVideoPlayer := VideoPlayer(Parent);
+    if Assigned(FVideoPlayer) then
+    begin
+      FVideoPlayer.SetBounds(Left, Top, Width, Height);
+      FVideoPlayer.LoadFromFile(AFilename);
+      SetKind(False, TImage.stmVideo);
+    end;
   end;
 
 begin
@@ -310,9 +329,9 @@ begin
       s1:= UpperCase(ExtractFileExt(AFilename));
       case s1 of
         // images
-        '.BMP' : Load_BMP;
-        '.JPG' : Load_JPG;
-        '.PNG' : Load_PNG;
+        '.BMP' : Load_BMP(AFilename);
+        '.JPG' : Load_JPG(AFilename);
+        '.PNG' : Load_PNG(AFilename);
 
         // animation
         //'.GIF' :
@@ -382,10 +401,10 @@ end;
 
 function TKey.GetShortName: string;
 begin
-  if FullPath = '' then
+  if FFilename = '' then
     Result := 'NA'
   else
-    Result := ExtractFileNameWithoutExt(ExtractFileNameOnly(FullPath));
+    Result := ExtractFileNameWithoutExt(ExtractFileNameOnly(FFilename));
 end;
 
 procedure TKey.Response(Sender: TObject);
