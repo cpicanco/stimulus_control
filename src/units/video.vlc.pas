@@ -5,7 +5,7 @@ unit Video.VLC;
 interface
 
 uses
-  Classes, Video, StdCtrls, Controls, lclvlc, vlc;
+  Classes, StdCtrls, Controls, lclvlc, vlc, Video.Contract;
 
 type
 

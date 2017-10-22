@@ -1,4 +1,4 @@
-unit Video;
+unit Video.Contract;
 
 {$mode objfpc}{$H+}
 {$interfaces corba}

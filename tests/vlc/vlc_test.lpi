@@ -44,9 +44,9 @@
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
-        <Filename Value="video.pas"/>
+        <Filename Value="../../src/units/video.contract.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Video"/>
+        <UnitName Value="Video.Contract"/>
       </Unit2>
       <Unit3>
         <Filename Value="video.alternatives.pas"/>
@@ -54,7 +54,7 @@
         <UnitName Value="Video.Alternatives"/>
       </Unit3>
       <Unit4>
-        <Filename Value="video.vlc.pas"/>
+        <Filename Value="../../src/units/video.vlc.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Video.VLC"/>
       </Unit4>
