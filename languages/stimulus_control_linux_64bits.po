@@ -257,6 +257,98 @@ msgstr ""
 msgid "Porta USB"
 msgstr ""
 
+#: gui.helpers.rsangle
+msgid "Ângulo"
+msgstr ""
+
+#: gui.helpers.rsblocaddress
+msgid "Endereço"
+msgstr ""
+
+#: gui.helpers.rsblocname
+#, fuzzy
+#| msgid "LabelBlocName"
+msgctxt "gui.helpers.rsblocname"
+msgid "Nome"
+msgstr "LabelBlocName"
+
+#: gui.helpers.rsblocnextbloconcriteria
+msgid "Bloco seguinte se critério for atingido"
+msgstr ""
+
+#: gui.helpers.rsblocnextbloconnotcriteria
+msgid "Bloco seguinte se critério não for atingido"
+msgstr ""
+
+#: gui.helpers.rsblocs
+msgctxt "gui.helpers.rsblocs"
+msgid "Bloco"
+msgstr ""
+
+#: gui.helpers.rsconsequence
+#, fuzzy
+msgctxt "gui.helpers.rsconsequence"
+msgid "Consequência"
+msgstr "Consequence"
+
+#: gui.helpers.rscontingency
+msgid "Contingência"
+msgstr ""
+
+#: gui.helpers.rsexpectedresponse
+msgctxt "gui.helpers.rsexpectedresponse"
+msgid "Resposta"
+msgstr ""
+
+#: gui.helpers.rsfilltypeaxes
+msgid "Eixos"
+msgstr ""
+
+#: gui.helpers.rsfilltypeblocchaining
+msgid "Encadear Blocos"
+msgstr ""
+
+#: gui.helpers.rsfilltypegonogo
+msgid "Go/No-Go"
+msgstr ""
+
+#: gui.helpers.rsfilltypematriz
+msgid "FP/FN"
+msgstr ""
+
+#: gui.helpers.rsfilltypemts
+msgid "MTS e Simples"
+msgstr ""
+
+#: gui.helpers.rslimitedhold
+msgid "Tempo/Estímulo"
+msgstr ""
+
+#: gui.helpers.rsmtsrelation
+msgid "Relação"
+msgstr ""
+
+#: gui.helpers.rsschedule
+#, fuzzy
+msgctxt "gui.helpers.rsschedule"
+msgid "Esquema"
+msgstr "Schedule"
+
+#: gui.helpers.rssize
+msgid "Tamanho"
+msgstr ""
+
+#: gui.helpers.rsstimulus
+msgctxt "gui.helpers.rsstimulus"
+msgid "Figura"
+msgstr ""
+
+#: gui.helpers.rstrials
+#, fuzzy
+msgctxt "gui.helpers.rstrials"
+msgid "Tentativas"
+msgstr "Trials"
+
 #: pupil.client.error_not_implemented
 #, fuzzy
 msgctxt "pupil.client.error_not_implemented"
@@ -817,9 +909,23 @@ msgstr ""
 msgid "Sessões"
 msgstr ""
 
-#: userconfigs_blocs.rscomparison
-msgctxt "userconfigs_blocs.rscomparison"
+#: userconfigs_feature_positive.rscomparison
+msgctxt "userconfigs_feature_positive.rscomparison"
 msgid "C"
+msgstr ""
+
+#: userconfigs_feature_positive.rsnegative
+msgctxt "userconfigs_feature_positive.rsnegative"
+msgid "Negativa"
+msgstr ""
+
+#: userconfigs_feature_positive.rsposition
+msgid "Bnd"
+msgstr ""
+
+#: userconfigs_feature_positive.rspositive
+msgctxt "userconfigs_feature_positive.rspositive"
+msgid "Positiva"
 msgstr ""
 
 #: userconfigs_get_matrix.ccustomresdefleft
@@ -843,10 +949,12 @@ msgid "Adicionar"
 msgstr ""
 
 #: userconfigs_go_nogo.rsnegative
+msgctxt "userconfigs_go_nogo.rsnegative"
 msgid "Negativa"
 msgstr ""
 
 #: userconfigs_go_nogo.rspositive
+msgctxt "userconfigs_go_nogo.rspositive"
 msgid "Positiva"
 msgstr ""
 
@@ -857,11 +965,11 @@ msgid "Estímulos"
 msgstr "Stimuli"
 
 #: userconfigs_go_nogo.rswindowtitlechoosenegative
-msgid "Escolhas as figuras negativas"
+msgid "Escolha as figuras negativas"
 msgstr ""
 
 #: userconfigs_go_nogo.rswindowtitlechoosepositive
-msgid "Escolhas as figuras positivas"
+msgid "Escolha as figuras positivas"
 msgstr ""
 
 #: userconfigs_mts_simple.rscomboboxtrialtypeitem0
