@@ -18,7 +18,7 @@ uses LCLIntf, LCLType, SysUtils, Variants, Classes,
 
     , Dialogs
     , Audio.Bass_nonfree
-    , Video
+    , Video.Contract
     , Schedules
     , Session.Configuration.GlobalContainer
     ;

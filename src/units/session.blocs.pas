@@ -82,7 +82,7 @@ type
     FOnHit: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
-    procedure CreateIETMedia(FileName, HowManyLoops, Color : String);
+    procedure CreateIETMedia(AFileName, AHowManyLoops, AColor : String);
     {$ifdef DEBUG}
        procedure DebugStatus(msg : string);
     {$endif}
@@ -715,7 +715,7 @@ begin
            rsReportITI + #32 + ACode + LineEnding)
 end;
 
-procedure TBlc.CreateIETMedia(FileName, HowManyLoops, Color: String);
+procedure TBlc.CreateIETMedia(AFileName, AHowManyLoops, AColor: String);
 //var
 //  MediaPath : string;
 begin
@@ -725,12 +725,12 @@ begin
   FIETMedia.Parent:= FBackGround;
   FIETMedia.OnConsequence:= @IETConsequence;
   FIETMedia.OnResponse:= @IETResponse;
-  FIETMedia.Loops := StrToIntDef(HowManyLoops, 1) - 1;
-  FIETMedia.Color := StrToIntDef(Color, 0);
+  FIETMedia.Loops := StrToIntDef(AHowManyLoops, 1) - 1;
+  FIETMedia.Color := StrToIntDef(AColor, 0);
   FIETMedia.Width := 500;
   FIETMedia.Height := 500;
   FIETMedia.Centralize(FBackGround);
-  FIETMedia.FullPath := FileName;
+  FIETMedia.Filename := AFileName;
   //FIETMedia.FullScreen;
   FIETMedia.Show;
   FIETMedia.Play;

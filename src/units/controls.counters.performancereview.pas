@@ -118,7 +118,7 @@ end;
 
 procedure TCounterPR.LoadImage(AImagePath: string);
 begin
-  FImage.FullPath := AImagePath;
+  FImage.Filename := AImagePath;
 end;
 
 procedure TCounterPR.Show;

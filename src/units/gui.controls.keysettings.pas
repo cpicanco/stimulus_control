@@ -142,7 +142,7 @@ begin
             begin
               if Assigned(FResponseKey) then
                 begin
-                  FResponseKey.FullPath := OpenDialog.FileName;
+                  FResponseKey.Filename := OpenDialog.FileName;
                   if FResponseKey.Kind.stmAudio then
                     ComboSRepeat.Enabled:=True
                   else
@@ -156,7 +156,7 @@ begin
             begin
               if Assigned(FResponseKey) then
                 begin
-                  FResponseKey.FullPath := OpenDialog.FileName;
+                  FResponseKey.Filename := OpenDialog.FileName;
                   if FResponseKey.Kind.stmAudio then
                     ComboCRepeat.Enabled:=True
                   else
@@ -172,7 +172,7 @@ begin
     begin
       if OpenDialog.Execute then
         begin
-          TKey(Sender).FullPath := OpenDialog.FileName;
+          TKey(Sender).Filename := OpenDialog.FileName;
           EditSFilename.Text := ExtractFileName(OpenDialog.FileName);
           if TKey(Sender).Kind.stmAudio then
             ComboSRepeat.Enabled:=True

@@ -102,7 +102,7 @@ begin
       s1:= CfgTrial.SList.Values[_Samp + _cStm] + #32;
       Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);  // must be set before fullpath
       Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]),$0000FF);
-      Key.FullPath:= RootMedia + ExtractDelimited(1,s1,[#32]);
+      Key.Filename:= RootMedia + ExtractDelimited(1,s1,[#32]);
 
       // SCH
       Key.Schedule.Kind:= CfgTrial.SList.Values[_Samp + _cSch];
