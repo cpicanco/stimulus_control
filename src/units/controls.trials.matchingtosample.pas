@@ -51,6 +51,7 @@ type
     procedure TrialBeforeEnd(Sender: TObject);
     procedure VisibleSample(AValue: Boolean);
     function GetHeader : string;
+    procedure DoNothing(Sender : TObject);
   protected
     // TTrial
     procedure TrialStart(Sender: TObject); override;
@@ -135,6 +136,13 @@ procedure TMTS.SampleConsequence(Sender: TObject);
 begin
   if FSample.Key.Kind.stmAudio then
     FSample.Key.Stop;
+
+  if FSample.Key.Kind.stmImage = stmVideo then
+  begin
+    FSample.Key.Stop;
+    FSample.Key.OnConsequence:=@DoNothing;
+  end;
+
   if FDelayed then
     begin
       VisibleSample(False);
@@ -179,6 +187,11 @@ begin
             rsReportRspModFrq + #9 + #9 + #9;
 end;
 
+procedure TMTS.DoNothing(Sender: TObject);
+begin
+
+end;
+
 procedure TMTS.BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
@@ -207,6 +220,10 @@ begin
   VisibleSample(True);
   if FSample.Key.Kind.stmAudio then
     FSample.Key.Play;
+
+  //if FSample.Key.Kind.stmImage = stmVideo then
+  //  FSample.Key.Play;
+
   OnMouseDown := @BackgroundMouseDown;
 end;
 

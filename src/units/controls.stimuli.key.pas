@@ -18,7 +18,7 @@ uses LCLIntf, LCLType, SysUtils, Variants, Classes,
 
     , Dialogs
     , Audio.Bass_nonfree
-    , Video.Contract
+    , Video.VLC
     , Schedules
     , Session.Configuration.GlobalContainer
     ;
@@ -40,7 +40,7 @@ type
     FStimulus: TBitmap;
     //FGifImage: TJvGIFAnimator;
 
-    FVideoPlayer : IVideoPlayer;
+    FVideoPlayer : TVLCVideoPlayer;
     FEdge: TColor;
     FFileName: string;
     FKind: TKind;
@@ -59,6 +59,9 @@ type
     procedure Response(Sender: TObject);
     procedure KeyMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure VideoResponse(Sender : TObject);
+  protected
+    procedure SetVisible(AValue:Boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -115,7 +118,10 @@ end;
 destructor TKey.Destroy;
 begin
   if Assigned(FVideoPlayer) then
+  begin
     FVideoPlayer.Stop;
+    FVideoPlayer.Free;
+  end;
 
   if Assigned(FAudioPlayer) then FAudioPlayer.Free;
   if Assigned(FStimulus) then FStimulus.Free;
@@ -314,7 +320,8 @@ var
 
   procedure Load_VID;
   begin
-    FVideoPlayer := VideoPlayer(Parent);
+    FVideoPlayer := TVLCVideoPlayer.Create(Parent);
+    FVideoPlayer.SetEndOfFileEvent(@VideoResponse);
     FVideoPlayer.SetBounds(Left, Top, Width, Height);
     FVideoPlayer.LoadFromFile(AFilename);
     SetKind(False, TImage.stmVideo);
@@ -384,6 +391,27 @@ begin
   Inc(FResponseCount);
   FLastResponseLog := IntToStr(X + Left) + #9 + IntToStr(Y + Top);
   FSchedule.DoResponse;
+end;
+
+procedure TKey.VideoResponse(Sender: TObject);
+begin
+  if Assigned(Self) then
+  begin
+    Inc(FResponseCount);
+    //FLastResponseLog :=
+    //  IntToStr(Mouse.CursorPos.x) + #9 + IntToStr(Mouse.CursorPos.y);
+    FSchedule.DoResponse;
+  end;
+end;
+
+procedure TKey.SetVisible(AValue: Boolean);
+begin
+  inherited SetVisible(AValue);
+  if Assigned(FVideoPlayer) then
+  if AValue then
+    FVideoPlayer.Show
+  else
+    FVideoPlayer.Hide;
 end;
 
 //******

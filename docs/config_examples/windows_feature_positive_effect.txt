@@ -18,7 +18,7 @@ NumTrials=	10 1
 [Blc 1 - T1]
 
 Name=	Positiva 1
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 
@@ -90,7 +90,7 @@ C9GapLength=	360
 [Blc 1 - T2]
 
 Name=	Negativa 2
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Style=	GO NOGO
@@ -149,7 +149,7 @@ C9GapLength=	360
 [Blc 1 - T3]
 
 Name=	Positiva 3
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Style=	GO NOGO
@@ -208,7 +208,7 @@ C9GapLength=	360
 [Blc 1 - T4]
 
 Name=	Negativa 4
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Style=	GO NOGO
@@ -267,7 +267,7 @@ C9GapLength=	360
 [Blc 1 - T5]
 
 Name=	Positiva 5
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Starter= True
@@ -327,7 +327,7 @@ C9GapLength=	360
 [Blc 1 - T6]
 
 Name=	Negativa 6
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Style=	GO NOGO
@@ -386,7 +386,7 @@ C9GapLength=	360
 [Blc 1 - T7]
 
 Name=	Positiva 7
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Style=	GO NOGO
@@ -446,7 +446,7 @@ C9GapLength=	360
 Style=	GO NOGO
 
 Name=	Negativa 8
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Starter= True
@@ -504,7 +504,7 @@ C9GapLength=	360
 
 [Blc 1 - T9]
 Name=	Positiva 9
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Style=	GO NOGO
@@ -564,7 +564,7 @@ C9GapLength=	360
 [Blc 1 - T10]
 
 Name=	Negativa 10
-Kind=	FPE
+Kind=	FPFN
 BkGnd=	16777215
 Cursor=	-1
 Style=	GO NOGO

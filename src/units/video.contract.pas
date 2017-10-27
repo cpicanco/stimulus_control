@@ -5,7 +5,7 @@ unit Video.Contract;
 
 interface
 
-uses Controls;
+uses Classes, Controls;
 
 type
 
@@ -17,6 +17,7 @@ type
     procedure Play;
     procedure Stop;
     procedure SetBounds(ALeft, ATop, AWidth, AHeight : integer);
+    procedure SetEndOfFileEvent(AEndOfFileEvent : TNotifyEvent);
     procedure FullScreen;
   end;
 
