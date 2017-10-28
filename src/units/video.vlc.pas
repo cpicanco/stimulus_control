@@ -80,8 +80,7 @@ begin
   //FButton.OnClick:=@Click;
 
   FPlayer := TLCLVLCPlayer.Create(Self);
-
-
+  {$IFDEF LINUX}
   // for some unknown reason we need
   // one more ParentWindow layer on top
   // to have easy control over
@@ -89,6 +88,11 @@ begin
   FHack := TWinControl.Create(Self);
   FHack.Parent := FBackground;
   FPlayer.ParentWindow := FHack;
+  {$ENDIF}
+
+  {$IFDEF WINDOWS}
+  FPlayer.ParentWindow := FBackground;
+  {$ENDIF}
   FPlayer.UseEvents := True;
   FPlayer.OnEOF:=@EndOfFile;
 
