@@ -3,7 +3,7 @@ object FormRandomizePositions: TFormRandomizePositions
   Height = 256
   Top = 185
   Width = 823
-  HorzScrollBar.Page = 804
+  HorzScrollBar.Page = 805
   VertScrollBar.Page = 63
   AutoScroll = True
   Caption = 'Aleatorizar posições dos estímulos'
@@ -16,13 +16,13 @@ object FormRandomizePositions: TFormRandomizePositions
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   ShowHint = True
-  LCLVersion = '1.8.0.1'
+  LCLVersion = '1.8.0.5'
   WindowState = wsMaximized
   object LabelGap: TLabel
     Left = 484
     Height = 13
     Top = 15
-    Width = 34
+    Width = 40
     Caption = 'e Pular'
     ParentColor = False
     Visible = False
@@ -31,7 +31,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Left = 344
     Height = 13
     Top = 15
-    Width = 54
+    Width = 62
     Caption = 'Aleatorizar'
     ParentColor = False
     Visible = False
@@ -40,7 +40,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Left = 344
     Height = 13
     Top = 43
-    Width = 59
+    Width = 69
     Caption = 'Começar na'
     ParentColor = False
   end
@@ -48,7 +48,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Left = 473
     Height = 13
     Top = 43
-    Width = 59
+    Width = 68
     Caption = 'Terminar na'
     ParentColor = False
   end
@@ -56,7 +56,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Left = 605
     Height = 13
     Top = 15
-    Width = 32
+    Width = 37
     Caption = 'linhas.'
     ParentColor = False
     Visible = False
@@ -65,7 +65,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Left = 605
     Height = 13
     Top = 43
-    Width = 47
+    Width = 54
     Caption = 'tentativa.'
     ParentColor = False
   end
@@ -150,7 +150,7 @@ object FormRandomizePositions: TFormRandomizePositions
     Left = 664
     Height = 55
     Top = 8
-    Width = 140
+    Width = 141
     AutoSize = True
     Caption = 'Blocos'
     ChildSizing.LeftRightSpacing = 5
@@ -160,7 +160,7 @@ object FormRandomizePositions: TFormRandomizePositions
     ChildSizing.Layout = cclLeftToRightThenTopToBottom
     ChildSizing.ControlsPerLine = 3
     ClientHeight = 40
-    ClientWidth = 136
+    ClientWidth = 137
     Constraints.MinHeight = 55
     TabOrder = 7
     Visible = False
@@ -179,13 +179,13 @@ object FormRandomizePositions: TFormRandomizePositions
       Left = 65
       Height = 23
       Top = 5
-      Width = 6
+      Width = 7
       Caption = '0'
       Layout = tlCenter
       ParentColor = False
     end
     object ButtonBlocFoward: TButton
-      Left = 81
+      Left = 82
       Height = 23
       Top = 5
       Width = 50
@@ -216,7 +216,7 @@ object FormRandomizePositions: TFormRandomizePositions
     TabOrder = 9
     object ListBoxPositions: TListBox
       Left = 0
-      Height = 38
+      Height = 40
       Hint = 'Dois cliques para carregar um arquivo com posições customizadas.'
       Top = 0
       Width = 165
@@ -224,7 +224,6 @@ object FormRandomizePositions: TFormRandomizePositions
       ExtendedSelect = False
       ItemHeight = 0
       OnDblClick = ListBoxPositionsDblClick
-      Options = [lboDrawFocusRect]
       ScrollWidth = 163
       Sorted = True
       TabOrder = 0

@@ -51,7 +51,7 @@ begin
   //FButton.Caption := '>';
   //FButton.Enabled := True;
   FBackground.Enabled:=True;
-  Sleep(1000);
+  Sleep(500);
   if Assigned(FEndOfFileEvent) then FEndOfFileEvent(Sender);
 end;
 
