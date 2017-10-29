@@ -13,8 +13,8 @@ unit userconfigs_feature_positive;
 
 interface
 
-uses Classes, SysUtils, FileUtil, Forms, Controls, Graphics,
-     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList, Grids
+uses Classes, SysUtils, FileUtil, IDEWindowIntf, Forms, Controls, Graphics,
+     Dialogs, ExtCtrls, StdCtrls, Spin, ActnList, Grids, XMLPropStorage
      , GUI.Helpers.Grids
      , Canvas.Helpers
      ;
@@ -48,40 +48,53 @@ type
     { TFormFPE }
 
     TFormFPE = class(TForm)
-      btnEditNodes: TButton;
       btnClose: TButton;
-      btnEditNodes1: TButton;
       btnMinimizeTopTab: TButton;
       btnOk: TButton;
+      gbLimitedHold: TGroupBox;
       gbTrials: TGroupBox;
-      gbStimuli: TGroupBox;
-      gbGapLength: TGroupBox;
+      LabelGapLength: TLabel;
+      LabelLimitedHold: TLabel;
+      LabelStimuliNumber: TLabel;
+      LabelSize: TLabel;
+      LabelBorder: TLabel;
+      LabelTrials: TLabel;
       Panel1: TPanel;
       RadioGroupEffect: TRadioGroup;
       RadioGroupGrids: TRadioGroup;
-      seTrials: TSpinEdit;
       seGapLength: TSpinEdit;
+      seLimitedHold: TSpinEdit;
+      seSize: TSpinEdit;
+      seBorder: TSpinEdit;
+      seStimuliNumber: TSpinEdit;
+      seTrials: TSpinEdit;
       PreviewTimer: TTimer;
+      XMLPropStorage1: TXMLPropStorage;
       procedure btnEditNodes1Click(Sender: TObject);
       procedure btnMinimizeTopTabClick(Sender: TObject);
       procedure Button2Click(Sender: TObject);
       procedure cbPreviewChange(Sender: TObject);
       procedure FormActivate(Sender: TObject);
+      procedure FormCreate(Sender: TObject);
+      procedure FormDestroy(Sender: TObject);
       procedure FormKeyPress(Sender: TObject; var Key: char);
       procedure FormPaint(Sender: TObject);
       procedure PreviewTimerTimer(Sender: TObject);
+      procedure RadioGroupGridsSelectionChanged(Sender: TObject);
       procedure seGapLengthEditingDone(Sender: TObject);
     private
     // fullscreen
-      FFullScreen : Boolean;
+      //FFullScreen : Boolean;
       //FOriginalBounds : TRect;
       //FOriginalWindowState : TWindowState;
       //FScreenBounds : TRect;
     // other
+      FDrawMask : Boolean;
       FCanDraw : Boolean;
       FCurrentTrial : integer;
       FMonitor: integer;
       FTrials : TTrials;
+      FBitmap : TBitmap;
       function GetMatrix(AMonitor : integer) : TStmMatrix;
       function GetCircleGrid(AMonitor : integer) : TStmCircleGrid;
       procedure SetMonitor(AValue: integer);
@@ -107,16 +120,28 @@ implementation
 
 {$R *.lfm}
 
-uses LazFileUtils, Session.ConfigurationFile, GUI.Helpers, strutils, constants;
+uses LazFileUtils, Session.ConfigurationFile, strutils, constants;
 { TFormFPE }
 
 procedure TFormFPE.FormActivate(Sender: TObject);
 begin
   //BorderStyle := bsNone;
   FCurrentTrial := 0;
-  WindowState:=wsMaximized;
+  WindowState:=wsFullScreen;
   //SetMatrix(GetMatrix(MonitorToShow));
   SetCircleGrid(GetCircleGrid(MonitorToShow));
+end;
+
+procedure TFormFPE.FormCreate(Sender: TObject);
+begin
+  FBitmap := TBitmap.Create;
+  RandomMask(FBitmap);
+  FDrawMask := True;
+end;
+
+procedure TFormFPE.FormDestroy(Sender: TObject);
+begin
+  FBitmap.Free;
 end;
 
 procedure TFormFPE.FormKeyPress(Sender: TObject; var Key: char);
@@ -169,6 +194,9 @@ begin
     begin
       OldCanvas := TCanvas.Create;
       SaveOldCanvas;
+      if FDrawMask then
+        Canvas.StretchDraw(ClientRect,FBitmap);
+      LoadOldCanvas;
 
       try
         //DrawCircle(Canvas, 300, 300, 100, True, 50, 5 );
@@ -217,11 +245,27 @@ begin
   Invalidate;
 end;
 
+procedure TFormFPE.RadioGroupGridsSelectionChanged(Sender: TObject);
+begin
+  case RadioGroupGrids.ItemIndex of
+    0:
+      begin
+        FDrawMask := False;
+        SetMatrix(GetMatrix(MonitorToShow));
+      end;
+    1:
+      begin
+        SetCircleGrid(GetCircleGrid(MonitorToShow));
+        FDrawMask := True;
+      end;
+  end;
+end;
+
 procedure TFormFPE.seGapLengthEditingDone(Sender: TObject);
 begin
   case RadioGroupGrids.ItemIndex of
-   0: SetMatrix(GetMatrix(MonitorToShow));
-   1: SetCircleGrid(GetCircleGrid(MonitorToShow));
+    0: SetMatrix(GetMatrix(MonitorToShow));
+    1: SetCircleGrid(GetCircleGrid(MonitorToShow));
   end;
 end;
 
@@ -268,20 +312,20 @@ var
   LW, LH,
   LSLeft, LSTop, LSCount, i, LSSize, LBorderSize: Integer;
 begin
-  LBorderSize := 50;
-  LSSize := 100;
+  LBorderSize := seBorder.Value;
+  LSSize := seSize.Value;
   LW := Screen.Monitors[AMonitor].Width;
   LH := Screen.Monitors[AMonitor].Height;
-  LR := GetCentralRect(LW,LH,(LSSize+LBorderSize) div 2);
-  //LR := GetCentralRect(LW,LH,LSSize);
+  //LR := GetCentralRect(LW,LH,(LSSize+LBorderSize) div 2);
+  LR := GetCentralRect(LW, LH, LBorderSize, LBorderSize, LBorderSize, LBorderSize);
 
-  LSCount := 9;
+  LSCount := seStimuliNumber.Value;
   SetLength(Result,LSCount);
   for i := 0 to LSCount -1 do
     begin
       LP := GetPointFromAngle(i*(360/LSCount),LR);
-      LSLeft:= LP.X-LSSize+LBorderSize;
-      LSTop := LP.Y-LSSize+LBorderSize;
+      LSLeft:= LP.X- (LSSize div 2);
+      LSTop := LP.Y- (LSSize div 2);
       Result[i].Left := LSLeft;
       Result[i].Top := LSTop;
       Result[i].Width := LSSize;
@@ -414,7 +458,7 @@ begin
         else
           Inc(LStimulusToGap);
     end;
-
+  LabelTrials.Caption := IntToStr(High(FTrials)+1);
   FCanDraw := True;
   Invalidate;
 end;
@@ -471,6 +515,7 @@ begin
           Inc(LStimulusToGap);
     end;
 
+  LabelTrials.Caption := IntToStr(High(FTrials)+1);
   FCanDraw := True;
   Invalidate;
 end;
@@ -538,7 +583,7 @@ begin
           LNewBloc.WriteToTrial(LRow, _Schedule,       T_CRF);
           LNewBloc.WriteToTrial(LRow, _ShowStarter,    BoolToStr(False, '1','0'));
           LNewBloc.WriteToTrial(LRow, _Cursor,         IntToStr(crNone));
-          LNewBloc.WriteToTrial(LRow, _LimitedHold,    '1700');
+          LNewBloc.WriteToTrial(LRow, _LimitedHold,    '4000');
           LNewBloc.WriteToTrial(LRow, _NextTrial,      '0');
 
           LNumComp := GetNumComp;

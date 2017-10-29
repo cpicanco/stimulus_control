@@ -1,7 +1,7 @@
 object FormFPE: TFormFPE
-  Left = 33
+  Left = 31
   Height = 243
-  Top = 164
+  Top = 156
   Width = 991
   Caption = 'FormFPE'
   ClientHeight = 243
@@ -9,9 +9,12 @@ object FormFPE: TFormFPE
   Color = clWhite
   DefaultMonitor = dmDesktop
   OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
   OnPaint = FormPaint
-  LCLVersion = '1.8.0.4'
+  SessionProperties = 'seBorder.Value;seGapLength.Value;seLimitedHold.Value;seSize.Value;seTrials.Value;seStimuliNumber.Value;RadioGroupGrids.ItemIndex;RadioGroupEffect.ItemIndex'
+  LCLVersion = '1.8.0.5'
   object Panel1: TPanel
     Left = 0
     Height = 160
@@ -44,30 +47,41 @@ object FormFPE: TFormFPE
     end
     object gbTrials: TGroupBox
       Left = 8
-      Height = 49
+      Height = 96
       Top = 8
-      Width = 141
+      Width = 96
       Caption = 'N° Tentativas'
-      ClientHeight = 30
-      ClientWidth = 137
+      ChildSizing.LeftRightSpacing = 10
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousSpaceResize
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 1
+      ClientHeight = 80
+      ClientWidth = 92
       TabOrder = 2
-      object btnEditNodes: TButton
-        Left = 76
-        Height = 25
-        Top = 2
-        Width = 54
-        Caption = 'Editar'
-        TabOrder = 0
-      end
       object seTrials: TSpinEdit
-        Left = 2
-        Height = 27
-        Top = 1
-        Width = 71
+        Left = 10
+        Height = 24
+        Top = 9
+        Width = 72
+        Constraints.MaxHeight = 24
         MaxValue = 2000
         MinValue = 2
-        TabOrder = 1
-        Value = 4
+        OnEditingDone = seGapLengthEditingDone
+        TabOrder = 0
+        Value = 6
+      end
+      object LabelTrials: TLabel
+        Left = 10
+        Height = 30
+        Top = 42
+        Width = 72
+        Alignment = taCenter
+        Caption = '0'
+        Font.Height = -27
+        Layout = tlCenter
+        ParentColor = False
+        ParentFont = False
       end
     end
     object btnOk: TButton
@@ -80,51 +94,10 @@ object FormFPE: TFormFPE
       ModalResult = 1
       TabOrder = 3
     end
-    object gbStimuli: TGroupBox
-      Left = 304
-      Height = 73
-      Top = 8
-      Width = 159
-      Caption = 'Estímulos'
-      ClientHeight = 54
-      ClientWidth = 155
-      TabOrder = 4
-      object btnEditNodes1: TButton
-        AnchorSideLeft.Side = asrBottom
-        Left = 0
-        Height = 25
-        Top = 2
-        Width = 54
-        BorderSpacing.Left = 13
-        Caption = 'Editar'
-        OnClick = btnEditNodes1Click
-        TabOrder = 0
-      end
-    end
-    object gbGapLength: TGroupBox
-      Left = 160
-      Height = 49
-      Top = 8
-      Width = 141
-      Caption = 'GapLength'
-      ClientHeight = 30
-      ClientWidth = 137
-      TabOrder = 5
-      object seGapLength: TSpinEdit
-        Left = 2
-        Height = 27
-        Top = 1
-        Width = 71
-        MaxValue = 360
-        OnEditingDone = seGapLengthEditingDone
-        TabOrder = 0
-        Value = 10
-      end
-    end
     object RadioGroupGrids: TRadioGroup
-      Left = 8
+      Left = 488
       Height = 80
-      Top = 64
+      Top = 8
       Width = 97
       AutoFill = True
       Caption = 'Grade'
@@ -135,19 +108,20 @@ object FormFPE: TFormFPE
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
-      ClientHeight = 61
+      ClientHeight = 64
       ClientWidth = 93
       ItemIndex = 1
       Items.Strings = (
         'Matrix'
         'Círculo'
       )
-      TabOrder = 6
+      OnSelectionChanged = RadioGroupGridsSelectionChanged
+      TabOrder = 4
     end
     object RadioGroupEffect: TRadioGroup
-      Left = 128
+      Left = 592
       Height = 80
-      Top = 64
+      Top = 8
       Width = 112
       AutoFill = True
       Caption = 'Efeito'
@@ -158,19 +132,135 @@ object FormFPE: TFormFPE
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
-      ClientHeight = 61
+      ClientHeight = 64
       ClientWidth = 108
       ItemIndex = 0
       Items.Strings = (
         'Positivo'
         'Negativo'
       )
-      TabOrder = 7
+      TabOrder = 5
+    end
+    object gbLimitedHold: TGroupBox
+      Left = 112
+      Height = 145
+      Top = 7
+      Width = 360
+      Caption = 'Estímulos (S)'
+      ChildSizing.LeftRightSpacing = 10
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousSpaceResize
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 129
+      ClientWidth = 356
+      TabOrder = 6
+      object LabelSize: TLabel
+        Left = 10
+        Height = 24
+        Top = 2
+        Width = 260
+        Caption = 'Tamanho de cada S'
+        ParentColor = False
+      end
+      object seSize: TSpinEdit
+        Left = 270
+        Height = 24
+        Top = 2
+        Width = 76
+        MaxValue = 500
+        MinValue = 10
+        OnEditingDone = seGapLengthEditingDone
+        TabOrder = 2
+        Value = 100
+      end
+      object LabelBorder: TLabel
+        Left = 10
+        Height = 24
+        Top = 28
+        Width = 260
+        Caption = 'Borda externa da grade (quadrado central)'
+        ParentColor = False
+      end
+      object seBorder: TSpinEdit
+        Left = 270
+        Height = 24
+        Top = 28
+        Width = 76
+        MaxValue = 500
+        MinValue = 10
+        OnEditingDone = seGapLengthEditingDone
+        TabOrder = 3
+        Value = 100
+      end
+      object LabelGapLength: TLabel
+        Left = 10
+        Height = 24
+        Top = 54
+        Width = 260
+        Caption = 'Tamanho da fresta (estímulo distintivo)'
+        ParentColor = False
+      end
+      object seGapLength: TSpinEdit
+        Left = 270
+        Height = 24
+        Top = 54
+        Width = 76
+        MaxValue = 360
+        OnEditingDone = seGapLengthEditingDone
+        TabOrder = 1
+        Value = 10
+      end
+      object LabelLimitedHold: TLabel
+        Left = 10
+        Height = 24
+        Top = 80
+        Width = 260
+        Caption = 'Tempo de apresentação'
+        ParentColor = False
+      end
+      object seLimitedHold: TSpinEdit
+        Left = 270
+        Height = 24
+        Top = 80
+        Width = 76
+        Enabled = False
+        Increment = 100
+        MaxValue = 10000
+        MinValue = 500
+        OnEditingDone = seGapLengthEditingDone
+        TabOrder = 0
+        Value = 4000
+      end
+      object LabelStimuliNumber: TLabel
+        Left = 10
+        Height = 24
+        Top = 105
+        Width = 260
+        Caption = 'Número de estímulos'
+        ParentColor = False
+      end
+      object seStimuliNumber: TSpinEdit
+        Left = 270
+        Height = 24
+        Top = 105
+        Width = 76
+        MaxValue = 12
+        MinValue = 4
+        OnEditingDone = seGapLengthEditingDone
+        TabOrder = 4
+        Value = 9
+      end
     end
   end
   object PreviewTimer: TTimer
     OnTimer = PreviewTimerTimer
     left = 48
+    top = 176
+  end
+  object XMLPropStorage1: TXMLPropStorage
+    StoredValues = <>
+    left = 144
     top = 176
   end
 end
