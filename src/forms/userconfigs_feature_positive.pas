@@ -127,7 +127,7 @@ procedure TFormFPE.FormActivate(Sender: TObject);
 begin
   //BorderStyle := bsNone;
   FCurrentTrial := 0;
-  WindowState:=wsFullScreen;
+  WindowState:=wsMaximized;
   //SetMatrix(GetMatrix(MonitorToShow));
   SetCircleGrid(GetCircleGrid(MonitorToShow));
 end;
