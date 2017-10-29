@@ -118,6 +118,7 @@ type
     procedure ClearAll;
     procedure SetVariables (SDistx, SDisty, SsW, SsH, Sni, Snj, SLeft, STop: string);
     procedure DrawStmFromCoordenates;
+    procedure FromItems(AItems : TStrings);
     property BackGround : TForm read FBackGround write FBackGround;
     property Distribuido : Boolean read FDistribuir write FDistribuir;
     property Items : TStringList read FString write FString;
@@ -143,11 +144,14 @@ type
 
 implementation
 
+uses StrUtils;
+
 { TCorner }
 
 procedure TCorner.Paint;
 begin
   inherited Paint;
+  Canvas.Pen.Mode:=pmXor;
   Canvas.Ellipse(0, 0, Width, Height);
 end;
 
@@ -388,6 +392,26 @@ begin
             end;
         end;
     end;
+  if Assigned(OnDraw) then OnDraw(Self);
+end;
+
+procedure TDrawCoordenates.FromItems(AItems: TStrings);
+var
+  i: Integer;
+  S : string;
+  ALeft, ATop, AWidth, AHeight : integer;
+begin
+  for i := 0 to AItems.Count-1 do
+  begin
+    S := AItems.ValueFromIndex[i];
+    S := S.Replace('*', '',[rfReplaceAll]);
+    ALeft   := StrToInt(ExtractDelimited(1,S,[#32]));
+    ATop    := StrToInt(ExtractDelimited(2,S,[#32]));
+    AWidth  := StrToInt(ExtractDelimited(3,S,[#32]));
+    AHeight := StrToInt(ExtractDelimited(4,S,[#32]));
+    SetPanelFeatures(i+1);
+    SetPanelSizePosition(ALeft, ATop, AWidth, AHeight);
+  end;
   if Assigned(OnDraw) then OnDraw(Self);
 end;
 
