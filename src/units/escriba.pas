@@ -461,7 +461,7 @@ begin
       NumComp := IntToStr(FBlcs[FIndBlc].Trials[FIndTrial].NumComp);
       FText.Add(
                 KComAtraso +
-                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Delayed] + KEnter +
+                  FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_SampleType] + KEnter +
                 KAtraso +
                   FBlcs[FIndBlc].Trials[FIndTrial].SList.Values [_Delay] + KEnter +
                 _Samp + KBnd + GetBnd(True) + KEnter +

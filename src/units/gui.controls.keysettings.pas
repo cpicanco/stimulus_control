@@ -247,7 +247,7 @@ begin
                 1 {successive}  :
                   EditSampleDelay.Enabled:=True;
               end;
-              ConfigList.Values[_Delayed] := SampleStyleToStr(ComboSampleStyle.ItemIndex);
+              ConfigList.Values[_SampleType] := SampleStyleToStr(ComboSampleStyle.ItemIndex);
             end;
 
           if Sender = EditSampleDelay then
@@ -711,7 +711,7 @@ begin
       EditSchedule.Text:=ConfigList.Values[_Samp+_cSch];
 
       //GBConseque : TGroupBox;
-      ComboSampleStyle.ItemIndex := StrToSampleStyle(ConfigList.Values[_Delayed]);
+      ComboSampleStyle.ItemIndex := StrToSampleStyle(ConfigList.Values[_SampleType]);
       EditSampleDelay.Text := ConfigList.Values[_Delay];
     end
   else
