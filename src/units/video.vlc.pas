@@ -16,11 +16,13 @@ type
     FEndOfFileEvent : TNotifyEvent;
     FBackground : TCustomControl;
     FHack : TWinControl;
+    FOnClick: TNotifyEvent;
     FPlayer : TLCLVLCPlayer;
     FCurrentVideoItem : TVLCMediaItem;
     //FButton : TButton;
     procedure Click(Sender : TObject);
     procedure EndOfFile(Sender : TObject);
+    procedure SetOnClick(AValue: TNotifyEvent);
   public
     constructor Create(AWinControl : TWinControl); reintroduce;
     destructor Destroy; override;
@@ -33,6 +35,7 @@ type
     procedure Show;
     procedure SetBounds(ALeft, ATop, AWidth, AHeight : integer);
     procedure SetEndOfFileEvent(AEndOfFileEvent : TNotifyEvent);
+    property OnClick : TNotifyEvent read FOnClick write SetOnClick;
   end;
 
 implementation
@@ -44,6 +47,7 @@ uses SysUtils;
 procedure TVLCVideoPlayer.Click(Sender: TObject);
 begin
   if FPlayer.Playing then Stop else Play;
+  if Assigned(OnClick) then OnClick(Sender);
 end;
 
 procedure TVLCVideoPlayer.EndOfFile(Sender: TObject);
@@ -53,6 +57,12 @@ begin
   FBackground.Enabled:=True;
   Sleep(500);
   if Assigned(FEndOfFileEvent) then FEndOfFileEvent(Sender);
+end;
+
+procedure TVLCVideoPlayer.SetOnClick(AValue: TNotifyEvent);
+begin
+  if FOnClick=AValue then Exit;
+  FOnClick:=AValue;
 end;
 
 constructor TVLCVideoPlayer.Create(AWinControl : TWinControl);
