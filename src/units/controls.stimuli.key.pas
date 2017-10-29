@@ -60,6 +60,7 @@ type
     procedure KeyMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure VideoResponse(Sender : TObject);
+    procedure VideoClick(Sender : TObject);
   protected
     procedure SetVisible(AValue:Boolean); override;
   public
@@ -85,6 +86,7 @@ type
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
     property OnEndMedia: TNotifyEvent read FOnEndMedia write FOnEndMedia;
   public
+    property OnClick;
     property OnDblClick;
     property Color;
     property Caption;
@@ -175,25 +177,23 @@ begin
 end;
 
 procedure TKey.Paint;
-    procedure PaintKey(Color : TColor);
-    begin
-      with Canvas do
-        begin
-          Font.Size:= 48;
-          Font.Color:= clWhite;
-          Pen.Width := 3;
-          Pen.Color := Edge;
-          Brush.Color:= Color;//FBorderColor;
-          //FillRect(Rect(0, 0, Width, Height));
-          Rectangle(ClientRect);
-          TextRect(ClientRect,
-                   (((ClientRect.Right-ClientRect.Left) div 2) - (TextWidth(Caption)div 2)),
-                   (((ClientRect.Bottom-ClientRect.Top) div 2) - (TextHeight(Caption)div 2)),
-                   Caption);
-        end;
-    end;
-
-
+  procedure PaintKey(Color : TColor);
+  begin
+    with Canvas do
+      begin
+        Font.Size:= 48;
+        Font.Color:= clWhite;
+        Pen.Width := 3;
+        Pen.Color := Edge;
+        Brush.Color:= Color;//FBorderColor;
+        //FillRect(Rect(0, 0, Width, Height));
+        Rectangle(ClientRect);
+        TextRect(ClientRect,
+                 (((ClientRect.Right-ClientRect.Left) div 2) - (TextWidth(Caption)div 2)),
+                 (((ClientRect.Bottom-ClientRect.Top) div 2) - (TextHeight(Caption)div 2)),
+                 Caption);
+      end;
+  end;
 begin
   case FKind.stmImage of
     stmPicture:Canvas.StretchDraw(ClientRect, FStimulus);
@@ -324,6 +324,7 @@ var
     FVideoPlayer.SetEndOfFileEvent(@VideoResponse);
     FVideoPlayer.SetBounds(Left, Top, Width, Height);
     FVideoPlayer.LoadFromFile(AFilename);
+    FVideoPlayer.OnClick:=@VideoClick;
     SetKind(False, TImage.stmVideo);
   end;
 
@@ -393,6 +394,24 @@ begin
   FSchedule.DoResponse;
 end;
 
+procedure TKey.SetVisible(AValue: Boolean);
+begin
+  inherited SetVisible(AValue);
+  if Assigned(FVideoPlayer) then
+  if AValue then
+    FVideoPlayer.Show
+  else
+    FVideoPlayer.Hide;
+end;
+
+function TKey.GetShortName: string;
+begin
+  if FFilename = '' then
+    Result := 'NA'
+  else
+    Result := ExtractFileNameWithoutExt(ExtractFileNameOnly(FFilename));
+end;
+
 procedure TKey.VideoResponse(Sender: TObject);
 begin
   if Assigned(Self) then
@@ -404,34 +423,30 @@ begin
   end;
 end;
 
-procedure TKey.SetVisible(AValue: Boolean);
+//******
+//**  **
+//******
+// TKey must send its info to OnClick events.
+//******
+//**  **
+//******
+
+procedure TKey.VideoClick(Sender: TObject);
 begin
-  inherited SetVisible(AValue);
-  if Assigned(FVideoPlayer) then
-  if AValue then
-    FVideoPlayer.Show
-  else
-    FVideoPlayer.Hide;
+  if Assigned(OnClick) then OnClick(Self); //must be Self
 end;
 
 //******
 //**  **
 //******
-// Sender is irrelevant at this point, TKey needs to send its info to TTrial descendents.
+// TKey must send its info to TTrial descendents.
 //******
 //**  **
 //******
+
 procedure TKey.Consequence(Sender: TObject);
 begin
   if Assigned(OnConsequence) then FOnConsequence(Self);   //must be Self
-end;
-
-function TKey.GetShortName: string;
-begin
-  if FFilename = '' then
-    Result := 'NA'
-  else
-    Result := ExtractFileNameWithoutExt(ExtractFileNameOnly(FFilename));
 end;
 
 procedure TKey.Response(Sender: TObject);
