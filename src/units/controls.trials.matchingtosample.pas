@@ -32,14 +32,20 @@ type
     //SampleMsg : string
   end;
 
+
+  TSampleType = (sampSimultaneous, sampSuccessive);
+
   { TMTS }
 
   {
-    Implements Conditional Discriminations
+    Implements
+    Conditional Discriminations
+    Successive and Simultaneous
+    With or Without delay
   }
   TMTS = Class(TSimpl)
   private
-    FDelayed : Boolean;
+    FSampleType : TSampleType;
     FDelay : TTimer;
     FSample : TKeySupport;
     FSDataSupport : TSampleDataSupport;
@@ -51,7 +57,6 @@ type
     procedure TrialBeforeEnd(Sender: TObject);
     procedure VisibleSample(AValue: Boolean);
     function GetHeader : string;
-    procedure DoNothing(Sender : TObject);
   protected
     // TTrial
     procedure TrialStart(Sender: TObject); override;
@@ -78,6 +83,8 @@ procedure TMTS.Play(ACorrection : Boolean);
 var
   s1: string;
   R: TRect;
+  LDelayed : Boolean;
+  LDelay : integer;
 begin
   inherited Play(ACorrection);
   with FSample do
@@ -114,14 +121,20 @@ begin
     end;
 
   // DELAY
-  FDelayed:= StrToBoolDef(CfgTrial.SList.Values[_Delayed], False);
-  if FDelayed then
-    begin
-      FDelay := TTimer.Create(Self);
-      FDelay.Enabled:=False;
-      FDelay.OnTimer := @DelayEnd;
-      FDelay.Interval:= StrToIntDef(CfgTrial.SList.Values[_Delay], 0);
-    end;
+  LDelayed := StrToBoolDef(CfgTrial.SList.Values[_SampleType], False);
+  if LDelayed then
+    FSampleType := sampSuccessive
+  else
+    FSampleType := sampSimultaneous;
+
+  LDelay := StrToIntDef(CfgTrial.SList.Values[_Delay], 0);
+  if LDelay > 0 then
+  begin
+    FDelay := TTimer.Create(Self);
+    FDelay.Enabled:=False;
+    FDelay.OnTimer := @DelayEnd;
+    FDelay.Interval:= LDelay;
+  end;
 
   if Self.ClassType = TMTS then Config(Self);
 end;
@@ -134,23 +147,26 @@ end;
 
 procedure TMTS.SampleConsequence(Sender: TObject);
 begin
-  if FSample.Key.Kind.stmAudio then
-    FSample.Key.Stop;
-
-  if FSample.Key.Kind.stmImage = stmVideo then
-  begin
-    FSample.Key.Stop;
-    FSample.Key.OnConsequence:=@DoNothing;
+  case FSampleType of
+    sampSimultaneous: { do nothing };
+    sampSuccessive:
+      begin
+        if FSample.Key.Kind.stmAudio then
+          FSample.Key.Stop;
+        VisibleSample(False);
+      end;
   end;
 
-  if FDelayed then
+  if Assigned(FSample.Key.OnConsequence) then
+  begin
+    FSample.Key.OnConsequence := nil;
+    if Assigned(FDelay) then
     begin
-      VisibleSample(False);
       FDelay.Enabled := True;
       FSDataSupport.Delay_Begin := TickCount;
-    end
-  else
-    inherited TrialStart(Sender);
+    end else
+      inherited TrialStart(Sender);
+  end;
 end;
 
 procedure TMTS.SampleResponse(Sender: TObject);
@@ -187,11 +203,6 @@ begin
             rsReportRspModFrq + #9 + #9 + #9;
 end;
 
-procedure TMTS.DoNothing(Sender: TObject);
-begin
-
-end;
-
 procedure TMTS.BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
@@ -221,8 +232,9 @@ begin
   if FSample.Key.Kind.stmAudio then
     FSample.Key.Play;
 
-  //if FSample.Key.Kind.stmImage = stmVideo then
-  //  FSample.Key.Play;
+  // todo: video autostart?
+  // if FSample.Key.Kind.stmImage = stmVideo then
+  //   FSample.Key.Play;
 
   OnMouseDown := @BackgroundMouseDown;
 end;
@@ -250,16 +262,17 @@ begin
     Lat_Mod := #32#32#32#32#32#32 + 'NA'
   else Lat_Mod := TimestampToStr(FSDataSupport.SampLatency - TimeStart);
 
-  if FDelayed then
-    begin
+  case FSampleType of
+    sampSuccessive:
       Dur_Mod := TimestampToStr(FSDataSupport.Delay_Begin - FSDataSupport.SampleBegin);
-      Atr_Mod := TimestampToStr(FSDataSupport.Delay_Begin - TimeStart);
-    end
-  else
-    begin
+    sampSimultaneous:
       Dur_Mod := TimestampToStr(TickCount - FSDataSupport.SampleBegin);
-      Atr_Mod := #32#32#32#32#32#32 + 'NA';
-    end;
+  end;
+
+  if Assigned(FDelay) then
+    Atr_Mod := TimestampToStr(FSDataSupport.Delay_Begin - TimeStart)
+  else
+    Atr_Mod := #32#32#32#32#32#32 + 'NA';
 
   Frq_Mod := _Samp + '=' +
              IntToStr(FSample.Key.ResponseCount) + #9 +
