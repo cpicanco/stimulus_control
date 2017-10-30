@@ -1,0 +1,19 @@
+[Main]
+
+Name=	Sessão1
+Subject=	Participante1
+Type=	CIC
+RootMedia=	Media
+RootData=	Data
+NumBlc=	1
+
+[Blc 1]
+
+Name=	Bloco 1
+BkGnd=	16777215
+ITI=	0
+NumTrials=	1 1
+
+[Blc 1 - T1]
+Name=	Free Operant Counter
+Kind=	FOC
