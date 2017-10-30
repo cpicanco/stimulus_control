@@ -34,7 +34,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/;/usr/local/lib/"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;src/prototypes;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;src/prototypes;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <Parsing>
@@ -72,6 +72,11 @@
             </Verbosity>
             <CustomOptions Value="-dUseCThreads
 -dZMQ_STATIC_LINK"/>
+            <OtherDefines Count="3">
+              <Define0 Value="UseCThreads"/>
+              <Define1 Value="DEBUG"/>
+              <Define2 Value="ZMQ_STATIC_LINK"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item2>
@@ -87,7 +92,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -127,7 +132,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/epiktimer"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/epiktimer"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-nozmq"/>
           </SearchPaths>
           <CodeGeneration>
@@ -173,7 +178,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -217,7 +222,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -257,7 +262,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -319,7 +324,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="55">
+    <Units Count="56">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -431,183 +436,187 @@
         <UnitName Value="Devices.RS232i"/>
       </Unit22>
       <Unit23>
-        <Filename Value="src/units/pupil.client.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Pupil.Client"/>
-      </Unit23>
-      <Unit24>
         <Filename Value="src/units/loggers.datafile.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Loggers.DataFile"/>
-      </Unit24>
-      <Unit25>
+      </Unit23>
+      <Unit24>
         <Filename Value="src/units/controls.stimuli.key.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Stimuli.Key"/>
-      </Unit25>
-      <Unit26>
+      </Unit24>
+      <Unit25>
         <Filename Value="src/units/schedules.classes.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Schedules.Classes"/>
-      </Unit26>
-      <Unit27>
+      </Unit25>
+      <Unit26>
         <Filename Value="src/units/schedules.abstract.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Schedules.Abstract"/>
-      </Unit27>
-      <Unit28>
+      </Unit26>
+      <Unit27>
         <Filename Value="src/units/schedules.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Schedules"/>
-      </Unit28>
-      <Unit29>
+      </Unit27>
+      <Unit28>
         <Filename Value="src/units/session.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Session"/>
-      </Unit29>
-      <Unit30>
+      </Unit28>
+      <Unit29>
         <Filename Value="src/units/timestamps.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Timestamps"/>
-      </Unit30>
-      <Unit31>
+      </Unit29>
+      <Unit30>
         <Filename Value="src/units/timestamps.helpers.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Timestamps.Helpers"/>
-      </Unit31>
-      <Unit32>
+      </Unit30>
+      <Unit31>
         <Filename Value="src/units/controls.trials.abstract.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.Abstract"/>
-      </Unit32>
-      <Unit33>
+      </Unit31>
+      <Unit32>
         <Filename Value="src/units/controls.trials.pupilcalibration.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.PupilCalibration"/>
-      </Unit33>
-      <Unit34>
+      </Unit32>
+      <Unit33>
         <Filename Value="src/units/controls.trials.dizzytimers.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.DizzyTimers"/>
-      </Unit34>
-      <Unit35>
+      </Unit33>
+      <Unit34>
         <Filename Value="src/units/controls.trials.fpfn.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.FPFN"/>
-      </Unit35>
-      <Unit36>
+      </Unit34>
+      <Unit35>
         <Filename Value="src/units/controls.trials.gonogo.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.GoNoGo"/>
-      </Unit36>
-      <Unit37>
+      </Unit35>
+      <Unit36>
         <Filename Value="src/units/controls.trials.helpers.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.Helpers"/>
-      </Unit37>
-      <Unit38>
+      </Unit36>
+      <Unit37>
         <Filename Value="src/units/controls.trials.matchingtosample.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.MatchingToSample"/>
-      </Unit38>
-      <Unit39>
+      </Unit37>
+      <Unit38>
         <Filename Value="src/units/controls.trials.textmessage.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.TextMessage"/>
-      </Unit39>
-      <Unit40>
+      </Unit38>
+      <Unit39>
         <Filename Value="src/units/controls.trials.customcircles.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.CustomCircles"/>
-      </Unit40>
-      <Unit41>
+      </Unit39>
+      <Unit40>
         <Filename Value="src/units/controls.trials.movesquare.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.MoveSquare"/>
-      </Unit41>
-      <Unit42>
+      </Unit40>
+      <Unit41>
         <Filename Value="src/units/controls.trials.performancereview.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.PerformanceReview"/>
-      </Unit42>
-      <Unit43>
+      </Unit41>
+      <Unit42>
         <Filename Value="src/units/versioning.git.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Versioning.Git"/>
-      </Unit43>
-      <Unit44>
+      </Unit42>
+      <Unit43>
         <Filename Value="src/units/versioning.lazarus.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Versioning.Lazarus"/>
-      </Unit44>
-      <Unit45>
-        <Filename Value="src/units/zmq.client.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ZMQ.Client"/>
-      </Unit45>
-      <Unit46>
+      </Unit43>
+      <Unit44>
         <Filename Value="src/forms/background.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Background"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit46>
-      <Unit47>
+      </Unit44>
+      <Unit45>
         <Filename Value="src/forms/userconfigs.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormUserConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit47>
-      <Unit48>
+      </Unit45>
+      <Unit46>
         <Filename Value="src/forms/userconfigs_blocs.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormBlocs"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit48>
-      <Unit49>
+      </Unit46>
+      <Unit47>
         <Filename Value="src/forms/userconfigs_feature_positive.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormFPE"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit49>
-      <Unit50>
+      </Unit47>
+      <Unit48>
         <Filename Value="src/forms/userconfigs_get_matrix.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormMatrixConfig"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit50>
-      <Unit51>
+      </Unit48>
+      <Unit49>
         <Filename Value="src/forms/userconfigs_go_nogo.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormGo_NoGo"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit51>
-      <Unit52>
+      </Unit49>
+      <Unit50>
         <Filename Value="src/forms/userconfigs_positions.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormRandomizePositions"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit52>
-      <Unit53>
+      </Unit50>
+      <Unit51>
         <Filename Value="src/forms/userconfigs_trial_mirrored.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BresenhamLineForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit53>
-      <Unit54>
+      </Unit51>
+      <Unit52>
         <Filename Value="src/forms/userconfigs_mts_simple.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormMTS"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="src/schedules/schedules.abstract.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules.Abstract"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="src/schedules/schedules.classes.pas"/>
+        <IsPartOfProject Value="True"/>
       </Unit54>
+      <Unit55>
+        <Filename Value="src/schedules/schedules.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules"/>
+      </Unit55>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -618,7 +627,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-      <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/fpc-zmq;dependency/pupil-fpc"/>
+      <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/fpc-zmq;dependency/pupil-fpc"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
     </SearchPaths>
     <CodeGeneration>
