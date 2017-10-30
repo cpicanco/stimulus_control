@@ -13,7 +13,7 @@ unit Controls.Trials.PupilCalibration;
 
 interface
 
-uses LCLIntf, LCLType, Classes, SysUtils, Graphics
+uses LCLIntf, LCLType, Classes, SysUtils, Graphics, ExtCtrls
 
   , Controls.Trials.Abstract
   , Controls.Trials.Helpers
@@ -39,14 +39,17 @@ type
   }
   TCLB = class(TTrial)
   private
+    FTimer : TTimer;
     FBlocking,
     FShowDots : Boolean;
     FDots : array of TDot;
     FDataSupport : TDataSupport;
     procedure StartPupilCalibration;
     procedure None(Sender: TObject);
+    procedure HideCalibrationFailedMessage(Sender: TObject);
     {$IFNDEF NO_LIBZMQ}
     procedure PupilCalibrationSuccessful(Sender: TObject; APupilMessage : TPupilMessage);
+    procedure PupilCalibrationFailed(Sender: TObject; APupilMessage : TPupilMessage);
     {$ENDIF}
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
@@ -81,21 +84,33 @@ begin
   if not FBlocking then
     EndTrial(Self);
 end;
+
+procedure TCLB.PupilCalibrationFailed(Sender: TObject;
+  APupilMessage: TPupilMessage);
+begin
+  FTimer.Enabled:=True;
+  Invalidate;
+end;
+
 {$ENDIF}
 
 procedure TCLB.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if (ssCtrl in Shift) and (key = 67) { c } then
+  if (ssCtrl in Shift) and (Key = 67) { c } then
     if GlobalContainer.PupilEnabled then
       StartPupilCalibration
     else
       EndTrial(Self);
+
+  if (ssCtrl in Shift) and (Key = 80) { p } then
 end;
 
 procedure TCLB.StartPupilCalibration;
 begin
   {$IFNDEF NO_LIBZMQ}
   GlobalContainer.PupilClient.Request(REQ_SHOULD_START_CALIBRATION, True);
+  {$ELSE}
+  EndTrial(Self);
   {$ENDIF}
   //FrmBackground.Hide;
 end;
@@ -104,6 +119,12 @@ procedure TCLB.None(Sender: TObject);
 begin
   { Implement an OnNone event here }
   if Assigned(OnNone) then OnNone(Sender);
+end;
+
+procedure TCLB.HideCalibrationFailedMessage(Sender: TObject);
+begin
+  FTimer.Enabled:=False;
+  Invalidate;
 end;
 
 procedure TCLB.TrialBeforeEnd(Sender: TObject);
@@ -135,24 +156,31 @@ begin
   if FShowDots then
     with Canvas do
       for i := Low(FDots) to High(FDots) do
+      begin
+        with FDots[i] do
         begin
-          with FDots[i] do
-            begin
-              aleft := X;
-              atop  := Y;
-              asize := Size;
-            end;
-          S := IntToStr(i+1);
-          LRect := Rect(aleft, atop, aleft + asize, atop + asize);
-          Brush.Style:=bsSolid;
-          Ellipse(LRect);
-
-          GetTextSize(S, Sw, Sh);
-          aLeft := LRect.Left+(asize div 2)-(Sw div 2);
-          aTop := LRect.Top+(asize div 2)-(Sh div 2);
-          Brush.Style:=bsClear;
-          TextOut(aleft,atop,S);
+          aleft := X;
+          atop  := Y;
+          asize := Size;
         end;
+        S := IntToStr(i+1);
+        LRect := Rect(aleft, atop, aleft + asize, atop + asize);
+        Brush.Style:=bsSolid;
+        Ellipse(LRect);
+
+        GetTextSize(S, Sw, Sh);
+        aLeft := LRect.Left+(asize div 2)-(Sw div 2);
+        aTop := LRect.Top+(asize div 2)-(Sh div 2);
+        Brush.Style:=bsClear;
+        TextOut(aleft,atop,S);
+      end;
+
+  if FTimer.Enabled then
+  begin
+    Canvas.Font.Size:=30;
+    Canvas.TextOut(0,0,'A calibragem falhou.');
+  end;
+
 end;
 
 procedure TCLB.WriteData(Sender: TObject);
@@ -180,6 +208,10 @@ begin
   OnTrialPaint:=@TrialPaint;
   FShowDots := False;
 
+  FTimer := TTimer.Create(Self);
+  FTimer.Enabled := False;
+  FTimer.Interval := 4000;
+  FTimer.OnTimer:=@HideCalibrationFailedMessage;
   with Canvas do
     begin
       Brush.Color := clBlack;
@@ -224,8 +256,12 @@ begin
 
   {$IFNDEF NO_LIBZMQ}
   if GlobalContainer.PupilEnabled then
+  begin
     GlobalContainer.PupilClient.OnCalibrationSuccessful := @PupilCalibrationSuccessful;
+    GlobalContainer.PupilClient.OnCalibrationFailed := @PupilCalibrationFailed;
+  end;
   {$ENDIF}
+
 
   if Self.ClassType = TCLB then Config(Self);
 end;
