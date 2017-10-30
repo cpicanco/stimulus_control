@@ -463,7 +463,7 @@ end;
 procedure TTrial.AddToClockList(ASchedule: TSchedule);
 begin
   if ASchedule.Loaded then
-    AddToClockList(ASchedule.StartMethod)
+    AddToClockList(ASchedule)
   else
     raise Exception.Create(ExceptionNoScheduleFound);
 end;

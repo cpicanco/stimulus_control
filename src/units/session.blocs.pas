@@ -140,6 +140,7 @@ uses strutils, constants, timestamps
      , Controls.Trials.MoveSquare
      , Controls.Trials.GoNoGo
      , Controls.Trials.PerformanceReview
+     , Controls.Trials.FreeOperantCounter
      {$ifdef DEBUG}
      , Loggers.Debug
      {$endif}
@@ -217,6 +218,7 @@ begin
     begin
 
       case FBlc.Trials[IndTrial].Kind of
+        T_FOC : FTrial := TFreeOperantCounter.Create(FBackGround);
         T_GNG : FTrial := TGNG.Create(FBackGround);
         T_MSQ : FTrial := TMSQ.Create(FBackGround);
         T_DZT : FTrial := TDZT.Create(FBackGround);
@@ -297,17 +299,22 @@ begin
             FloatToStrF(FITIEND - TimeStart, ffFixed,0,9);
 
   // Check where it is coming from
-  if Sender is TDZT then
+  if (Sender is TDZT) or
+     (Sender is TFreeOperantCounter) then
     begin
-      // Trial may not have changed, avoid repetition
+      // Trial data have changed, so avoid repetition
       if NewData = FLastData then
-        NewData := EmptyBlock + #9 + EmptyBlock + #9 +  EmptyBlock;
+      begin
+        NewData := EmptyBlock + #9 + EmptyBlock + #9 +  EmptyBlock + #9 +
+                   EmptyBlock + #9 +  EmptyBlock;
+      end
+      else FLastData := NewData;
 
       // no ITI
       if FTrial.Result = '' then
         ITIData :=  DoNotApply + #9 + DoNotApply
       else
-        // Check if it is the fisrt trial
+        // Check if first trial
         if (FManager.Trials + 1) = 1 then
           IsFirst := True
         else
@@ -316,6 +323,7 @@ begin
     end
   else
     begin
+      FLastData := NewData;
 
       if (FManager.Trials + 1) = 1 then
         IsFirst := True
@@ -330,7 +338,6 @@ begin
   // write data
   LReportLn := LReportLn + NewData + #9 + ITIData + #9 + FTrial.Data + LineEnding;
   SaveData(LReportLn);
-  FLastData := NewData;
   FLastITIData := ITIData;
   FTrial.Data := '';
 end;

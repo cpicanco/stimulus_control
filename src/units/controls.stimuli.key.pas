@@ -166,9 +166,9 @@ end;
 
 procedure TKey.AutoDestroyIn(AInterval: integer);
 begin
-  FSchedule.Kind := 'FT '+IntToStr(AInterval);
+  FSchedule.Load('FT '+IntToStr(AInterval));
   FSchedule.OnConsequence:=@AutoDestroy;
-  FSchedule.StartClock;
+  FSchedule.Start;
 end;
 
 procedure TKey.Paint;

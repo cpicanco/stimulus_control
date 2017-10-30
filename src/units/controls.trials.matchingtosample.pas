@@ -105,7 +105,7 @@ begin
       Key.FullPath:= RootMedia + ExtractDelimited(1,s1,[#32]);
 
       // SCH
-      Key.Schedule.Kind:= CfgTrial.SList.Values[_Samp + _cSch];
+      Key.Schedule.Load(CfgTrial.SList.Values[_Samp + _cSch]);
       AddToClockList(Key.Schedule);
 
       // MSG
