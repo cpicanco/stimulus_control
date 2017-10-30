@@ -1,0 +1,5 @@
+lib/*
+backup/*
+*/lib/*
+*/backup/*
+test_schedules
