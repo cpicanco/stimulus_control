@@ -104,7 +104,7 @@ begin
         Key.Cursor := Self.Cursor;
         Key.OnConsequence := @Consequence;
         Key.OnResponse := @Response;
-        Key.Schedule.Kind := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cSch];
+        Key.Schedule.Load(CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cSch]);
         AddToClockList(Key.Schedule);
         Key.Parent := TCustomControl(Self.Parent);
 
