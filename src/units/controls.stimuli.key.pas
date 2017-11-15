@@ -438,7 +438,8 @@ procedure TKey.KeyMouseDown(Sender: TObject; Button: TMouseButton;
 begin
   Inc(FResponseCount);
   FLastResponseLog := IntToStr(X + Left) + #9 + IntToStr(Y + Top);
-  FSchedule.DoResponse;
+  if FSchedule.Loaded then
+     FSchedule.DoResponse;
 end;
 
 //******
