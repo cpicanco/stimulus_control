@@ -10,6 +10,8 @@ Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
 - It is a prototype to run non time-critical experiments.
 - It is being inspired by OpenSesame, Psychopy and Expyriment.
 
+**[BAIXE A VERSÃO MAIS RECENTE AQUI](https://github.com/cpicanco/stimulus_control/releases)**.
+
 **[Download the prototype here](https://github.com/cpicanco/stimulus_control/releases)**.
 
 **[Instructions to compile the prototype here](https://github.com/cpicanco/stimulus_control/wiki)**.
