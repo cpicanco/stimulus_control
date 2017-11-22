@@ -1,14 +1,14 @@
 object FormMTS: TFormMTS
-  Left = 90
+  Left = 33
   Height = 496
   Top = 159
-  Width = 1046
-  HorzScrollBar.Page = 670
+  Width = 991
+  HorzScrollBar.Page = 701
   VertScrollBar.Page = 160
   AutoScroll = True
   Caption = 'Pareamento ao Modelo'
   ClientHeight = 496
-  ClientWidth = 1046
+  ClientWidth = 991
   OnActivate = FormActivate
   OnCreate = FormCreate
   SessionProperties = 'ComboBoxTrialType.ItemIndex;ComboBoxTrialType.Text;EditDefaultCsqHIT.Text;EditDefaultCsqMISS.Text;OpenDialog.InitialDir;SpinComparisons.Value;SpinCursor.Value;SpinPresentations.Value;Caption'
@@ -17,14 +17,14 @@ object FormMTS: TFormMTS
     Left = 0
     Height = 160
     Top = 0
-    Width = 1046
+    Width = 991
     Align = alTop
     ClientHeight = 160
-    ClientWidth = 1046
+    ClientWidth = 991
     ParentColor = False
     TabOrder = 0
     object btnMinimizeTopTab: TButton
-      Left = 801
+      Left = 746
       Height = 56
       Hint = 'Aperte barra de espaço para alternar a aba'
       Top = 8
@@ -35,7 +35,7 @@ object FormMTS: TFormMTS
       TabOrder = 0
     end
     object btnClose: TButton
-      Left = 921
+      Left = 866
       Height = 56
       Top = 8
       Width = 118
@@ -45,7 +45,7 @@ object FormMTS: TFormMTS
       TabOrder = 1
     end
     object btnOk: TButton
-      Left = 801
+      Left = 746
       Height = 73
       Top = 79
       Width = 238
@@ -56,9 +56,9 @@ object FormMTS: TFormMTS
     end
     object gbStimuli: TGroupBox
       Left = 8
-      Height = 123
+      Height = 139
       Top = 8
-      Width = 339
+      Width = 373
       AutoSize = True
       Caption = 'Configurações gerais da tentativa'
       ChildSizing.LeftRightSpacing = 5
@@ -67,15 +67,15 @@ object FormMTS: TFormMTS
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 107
-      ClientWidth = 335
+      ClientHeight = 120
+      ClientWidth = 369
       TabOrder = 3
       object LabelPresentations: TLabel
         Left = 5
-        Height = 24
+        Height = 27
         Hint = 'Quantas vezes cada estímulo será apresentado?'
         Top = 5
-        Width = 145
+        Width = 179
         Alignment = taCenter
         Caption = 'Número de apresentações'
         Layout = tlCenter
@@ -84,8 +84,8 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinPresentations: TSpinEdit
-        Left = 150
-        Height = 24
+        Left = 184
+        Height = 27
         Hint = 'Quantas vezes cada estímulo será apresentado?'
         Top = 5
         Width = 180
@@ -98,10 +98,10 @@ object FormMTS: TFormMTS
       end
       object LabelComparisons: TLabel
         Left = 5
-        Height = 24
+        Height = 27
         Hint = 'Quantos estímulos de comparação?'
-        Top = 29
-        Width = 145
+        Top = 32
+        Width = 179
         Alignment = taCenter
         Caption = 'Número de Comparações'
         Layout = tlCenter
@@ -110,13 +110,13 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinComparisons: TSpinEdit
-        Left = 150
-        Height = 24
+        Left = 184
+        Height = 27
         Hint = 'Quantos estímulos de comparação?'
-        Top = 29
+        Top = 32
         Width = 180
         Alignment = taCenter
-        MaxValue = 2
+        MaxValue = 1000
         MinValue = 2
         OnEditingDone = SpinComparisonsEditingDone
         ParentShowHint = False
@@ -126,10 +126,10 @@ object FormMTS: TFormMTS
       end
       object LabelDefaultCursor: TLabel
         Left = 5
-        Height = 24
+        Height = 27
         Hint = 'Imagem do cursor do mouse'
-        Top = 53
-        Width = 145
+        Top = 59
+        Width = 179
         Alignment = taCenter
         Caption = 'Cursor'
         Layout = tlCenter
@@ -138,10 +138,10 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object SpinCursor: TSpinEdit
-        Left = 150
-        Height = 24
+        Left = 184
+        Height = 27
         Hint = 'Imagem do cursor do mouse'
-        Top = 53
+        Top = 59
         Width = 180
         Alignment = taCenter
         MaxValue = 42
@@ -154,10 +154,10 @@ object FormMTS: TFormMTS
       end
       object LabelTrialType: TLabel
         Left = 5
-        Height = 25
+        Height = 29
         Hint = 'Tipo de tentativa'
-        Top = 77
-        Width = 145
+        Top = 86
+        Width = 179
         Alignment = taCenter
         Caption = 'Tipo'
         Layout = tlCenter
@@ -166,9 +166,9 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object ComboBoxTrialType: TComboBox
-        Left = 150
-        Height = 25
-        Top = 77
+        Left = 184
+        Height = 29
+        Top = 86
         Width = 180
         Constraints.MinWidth = 180
         ItemHeight = 0
@@ -184,9 +184,9 @@ object FormMTS: TFormMTS
     end
     object gbStimuli1: TGroupBox
       Left = 384
-      Height = 74
+      Height = 83
       Top = 8
-      Width = 285
+      Width = 316
       AutoSize = True
       Caption = 'Consequência'
       ChildSizing.LeftRightSpacing = 5
@@ -195,15 +195,15 @@ object FormMTS: TFormMTS
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 58
-      ClientWidth = 281
+      ClientHeight = 64
+      ClientWidth = 312
       TabOrder = 4
       object LabelDefaultCsqHIT: TLabel
         Left = 5
-        Height = 24
+        Height = 27
         Hint = 'Consequência padrão para acerto'
         Top = 5
-        Width = 121
+        Width = 152
         Alignment = taCenter
         Caption = 'Durante o IET (Acerto)'
         Layout = tlCenter
@@ -212,8 +212,8 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object EditDefaultCsqHIT: TEdit
-        Left = 126
-        Height = 24
+        Left = 157
+        Height = 27
         Hint = 'Arquivo, Cor, Repetições, Tempo'
         Top = 5
         Width = 150
@@ -223,10 +223,10 @@ object FormMTS: TFormMTS
       end
       object LabelDefaultCsqMISS: TLabel
         Left = 5
-        Height = 24
+        Height = 27
         Hint = 'Consequência padrão para erro'
-        Top = 29
-        Width = 121
+        Top = 32
+        Width = 152
         Alignment = taCenter
         Caption = 'Durante o IET (Erro)'
         Layout = tlCenter
@@ -235,10 +235,10 @@ object FormMTS: TFormMTS
         ShowHint = True
       end
       object EditDefaultCsqMISS: TEdit
-        Left = 126
-        Height = 24
+        Left = 157
+        Height = 27
         Hint = 'Arquivo, Cor, Repetições, Tempo'
-        Top = 29
+        Top = 32
         Width = 150
         Constraints.MinWidth = 150
         TabOrder = 1

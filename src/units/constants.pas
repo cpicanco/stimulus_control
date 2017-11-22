@@ -93,6 +93,7 @@ const
   // FPE
   _DrawingType = 'DrawingType';
   _Contingency = 'Contingency';
+  _ShouldPlaySound = 'ShouldPlaySound';
 
   // GNG
   _PopUpTime = 'ConsequenceTime';

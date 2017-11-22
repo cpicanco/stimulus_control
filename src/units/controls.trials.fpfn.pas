@@ -45,6 +45,7 @@ type
     FFeaturesToDraw : TFPFNDrawing;
     FSchedule : TSchedule;
     FSound : TBassStream;
+    FShouldPlaySound : Boolean;
 
     // go
     procedure Consequence(Sender: TObject);
@@ -190,7 +191,7 @@ begin
     T_MISS : LSoundFile := RootMedia+'CSQ2.wav';
   end;
 
-  if FileExists(LSoundFile) then
+  if FileExists(LSoundFile) and FShouldPlaySound then
     begin
       LogEvent('C');
       if Assigned(FSound) then
@@ -267,6 +268,7 @@ begin
   // Use alias as defaults
   FContingency := CfgTrial.SList.Values[_Contingency];
 
+  FShouldPlaySound := StrToBoolDef(CfgTrial.SList.Values[_ShouldPlaySound], True);
   LNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
   SetLength(LCircles, LNumComp);
   for i := 0 to LNumComp -1 do

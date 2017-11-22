@@ -578,8 +578,9 @@ begin
       begin
          //SList.Values[_BkGnd] := IntToStr(clWhite);
           LNewBloc.WriteToTrial(LRow, _Kind, T_FPFN);
-          LNewBloc.WriteToTrial(LRow, _Name,           Cells[1, LRow] + #32 + IntToStr(LRow));
-          LNewBloc.WriteToTrial(LRow, _Contingency,    Cells[1, LRow]);
+          LNewBloc.WriteToTrial(LRow, _Name,            Cells[1, LRow] + #32 + IntToStr(LRow));
+          LNewBloc.WriteToTrial(LRow, _Contingency,     Cells[1, LRow]);
+          LNewBloc.WriteToTrial(LRow, _ShouldPlaySound, Cells[2, LRow] );
           LNewBloc.WriteToTrial(LRow, _Schedule,       T_CRF);
           LNewBloc.WriteToTrial(LRow, _ShowStarter,    BoolToStr(False, '1','0'));
           LNewBloc.WriteToTrial(LRow, _Cursor,         IntToStr(crNone));

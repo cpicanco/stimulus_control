@@ -98,9 +98,10 @@ begin
 
       if ATrialType = rsFillTypeMatriz then
         begin
-          ColCount := 2;
+          ColCount := 3;
           Cells[0, 0] := rsTrials;
           Cells[1, 0] := rsContingency;
+          Cells[2, 0] := rsConsequence;
         end;
 
       if ATrialType = rsFillTypeGoNoGo then
