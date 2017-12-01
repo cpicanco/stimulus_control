@@ -373,7 +373,8 @@ begin
         if (aRow + 1) > RowCount then RowCount := aRow + 1;
         Cells[0, aRow] := IntToStr(aRow);    //Trial Number
         Cells[1, aRow] := aContingency;
-        aCol := 2;
+        Cells[2, aRow] := '';
+        aCol := 3;
 
         LowComp := Low(FTrials[aTrial].Comps);
         HighComp := High(FTrials[aTrial].Comps);
@@ -580,19 +581,19 @@ begin
           LNewBloc.WriteToTrial(LRow, _Kind, T_FPFN);
           LNewBloc.WriteToTrial(LRow, _Name,            Cells[1, LRow] + #32 + IntToStr(LRow));
           LNewBloc.WriteToTrial(LRow, _Contingency,     Cells[1, LRow]);
-          LNewBloc.WriteToTrial(LRow, _ShouldPlaySound, Cells[2, LRow] );
-          LNewBloc.WriteToTrial(LRow, _Schedule,       T_CRF);
-          LNewBloc.WriteToTrial(LRow, _ShowStarter,    BoolToStr(False, '1','0'));
-          LNewBloc.WriteToTrial(LRow, _Cursor,         IntToStr(crNone));
-          LNewBloc.WriteToTrial(LRow, _LimitedHold,    '4000');
-          LNewBloc.WriteToTrial(LRow, _NextTrial,      '0');
+          LNewBloc.WriteToTrial(LRow, _ShouldPlaySound, Cells[2, LRow]);
+          LNewBloc.WriteToTrial(LRow, _Schedule,        T_CRF);
+          LNewBloc.WriteToTrial(LRow, _ShowStarter,     BoolToStr(False, '1','0'));
+          LNewBloc.WriteToTrial(LRow, _Cursor,          IntToStr(crNone));
+          LNewBloc.WriteToTrial(LRow, _LimitedHold,     '4000');
+          LNewBloc.WriteToTrial(LRow, _NextTrial,       '0');
 
           LNumComp := GetNumComp;
-          LNewBloc.WriteToTrial(LRow, _NumComp,        IntToStr(LNumComp));
+          LNewBloc.WriteToTrial(LRow, _NumComp,         IntToStr(LNumComp));
           for i := 1 to LNumComp do
             begin
-              LNewBloc.WriteToTrial(LRow,_Comp+IntToStr(i)+_cBnd, Cells[i+1+LNumComp, LRow]);
-              LValues :=  Cells[i + 1, LRow] + #32;
+              LNewBloc.WriteToTrial(LRow,_Comp+IntToStr(i)+_cBnd, Cells[i+2+LNumComp, LRow]);
+              LValues :=  Cells[i + 2, LRow] + #32;
               LNewBloc.WriteToTrial(LRow,_Comp + IntToStr(i) + _cGap, ExtractDelimited(1,LValues,[#32]));
               LNewBloc.WriteToTrial(LRow,_Comp + IntToStr(i) + _cGap_Degree, ExtractDelimited(2,LValues,[#32]));
               LNewBloc.WriteToTrial(LRow,_Comp + IntToStr(i) + _cGap_Length, ExtractDelimited(3,LValues,[#32]));

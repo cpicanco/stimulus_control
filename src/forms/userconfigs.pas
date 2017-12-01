@@ -182,6 +182,7 @@ resourcestring
   rsComboBoxRandomizeTrialOrder =  'Ordem das tentativas';
   rsComboBoxRandomizeTrialOrderConstraints = 'Ordem das tentativas (com restrições)';
   rsComboBoxRandomizeResponses = 'Respostas';
+  rsComboBoxRandomizeReinforcement = 'Probabilidade de Reforço (-25%)';
   rsComboBoxBlocCounterNone = 'Não';
   rsComboBoxBlocCounterShowHitMiss = 'Mostrar número de acertos e erros';
   rsComboBoxFillTargetColumnAllRows = 'todas as linhas';
@@ -193,7 +194,7 @@ implementation
 
 {$R *.lfm}
 
-uses background, strutils
+uses background
      , Session.Configuration.GlobalContainer
      , userconfigs_trial_mirrored
      , userconfigs_feature_positive
@@ -204,8 +205,9 @@ uses background, strutils
      , userconfigs_get_matrix
      , Versioning.Git
      , Versioning.Lazarus
-     , constants
      , Canvas.Helpers
+     , constants
+     , ReinforcementProbability
      , GUI.Helpers
      {$ifdef DEBUG}
      , Loggers.Debug
@@ -606,6 +608,8 @@ begin
           with StringGrid1 do
             for LRow := 1 to RowCount -1 do
               Cells[6, LRow] := IntToStr(Round(Random * 1));
+
+        3: RemoveConsequence(StringGrid1, FLastFocusedCol);
       end;
 
       ResetRepetionMatrix;
@@ -1019,6 +1023,7 @@ begin
       Items[0] := rsComboBoxRandomizeTrialOrder;
       Items[1] := rsComboBoxRandomizeTrialOrderConstraints;
       Items[2] := rsComboBoxRandomizeResponses;
+      Items[3] := rsComboBoxRandomizeReinforcement;
     end;
   with ComboBoxFillTargetColumn do
     begin
