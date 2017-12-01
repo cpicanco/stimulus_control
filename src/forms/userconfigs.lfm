@@ -1,10 +1,10 @@
 object FormUserConfig: TFormUserConfig
-  Left = 107
+  Left = 155
   Height = 506
-  Top = 167
+  Top = 90
   Width = 752
-  HorzScrollBar.Page = 490
-  VertScrollBar.Page = 377
+  HorzScrollBar.Page = 488
+  VertScrollBar.Page = 376
   AutoScroll = True
   Caption = 'Configurar Sessão'
   ClientHeight = 506
@@ -1620,8 +1620,7 @@ object FormUserConfig: TFormUserConfig
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   ParentBiDiMode = False
-  Position = poScreenCenter
-  SessionProperties = 'btnExportStimulus.Caption;btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;btnRun.Caption;btnSave.Caption;btnTrialsDone.Caption;ButtonRandomizeTargetSession.Caption;Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Caption;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Caption;chkPlayOnSecondMonitor.Checked;chkPupilClient.Caption;chkPupilClient.Checked;chkShowRepetitions.Caption;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ColorButtonBloc.Caption;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Items;ComboBoxBlocCounter.Text;ComboBoxFillTargetColumn.ItemIndex;ComboBoxFillTargetColumn.Items;ComboBoxFillTargetColumn.Text;ComboBoxGridType.ItemIndex;ComboBoxGridType.Items;ComboBoxGridType.Text;ComboBoxLanguage.ItemIndex;ComboBoxLanguage.Items;ComboBoxLanguage.Text;ComboBoxRandomize.ItemIndex;ComboBoxRandomize.Items;ComboBoxRandomize.Text;ComboBoxSessionType.ItemIndex;ComboBoxSessionType.Items;ComboBoxSessionType.Text;EditBlocChainingPath.Text;EditBlocName.Text;EditParticipant.Text;EditSessionName.Text;EditTargetSession.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;gbRepetitionsBlocks.Caption;gbRepetitions.Caption;gbTrialGroup.Caption;Height;HorzScrollBar;LabelBlocBkGnd.Caption;LabelBlocChainingPath.Caption;LabelBlocCounter.Caption;LabelBlocCrtConsecutiveHit.Caption;LabelBlocCrtHitPorcentage.Caption;LabelBlocITI.Caption;LabelBlocMaxCorrection.Caption;LabelBlocMaxRepetition.Caption;LabelBlocName.Caption;LabelBlocVirtualTrial.Caption;LabelLanguage.Caption;LabelParticipant.Caption;LabelSessionName.Caption;LabelSessionType.Caption;LabelTargetSession.Caption;leFillValue.Text;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piMTS.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;Position;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;seTrialGroup.Value;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;tbBlocs.Caption;tbGeneral.Caption;tbSave.Caption;tbStimuli.Caption;tbTools.Caption;tbTrials.Caption;tbVersion.Caption;VertScrollBar;Width;WindowState;XMLPropStorage1.StoredValues'
+  SessionProperties = 'btnExportStimulus.Caption;btnFillCondition.Caption;btnGridType.Caption;btnRandomize.Caption;btnRun.Caption;btnSave.Caption;btnTrialsDone.Caption;ButtonRandomizeTargetSession.Caption;Caption;cbDrawTrialGroup.Checked;cbShowRepetitions.Checked;chkDrawTrialGroup.Caption;chkDrawTrialGroup.Checked;chkPlayOnSecondMonitor.Caption;chkPlayOnSecondMonitor.Checked;chkPupilClient.Caption;chkPupilClient.Checked;chkShowRepetitions.Caption;chkShowRepetitions.Checked;ColorButtonBloc.ButtonColor;ColorButtonBloc.Caption;ComboBoxBlocCounter.ItemIndex;ComboBoxBlocCounter.Items;ComboBoxBlocCounter.Text;ComboBoxFillTargetColumn.ItemIndex;ComboBoxFillTargetColumn.Items;ComboBoxFillTargetColumn.Text;ComboBoxGridType.ItemIndex;ComboBoxGridType.Items;ComboBoxGridType.Text;ComboBoxLanguage.ItemIndex;ComboBoxLanguage.Items;ComboBoxLanguage.Text;ComboBoxRandomize.ItemIndex;ComboBoxRandomize.Items;ComboBoxRandomize.Text;ComboBoxSessionType.ItemIndex;ComboBoxSessionType.Items;ComboBoxSessionType.Text;EditBlocChainingPath.Text;EditBlocName.Text;EditParticipant.Text;EditSessionName.Text;EditTargetSession.Text;edtContent.Text;edtTarget.Text;edtTrialGroup.Text;gbRepetitionsBlocks.Caption;gbRepetitions.Caption;gbTrialGroup.Caption;Height;HorzScrollBar;LabelBlocBkGnd.Caption;LabelBlocChainingPath.Caption;LabelBlocCounter.Caption;LabelBlocCrtConsecutiveHit.Caption;LabelBlocCrtHitPorcentage.Caption;LabelBlocITI.Caption;LabelBlocMaxCorrection.Caption;LabelBlocMaxRepetition.Caption;LabelBlocName.Caption;LabelBlocVirtualTrial.Caption;LabelLanguage.Caption;LabelParticipant.Caption;LabelSessionName.Caption;LabelSessionType.Caption;LabelTargetSession.Caption;leFillValue.Text;Left;leParticipant.Text;leSessionName.Text;Memo1.Lines;OpenDialog1.InitialDir;OpenPictureDialog1.InitialDir;pgRodar.TabIndex;piAxes.Checked;piBlocChaining.Checked;piExpectedResponse.Checked;piFillAll.Checked;piFillEven.Checked;piFillOdd.Checked;piFPE.Checked;piGo_NoGo.Checked;piMatrix.Checked;piMTS.Checked;piTrialGroup.Checked;piTrials.Checked;piTrialsWithConstraints.Checked;SaveDialog1.InitialDir;seBlocCrtConsecutiveHit.Value;seBlocCrtHitPorcentage.Value;seBlocITI.Value;seBlocksCount.Value;seBlocMaxCorrection.Value;seBlocMaxRepetition.Value;seBlocVirtualTrial.Value;seCount.Value;SelectDirectoryDialog1.InitialDir;seTrialGroup.Value;StringGrid1.ColCount;StringGrid1.Columns;StringGrid1.RowCount;StringGrid1.VisibleColCount;StringGrid1.VisibleRowCount;tbBlocs.Caption;tbGeneral.Caption;tbSave.Caption;tbStimuli.Caption;tbTools.Caption;tbTrials.Caption;tbVersion.Caption;Top;VertScrollBar;Width;WindowState;XMLPropStorage1.StoredValues'
   LCLVersion = '1.8.0.5'
   object btnRun: TButton
     Left = 8
@@ -1635,9 +1634,9 @@ object FormUserConfig: TFormUserConfig
   end
   object chkPlayOnSecondMonitor: TCheckBox
     Left = 80
-    Height = 21
-    Top = 477
-    Width = 91
+    Height = 24
+    Top = 474
+    Width = 114
     Anchors = [akLeft, akBottom]
     Caption = 'no Monitor 2'
     TabOrder = 1
@@ -1658,8 +1657,8 @@ object FormUserConfig: TFormUserConfig
       ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 436
-      ClientWidth = 748
+      ClientHeight = 437
+      ClientWidth = 750
       object LabelSessionName: TLabel
         Left = 74
         Height = 25
@@ -1744,8 +1743,8 @@ object FormUserConfig: TFormUserConfig
     end
     object tbStimuli: TTabSheet
       Caption = 'Estímulos'
-      ClientHeight = 436
-      ClientWidth = 748
+      ClientHeight = 437
+      ClientWidth = 750
       TabVisible = False
       object btnExportStimulus: TButton
         Left = 8
@@ -1764,8 +1763,8 @@ object FormUserConfig: TFormUserConfig
       ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 2
-      ClientHeight = 436
-      ClientWidth = 748
+      ClientHeight = 437
+      ClientWidth = 750
       object LabelBlocChainingPath: TLabel
         Left = 69
         Height = 25
@@ -1950,13 +1949,13 @@ object FormUserConfig: TFormUserConfig
     end
     object tbTrials: TTabSheet
       Caption = 'Tentativas'
-      ClientHeight = 436
-      ClientWidth = 748
+      ClientHeight = 437
+      ClientWidth = 750
       object StringGrid1: TStringGrid
         Left = 0
-        Height = 181
+        Height = 182
         Top = 200
-        Width = 748
+        Width = 750
         Align = alClient
         BorderSpacing.Top = 200
         BorderSpacing.Bottom = 55
@@ -2010,14 +2009,14 @@ object FormUserConfig: TFormUserConfig
         Top = 56
         Width = 160
         Caption = 'Repetições'
-        ClientHeight = 33
+        ClientHeight = 30
         ClientWidth = 156
         ParentShowHint = False
         ShowHint = True
         TabOrder = 3
         object seCount: TSpinEdit
           Left = 96
-          Height = 24
+          Height = 27
           Top = 3
           Width = 50
           Anchors = [akTop, akRight]
@@ -2028,10 +2027,10 @@ object FormUserConfig: TFormUserConfig
         end
         object chkShowRepetitions: TCheckBox
           Left = 8
-          Height = 21
+          Height = 24
           Hint = 'Mostrar repetições na coluna selecionada.'
           Top = 3
-          Width = 64
+          Width = 81
           Caption = 'Mostrar'
           OnChange = chkShowRepetitionsChange
           TabOrder = 1
@@ -2044,14 +2043,14 @@ object FormUserConfig: TFormUserConfig
         Top = 56
         Width = 160
         Caption = 'Grupo de repetições'
-        ClientHeight = 33
+        ClientHeight = 30
         ClientWidth = 156
         ParentShowHint = False
         ShowHint = True
         TabOrder = 7
         object seBlocksCount: TSpinEdit
           Left = 96
-          Height = 24
+          Height = 27
           Hint = 'Blocos'
           Top = 3
           Width = 50
@@ -2064,7 +2063,7 @@ object FormUserConfig: TFormUserConfig
       end
       object leFillValue: TLabeledEdit
         Left = 324
-        Height = 24
+        Height = 27
         Top = 168
         Width = 160
         EditLabel.AnchorSideLeft.Control = leFillValue
@@ -2072,8 +2071,8 @@ object FormUserConfig: TFormUserConfig
         EditLabel.AnchorSideRight.Side = asrBottom
         EditLabel.AnchorSideBottom.Control = leFillValue
         EditLabel.Left = 324
-        EditLabel.Height = 14
-        EditLabel.Top = 151
+        EditLabel.Height = 17
+        EditLabel.Top = 148
         EditLabel.Width = 160
         EditLabel.Caption = 'leFillValue'
         EditLabel.ParentColor = False
@@ -2099,23 +2098,23 @@ object FormUserConfig: TFormUserConfig
         Top = 56
         Width = 160
         Caption = 'Grupo de Tentativas'
-        ClientHeight = 33
+        ClientHeight = 30
         ClientWidth = 156
         ParentShowHint = False
         ShowHint = True
         TabOrder = 6
         object chkDrawTrialGroup: TCheckBox
           Left = 8
-          Height = 21
+          Height = 24
           Top = 3
-          Width = 64
+          Width = 81
           Caption = 'Mostrar'
           OnChange = chkDrawTrialGroupChange
           TabOrder = 0
         end
         object seTrialGroup: TSpinEdit
           Left = 96
-          Height = 24
+          Height = 27
           Top = 3
           Width = 50
           Anchors = [akTop, akRight]
@@ -2127,7 +2126,7 @@ object FormUserConfig: TFormUserConfig
       end
       object ComboBoxRandomize: TComboBox
         Left = 101
-        Height = 23
+        Height = 27
         Top = 27
         Width = 383
         ItemHeight = 0
@@ -2144,7 +2143,7 @@ object FormUserConfig: TFormUserConfig
       end
       object ComboBoxGridType: TComboBox
         Left = 101
-        Height = 23
+        Height = 27
         Top = 1
         Width = 383
         ItemHeight = 0
@@ -2167,8 +2166,8 @@ object FormUserConfig: TFormUserConfig
         AnchorSideBottom.Side = asrBottom
         Left = 0
         Height = 40
-        Top = 388
-        Width = 748
+        Top = 389
+        Width = 750
         Anchors = [akLeft, akRight, akBottom]
         Caption = 'Escrever'
         OnClick = btnTrialsDoneClick
@@ -2176,7 +2175,7 @@ object FormUserConfig: TFormUserConfig
       end
       object ComboBoxFillTargetColumn: TComboBox
         Left = 101
-        Height = 23
+        Height = 27
         Top = 168
         Width = 221
         ItemHeight = 0
@@ -2196,8 +2195,8 @@ object FormUserConfig: TFormUserConfig
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ClientHeight = 436
-      ClientWidth = 748
+      ClientHeight = 437
+      ClientWidth = 750
       object btnSave: TButton
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Side = asrBottom
@@ -2229,8 +2228,8 @@ object FormUserConfig: TFormUserConfig
       ChildSizing.EnlargeHorizontal = crsHomogenousSpaceResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
-      ClientHeight = 436
-      ClientWidth = 748
+      ClientHeight = 437
+      ClientWidth = 750
       object LabelTargetSession: TLabel
         Left = 249
         Height = 15
@@ -2263,8 +2262,8 @@ object FormUserConfig: TFormUserConfig
     end
     object tbVersion: TTabSheet
       Caption = 'Sobre o programa'
-      ClientHeight = 436
-      ClientWidth = 748
+      ClientHeight = 437
+      ClientWidth = 750
       ParentBiDiMode = False
       object Image1: TImage
         Left = 360
@@ -3935,9 +3934,9 @@ object FormUserConfig: TFormUserConfig
   end
   object chkPupilClient: TCheckBox
     Left = 200
-    Height = 21
-    Top = 477
-    Width = 101
+    Height = 24
+    Top = 474
+    Width = 126
     Anchors = [akLeft, akBottom]
     Caption = 'Interface Pupil'
     TabOrder = 3
