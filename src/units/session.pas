@@ -184,7 +184,9 @@ begin
 end;
 
 procedure TSession.EndSess(Sender: TObject);
-var Footer : string;
+var
+  Footer : string;
+  UserCalibrationData : string = 'pupil_capture_settings'+PathDelim+'user_calibration_data';
 begin
   Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
   {$IFNDEF NO_LIBZMQ}
@@ -192,6 +194,11 @@ begin
     begin
       FGlobalContainer.PupilClient.Request(REQ_SHOULD_STOP_RECORDING);
       CopyFile(FConfigs.Filename,FGlobalContainer.RootData + ExtractFileName(FConfigs.Filename));
+      {$IFDEF LINUX}
+      UserCalibrationData := GetEnvironmentVariable('HOME')+PathDelim+UserCalibrationData;
+      if FileExists(UserCalibrationData) then
+        CopyFile(UserCalibrationData, FGlobalContainer.RootData + ExtractFileName(UserCalibrationData));
+      {$ENDIF}
     end;
   {$ENDIF}
 
