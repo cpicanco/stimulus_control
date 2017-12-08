@@ -69,6 +69,7 @@ Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
     - Auto start/stop of Pupil Recordings
     - Auto start/stop (and custom start) of the current selected Pupil Calibration Method
     - Prompts for unsuccesful calibration
+    - More details about our implementation here: https://github.com/cpicanco/pupil-fpc
 
   - Cross-Platform. Tested under Windows (7, 8 and 10), Crunchbang 11, Ubuntu LTS (13.10, 14.04, 16.04) and Debian 8.
 
