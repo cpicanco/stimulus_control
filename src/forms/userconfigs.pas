@@ -571,17 +571,17 @@ var
     LRow {increment} := seTrialGroup.Value;
     LBeginRow := 1;
     LEndRow :=  LRow {increment} + 1;
-    while LEndRow <= StringGrid1.RowCount - 1 do
-      begin
-        if AWithConstraints then
-          repeat
-            RandTrialOrder(LBeginRow, LEndRow -1);
-          until RepetitionBlocksMeetsConstraints(LBeginRow,LEndRow -2)
-        else
+    while LEndRow <= StringGrid1.RowCount do
+    begin
+      if AWithConstraints then
+        repeat
           RandTrialOrder(LBeginRow, LEndRow -1);
-        Inc(LBeginRow, LRow {increment});
-        Inc(LEndRow, LRow {increment});
-      end;
+        until RepetitionBlocksMeetsConstraints(LBeginRow,LEndRow -2)
+      else
+        RandTrialOrder(LBeginRow, LEndRow -1);
+      Inc(LBeginRow, LRow {increment});
+      Inc(LEndRow, LRow {increment});
+    end;
     ResetRepetionMatrix;
     CheckRepetitionCol(FLastFocusedCol);
   end;
