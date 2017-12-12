@@ -58,11 +58,22 @@ Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
     - Concatenate blocs of trials
     - Concatenate blocs of trials based on participant's performance (if criteria was reached, go to bloc x, if not go to bloc y)
 
-  - Timestamped Events and some communication with Pupil Software (https://github.com/pupil-labs/pupil);
+  - Timestamped Events
+    - Starts and endings of trials, Hits and Misses are timestamped by default
+    - Custom timestamps can be implemented through custom trial types
+    - For high precision and high granularity timestamps
+      - We use EpikTimer package on windows 
+      - We use `clock_get_time` on linux
+  
+  - Pupil Communication (https://github.com/pupil-labs/pupil)
+    - Auto start/stop of Pupil Recordings
+    - Auto start/stop (and custom start) of the current selected Pupil Calibration Method
+    - Prompts for unsuccesful calibration
+    - More details about our implementation here: https://github.com/cpicanco/pupil-fpc
 
   - Cross-Platform. Tested under Windows (7, 8 and 10), Crunchbang 11, Ubuntu LTS (13.10, 14.04, 16.04) and Debian 8.
 
-  - Free software, GPL3, compiled with Lazarus RAD IDE (1.6.2, 1.6.4) and FPC (3.0.0, 3.0.2).
+  - Free software, GPL3, compiled with Lazarus RAD IDE (1.6.2, 1.6.4, 1.8) and FPC (3.0.0, 3.0.2, 3.0.4).
   
   - Core code was written using a Behavior Analytic ontology.
 
