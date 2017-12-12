@@ -53,6 +53,7 @@ resourcestring
   rsFillTypeGoNoGo = 'Go/No-Go';
   rsFillTypeMTS = 'MTS e Simples';
   rsFillTypeBlocChaining = 'Encadear Blocos';
+  rsTrialName = 'Nome';
 
   rsMTSRelation = 'Relação';
   rsTrials = 'Tentativas';
@@ -98,10 +99,11 @@ begin
 
       if ATrialType = rsFillTypeMatriz then
         begin
-          ColCount := 3;
+          ColCount := 4;
           Cells[0, 0] := rsTrials;
-          Cells[1, 0] := rsContingency;
-          Cells[2, 0] := rsConsequence;
+          Cells[1, 0] := rsTrialName;
+          Cells[2, 0] := rsContingency;
+          Cells[3, 0] := rsConsequence;
         end;
 
       if ATrialType = rsFillTypeGoNoGo then

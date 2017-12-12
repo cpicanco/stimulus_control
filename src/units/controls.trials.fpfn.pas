@@ -46,6 +46,7 @@ type
     FSchedule : TSchedule;
     FSound : TBassStream;
     FShouldPlaySound : Boolean;
+    FCenterStyle : string;
 
     // go
     procedure Consequence(Sender: TObject);
@@ -210,6 +211,7 @@ procedure TFPFN.DrawForeground(ACircles: array of TCircle;
 var
   i : integer;
   LR : TRect;
+  LX, LY, LSize : integer;
 begin
   FForeground.Width:= Width;
   FForeground.Height:= Height;
@@ -234,6 +236,31 @@ begin
         fpfnFullOuterInnerCircles:
           DrawCustomEllipse(FForeground.Canvas, OuterRect, InnerRect, gap, gap_degree, gap_length);
       end;
+
+  LX := Round(Width / 2);
+  LY := Round(Height / 2);
+  LSize := (ACircles[0].OuterRect.Right-ACircles[0].OuterRect.Left) div 2;
+  case UpperCase(FCenterStyle) of
+    'O' :
+      with FForeground.Canvas do
+      begin
+        Brush.Style:= bsClear;
+        Pen.Mode := pmBlack;
+        Pen.Width := 5;
+        Rectangle(LX - LSize, LY - LSize, LX + LSize, LY + LSize);
+      end;
+
+    'X' :
+      with FForeground.Canvas do
+      begin
+        Brush.Style:= bsSolid;
+        Pen.Mode := pmBlack;
+        Pen.Width := 5;
+        Line(LX - LSize, LY - LSize, LX + LSize, LY + LSize);
+        Line(LX + LSize, LY - LSize, LX - LSize, LY + LSize);
+      end;
+    else { do nothing };
+  end;
 end;
 
 procedure TFPFN.Play(ACorrection: Boolean);
@@ -264,9 +291,8 @@ begin
       Enabled := False;
     end;
   AddToClockList(FSchedule);
-
-  // Use alias as defaults
   FContingency := CfgTrial.SList.Values[_Contingency];
+  FCenterStyle := CfgTrial.SList.Values[_Comp+_Style];
 
   FShouldPlaySound := StrToBoolDef(CfgTrial.SList.Values[_ShouldPlaySound], True);
   LNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
@@ -323,7 +349,7 @@ begin
            LLatency + #9 +
            TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
-           FContingency;
+           FContingency + #32 + FCenterStyle;
 
   if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
