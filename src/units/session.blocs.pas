@@ -727,10 +727,9 @@ begin
   FIETMedia.OnResponse:= @IETResponse;
   FIETMedia.Loops := StrToIntDef(AHowManyLoops, 1) - 1;
   FIETMedia.Color := StrToIntDef(AColor, 0);
-  FIETMedia.Width := 500;
-  FIETMedia.Height := 500;
-  FIETMedia.Centralize(FBackGround);
   FIETMedia.Filename := AFileName;
+  FIETMedia.SetOriginalSize;
+  FIETMedia.Centralize(FBackGround);
   //FIETMedia.FullScreen;
   FIETMedia.Show;
   FIETMedia.Play;

@@ -15,7 +15,9 @@ type
   private
     FEndOfFileEvent : TNotifyEvent;
     FBackground : TCustomControl;
+    {$IFDEF LINUX}
     FHack : TWinControl;
+    {$ENDIF}
     FOnClick: TNotifyEvent;
     FPlayer : TLCLVLCPlayer;
     FCurrentVideoItem : TVLCMediaItem;

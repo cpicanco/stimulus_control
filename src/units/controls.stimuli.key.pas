@@ -72,6 +72,7 @@ type
     procedure FullScreen;
     procedure Centralize(AControl : TControl = nil);
     procedure AutoDestroyIn(AInterval : integer);
+    procedure SetOriginalSize;
     property Schedule : TSchedule read FSchedule;
     property Edge : TColor read FEdge write FEdge;
     property EditMode: Boolean read FEditMode write FEditMode;
@@ -174,6 +175,20 @@ begin
   FSchedule.Kind := 'FT '+IntToStr(AInterval);
   FSchedule.OnConsequence:=@AutoDestroy;
   FSchedule.StartClock;
+end;
+
+procedure TKey.SetOriginalSize;
+begin
+  case FKind.stmImage of
+    stmPicture:
+      begin
+        Width := FStimulus.Width;
+        Height := FStimulus.Height;
+      end;
+    //stmAnimation:PaintGIF;
+    stmNone: { do nothing };
+    stmVideo: { do nothing };
+  end;
 end;
 
 procedure TKey.Paint;
