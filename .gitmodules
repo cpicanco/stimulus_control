@@ -6,7 +6,7 @@
 	url = git@github.com:cpicanco/fpc_zyre.git
 [submodule "dependency/epiktimer"]
 	path = dependency/epiktimer
-	url = git@github.com:cpicanco/epiktimer.git
+	url = https://github.com/graemeg/epiktimer.git
 [submodule "dependency/travis-lazarus"]
 	path = dependency/travis-lazarus
 	url = https://github.com/nielsAD/travis-lazarus.git
