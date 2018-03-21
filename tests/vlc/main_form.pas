@@ -19,8 +19,7 @@ type
     procedure Timer2Timer(Sender: TObject);
   private
     FKey : TKey;
-
-    FKey2 : TKey;
+    //FKey2 : TKey;
   public
     { public declarations }
   end;
@@ -29,7 +28,14 @@ var
   Form1: TForm1;
 
 const
-  CFILE = '../../Participante1/Media/V1.mp4';
+
+{$IFDEF LINUX}
+  CFILE = '../../media/LA.mp4';
+{$ENDIF}
+
+{$IFDEF WINDOWS}
+  CFILE = '..\..\media\LA.mp4';
+{$ENDIF}
 
 implementation
 
@@ -45,30 +51,13 @@ begin
   FKey.Height:= 300;
   FKey.Parent := Self;
   FKey.Filename := CFILE;
+  FKey.Schedule.;
 
-  FKey2 := TKey.Create(Self);
-  FKey2.Width := 300;
-  FKey2.Height:= 300;
-  FKey2.Parent := Self;
-  FKey2.Filename := CFILE;
-end;
-
-procedure TForm1.Timer1Timer(Sender: TObject);
-begin
-  //Timer1.Enabled:=False;
-  //LCLVLCPlayer1.Pause;
-  //Timer1.OnTimer:=@Timer2Timer;
-  //Timer1.Interval:= 2000;
-  //Timer1.Enabled:=True;
-end;
-
-procedure TForm1.Timer2Timer(Sender: TObject);
-begin
-  //Timer1.Enabled:=False;
-  //LCLVLCPlayer1.Resume;
-  //Timer1.OnTimer:=@Timer1Timer;
-  //Timer1.Interval:= 2000;
-  //Timer1.Enabled:=True;
+  //FKey2 := TKey.Create(Self);
+  //FKey2.Width := 300;
+  //FKey2.Height:= 300;
+  //FKey2.Parent := Self;
+  //FKey2.Filename := CFILE;
 end;
 
 

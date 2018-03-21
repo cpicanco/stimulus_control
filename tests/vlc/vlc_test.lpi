@@ -72,6 +72,9 @@
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
+      <Debugging>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
       <Options>
         <Win32>
           <GraphicApplication Value="True"/>
@@ -81,10 +84,6 @@
     <Other>
       <CustomOptions Value="-dUseCThreads
 -dNO_LIBZMQ"/>
-      <OtherDefines Count="2">
-        <Define0 Value="UseCThreads"/>
-        <Define1 Value="NO_LIBZMQ"/>
-      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>
