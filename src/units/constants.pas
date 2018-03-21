@@ -93,6 +93,7 @@ const
   // FPE
   _DrawingType = 'DrawingType';
   _Contingency = 'Contingency';
+  _ShouldPlaySound = 'ShouldPlaySound';
 
   // GNG
   _PopUpTime = 'ConsequenceTime';
@@ -195,6 +196,7 @@ const
 
   { Trial Kinds }
 
+  T_FOC = 'FOC';
   T_GNG = 'GNG';
   T_MSQ = 'MSQ';
   T_DZT = 'DZT';
@@ -238,6 +240,7 @@ resourcestring
   ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
   ExceptionConfigurationNotAllowed = 'A configuração não é permitida.';
 
+  rsReportPoints = 'Pontos';
   rsReportMsgTxt = 'Mensagem';
   rsReportStmBeg = 'S.Inicio';
   rsReportStmDur = 'S.Duracao';

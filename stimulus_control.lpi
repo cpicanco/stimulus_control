@@ -34,7 +34,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/;/usr/local/lib/"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;src/prototypes;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;src/prototypes;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -60,6 +60,11 @@
             </Verbosity>
             <CustomOptions Value="-dUseCThreads
 -dZMQ_STATIC_LINK"/>
+            <OtherDefines Count="3">
+              <Define0 Value="UseCThreads"/>
+              <Define1 Value="DEBUG"/>
+              <Define2 Value="ZMQ_STATIC_LINK"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item2>
@@ -75,7 +80,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <Parsing>
@@ -124,7 +129,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/epiktimer"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/epiktimer"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-nozmq"/>
           </SearchPaths>
           <CodeGeneration>
@@ -169,7 +174,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/32;dependency/libzmq/win10-32"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -212,7 +217,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <Parsing>
@@ -261,7 +266,7 @@
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
             <Libraries Value="dependency/lbass/windows/64;dependency/libzmq/win10-64"/>
-            <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -325,7 +330,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="53">
+    <Units Count="56">
       <Unit0>
         <Filename Value="stimulus_control.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -604,6 +609,20 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit52>
+      <Unit53>
+        <Filename Value="src/schedules/schedules.abstract.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules.Abstract"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="src/schedules/schedules.classes.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="src/schedules/schedules.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules"/>
+      </Unit55>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -614,7 +633,7 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-      <OtherUnitFiles Value="src/forms;src/units;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/fpc-zmq;dependency/pupil-fpc"/>
+      <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/fpc-zmq;dependency/pupil-fpc"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
     </SearchPaths>
     <Parsing>

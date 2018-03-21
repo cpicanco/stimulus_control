@@ -172,9 +172,9 @@ end;
 
 procedure TKey.AutoDestroyIn(AInterval: integer);
 begin
-  FSchedule.Kind := 'FT '+IntToStr(AInterval);
+  FSchedule.Load('FT '+IntToStr(AInterval));
   FSchedule.OnConsequence:=@AutoDestroy;
-  FSchedule.StartClock;
+  FSchedule.Start;
 end;
 
 procedure TKey.SetOriginalSize;
@@ -406,7 +406,8 @@ procedure TKey.KeyMouseDown(Sender: TObject; Button: TMouseButton;
 begin
   Inc(FResponseCount);
   FLastResponseLog := IntToStr(X + Left) + #9 + IntToStr(Y + Top);
-  FSchedule.DoResponse;
+  if FSchedule.Loaded then
+     FSchedule.DoResponse;
 end;
 
 procedure TKey.SetVisible(AValue: Boolean);

@@ -139,7 +139,7 @@ begin
     begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
-      Kind := CfgTrial.SList.Values[_Schedule];
+      Load(CfgTrial.SList.Values[_Schedule]);
     end;
   AddToClockList(FSchedule);
   FCircles.angle := StrToFloatDef(CfgTrial.SList.Values[_Angle], 0.0);

@@ -142,7 +142,7 @@ begin
                 FSession.WriteToTrial(LRow,FBloc.ID,_Comp+IntToStr(LCol-1)+_cBnd,FPositions.Values[Cells[LCol,LRow]]);
 
                 // position report message
-                LReportMessage:=ExtractDelimited(1,FSession.ReadTrialString(FBloc.ID,LRow+1,_Comp+IntToStr(LCol-1)+_cStm),[#32]);
+                LReportMessage:=ExtractDelimited(1,FSession.ReadTrialString(FBloc.ID,LRow,_Comp+IntToStr(LCol-1)+_cStm),[#32]);
                 LReportMessage:=ExtractFileNameWithoutExt(LReportMessage);
                 LReportMessage:=LReportMessage +' - '+Cells[LCol,LRow];
                 FSession.WriteToTrial(LRow,FBloc.ID,_Comp+IntToStr(LCol-1)+_cMsg,LReportMessage);

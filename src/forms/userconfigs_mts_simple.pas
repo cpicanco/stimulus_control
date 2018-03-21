@@ -164,6 +164,7 @@ begin
       Top:= 300;
       Left:=50;
       OnClick:=@KeyClick;
+      Schedule.AsString := 'EXT';
       Width:=300;
       Height:=300;
       Tag := 0;
@@ -262,6 +263,7 @@ begin
           LComparisons := High(Comparisons);
           Comparisons[LComparisons].List := TStringList.Create;
           Comparisons[LComparisons].Key := TKey.Create(Self);
+          Comparisons[LComparisons].Key.Schedule.AsString := 'EXT';
           Comparisons[LComparisons].Key.Tag := LComparisons+1;
           SetDefaultsToComparison(Comparisons[LComparisons].List, Comparisons[LComparisons].Key.Tag);
           if LComparisons = 0 then

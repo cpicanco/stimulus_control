@@ -12,7 +12,7 @@ NumBlc=	1
 Name=	Bloco 1
 BkGnd=	16777215
 Counter=	performance
-ITI=	0
+ITI=	2000
 NumTrials=	3 1
 
 [Blc 1 - T1]
@@ -24,7 +24,7 @@ NumComp = 2
 C1Bnd=500 388 200 100
 C1Stm=A2.bmp 0 200
 C1Sch=CRF
-C1IET=CSQ1.wav 0 -1 1
+C1IET=CSQ1.wav 0 -1 1000
 C1Msg=A1 - 9
 C1Res=HIT
 C1Nxt=0

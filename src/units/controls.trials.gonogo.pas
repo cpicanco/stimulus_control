@@ -294,7 +294,7 @@ begin
     begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
-      Kind := CfgTrial.SList.Values[_Schedule];
+      Load(CfgTrial.SList.Values[_Schedule]);
       Enabled := False;
     end;
   AddToClockList(FSchedule);

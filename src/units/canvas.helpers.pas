@@ -25,7 +25,7 @@ function BresenhamLine(x0, x1, y0, y1 : integer): TPoints;
 procedure CenteredMarker(Canvas: TCanvas; Width, Height, size: integer);
 procedure DrawCenteredCircle (Canvas : TCanvas; Width, Height, Size : integer);
 procedure DrawCustomEllipse(Canvas: TCanvas; AOuterR, AInnerR: TRect; gap: Boolean; gap_degree, gap_length: integer);
-procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect; gap: Boolean; gap_degree, gap_length: integer);
+procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect;gap_degree, gap_length: integer);
 procedure DrawMiniCircle(Canvas: TCanvas; center: TPoint; size : integer);
 procedure PlotPixel (Canvas: TCanvas; aPoint : TPoint; clColor : TColor);
 procedure TopBottomLine(Canvas:TCanvas; aControl : TControl);
@@ -218,13 +218,17 @@ begin
 
       Brush.Style := bsClear;
       Pen.Mode := pmWhite;
-      Ellipse(AInnerR);
-      Brush.Style := bsSolid;
 
       if gap then
         begin
-          Pen.Mode := pmBlack;
+          Brush.Style := bsSolid;
+          Pen.Mode := pmWhite;
           Arc(AInnerR.Left,AInnerR.Top,AInnerR.Right-1,AInnerR.Bottom-1, gap_degree, gap_length);
+        end
+      else
+        begin
+          Ellipse(AInnerR);
+          Brush.Style := bsSolid;
         end;
 
       Pen.Width := 1;
@@ -232,7 +236,7 @@ begin
     end;
 end;
 
-procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect; gap: Boolean;
+procedure DrawCustomEllipse(Canvas: TCanvas; AR: TRect;
   gap_degree, gap_length: integer);
 begin
   with Canvas do
@@ -244,10 +248,7 @@ begin
       Brush.Style := bsClear;
       Brush.Color:=clWhite;
       //Ellipse(AR);
-      if gap then
-        Arc(AR.Left,AR.Top,AR.Right,AR.Bottom, gap_degree*16, (360-gap_length)*28)
-      else
-        Arc(AR.Left,AR.Top,AR.Right,AR.Bottom, 0, 360*16);
+      Arc(AR.Left,AR.Top,AR.Right,AR.Bottom, gap_degree, gap_length)
     end;
 end;
 

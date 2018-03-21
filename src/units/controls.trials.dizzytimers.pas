@@ -208,13 +208,13 @@ begin
   if FDizzyTimer.Mode = 'A' then // do nothing
   else
     if FDizzyTimer.Mode = 'B' then
-      if FSchedule.Kind = T_EXT then
+      if FSchedule.ScheduleName = Schedules.EXT then
         begin
-          FSchedule.Kind := FDizzyTimer.Schedule;
+          FSchedule.Load(FDizzyTimer.Schedule);
         end
       else
         begin
-          FSchedule.Kind := T_EXT;
+          FSchedule.Load(Schedules.EXT);
         end;
   LogEvent(ACode);
   Invalidate;
@@ -296,12 +296,13 @@ begin
     begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
-      Kind := FDizzyTimer.Schedule;
-      if Loaded then
-        AddToClockList(StartMethod)
-      else
-        raise Exception.Create(ExceptionNoScheduleFound);
+      Load(FDizzyTimer.Schedule);
     end;
+
+  if FSchedule.Loaded then
+    AddToClockList(FSchedule)
+  else
+    raise Exception.Create(ExceptionNoScheduleFound);
 
   s1 := CfgTrial.SList.Values[_Trial + _cRes] + #32;
 
