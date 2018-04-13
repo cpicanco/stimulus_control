@@ -61,7 +61,6 @@ type
     FTimeScheduleBegin,
     FTimeLatency,
     FTimeConsequence : cardinal;
-    FThreadMethod : TThreadMethod;
     FClock : TClockThread;
     FSchedule : TSchedule;
     FCumulativeRecord : TCummulativeRecord;
@@ -87,13 +86,8 @@ implementation
 
 procedure TFormSchedules.ListBoxSchedulesClick(Sender: TObject);
 begin
-  with FSchedule do
-    begin
-      Kind := ListBoxSchedules.Items.Strings[ListBoxSchedules.ItemIndex];
-      if Loaded then
-      FThreadMethod := StartMethod;
-      TThreadMethod(FThreadMethod);
-    end;
+  FSchedule.Load(ListBoxSchedules.Items.Strings[ListBoxSchedules.ItemIndex]);
+  FSchedule.Start;
   ResetTimer;
   FCumulativeRecord.Reset;
 end;
@@ -269,7 +263,7 @@ begin
   FSchedule := TSchedule.Create(PanelOperandum);
   FSchedule.OnResponse := @Response;
   FSchedule.OnConsequence := @Consequence;
-  FSchedule.Kind := 'EXT';
+  FSchedule.AsString := 'EXT';
   ResetTimer;
 
   FCumulativeRecord := TCummulativeRecord.Create(PanelCumulativeRecord);
