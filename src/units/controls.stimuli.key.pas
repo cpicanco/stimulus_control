@@ -120,12 +120,7 @@ end;
 
 destructor TKey.Destroy;
 begin
-  if Assigned(FVideoPlayer) then
-  begin
-    FVideoPlayer.Stop;
-    FVideoPlayer.Free;
-  end;
-
+  if Assigned(FVideoPlayer) then FVideoPlayer.Stop;
   if Assigned(FAudioPlayer) then FAudioPlayer.Free;
   if Assigned(FStimulus) then FStimulus.Free;
   //if Assigned(FGifImage) then FreeAndNil (FGifImage);
@@ -335,7 +330,7 @@ var
 
   procedure Load_VID;
   begin
-    FVideoPlayer := TVLCVideoPlayer.Create(Parent);
+    FVideoPlayer := TVLCVideoPlayer.Create(Self, Parent);
     FVideoPlayer.SetEndOfFileEvent(@VideoResponse);
     FVideoPlayer.SetBounds(Left, Top, Width, Height);
     FVideoPlayer.LoadFromFile(AFilename);

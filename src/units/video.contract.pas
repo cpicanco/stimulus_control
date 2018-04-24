@@ -21,19 +21,20 @@ type
     procedure FullScreen;
   end;
 
-  function VideoPlayer(AWinControl : TWinControl) : IVideoPlayer; inline;
+  function VideoPlayer(AOwner : TComponent;
+    AParent : TWinControl) : IVideoPlayer; inline;
 
 implementation
 
 uses SysUtils, Video.VLC;
 
-function VideoPlayer(AWinControl: TWinControl): IVideoPlayer;
+function VideoPlayer(AOwner: TComponent; AParent: TWinControl): IVideoPlayer;
 begin
   Result := nil;
   if TVLCVideoPlayer.Exist then
     begin
-      Result := TVLCVideoPlayer.Create(AWinControl);
-      exit;
+      Result := TVLCVideoPlayer.Create(AOwner, AParent);
+      Exit;
     end;
 
   if not Assigned(Result) then

@@ -68,11 +68,29 @@
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <Libraries Value="/usr/lib/gcc/x86_64-linux-gnu/4.9/"/>
-      <OtherUnitFiles Value="../../dependency/bass;../../src/units;../../dependency/delphizmq;../../dependency/msgpack-delphi"/>
+      <OtherUnitFiles Value="../../dependency/bass;../../src/units;../../src/schedules;../../dependency/msgpack-delphi"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <IncludeAssertionCode Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
+      <Optimizations>
+        <OptimizationLevel Value="0"/>
+      </Optimizations>
+    </CodeGeneration>
     <Linking>
       <Debugging>
+        <UseHeaptrc Value="True"/>
         <UseExternalDbgSyms Value="True"/>
       </Debugging>
       <Options>

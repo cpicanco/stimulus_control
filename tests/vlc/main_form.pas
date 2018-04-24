@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Controls.Stimuli.Key
+  ExtCtrls, Controls.Stimuli.Key, Video.VLC
   ;
 
 type
@@ -15,11 +15,9 @@ type
 
   TForm1 = class(TForm)
     procedure FormCreate(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
-    procedure Timer2Timer(Sender: TObject);
   private
     FKey : TKey;
-    //FKey2 : TKey;
+    FVlc : TVLCVideoPlayer;
   public
     { public declarations }
   end;
@@ -45,13 +43,16 @@ implementation
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  FKey := TKey.Create(Self);
+  FKey := TKey.Create(Form1);
+  FKey.Schedule.Load('FR 2');
+  //FKey.Schedule.Start;
   FKey.Left := 400;
   FKey.Width := 300;
   FKey.Height:= 300;
   FKey.Parent := Self;
   FKey.Filename := CFILE;
-  FKey.Schedule.;
+  Fkey.Schedule.Start;
+
 
   //FKey2 := TKey.Create(Self);
   //FKey2.Width := 300;

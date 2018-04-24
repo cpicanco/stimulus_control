@@ -1,6 +1,7 @@
 program vlc_test;
 
 {$mode objfpc}{$H+}
+{$PackRecords C}
 
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}

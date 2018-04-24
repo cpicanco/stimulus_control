@@ -26,7 +26,7 @@ type
     procedure EndOfFile(Sender : TObject);
     procedure SetOnClick(AValue: TNotifyEvent);
   public
-    constructor Create(AWinControl : TWinControl); reintroduce;
+    constructor Create(AOwner : TComponent; AParent : TWinControl); reintroduce;
     destructor Destroy; override;
     class function Exist : Boolean;
     procedure FullScreen;
@@ -67,15 +67,15 @@ begin
   FOnClick:=AValue;
 end;
 
-constructor TVLCVideoPlayer.Create(AWinControl : TWinControl);
+constructor TVLCVideoPlayer.Create(AOwner: TComponent; AParent: TWinControl);
 begin
-  inherited Create(AWinControl);
+  inherited Create(AOwner);
   FBackground := TCustomControl.Create(Self);
   FBackground.Width  := 300;
   FBackground.Height := 300;
   FBackground.Left := 490;
   FBackground.Top := 0;
-  FBackground.Parent := AWinControl;
+  FBackground.Parent := AParent;
   FBackground.Color:=$00000;
   FBackground.Cursor:=crHandPoint;
   FBackground.OnClick:=@Click;
@@ -84,7 +84,7 @@ begin
   //FButton.Caption:='>';
   //FButton.Width:=100;
   //FButton.Height:=30;
-  //FButton.Parent := AWinControl;
+  //FButton.Parent := AParent;
   //FButton.AnchorSide[akLeft].Side := asrCenter;
   //FButton.AnchorSide[akLeft].Control := FBackground;
   //FButton.Anchors := FButton.Anchors + [akLeft];
@@ -113,6 +113,7 @@ end;
 
 destructor TVLCVideoPlayer.Destroy;
 begin
+  FPlayer.ParentWindow := nil;
   FCurrentVideoItem.Free;
   inherited Destroy;
 end;
