@@ -617,6 +617,7 @@
       <Unit54>
         <Filename Value="src/schedules/schedules.classes.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules.Classes"/>
       </Unit54>
       <Unit55>
         <Filename Value="src/schedules/schedules.pas"/>
