@@ -71,9 +71,9 @@ Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
     - Prompts for unsuccesful calibration
     - More details about our implementation here: https://github.com/cpicanco/pupil-fpc
 
-  - Cross-Platform. Tested under Windows (7, 8 and 10), Crunchbang 11, Ubuntu LTS (13.10, 14.04, 16.04) and Debian 8.
+  - Cross-Platform. Tested under Windows (7, 8 and 10), Crunchbang 11, Ubuntu LTS (16.04) and Debian 9.
 
-  - Free software, GPL3, compiled with Lazarus RAD IDE (1.6.2, 1.6.4, 1.8) and FPC (3.0.0, 3.0.2, 3.0.4).
+  - Free software, GPL3, compiled with Lazarus RAD IDE (1.8.2) and FPC (3.0.4).
   
   - Core code was written using a Behavior Analytic ontology.
 
