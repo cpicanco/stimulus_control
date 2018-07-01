@@ -20,7 +20,6 @@ uses LCLIntf, LCLType, SysUtils, Variants, Classes,
     , Audio.Bass_nonfree
     , Video.VLC
     , Schedules
-    , Session.Configuration.GlobalContainer
     ;
 
 type
@@ -66,6 +65,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function BoundsAsString : string;
     procedure Paint; override;
     procedure Play;
     procedure Stop;
@@ -87,17 +87,16 @@ type
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
     property OnEndMedia: TNotifyEvent read FOnEndMedia write FOnEndMedia;
   public
-    property OnClick;
-    property OnDblClick;
     property Color;
     property Caption;
     property Font;
-    property OnMouseDown;
   end;
 
 implementation
 
-uses FileUtil;
+uses FileUtil
+   , Session.Configuration.GlobalContainer
+   ;
 
 constructor TKey.Create(AOwner: TComponent);
 begin
@@ -128,6 +127,15 @@ begin
   inherited Destroy;
 end;
 
+function TKey.BoundsAsString: string;
+begin
+  Result :=
+   IntToStr(Left) + #32 +
+   IntToStr(Top) + #32 +
+   IntToStr(Width) + #32 +
+   IntToStr(Height);
+end;
+
 procedure TKey.FullScreen;
 begin
   if FKind.stmImage  = stmPicture then
@@ -154,10 +162,7 @@ begin
     end
   else
     begin
-      if Assigned(GGlobalContainer) then
-        LMonitor := GGlobalContainer.MonitorToShow
-      else
-        LMonitor := 0;
+      LMonitor := GlobalContainer.MonitorToShow;
       LWidth :=  Screen.Monitors[LMonitor].Width;
       LHeight := Screen.Monitors[LMonitor].Height;
     end;
@@ -294,6 +299,8 @@ var
     CreateBitmap;
     LPNG := TPortableNetworkGraphic.Create;
     LPNG.LoadFromFile(AF);
+    Width := LPNG.Width;
+    Height := LPNG.Height;
     FStimulus.Assign(LPNG);
     FStimulus.Transparent:=True;
     FStimulus.TransparentColor:=clFuchsia;
@@ -399,8 +406,8 @@ end;
 procedure TKey.KeyMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  Inc(FResponseCount);
   FLastResponseLog := IntToStr(X + Left) + #9 + IntToStr(Y + Top);
+  Inc(FResponseCount);
   if FSchedule.Loaded then
      FSchedule.DoResponse;
 end;
@@ -446,6 +453,7 @@ procedure TKey.VideoClick(Sender: TObject);
 begin
   if Assigned(OnClick) then OnClick(Self); //must be Self
 end;
+
 
 //******
 //**  **

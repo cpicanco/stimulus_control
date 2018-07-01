@@ -26,13 +26,14 @@ type
 
   TMessageStyle  = (msgDefault,msgAudio);
 
+  { TMessageTrial }
+
   TMessageTrial = class(TTrial)
   private
     FAudio : TBassStream;
     FAudioPlaying : Boolean;
     FMessageStyle : TMessageStyle;
     FDataSupport : TDataSupport;
-    FMessagePrompt,
     FMessage : TLabel;
     procedure MessageMouseUp(Sender: TObject;Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
     procedure TrialBeforeEnd(Sender: TObject);
@@ -42,8 +43,9 @@ type
     procedure WriteData(Sender: TObject); override;
     //procedure ThreadClock(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
     destructor Destroy;override;
+    function AsString : string; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -62,7 +64,7 @@ uses
   {$endif}
   ;
 
-constructor TMessageTrial.Create(AOwner: TComponent);
+constructor TMessageTrial.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -78,17 +80,6 @@ begin
     //Layout := tlCenter;
     WordWrap := True;
     Font.Name := 'TimesNewRoman';
-    OnMouseUp := @MessageMouseUp;
-    Parent := TCustomControl(AOwner);
-  end;
-
-  FMessagePrompt := TLabel.Create(Self);
-  with FMessagePrompt do begin
-    Visible := False;
-    Cursor := -1;
-    Caption := MessagePrompt1;
-    Font.Name := 'TimesNewRoman';
-    Font.Size := 14;
     OnMouseUp := @MessageMouseUp;
     Parent := TCustomControl(AOwner);
   end;
@@ -112,6 +103,11 @@ begin
   if Assigned(FAudio) then
     FAudio.Free;
   inherited Destroy;
+end;
+
+function TMessageTrial.AsString: string;
+begin
+  Result := '';
 end;
 
 procedure TMessageTrial.MessageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -152,14 +148,16 @@ procedure TMessageTrial.Play(ACorrection : Boolean);
 var
   LFontColor : Integer;
   LAudioFile : string;
+  LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LFontColor :=  StrToIntDef(CfgTrial.SList.Values[_MsgFontColor], $000000);
-  FMessageStyle := TMessageStyle(Ord(StrToIntDef(CfgTrial.SList.Values[_Style], 0)));
+  LParameters := Configurations.SList;
+  LFontColor :=  StrToIntDef(LParameters.Values[_MsgFontColor], $000000);
+  FMessageStyle := TMessageStyle(Ord(StrToIntDef(LParameters.Values[_Style], 0)));
 
   if FMessageStyle = msgAudio then
     begin
-      LAudioFile := CfgTrial.SList.Values[_cStm];
+      LAudioFile := LParameters.Values[_cStm];
       case LAudioFile of
         T_HIT  : LAudioFile := RootMedia+'CSQ1.wav';
         T_MISS : LAudioFile := RootMedia+'CSQ2.wav';
@@ -179,17 +177,10 @@ begin
   with FMessage do
     begin
       Cursor := Self.Cursor;
-      Caption := CfgTrial.SList.Values[_Msg];
-      Width := StrToIntDef(CfgTrial.SList.Values[_MsgWidth], 640);
-      Font.Size := StrToIntDef(CfgTrial.SList.Values[_MsgFontSize], 22);
+      Caption := LParameters.Values[_Msg];
+      Width := StrToIntDef(LParameters.Values[_MsgWidth], 640);
+      Font.Size := StrToIntDef(LParameters.Values[_MsgFontSize], 22);
       Font.Color := LFontColor;
-    end;
-
-  with FMessagePrompt do
-    begin
-      Cursor := Self.Cursor;
-      Font.Color:= LFontColor;
-      Enabled := StrToBoolDef(CfgTrial.SList.Values[_Prompt], False);
     end;
 
   if Self.ClassType = TMessageTrial then Config(Self);
@@ -203,12 +194,6 @@ begin
       SetBounds((Self.Width - Width) div 2, (Self.Height - Height) div 2, Width, Height);
     end;
 
-  if FMessagePrompt.Enabled then
-    with FMessagePrompt do
-      begin
-        Visible := True;
-        SetBounds((Self.Width - Width) div 2, (Self.Height - Height) - 20, Width, Height);
-      end;
   FDataSupport.StmBegin := TickCount;
 end;
 

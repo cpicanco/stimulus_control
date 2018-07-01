@@ -7,7 +7,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit constants;
+unit Constants;
 
 {$mode objfpc}{$H+}
 
@@ -112,6 +112,10 @@ const
   _cIET = 'IET';          // Inter Trial Interval, in miliseconds
   _cTO  = 'TO';           // Time-Out Interval, in miliseconds
 
+  // LIKERT
+  _Left = 'Left';
+  _Right = 'Right';
+
   // Identificadores
   _Kplus = 'K+';
   _Kminus = 'K-';
@@ -206,6 +210,7 @@ const
   T_MSG = 'MSG';
   T_MTS = 'MTS';
   T_Simple = 'SIMPLE';
+  T_LIK = 'LIKERT';
 
   { Schedules }
   T_RR  = 'RR';

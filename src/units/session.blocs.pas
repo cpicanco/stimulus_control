@@ -34,6 +34,7 @@ type
 
   TBlc = class(TComponent)
   private
+    CounterManager : TCounterManager;
     function GetTimeStart: Extended;
     procedure LogEvent(ACode : string);
   private
@@ -63,11 +64,9 @@ type
     FTimerTO : TFakeTimer;
 
     // main objects/components
-    FGlobalContainer: TGlobalContainer;
     FBackGround: TWinControl;
     FBlc: TCfgBlc;
     FTrial: TTrial;
-    FManager : TCounterManager;
     FCounterLabel : TLabel;
     FIETMedia : TKey;
 
@@ -107,7 +106,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Play(ACfgBlc: TCfgBlc; AManager : TCountermanager; AGlobalContainer: TGlobalContainer);
+    procedure Play(ACfgBlc: TCfgBlc);
     property BackGround: TWinControl read FBackGround write FBackGround;
     property NextBlc: String read FNextBlc write FNextBlc;
     property SaveData : TDataProcedure read FSaveData write FSaveData;
@@ -129,25 +128,29 @@ type
 
 implementation
 
-uses strutils, constants, timestamps
-     , Controls.Trials.TextMessage
-     , Controls.Trials.SimpleDiscrimination
-     , Controls.Trials.CustomCircles
-     , Controls.Trials.FPFN
-     , Controls.Trials.PupilCalibration
-     , Controls.Trials.MatchingToSample
-     , Controls.Trials.DizzyTimers
-     , Controls.Trials.MoveSquare
-     , Controls.Trials.GoNoGo
-     , Controls.Trials.PerformanceReview
-     , Controls.Trials.FreeOperantCounter
-     {$ifdef DEBUG}
-     , Loggers.Debug
-     {$endif}
-     ;
+uses StrUtils, Constants, Timestamps
+   , Session.Configuration.GlobalContainer
+   , Controls.Trials.TextMessage
+   , Controls.Trials.SimpleDiscrimination
+   , Controls.Trials.CustomCircles
+   , Controls.Trials.FPFN
+   , Controls.Trials.PupilCalibration
+   , Controls.Trials.MatchingToSample
+   , Controls.Trials.DizzyTimers
+   , Controls.Trials.MoveSquare
+   , Controls.Trials.GoNoGo
+   , Controls.Trials.PerformanceReview
+   , Controls.Trials.FreeOperantCounter
+   , Controls.Trials.Likert
+   {$ifdef DEBUG}
+   , Loggers.Debug
+   {$endif}
+   ;
 constructor TBlc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FBackGround.OnKeyUp:=@IETKeyUp;
+
   with FTimerITI do begin
     Interval := 0;
     Enabled := False;
@@ -166,6 +169,7 @@ begin
   FTimer := TTimer.Create(Self);
   FTimer.OnTimer := @InterTrialIntervals;
   FTimer.Enabled := False;
+  CounterManager := GlobalContainer.Manager;
 end;
 
 destructor TBlc.Destroy;
@@ -178,23 +182,16 @@ begin
   inherited Destroy;
 end;
 
-procedure TBlc.Play(ACfgBlc: TCfgBlc; AManager: TCountermanager; AGlobalContainer: TGlobalContainer);
+procedure TBlc.Play(ACfgBlc: TCfgBlc);
 begin
   FBlc:= ACfgBlc;
-  FManager := AManager;
-  FGlobalContainer:= AGlobalContainer;
-  FBackGround.OnKeyUp:=@IETKeyUp;
   FLastTrialHeader:= '';
   FIsCorrection := False;
-
   FBlcHeader := rsReportBlocID + #9 +
                 rsReportBlocName + #9 +
                 rsReportTrialNO + #9 +
                 rsReportTrialID + #9 +
                 rsReportTrialName + #9;
-
-  //SaveData(FBlc.Name + LineEnding);
-
   PlayTrial;
 end;
 
@@ -212,7 +209,7 @@ begin
 
   FBackGround.Color:= FBlc.BkGnd;
 
-  IndTrial := FManager.CurrentTrial;
+  IndTrial := CounterManager.CurrentTrial;
   if IndTrial = 0 then FFirstTrialBegin := TickCount;
   if IndTrial < FBlc.NumTrials then
     begin
@@ -227,17 +224,16 @@ begin
         T_MRD : FTrial := TMRD.Create(FBackGround);
         T_MSG : FTrial := TMessageTrial.Create(FBackGround);
         T_MTS : FTrial := TMTS.Create(FBackGround);
+        T_LIK : FTrial := TLikert.Create(FBackGround);
         T_Simple : FTrial := TSimpl.Create(FBackGround);
       end;
 
-      if FManager.Trials = 0 then
+      if CounterManager.Trials = 0 then
         SaveTData(FTrial.HeaderTimestamps + LineEnding);
 
       if Assigned(FTrial) then
         begin
-          FTrial.GlobalContainer := FGlobalContainer;
-          FTrial.CounterManager := FManager;
-          FTrial.CfgTrial := FBlc.Trials[IndTrial];
+          FTrial.Configurations := FBlc.Trials[IndTrial];
           FTrial.SaveTData := SaveTData;
           //FTrial.DoubleBuffered := True;
           FTrial.OnTrialEnd := @EndTrial;
@@ -279,19 +275,19 @@ begin
 
   //FBlcHeader:= #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9 #32#32#32#32#32#32#32#32#9;
 
-  CountBlc := IntToStr(FManager.CurrentBlc + 1);
+  CountBlc := IntToStr(CounterManager.CurrentBlc + 1);
 
-  CountTr := IntToStr(FManager.Trials + 1);
-  NumTr:= IntToStr(FManager.CurrentTrial + 1);
+  CountTr := IntToStr(CounterManager.Trials + 1);
+  NumTr:= IntToStr(CounterManager.CurrentTrial + 1);
 
   // Fill Empty Names
   if Sender is TPerformanceReview then
     NameTr := 'Performance Counter'
   else
-    if FBlc.Trials[FManager.CurrentTrial].Name = '' then
+    if FBlc.Trials[CounterManager.CurrentTrial].Name = '' then
       NameTr := '--------'
     else
-      NameTr := FBlc.Trials[FManager.CurrentTrial].Name;
+      NameTr := FBlc.Trials[CounterManager.CurrentTrial].Name;
 
   NewData := CountBlc + #9 + FBlc.Name + #9 + CountTr + #9 + NumTr + #9 + NameTr;
 
@@ -315,7 +311,7 @@ begin
         ITIData :=  DoNotApply + #9 + DoNotApply
       else
         // Check if first trial
-        if (FManager.Trials + 1) = 1 then
+        if (CounterManager.Trials + 1) = 1 then
           IsFirst := True
         else
           IsFirst := False;
@@ -325,7 +321,7 @@ begin
     begin
       FLastData := NewData;
 
-      if (FManager.Trials + 1) = 1 then
+      if (CounterManager.Trials + 1) = 1 then
         IsFirst := True
       else
         IsFirst := False;
@@ -384,22 +380,22 @@ begin
   HasCsqInterval := False;
 
   if  (FTrial.NextTrial = T_END) then //end bloc
-    FManager.CurrentTrial := FBlc.NumTrials
+    CounterManager.CurrentTrial := FBlc.NumTrials
   else // continue
-    if (FTrial.NextTrial = T_CRT) or // FTrial.NextTrial base 1, FManager.CurrentTrial.Counter base 0)
-       (FTrial.NextTrial = (IntToStr(FManager.CurrentTrial + 1))) then
+    if (FTrial.NextTrial = T_CRT) or // FTrial.NextTrial base 1, CounterManager.CurrentTrial.Counter base 0)
+       (FTrial.NextTrial = (IntToStr(CounterManager.CurrentTrial + 1))) then
       begin //correction trials were on
-        if ((FBlc.MaxCorrection) = FManager.BlcCscCorrections) and
+        if ((FBlc.MaxCorrection) = CounterManager.BlcCscCorrections) and
            (FBlc.MaxCorrection <> 0) then
           begin //correction
-            FManager._VirtualTrialFix;
-            FManager.OnNotCorrection(Sender);
-            FManager.OnTrialEnd (Sender);
+            CounterManager._VirtualTrialFix;
+            CounterManager.OnNotCorrection(Sender);
+            CounterManager.OnTrialEnd (Sender);
             FIsCorrection := False;
           end
         else
           begin // not correction
-            FManager.OnCorrection(Sender);
+            CounterManager.OnCorrection(Sender);
             FIsCorrection := True;
           end;
       end
@@ -407,20 +403,20 @@ begin
       if StrToIntDef(FTrial.NextTrial, 0) > 0 then
         begin //go to the especified trial
           if FTrial.Result = T_MISS then
-            FManager.VirtualTrialLoop := FManager.VirtualTrialValue;
+            CounterManager.VirtualTrialLoop := CounterManager.VirtualTrialValue;
 
-          FManager.OnNotCorrection(Sender);
-          FManager.CurrentTrial := StrToIntDef(FTrial.NextTrial, 0) - 1;
-          FManager.OnNxtTrial(Sender);
+          CounterManager.OnNotCorrection(Sender);
+          CounterManager.CurrentTrial := StrToIntDef(FTrial.NextTrial, 0) - 1;
+          CounterManager.OnNxtTrial(Sender);
           FIsCorrection := False;
         end
       else // go to the next trial,
         begin
           if FTrial.Result = T_MISS then
-            FManager.VirtualTrialLoop := FManager.VirtualTrialValue;
+            CounterManager.VirtualTrialLoop := CounterManager.VirtualTrialValue;
 
-          FManager.OnNotCorrection(Sender);
-          FManager.OnTrialEnd(Sender);
+          CounterManager.OnNotCorrection(Sender);
+          CounterManager.OnTrialEnd(Sender);
           FIsCorrection := False;
         end;
 
@@ -431,19 +427,19 @@ begin
   // criteria related to hits
   LCriteriaWasReached := False;
   if FBlc.CrtConsecutiveHit > 0 then
-    LCriteriaWasReached := FManager.BlcCscHits = FBlc.CrtConsecutiveHit;
+    LCriteriaWasReached := CounterManager.BlcCscHits = FBlc.CrtConsecutiveHit;
 
-  if FManager.BlcTrials >= FBlc.NumTrials then
+  if CounterManager.BlcTrials >= FBlc.NumTrials then
     if FBlc.CrtHitPorcentage > 0 then
-      LCriteriaWasReached := FManager.HitPorcentage >= FBlc.CrtHitPorcentage;
+      LCriteriaWasReached := CounterManager.HitPorcentage >= FBlc.CrtHitPorcentage;
 
   // criteria related to misses
   if FBlc.CrtConsecutiveMiss > 0 then
-    LCriteriaWasReached := FManager.BlcCscMisses = FBlc.CrtConsecutiveMiss;
+    LCriteriaWasReached := CounterManager.BlcCscMisses = FBlc.CrtConsecutiveMiss;
 
   if LCriteriaWasReached then
     begin
-      //FManager.CurrentTrial := FBlc.NumTrials;
+      //CounterManager.CurrentTrial := FBlc.NumTrials;
       if Assigned(OnCriteria) then FOnCriteria(Sender);
     end;
 
@@ -513,7 +509,7 @@ begin
   //FTrial.Hide;
 
   {$ifdef DEBUG}
-    DebugLn(mt_Debug + '[Blc - ' + FBlc.Name + ' T - ' + IntToStr(FManager.CurrentTrial)+ ']');
+    DebugLn(mt_Debug + '[Blc - ' + FBlc.Name + ' T - ' + IntToStr(CounterManager.CurrentTrial)+ ']');
     DebugLn(mt_Debug + 'Timer Intervals -> ITI:' + IntToStr(FTimerITI.Interval) + ' TO:' + IntToStr(FTimerTO.Interval) + ' Csq:' + IntToStr(FTimerCsq.Interval));
   {$endif}
 
@@ -681,8 +677,6 @@ begin
             FTrial := nil;
           end;
         FTrial := TPerformanceReview.Create(FBackGround);
-        FTrial.GlobalContainer := FGlobalContainer;
-        FTrial.CounterManager := FManager;
         FTrial.SaveTData := SaveTData;
         FTrial.OnTrialEnd := @EndBlcAndFreeTrial;
         FTrial.OnTrialWriteData := @WriteTrialData;
@@ -716,9 +710,9 @@ end;
 procedure TBlc.LogEvent(ACode: string);
 begin
   SaveTData(TimestampToStr(TickCount - TimeStart) + #9 +
-           IntToStr(FManager.CurrentBlc+1) + #9 +
-           IntToStr(FManager.CurrentTrial+1) + #9 +
-           IntToStr(FManager.Trials+1) + #9 + // Current trial cycle
+           IntToStr(CounterManager.CurrentBlc+1) + #9 +
+           IntToStr(CounterManager.CurrentTrial+1) + #9 +
+           IntToStr(CounterManager.Trials+1) + #9 + // Current trial cycle
            rsReportITI + #32 + ACode + LineEnding)
 end;
 
@@ -769,11 +763,11 @@ end;   }
 
 procedure TBlc.Hit(Sender: TObject);
 begin
-  FManager.OnHit(Sender);
+  CounterManager.OnHit(Sender);
   if FBlc.CrtKCsqHit > 0 then
-    if FBlc.CrtKCsqHit = FManager.BlcCsqHits then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
+    if FBlc.CrtKCsqHit = CounterManager.BlcCsqHits then       //Procedimento da Ana Paula, acertos consecutivos produzindo csq
       begin
-        FManager.OnCsqCriterion(Sender);
+        CounterManager.OnCsqCriterion(Sender);
         //FTrial.DispenserPlusCall;
       end;
   if Assigned(OnHit) then FOnHit(Sender);
@@ -792,7 +786,7 @@ end;
 
 procedure TBlc.Miss(Sender: TObject);
 begin
-  FManager.OnMiss(Sender);
+  CounterManager.OnMiss(Sender);
   if Assigned(OnMiss) then FOnMiss(Sender);
 end;
 

@@ -17,29 +17,13 @@ uses Classes, ComCtrls, SysUtils,  Dialogs, Forms
     {$IFNDEF NO_LIBZMQ}
     , Pupil.Client
     {$ENDIF}
-    , countermanager
+    , CounterManager
     ;
 
 type
 
   { TDataProcedure }
   TDataProcedure = procedure (S : string) of object;
-
-  { TGlobalContainer }
-
-  TGlobalContainer = class //(TObject)
-    {$IFNDEF NO_LIBZMQ}
-    PupilClient: TPupilClient;
-    {$ENDIF}
-    PupilEnabled : Boolean;
-    CounterManager : TCounterManager;
-    RootData: string;
-    RootMedia: string;
-    ExeName : string;
-    TimeStart : Extended;
-    TestMode : Boolean;
-    MonitorToShow : Byte;
-  end;
 
   TCfgTrial = record
     Id : integer;
@@ -91,7 +75,6 @@ type
   TCfgSes = class(TComponent)
   private
     FFilename: string;
-    FGlobalContainer : TGlobalContainer;
 
     // todo: refactoring
     FData: string;
@@ -124,7 +107,6 @@ type
     procedure SetLengthVetTrial(Blc : Integer);
     property EditMode : Boolean read FEditMode;
   public
-    property GlobalContainer : TGlobalContainer read FGlobalContainer;
     property PupilEnabled : Boolean read GetPupilEnabled write SetPupilEnabled;
     property SessionName : string read FSessionName write FSessionName;
     property SessionSubject : string read FSessionSubject write FSessionSubject;
@@ -157,7 +139,9 @@ resourcestring
   //messLevel_04_M = 'Mensagem';
 implementation
 
-uses constants, Session.ConfigurationFile, Session.Configuration.GlobalContainer;
+uses Constants
+   , Session.ConfigurationFile
+   , Session.Configuration.GlobalContainer;
 
 { TCfgSes }
 
@@ -168,32 +152,29 @@ end;
 
 function TCfgSes.GetCurrentBlc: TCfgBlc;
 begin
-  Result := GetCfgBlc(FGlobalContainer.CounterManager.CurrentBlc);
+  Result := GetCfgBlc(GlobalContainer.CounterManager.CurrentBlc);
 end;
 
 function TCfgSes.GetPupilEnabled: Boolean;
 begin
-  Result := FGlobalContainer.PupilEnabled;
+  Result := GlobalContainer.PupilEnabled;
 end;
 
 procedure TCfgSes.SetPupilEnabled(AValue: Boolean);
 begin
-  if FGlobalContainer.PupilEnabled=AValue then Exit;
-  FGlobalContainer.PupilEnabled:=AValue;
+  if GlobalContainer.PupilEnabled=AValue then Exit;
+  GlobalContainer.PupilEnabled:=AValue;
 end;
 
 constructor TCfgSes.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FGlobalContainer:= TGlobalContainer.Create;
-  GGlobalContainer := FGlobalContainer;
   FLoaded := False;
 end;
 
 destructor TCfgSes.Destroy;
 var i, j : Integer;
 begin
-  FGlobalContainer.Free;
   if Length(FBlcs) > 0 then
     for i:= Low(FBlcs) to High(FBlcs) do
       if Length(FBlcs[i].Trials) > 0 then
@@ -241,7 +222,7 @@ var
 
   function DefaultMediaPath: string;
   begin
-    Result := ConcatPaths([ExtractFilePath(FGlobalContainer.ExeName), 'media']);
+    Result := ConcatPaths([ExtractFilePath(GlobalContainer.ExeName), 'media']);
     Result := IncludeTrailingPathDelimiter(Result);
   end;
 
@@ -264,12 +245,12 @@ begin
 
               // set media and data paths
               s1 := ReadString(_Main, _RootMedia, '');
-              HandleRootPath(FGlobalContainer.RootMedia);
-              if not DirectoryExists(FGlobalContainer.RootMedia) then
-                 FGlobalContainer.RootMedia := DefaultMediaPath;
+              HandleRootPath(GlobalContainer.RootMedia);
+              if not DirectoryExists(GlobalContainer.RootMedia) then
+                 GlobalContainer.RootMedia := DefaultMediaPath;
 
               s1 := ReadString(_Main, _RootData, '');
-              HandleRootPath(FGlobalContainer.RootData);
+              HandleRootPath(GlobalContainer.RootData);
 
               SetLength(FBlcs, FNumBlc);
               for i:= Low(FBlcs) to High(FBlcs) do

@@ -17,23 +17,24 @@ type
   TConfigurationFile = class(TIniFile)
   private
     FBlocCount : integer;
+    class function TrialSection(BlocIndex, TrialIndex : integer) : string;
+    class function BlocSection(BlocIndex : integer) : string;
     function GetBlocCount : integer;
-    function BlocSection(BlocIndex : integer) : string;
     function GetTrialCount(BlocIndex : integer): integer;
-    function TrialSection(BlocIndex, TrialIndex : integer) : string;
     function GetBloc(BlocIndex : integer): TCfgBlc;
     function GetTrial(BlocIndex, TrialIndex : integer): TCfgTrial;
     //procedure SetBloc(BlocIndex : integer; AValue: TCfgBlc);
     //procedure SetTrial(BlocIndex, TrialIndex : integer; AValue: TCfgTrial);
     procedure CopySection(AFrom, ATo : string; AConfigurationFile : TConfigurationFile);
-    procedure WriteSection(ASectionName:string;ASection : TStrings);
+    procedure WriteSection(ASectionName:string; ASection : TStrings);
   public
     constructor Create(const AConfigurationFile: string; AEscapeLineFeeds:Boolean=False); override;
     destructor Destroy; override;
-    procedure Invalidate;
-    procedure ReadPositionsInBloc(ABloc:integer; APositionsList : TStrings);
+    class function FullTrialSection(ABloc, ATrial : integer) : string;
     function ReadTrialString(ABloc : integer; ATrial : integer; AName:string):string;
     function ReadTrialInteger(ABloc : integer; ATrial : integer; AName:string):LongInt;
+    procedure Invalidate;
+    procedure ReadPositionsInBloc(ABloc:integer; APositionsList : TStrings);
     procedure WriteToBloc(ABloc : integer;AName, AValue: string);
     procedure WriteToTrial(ATrial : integer; AStrings : TStrings); overload;
     procedure WriteToTrial(ATrial : integer; AName, AValue: string); overload;
@@ -65,7 +66,7 @@ begin
   Result := FBlocCount;
 end;
 
-function TConfigurationFile.BlocSection(BlocIndex: integer): string;
+class function TConfigurationFile.BlocSection(BlocIndex: integer): string;
 begin
   Result := _Blc + #32 + IntToStr(BlocIndex);
 end;
@@ -77,7 +78,7 @@ begin
     Inc(Result);
 end;
 
-function TConfigurationFile.TrialSection(BlocIndex, TrialIndex: integer
+class function TConfigurationFile.TrialSection(BlocIndex, TrialIndex: integer
   ): string;
 begin
   Result := BlocSection(BlocIndex) + ' - ' + _Trial + IntToStr(TrialIndex);
@@ -259,6 +260,12 @@ end;
 destructor TConfigurationFile.Destroy;
 begin
   inherited Destroy;
+end;
+
+class function TConfigurationFile.FullTrialSection(ABloc,
+  ATrial: integer): string;
+begin
+  Result := '[' + TrialSection(ABloc, ATrial) + ']';
 end;
 
 procedure TConfigurationFile.WriteToBloc(ABloc: integer; AName, AValue: string);

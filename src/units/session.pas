@@ -186,7 +186,9 @@ end;
 procedure TSession.EndSess(Sender: TObject);
 var
   Footer : string;
+  {$IFNDEF NO_LIBZMQ}
   UserCalibrationData : string = 'pupil_capture_settings'+PathDelim+'user_calibration_data';
+  {$ENDIF}
 begin
   Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
   {$IFNDEF NO_LIBZMQ}
@@ -406,7 +408,7 @@ begin
   if Manager.CurrentBlc < Configs.NumBlc then
     begin
       Manager.SetVirtualTrialValue(Configs.CurrentBlc.VirtualTrialValue);
-      FBlc.Play(Configs.CurrentBlc, FManager, FGlobalContainer)
+      FBlc.Play(Configs.CurrentBlc)
     end
   else EndSess(Sender);
 end;

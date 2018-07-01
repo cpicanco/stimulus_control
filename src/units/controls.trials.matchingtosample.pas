@@ -62,15 +62,18 @@ type
     procedure TrialStart(Sender: TObject); override;
     procedure WriteData(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
+    function AsString : string; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
 implementation
 
-uses strutils, constants, timestamps, Controls.Stimuli.Key;
+uses strutils, constants, timestamps, Controls.Stimuli.Key
+  , Session.ConfigurationFile
+  ;
 
-constructor TMTS.Create(AOwner: TComponent);
+constructor TMTS.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -85,8 +88,10 @@ var
   R: TRect;
   LDelayed : Boolean;
   LDelay : integer;
+  LParameters : TStringList;
 begin
   inherited Play(ACorrection);
+  LParameters := Configurations.SList;
   with FSample do
     begin
       // Owner is TGraphicControl
@@ -96,10 +101,10 @@ begin
       Key.OnResponse:= @SampleResponse;
 
       // Parent is TCustomControl/TForm
-      Key.Parent:= TCustomControl(Self.Parent);
+      Key.Parent:= Self.Parent;
 
       // BND
-      s1:= CfgTrial.SList.Values[_Samp + _cBnd];
+      s1:= LParameters.Values[_Samp + _cBnd];
       R.Top:= StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
       R.Left:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
       R.Right:= StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
@@ -107,27 +112,27 @@ begin
       Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
       // STM
-      s1:= CfgTrial.SList.Values[_Samp + _cStm] + #32;
+      s1:= LParameters.Values[_Samp + _cStm] + #32;
       Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);  // must be set before fullpath
       Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]),$0000FF);
       Key.Filename:= RootMedia + ExtractDelimited(1,s1,[#32]);
 
       // SCH
-      Key.Schedule.Load(CfgTrial.SList.Values[_Samp + _cSch]);
+      Key.Schedule.Load(LParameters.Values[_Samp + _cSch]);
       AddToClockList(Key.Schedule);
 
       // MSG
-      Msg:= CfgTrial.SList.Values[_Samp + _cMsg];
+      Msg:= LParameters.Values[_Samp + _cMsg];
     end;
 
   // DELAY
-  LDelayed := StrToBoolDef(CfgTrial.SList.Values[_SampleType], False);
+  LDelayed := StrToBoolDef(LParameters.Values[_SampleType], False);
   if LDelayed then
     FSampleType := sampSuccessive
   else
     FSampleType := sampSimultaneous;
 
-  LDelay := StrToIntDef(CfgTrial.SList.Values[_Delay], 0);
+  LDelay := StrToIntDef(LParameters.Values[_Delay], 0);
   if LDelay > 0 then
   begin
     FDelay := TTimer.Create(Self);
@@ -137,6 +142,40 @@ begin
   end;
 
   if Self.ClassType = TMTS then Config(Self);
+end;
+
+function TMTS.AsString: string;
+var
+  LTrial : TStringList;
+begin
+  LTrial := TStringList.Create;
+  LTrial.BeginUpdate;
+  if Self.ClassType = TMTS then
+  begin
+    LTrial.Append(TConfigurationFile.FullTrialSection(
+      CounterManager.CurrentBlc, CounterManager.CurrentTrial));
+    LTrial.Values[_Kind] := T_Simple;
+    LTrial.Values[_Cursor] := IntToStr(Cursor);
+    LTrial.Values[_LimitedHold] := IntToStr(LimitedHold);
+  end;
+
+  case FSampleType of
+    sampSuccessive : LTrial.Values[_SampleType] := BoolToStr(True);
+    sampSimultaneous : LTrial.Values[_SampleType] := BoolToStr(False);
+  end;
+  LTrial.Values[_Delay] := IntToStr(FDelay.Interval);
+
+  with FSample do
+  begin
+    LTrial.Values[_Samp + _cStm] := ExtractFileName(Key.Filename);
+    LTrial.Values[_Samp + _cBnd] := Key.BoundsAsString;
+    LTrial.Values[_Samp + _cSch] := Key.Schedule.AsString;
+    LTrial.Values[_Samp + _cMsg] := Msg;
+  end;
+  LTrial.Append(inherited AsString);
+  LTrial.EndUpdate;
+  Result := LTrial.Text;
+  LTrial.Free;
 end;
 
 procedure TMTS.DelayEnd(Sender: TObject);
@@ -190,6 +229,10 @@ end;
 procedure TMTS.VisibleSample(AValue: Boolean);
 begin
   FSample.Key.Visible := AValue;
+  if FSample.Key.Visible then
+    LogEvent('Sample.Show,'+FSample.Msg)
+  else
+    LogEvent('Sample.Hide,'+FSample.Msg);
 end;
 
 function TMTS.GetHeader: string;
@@ -229,6 +272,8 @@ begin
   FSDataSupport.SampLatency := TimeStart;
   FSDataSupport.SampleBegin := TickCount;
   VisibleSample(True);
+  VisibleComparisons(False);
+
   if FSample.Key.Kind.stmAudio then
     FSample.Key.Play;
 

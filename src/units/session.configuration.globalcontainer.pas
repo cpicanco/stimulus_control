@@ -14,12 +14,51 @@ unit Session.Configuration.GlobalContainer;
 interface
 
 uses
-  Classes, SysUtils, Session.Configuration;
+  CounterManager;
 
+type
+
+  { TGlobalContainer }
+
+  TGlobalContainer = class
+    {$IFNDEF NO_LIBZMQ}
+    PupilClient: TPupilClient;
+    {$ENDIF}
+    PupilEnabled : Boolean;
+    CounterManager : TCounterManager;
+    RootData: string;
+    RootMedia: string;
+    ExeName : string;
+    TimeStart : Extended;
+    TestMode : Boolean;
+    MonitorToShow : Byte;
+  end;
 var
-  GGlobalContainer : TGlobalContainer;
+  GlobalContainer : TGlobalContainer;
 
 implementation
+
+uses SysUtils, Forms, Timestamps;
+
+initialization
+  GlobalContainer := TGlobalContainer.Create;
+  with GlobalContainer do
+  begin
+    ExeName := Application.ExeName;
+    RootData := ExtractFilePath(ExeName) + 'data' + DirectorySeparator;
+    RootMedia := ExtractFilePath(ExeName) +  'media' + DirectorySeparator;
+    ForceDirectories(RootData);
+    ForceDirectories(RootMedia);
+    CounterManager := TCounterManager.Create(nil);
+    MonitorToShow := 0;
+    TimeStart := TickCount;
+    PupilEnabled := False;
+    TestMode := False;
+  end
+
+finalization
+  GlobalContainer.CounterManager.Free;
+  GlobalContainer.Free;
 
 end.
 

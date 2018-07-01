@@ -65,15 +65,16 @@ type
     procedure TrialResult(Sender: TObject);
     procedure VisibleComparisons(AValue: Boolean);
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
+    function AsString : string; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
 implementation
 
-uses strutils, constants, timestamps;
+uses strutils, constants, timestamps, Session.ConfigurationFile;
 
-constructor TSimpl.Create(AOwner: TComponent);
+constructor TSimpl.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -87,48 +88,87 @@ begin
                       rsReportRspTop;              // top left of all clicks (both background and comparisons)
 end;
 
+function TSimpl.AsString: string;
+var
+  LTrial : TStringList;
+  i : integer;
+begin
+  LTrial := TStringList.Create;
+  LTrial.BeginUpdate;
+  if Self.ClassType = TSimpl then
+  begin
+    LTrial.Append(TConfigurationFile.FullTrialSection(
+      CounterManager.CurrentBlc, CounterManager.CurrentTrial));
+    LTrial.Values[_Kind] := T_Simple;
+    LTrial.Values[_Cursor] := IntToStr(Cursor);
+    LTrial.Values[_LimitedHold] := IntToStr(LimitedHold);
+  end;
+
+  LTrial.Values[_NumComp] := IntToStr(Length(FComparisons));
+  for i := Low(FComparisons) to High(FComparisons) do
+    with FComparisons[i] do
+    begin
+      LTrial.Values[_Comp + IntToStr(i + 1) + _cSch] := Key.Schedule.AsString;
+      LTrial.Values[_Comp + IntToStr(i + 1) + _cBnd] := Key.BoundsAsString;
+      LTrial.Values[_Comp + IntToStr(i + 1) + _cStm] := ExtractFileName(Key.Filename);
+      LTrial.Values[_Comp + IntToStr(i + 1) + _cMsg] := Msg;
+      LTrial.Values[_Comp + IntToStr(i + 1) + _cRes] := Res;
+      LTrial.Values[_Comp + IntToStr(i + 1) + _cNxt] := Nxt;
+      LTrial.Values[_Comp + IntToStr(i + 1) + _cIET] := IET;
+    end;
+  LTrial.EndUpdate;
+  Result := LTrial.Text;
+  LTrial.Free;
+end;
+
 procedure TSimpl.Play(ACorrection: Boolean);
 var
   s1 : string;
   R : TRect;
   I : Integer;
+  LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  FNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
+  LParameters := Configurations.SList;
+  FNumComp := StrToIntDef(LParameters.Values[_NumComp], 0);
   SetLength(FComparisons, FNumComp);
   for I := 0 to FNumComp-1 do
     with FComparisons[I] do
       begin
+        // Owner is TGraphicControl
         Key := TKey.Create(Self);
         Key.Tag := I;
         Key.Cursor := Self.Cursor;
         Key.OnConsequence := @Consequence;
         Key.OnResponse := @Response;
-        Key.Schedule.Load(CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cSch]);
-        AddToClockList(Key.Schedule);
-        Key.Parent := TCustomControl(Self.Parent);
 
-        s1 := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cBnd] + #32;
+        // Parent is TCustomControl/TForm
+        Key.Parent := Self.Parent;
+
+        s1 := LParameters.Values[_Comp + IntToStr(I + 1) + _cBnd] + #32;
         R.Top := StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
         R.Left := StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
         R.Bottom := StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
         R.Right := StrToIntDef(ExtractDelimited(4,s1,[#32]),100);
         Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
-        s1 := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cStm] + #32;
+        s1 := LParameters.Values[_Comp + IntToStr(I + 1) + _cStm] + #32;
         Key.Filename := RootMedia + ExtractDelimited(1,s1,[#32]);
+
+        Key.Schedule.Load(LParameters.Values[_Comp + IntToStr(I + 1) + _cSch]);
+        AddToClockList(Key.Schedule);
+
         Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
         Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]), $0000FF); //clRed
 
-        Csq := StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cCsq], 0);
-        Usb := CfgTrial.SList.Values[_Comp+IntToStr(I+1)+_cUsb];
-        Msg := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cMsg];
-        Res := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cRes];
-        Nxt := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cNxt];
-        TO_ := StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cTO], 0);
-        IET := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cIET];
+        Csq := StrToIntDef(LParameters.Values[_Comp + IntToStr(I + 1) + _cCsq], 0);
+        Usb := LParameters.Values[_Comp+IntToStr(I+1)+_cUsb];
+        Msg := LParameters.Values[_Comp + IntToStr(I + 1) + _cMsg];
+        Res := LParameters.Values[_Comp + IntToStr(I + 1) + _cRes];
+        Nxt := LParameters.Values[_Comp + IntToStr(I + 1) + _cNxt];
+        TO_ := StrToIntDef(LParameters.Values[_Comp + IntToStr(I + 1) + _cTO], 0);
+        IET := LParameters.Values[_Comp + IntToStr(I + 1) + _cIET];
       end;
-
   if Self.ClassType = TSimpl then Config(Self);
 end;
 
@@ -178,8 +218,14 @@ begin
 end;
 
 procedure TSimpl.TrialStart(Sender: TObject);
+var
+  CmpMsg : string = '';
+  i : integer;
 begin
+  for i := Low(FComparisons) to High(FComparisons) do
+    CmpMsg := CmpMsg + FComparisons[I].Msg + ',';
   VisibleComparisons(True);
+  LogEvent('Comparisons.Show,'+ CmpMsg);
 
   with FDataSupport do
     begin

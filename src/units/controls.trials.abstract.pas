@@ -16,7 +16,7 @@ interface
 uses LCLIntf, LCLType, Controls, ExtCtrls, Classes, SysUtils, LCLProc
 
   , Session.Configuration
-  , countermanager
+  , CounterManager
   , Schedules
   , Devices.RS232i
   //, interface_plp
@@ -32,10 +32,8 @@ type
 
   TTrial = class(TGraphicControl)
   private
-    FGlobalContainer: TGlobalContainer;
-    FCfgTrial: TCfgTrial;
+    FConfigurations: TCfgTrial;
     FClock : TTimer;
-    FCounterManager : TCounterManager;
     FLogEvent: TDataProcedure;
     FClockList : array of TThreadMethod;
     FData,
@@ -78,6 +76,8 @@ type
     FOldKeyUp : TKeyEvent;
     FOldKeyDown: TKeyEvent;
     procedure EndTrialThread(Sender: TObject);
+    procedure SetConfigurations(AValue: TCfgTrial);
+    procedure SetLimitedHold(AValue: integer);
     procedure SetOnTrialBeforeEnd(AValue: TNotifyEvent);
     procedure SetOnBeginCorrection(AValue: TNotifyEvent);
     procedure SetOnBkGndResponse(AValue: TNotifyEvent);
@@ -110,26 +110,28 @@ type
     property OnTrialPaint: TPaintEvent read FOnTrialPaint write SetOnTrialPaint;
     property OnTrialStart: TNotifyEvent read FOnTrialStart write SetOnTrialStart;
   protected
+    CounterManager : TCounterManager;
     procedure Paint; override;
     procedure Dispenser(AParallelPort: Byte; ARS232: string);
   public
-    constructor Create (ACustomControlOwner : TComponent); override;
+    constructor Create(AOwner : TCustomControl); virtual; reintroduce;
     destructor Destroy; override;
+    function AsString : string; virtual; abstract;
     procedure Play(ACorrection: Boolean=False); virtual;
-    procedure Hide;virtual;
-    procedure SetFocus;virtual;
-    property CfgTrial: TCfgTrial read FCfgTrial write FCfgTrial;
-    property CounterManager : TCounterManager read FCounterManager write FCounterManager;
+    procedure Hide; virtual;
+    procedure Show; virtual;
+    procedure SetFocus; virtual;
+    property Configurations: TCfgTrial read FConfigurations write SetConfigurations;
     property Data: string read FData write FData;
     property FileName : string read FFilename write FFilename;
-    property GlobalContainer : TGlobalContainer read FGlobalContainer write FGlobalContainer;
     property Header: string read FHeader write FHeader;
     property HeaderTimestamps: string read FHeaderTimestamps write FHeaderTimestamps;
     property IETConsequence : string read FIETConsequence write FIETConsequence;
     property NextTrial: string read FNextTrial write FNextTrial;
     property Result: string read FResult write FResult;
+    property LimitedHold : Integer read FLimitedHold write SetLimitedHold;
     property RootMedia : string read GetRootMedia write SetRootMedia;
-    property SaveTData : TDataProcedure read FLogEvent write FLogEvent;
+    property SaveData : TDataProcedure read FLogEvent write FLogEvent;
     property TestMode : Boolean read GetTestMode write SetTestMode;
     property TimeOut : Integer read FTimeOut write FTimeOut;
     property TimeStart : Extended read GetTimeStart;
@@ -153,7 +155,8 @@ resourcestring
 implementation
 
 
-uses constants, timestamps, Canvas.Helpers
+uses Constants, Timestamps, Canvas.Helpers
+   , Session.Configuration.GlobalContainer
     {$ifdef DEBUG}
     , Loggers.Debug
     {$endif}
@@ -282,6 +285,23 @@ begin
   if Assigned(OnTrialEnd) then OnTrialEnd(Sender);
 end;
 
+procedure TTrial.SetConfigurations(AValue: TCfgTrial);
+begin
+  if FConfigurations.Id = AValue.Id then Exit;
+  FConfigurations.Id := AValue.Id;
+  FConfigurations.Kind := AValue.Kind;
+  FConfigurations.Name := AValue.Name;
+  FConfigurations.NumComp := AValue.NumComp;
+  FConfigurations.SList.Assign(AValue.SList);
+end;
+
+procedure TTrial.SetLimitedHold(AValue: integer);
+begin
+  if FLimitedHold=AValue then Exit;
+  FLimitedHold := AValue;
+  FClock.Interval := FLimitedHold;
+end;
+
 procedure TTrial.Paint;
 begin
   inherited Paint;
@@ -300,10 +320,15 @@ begin
       RS232.Dispenser(ARS232);
 end;
 
-constructor TTrial.Create(ACustomControlOwner: TComponent);
+constructor TTrial.Create(AOwner: TCustomControl);
 begin
-  Assert(ACustomControlOwner is TCustomControl, 'Owner of TTrial must be a TCustomControl.');
-  inherited Create(ACustomControlOwner);
+  inherited Create(AOwner);
+  CounterManager := GlobalContainer.CounterManager;
+  FConfigurations.Id := -1;
+  FConfigurations.NumComp := 0;
+  FConfigurations.Name := T_NONE;
+  FConfigurations.Kind := 'abstract';
+  FConfigurations.SList := TStringList.Create;
   FResponseEnabled := False;
   FShowStarter := False;
   NextTrial := '0';
@@ -312,16 +337,16 @@ begin
   Color := 0;
   Cursor:= -1;
   Align := alClient;
-  with TCustomControl(ACustomControlOwner) do
+  with AOwner do
     begin
       FOldKeyUp := OnKeyUp;
       FOldKeyDown := OnKeyDown;
       OnKeyUp := @TrialKeyUp;
       OnKeyDown := @TrialKeyDown;
     end;
-  Parent := TWinControl(ACustomControlOwner);
+  Parent := AOwner;
 
-  //FLimitedhold is controlled by a TTrial descendent. It controls Trial ending.
+  //FLimitedhold controls Trial ending.
   FLimitedHold := 0;
   FClock := TTimer.Create(Self);
   FClock.Interval := FLimitedHold;
@@ -347,30 +372,24 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.Destroy:FNextTrial:' + FNextTrial);
   {$endif}
-
-  //if Assigned(FClock) then
-  //  begin
-  //    FClock.OnTimer := nil;
-  //    FClock.Enabled := False;
-  //    FClock.Terminate;
-  //    FClock := nil;
-  //  end;
+  FConfigurations.SList.Free;
   inherited Destroy;
 end;
 
 procedure TTrial.Play(ACorrection: Boolean);
+var
+  LParameters : TStringList;
 begin
+  LParameters := Configurations.SList;
+
   // avoid responses while loading configurations
   FResponseEnabled := False;
 
-  // full path for loading media files
-  RootMedia:= FGlobalContainer.RootMedia;
-
   // what will be the next trial?
-  NextTrial := CfgTrial.SList.Values[_NextTrial];
+  NextTrial := LParameters.Values[_NextTrial];
 
   // will the trial count as MISS, HIT or NONE?
-  Result := CfgTrial.SList.Values[_cRes];
+  Result := LParameters.Values[_cRes];
   if Result = '' then
     Result := T_NONE;
 
@@ -384,20 +403,20 @@ begin
     FIsCorrection := False;
 
   // Trial background color
-  Color:= StrToIntDef(CfgTrial.SList.Values[_BkGnd], Parent.Color);
+  Color:= StrToIntDef(LParameters.Values[_BkGnd], Parent.Color);
 
   // Trial will last LimitedHold ms if LimitedHold > 0
-  FLimitedHold := StrToIntDef(CfgTrial.SList.Values[_LimitedHold], 0);
+  FLimitedHold := StrToIntDef(LParameters.Values[_LimitedHold], 0);
   FClock.Interval := FLimitedHold;
 
   // Present a dot at the screen center. A key response is required before trialstart
-  FShowStarter := StrToBoolDef(CfgTrial.SList.Values[_ShowStarter], False);
+  FShowStarter := StrToBoolDef(LParameters.Values[_ShowStarter], False);
   if FShowStarter then
     Header := 'Str.Lat.' + #9 + Header;
 
   // image of the mouse cursor
   if TestMode then Cursor:= 0
-  else Cursor:= StrToIntDef(CfgTrial.SList.Values[_Cursor], 0);
+  else Cursor:= StrToIntDef(LParameters.Values[_Cursor], 0);
 end;
 
 procedure TTrial.Hide;
@@ -409,6 +428,17 @@ begin
     for i := 0 to ComponentCount -1 do
       if Components[i] is TControl then
         TControl(Components[i]).Hide;
+end;
+
+procedure TTrial.Show;
+var
+  i : integer;
+begin
+  inherited Show;
+  if ComponentCount > 0 then
+    for i := 0 to ComponentCount -1 do
+      if Components[i] is TControl then
+        TControl(Components[i]).Show;
 end;
 
 procedure TTrial.SetFocus;
@@ -453,7 +483,7 @@ end;
 
 procedure TTrial.LogEvent(ACode: string);
 begin
-  SaveTData(TimestampToStr(TickCount - TimeStart) + #9 +
+  SaveData(TimestampToStr(TickCount - TimeStart) + #9 +
            IntToStr(CounterManager.CurrentBlc+1) + #9 +
            IntToStr(CounterManager.CurrentTrial+1) + #9 +
            IntToStr(CounterManager.Trials+1) + #9 + // Current trial cycle
@@ -560,29 +590,29 @@ end;
 
 function TTrial.GetRootMedia: string;
 begin
-  Result := FGlobalContainer.RootMedia;
+  Result := GlobalContainer.RootMedia;
 end;
 
 function TTrial.GetTestMode: Boolean;
 begin
-  Result := FGlobalContainer.TestMode;
+  Result := GlobalContainer.TestMode;
 end;
 
 function TTrial.GetTimeStart: Extended;
 begin
-  Result := FGlobalContainer.TimeStart;
+  Result := GlobalContainer.TimeStart;
 end;
 
 procedure TTrial.SetRootMedia(AValue: string);
 begin
-  if FGlobalContainer.RootMedia=AValue then Exit;
-  FGlobalContainer.RootMedia:=AValue;
+  if GlobalContainer.RootMedia=AValue then Exit;
+  GlobalContainer.RootMedia:=AValue;
 end;
 
 procedure TTrial.SetTestMode(AValue: Boolean);
 begin
-  if FGlobalContainer.TestMode=AValue then Exit;
-  FGlobalContainer.TestMode:=AValue;
+  if GlobalContainer.TestMode=AValue then Exit;
+  GlobalContainer.TestMode:=AValue;
 end;
 
 
