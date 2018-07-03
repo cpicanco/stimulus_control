@@ -13,12 +13,13 @@ unit Controls.Trials.Abstract;
 
 interface
 
-uses LCLIntf, LCLType, Controls, ExtCtrls, Classes, SysUtils, LCLProc
-
+uses Controls, ExtCtrls, Classes, SysUtils
   , Session.Configuration
   , CounterManager
   , Schedules
+  {$IFDEF RS232}
   , Devices.RS232i
+  {$ENDIF}
   //, interface_plp
   ;
 
@@ -112,7 +113,9 @@ type
   protected
     CounterManager : TCounterManager;
     procedure Paint; override;
+    {$IFDEF RS232}
     procedure Dispenser(AParallelPort: Byte; ARS232: string);
+    {$ENDIF}
   public
     constructor Create(AOwner : TCustomControl); virtual; reintroduce;
     destructor Destroy; override;
@@ -313,12 +316,14 @@ begin
   if Assigned(OnTrialPaint) and FResponseEnabled then OnTrialPaint;
 end;
 
+{$IFDEF RS232}
 procedure TTrial.Dispenser(AParallelPort: Byte; ARS232: string);
 begin
     //PLP.OutPortOn(Csq);
     if ARS232 <> '' then
       RS232.Dispenser(ARS232);
 end;
+{$ENDIF}
 
 constructor TTrial.Create(AOwner: TCustomControl);
 begin

@@ -328,12 +328,15 @@ begin
 end;
 
 procedure TSimpl.Consequence(Sender: TObject);
+{$IFDEF RS232}
 var
   i: PtrInt;
+{$ENDIF}
 begin
   if not FConsequenceFired then
     FConsequenceFired := True;
 
+  {$IFDEF RS232}
   if Sender is TKey then
     begin
       i := TKey(Sender).Tag;
@@ -341,6 +344,7 @@ begin
       FConsequence.RS232Code := FComparisons[i].Usb;
       Dispenser(FConsequence.PLPCode, FConsequence.RS232Code);
     end;
+  {$ENDIF}
 
   CounterManager.OnConsequence(Sender);
   if Assigned(OnConsequence) then OnConsequence(Sender);

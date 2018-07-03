@@ -23,8 +23,12 @@ type
   private
     procedure Play;
   public
-
-
+    {$IFDEF WINDOWS}
+    OriginalBounds: TRect;
+    OriginalWindowState: TWindowState;
+    ScreenBounds: TRect;
+    procedure SwitchFullScreen;
+    {$ENDIF}
   end;
 
 resourcestring
@@ -66,9 +70,6 @@ type
 
 var
   Trial : TTrial;
-  Stimuli : array [0..17] of string = (
-  '¶', '@', '$', '€', '&', '#', '%', '≡', '∞',
-  '∑', '↔', 'ℓ', 'β', 'Δ', 'π', 'Φ', 'Ψ', 'Ω');
   ConfigurationFile : TConfigurationFile;
   BndCenter : string = '234 533 300 300';
   BndSample : string = '15 533 300 300';
@@ -87,6 +88,9 @@ var
   DestinPath : string;
   SrcFile : string;
   DstFile : string;
+  Stimuli : array [0..17] of string = (
+  '¶', '@', '$', '€', '&', '#', '%', '≡', '∞',
+  '∑', '↔', 'ℓ', 'β', 'Δ', 'π', 'Φ', 'Ψ', 'Ω');
   DefaultStimuliNames : array [0..5] of string =
     ('A1', 'A2', 'B1', 'B2', 'C1', 'C2');
 begin
@@ -323,6 +327,7 @@ end;
 procedure TBackground.ButtonStartClick(Sender: TObject);
 begin
   ButtonStart.Hide;
+  {$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
   Play;
 end;
 
@@ -386,6 +391,28 @@ begin
     TrialConfig.SList.Free;
   end;
 end;
+
+{$IFDEF WINDOWS}
+// http://wiki.freepascal.org/Application_full_screen_mode
+procedure TBackground.SwitchFullScreen;
+begin
+  if BorderStyle <> bsNone then begin
+    // To full screen
+    OriginalWindowState := WindowState;
+    OriginalBounds := BoundsRect;
+
+    BorderStyle := bsNone;
+    BoundsRect := Screen.MonitorFromWindow(Handle).BoundsRect;
+  end else begin
+    // From full screen
+    BorderStyle := bsSizeable;
+    if OriginalWindowState = wsMaximized then
+      WindowState := wsMaximized
+    else
+      BoundsRect := OriginalBounds;
+  end;
+end;
+{$ENDIF}
 
 var
   Footer : string;

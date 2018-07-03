@@ -7,7 +7,7 @@ object Background: TBackground
   ClientHeight = 240
   ClientWidth = 320
   Color = clWhite
-  LCLVersion = '1.9.0.0'
+  LCLVersion = '1.8.4.0'
   WindowState = wsFullScreen
   object ButtonStart: TButton
     Left = 112
@@ -19,14 +19,14 @@ object Background: TBackground
     TabOrder = 0
   end
   object OpenDialog: TOpenDialog
-    Left = 40
-    Top = 24
+    left = 40
+    top = 24
   end
   object InterTrial: TTimer
     Enabled = False
     OnTimer = InterTrialTimer
     OnStopTimer = InterTrialStopTimer
-    Left = 152
-    Top = 24
+    left = 152
+    top = 24
   end
 end

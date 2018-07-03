@@ -17,7 +17,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, StdCtrls, Graphics
 
   , Controls.Trials.Abstract
   , Controls.Trials.Helpers
-  , Audio.Bass_nonfree
+  {$IFDEF AUDIO}, Audio.Bass_nonfree {$ENDIF}
   ;
 
 type
@@ -30,7 +30,7 @@ type
 
   TMessageTrial = class(TTrial)
   private
-    FAudio : TBassStream;
+    {$IFDEF AUDIO}FAudio : TBassStream;{$ENDIF}
     FAudioPlaying : Boolean;
     FMessageStyle : TMessageStyle;
     FDataSupport : TDataSupport;
@@ -58,7 +58,7 @@ implementation
 uses
   constants
   , Timestamps
-  , Audio.BassCallbacks
+  {$IFDEF AUDIO}, Audio.BassCallbacks{$ENDIF}
   {$ifdef DEBUG}
   , Loggers.Debug
   {$endif}
@@ -93,15 +93,17 @@ begin
   IETConsequence := T_NONE;
   Result := T_NONE;
 
-  GMessageTrialAudioWasPlayed := False;
+  {$IFDEF AUDIO}GMessageTrialAudioWasPlayed := False;{$ENDIF}
   FAudioPlaying := False;
-  FAudio := nil;
+  {$IFDEF AUDIO}FAudio := nil;{$ENDIF}
 end;
 
 destructor TMessageTrial.Destroy;
 begin
+  {$IFDEF AUDIO}
   if Assigned(FAudio) then
     FAudio.Free;
+  {$ENDIF}
   inherited Destroy;
 end;
 
@@ -123,6 +125,7 @@ begin
     case FMessageStyle of
       msgDefault:
         EndTrial(Sender);
+      {$IFDEF AUDIO}
       msgAudio:
         if GMessageTrialAudioWasPlayed then
           EndTrial(Sender)
@@ -132,6 +135,7 @@ begin
               FAudioPlaying:=True;
               FAudio.Play;
             end;
+      {$ENDIF}
     end;
 end;
 
@@ -154,7 +158,7 @@ begin
   LParameters := Configurations.SList;
   LFontColor :=  StrToIntDef(LParameters.Values[_MsgFontColor], $000000);
   FMessageStyle := TMessageStyle(Ord(StrToIntDef(LParameters.Values[_Style], 0)));
-
+  {$IFDEF AUDIO}
   if FMessageStyle = msgAudio then
     begin
       LAudioFile := LParameters.Values[_cStm];
@@ -173,6 +177,7 @@ begin
       else
         raise Exception.Create('File does not exist: '+LAudioFile);
     end;
+  {$ENDIF}
 
   with FMessage do
     begin

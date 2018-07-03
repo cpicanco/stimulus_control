@@ -55,15 +55,18 @@ type
 
   TBassStream = class
     private
+      FExcutions: integer;
       FLoops : integer;
       FSample : HSAMPLE;
       FSyncProcedure: SYNCPROC;
+      procedure SetExcutions(AValue: integer);
       procedure SetSyncProcedure(AValue: SYNCPROC);
     public
       constructor Create(FileName : AnsiString; Loops : integer = -1); overload;
       procedure Play;
       procedure Stop;
       property SyncProcedure : SYNCPROC read FSyncProcedure write SetSyncProcedure;
+      property Excutions : integer read FExcutions write SetExcutions;
   end;
 
 
@@ -78,6 +81,12 @@ begin
 
   if Assigned(FSyncProcedure) then
     BASS_ChannelSetSync(FSample, BASS_SYNC_END, 0, SyncProcedure, nil);
+end;
+
+procedure TBassStream.SetExcutions(AValue: integer);
+begin
+  if FExcutions=AValue then Exit;
+  FExcutions:=AValue;
 end;
 
 constructor TBassStream.Create(FileName: AnsiString; Loops: integer);

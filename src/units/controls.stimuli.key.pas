@@ -17,9 +17,9 @@ uses LCLIntf, LCLType, SysUtils, Variants, Classes,
      Graphics, Controls, Forms, ExtCtrls, LazFileUtils
 
     , Dialogs
-    , Audio.Bass_nonfree
-    , Video.VLC
     , Schedules
+     {$IFDEF AUDIO}, Audio.Bass_nonfree {$ENDIF}
+     {$IFDEF VIDEO}, Video.VLC {$ENDIF}
     ;
 
 type
@@ -34,12 +34,11 @@ type
 
   TKey = class(TGraphicControl)
   private
-    FAudioPlayer : TBassStream;
+    {$IFDEF AUDIO}FAudioPlayer : TBassStream;{$ENDIF}
+    {$IFDEF VIDEO}FVideoPlayer : TVLCVideoPlayer;{$ENDIF}
     FSchedule: TSchedule;
     FStimulus: TBitmap;
     //FGifImage: TJvGIFAnimator;
-
-    FVideoPlayer : TVLCVideoPlayer;
     FEdge: TColor;
     FFileName: string;
     FKind: TKind;
@@ -119,8 +118,8 @@ end;
 
 destructor TKey.Destroy;
 begin
-  if Assigned(FVideoPlayer) then FVideoPlayer.Stop;
-  if Assigned(FAudioPlayer) then FAudioPlayer.Free;
+  {$IFDEF VIDEO}if Assigned(FVideoPlayer) then FVideoPlayer.Stop;{$ENDIF}
+  {$IFDEF AUDIO}if Assigned(FAudioPlayer) then FAudioPlayer.Free;{$ENDIF}
   if Assigned(FStimulus) then FStimulus.Free;
   //if Assigned(FGifImage) then FreeAndNil (FGifImage);
 
@@ -144,9 +143,10 @@ begin
       Height := ClientHeight;
       FStimulus.SetSize(Width,Height)
     end;
-
+  {$IFDEF VIDEO}
   if FKind.stmImage = stmVideo then
     FVideoPlayer.FullScreen;
+  {$ENDIF}
   Invalidate;
 end;
 
@@ -220,30 +220,38 @@ end;
 
 procedure TKey.Play;
 begin
+  {$IFDEF AUDIO}
   if FKind.stmAudio then
     if Assigned(FAudioPlayer) then
       FAudioPlayer.Play;
+  {$ENDIF}
 
+  {$IFDEF VIDEO}
   case FKind.stmImage of
     //stmAnimation : ;
     //stmNone : ;
     //stmPicture : ;
     stmVideo: if Assigned(FVideoPlayer) then FVideoPlayer.Play;
   end;
+  {$ENDIF}
 end;
 
 procedure TKey.Stop;
 begin
+  {$IFDEF AUDIO}
   if FKind.stmAudio then
     if Assigned(FAudioPlayer) then
       FAudioPlayer.Stop;
+  {$ENDIF}
 
+  {$IFDEF VIDEO}
   case FKind.stmImage of
     //stmAnimation : ;
     //stmNone : ;
     //stmPicture : ;
     stmVideo: if Assigned(FVideoPlayer) then FVideoPlayer.Stop;
   end;
+  {$ENDIF}
 end;
 
 procedure TKey.SetFileName(AFilename: string);                 //Review required
@@ -326,6 +334,7 @@ var
     SetKind(Audio, stmPicture);
   end;
 
+  {$IFDEF AUDIO}
   procedure Load_AUD;
   begin
     if Loops > 0 then
@@ -334,7 +343,9 @@ var
       FAudioPlayer := TBassStream.Create(AFilename);
     SetKind(True, TImage.stmNone);
   end;
+  {$ENDIF}
 
+  {$IFDEF VIDEO}
   procedure Load_VID;
   begin
     FVideoPlayer := TVLCVideoPlayer.Create(Self, Parent);
@@ -344,6 +355,7 @@ var
     FVideoPlayer.OnClick:=@VideoClick;
     SetKind(False, TImage.stmVideo);
   end;
+  {$ENDIF}
 
 begin
   if FFileName = AFilename then Exit;
@@ -364,11 +376,13 @@ begin
         //    SetKind(Audio, stmAnimation);
         //  end;
 
-        // video
+        {$IFDEF VIDEO}
         '.MPG', '.AVI',
         '.MOV', '.FLV',
         '.WMV', '.MP4': Load_VID;
-        // audio
+        {$ENDIF}
+
+        {$IFDEF AUDIO}
         '.WAV','.AIFF','.MP3','.OGG':
           begin
             Load_AUD;
@@ -391,6 +405,7 @@ begin
                   Break;
                 end;
           end;
+        {$ENDIF}
       end;
 
       FFileName := AFilename;
@@ -415,11 +430,13 @@ end;
 procedure TKey.SetVisible(AValue: Boolean);
 begin
   inherited SetVisible(AValue);
+  {$IFDEF VIDEO}
   if Assigned(FVideoPlayer) then
   if AValue then
     FVideoPlayer.Show
   else
     FVideoPlayer.Hide;
+  {$ENDIF}
 end;
 
 function TKey.GetShortName: string;
