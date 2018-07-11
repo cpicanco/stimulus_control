@@ -24,7 +24,6 @@ type
     procedure TrialEnd(Sender: TObject);
   private
     FHeader : string;
-    FFilename : string;
     procedure Play;
   public
     {$IFDEF WINDOWS}
@@ -73,16 +72,39 @@ type
   end;
 
 var
+  FDataFile : string;
+  FSessionFile : string;
   Trial : TTrial;
   ConfigurationFile : TConfigurationFile;
   BndCenter : string = '234 533 300 300';
   BndSample : string = '15 533 300 300';
   BndComparisons : array [0..1] of string = ('400 333 300 300', '400 733 300 300');
 
-  function AppExt(Stm : string) : string;
+function AppExt(Stm : string) : string;
+begin
+  Result := Stm + '.png';
+end;
+
+procedure NewConfigurationFile;
+begin
+  FSessionFile := ExtractFilePath(
+    Application.ExeName) + DirectorySeparator + 'last_session.ini';
+  if FileExists(FSessionFile) then
   begin
-    Result := Stm + '.png';
+    DeleteFile(FSessionFile);
   end;
+  ConfigurationFile := TConfigurationFile.Create(FSessionFile);
+  ConfigurationFile.CacheUpdates := True;
+  ConfigurationFile.WriteString(_Main, _NumBlc, '2');
+  ConfigurationFile.WriteToBloc(1, _Name, 'Memory Test - SS');
+  ConfigurationFile.Invalidate;
+end;
+
+procedure ClearConfigurationFile;
+begin
+  ConfigurationFile.Free;
+  NewConfigurationFile;
+end;
 
 procedure RandomizeStimuli;
 var
@@ -140,11 +162,11 @@ var
     'Pressione a BARRA DE ESPAÇO no teclado para começar.';
 
     M2 : string =
-    'Agora, nesta parte, você verá um símbolo na parte superior da ' +
-    'tela e DEVERÁ CLICAR NELE. Em seguida, aparecerão dois símbolos ' +
-    'na parte inferior da tela.' +
-    'Você DEVERÁ ESCOLHER CLICANDO DUAS VEZES SOBRE UM DELES. ' +
-    'Pressione a BARRA DE ESPAÇO no teclado para começar.';
+    'Agora, nesta parte, você verá um símbolo na parte superior da tela e dois ' +
+    'símbolos na parte inferior da tela. Você DEVERÁ ESCOLHER ENTRE ' +
+    'OS DOIS SIMBOLOS QUE ESTÃO NA PARTE INFEIROR DA TELA. ' +
+    'PARA ISSO VOCÊ DEVE CLICAR SOBRE UM DOS DOIS. Pressione ' +
+    'a BARRA DE ESPAÇO no teclado para começar.';
 
     M3 : string =
     'Agora, nesta fase, você verá uma figura na tela que junta dois símbolos. ' +
@@ -159,6 +181,11 @@ var
     i := ConfigurationFile.TrialCount[1]+1;
     with ConfigurationFile do
     begin
+      case AMsg of
+        0 : WriteToTrial(i, _Name, 'Pareamento - MSG');
+        1 : WriteToTrial(i, _Name, 'Teste MTS - MSG');
+        2 : WriteToTrial(i, _Name, 'Teste de Memória - MSG');
+      end;
       WriteToTrial(i, _Kind, T_MSG);
       WriteToTrial(i, _ITI, '3000');
       case AMsg of
@@ -187,20 +214,22 @@ var
       i := ConfigurationFile.TrialCount[1]+1;
       with ConfigurationFile do
       begin
+        WriteToTrial(i, _Name, 'Pareamento - '+AConPair.B+' '+AConPair.A);
+        WriteToTrial(i, _Cursor, '-1');
         WriteToTrial(i, _Kind, T_MTS);
-        WriteToTrial(i, _ITI, '9000');
+        WriteToTrial(i, _ITI, '3000');
         WriteToTrial(i, _SampleType, BoolToStr(True));
         WriteToTrial(i, _Delay, '500');
 
         WriteToTrial(i, _Samp+_cStm, AppExt(AConPair.B));
         WriteToTrial(i, _Samp+_cBnd, BndCenter);
-        WriteToTrial(i, _Samp+_cSch, 'FT 2000');
+        WriteToTrial(i, _Samp+_cSch, 'FT 1500');
         WriteToTrial(i, _Samp+_cMsg, AConPair.B + '-' + BndCenter);
 
         WriteToTrial(i, _NumComp, '1');
         WriteToTrial(i, _Comp+'1'+_cStm, AppExt(AConPair.A));
         WriteToTrial(i, _Comp+'1'+_cBnd, BndCenter);
-        WriteToTrial(i, _Comp+'1'+_cSch, 'FT 2000');
+        WriteToTrial(i, _Comp+'1'+_cSch, 'FT 1500');
         WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.A + '-' + BndCenter);
       end;
     end;
@@ -251,25 +280,26 @@ var
       i := ConfigurationFile.TrialCount[1]+1;
       with ConfigurationFile do
       begin
+        WriteToTrial(i, _Name, 'Teste MTS - '+AConPair.A+' '+AConPair.B);
         WriteToTrial(i, _Kind, T_MTS);
-        WriteToTrial(i, _ITI, '6000');
+        WriteToTrial(i, _ITI, '1000');
         WriteToTrial(i, _SampleType, BoolToStr(False));
         WriteToTrial(i, _Delay, '0');
 
         WriteToTrial(i, _Samp+_cStm, AppExt(AConPair.A));
         WriteToTrial(i, _Samp+_cBnd, BndSample);
-        WriteToTrial(i, _Samp+_cSch, 'CRF');
+        WriteToTrial(i, _Samp+_cSch, 'FT 1');
         WriteToTrial(i, _Samp+_cMsg, AConPair.A);
 
         WriteToTrial(i, _NumComp, '2');
         WriteToTrial(i, _Comp+'1'+_cStm, AppExt(AConPair.B));
         WriteToTrial(i, _Comp+'1'+_cBnd, Comparisons[0]);
-        WriteToTrial(i, _Comp+'1'+_cSch, 'FR 2');
+        WriteToTrial(i, _Comp+'1'+_cSch, 'CRF');
         WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.B + '-' + Comparisons[0]);
 
         WriteToTrial(i, _Comp+'2'+_cStm, AppExt(AIncPair.B));
         WriteToTrial(i, _Comp+'2'+_cBnd, Comparisons[1]);
-        WriteToTrial(i, _Comp+'2'+_cSch, 'FR 2');
+        WriteToTrial(i, _Comp+'2'+_cSch, 'CRF');
         WriteToTrial(i, _Comp+'2'+_cMsg, AIncPair.B + '-' + Comparisons[1]);
       end;
     end;
@@ -327,6 +357,7 @@ var
       for i := Low(AllPairs) to High(AllPairs) do
       begin
         t := ConfigurationFile.TrialCount[1] + 1;
+        WriteToTrial(t, _Name, 'Teste de Memória - '+AllPairs[i].A+' '+AllPairs[i].B);
         WriteToTrial(t, _Kind, T_LIK);
         WriteToTrial(t, _ITI, '3000');
         WriteToTrial(t, _Left, AppExt(AllPairs[i].A));
@@ -356,6 +387,7 @@ begin
   case ACondition of
     0 :
       begin
+        ConfigurationFile.WriteToBloc(1, _Name, 'Avaliação de Memória');
         WriteSSBloc;
         WriteLikertBloc;
 
@@ -368,6 +400,7 @@ begin
       end;
     1 :
       begin
+        ConfigurationFile.WriteToBloc(1, _Name, 'Avaliação MTS');
         WriteSSBloc;
         WriteLikertBloc;
 
@@ -399,13 +432,13 @@ begin
   {$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
 
   SessionName := RadioGroupCondition.Items[RadioGroupCondition.ItemIndex];
-  FFilename := '000';
+  FDataFile := '000';
   FHeader := HSUBJECT_NAME + #9 + EditParticipant.Text + LineEnding +
              HSESSION_NAME + #9 + SessionName + LineEnding +
              HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
 
-  FFilename := GlobalContainer.RootData + DirectorySeparator + FFilename;
-  CreateLogger(LGTimestamps, FFilename, FHeader);
+  FDataFile := GlobalContainer.RootData + DirectorySeparator + FDataFile;
+  CreateLogger(LGTimestamps, FDataFile, FHeader);
   Play;
 end;
 
@@ -414,6 +447,7 @@ var
   CurrentTrial : integer;
   TotalTrials : integer;
   Footer : string;
+  MouseOnSet : TPoint = (x:683; y :165);
 begin
   TotalTrials := ConfigurationFile.TrialCount[1]-1;
   CurrentTrial := GlobalContainer.CounterManager.CurrentTrial;
@@ -425,9 +459,11 @@ begin
     ShowMessage('Fim.');
     Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
     FreeLogger(LGTimestamps,Footer);
+    CopyFile(FSessionFile, ExtractFileNameWithoutExt(FDataFile)+'.ini');
     WindowState := wsNormal;
     Exit;
   end;
+  Mouse.CursorPos := MouseOnSet;
   Play;
 end;
 
@@ -438,6 +474,7 @@ end;
 
 procedure TBackground.RadioGroupConditionSelectionChanged(Sender: TObject);
 begin
+  ClearConfigurationFile;
   MakeConfigurationFile(RadioGroupCondition.ItemIndex);
 end;
 
@@ -501,19 +538,8 @@ begin
 end;
 {$ENDIF}
 
-var
-  FSessionFile : string;
-
 initialization
-  FSessionFile := ExtractFilePath(
-    Application.ExeName) + DirectorySeparator + 'last_session.ini';
-  if FileExists(FSessionFile) then
-    DeleteFile(FSessionFile);
-  ConfigurationFile := TConfigurationFile.Create(FSessionFile);
-  ConfigurationFile.CacheUpdates := True;
-  ConfigurationFile.WriteString(_Main, _NumBlc, '2');
-  ConfigurationFile.WriteToBloc(1, _Name, 'Memory Test');
-  ConfigurationFile.Invalidate;
+  NewConfigurationFile;
   Randomize;
   RandomizeStimuli;
   MakeConfigurationFile(0);

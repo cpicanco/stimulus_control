@@ -369,6 +369,7 @@ begin
                       rsReportBlocID + #9 +
                       rsReportTrialID + #9 +
                       rsReportTrialNO + #9 +
+                      rsReportTrialName + #9 +
                       rsReportEvent;
 end;
 
@@ -492,6 +493,7 @@ begin
            IntToStr(CounterManager.CurrentBlc+1) + #9 +
            IntToStr(CounterManager.CurrentTrial+1) + #9 +
            IntToStr(CounterManager.Trials+1) + #9 + // Current trial cycle
+           Configurations.Name + #9 +
            ACode + LineEnding)
 end;
 
