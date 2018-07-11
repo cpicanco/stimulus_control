@@ -35,7 +35,7 @@ type
     FMessageStyle : TMessageStyle;
     FDataSupport : TDataSupport;
     FMessage : TLabel;
-    procedure MessageMouseUp(Sender: TObject;Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
+    //procedure MessageMouseUp(Sender: TObject;Button: TMouseButton; Shift:TShiftState; X,Y:Integer);
     procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
@@ -80,7 +80,7 @@ begin
     //Layout := tlCenter;
     WordWrap := True;
     Font.Name := 'TimesNewRoman';
-    OnMouseUp := @MessageMouseUp;
+    //OnMouseUp := @MessageMouseUp;
     Parent := TCustomControl(AOwner);
   end;
 
@@ -111,13 +111,13 @@ function TMessageTrial.AsString: string;
 begin
   Result := '';
 end;
-
-procedure TMessageTrial.MessageMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-  if Button = mbLeft then
-    EndTrial(Sender);
-end;
+//
+//procedure TMessageTrial.MessageMouseUp(Sender: TObject; Button: TMouseButton;
+//  Shift: TShiftState; X, Y: Integer);
+//begin
+//  if Button = mbLeft then
+//    EndTrial(Sender);
+//end;
 
 procedure TMessageTrial.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin

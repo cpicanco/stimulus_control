@@ -12,7 +12,6 @@
       <XPManifest>
         <DpiAware Value="True"/>
       </XPManifest>
-      <Icon Value="0"/>
     </General>
     <BuildModes Count="2">
       <Item1 Name="Linux" Default="True"/>
@@ -107,27 +106,18 @@
       <OtherUnitFiles Value="../../src/units;../../src/schedules"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
-    <Parsing>
-      <SyntaxOptions>
-        <IncludeAssertionCode Value="True"/>
-      </SyntaxOptions>
-    </Parsing>
     <CodeGeneration>
-      <Checks>
-        <IOChecks Value="True"/>
-        <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
-        <StackChecks Value="True"/>
-      </Checks>
-      <VerifyObjMethodCallValidity Value="True"/>
       <TargetCPU Value="x86_64"/>
       <TargetOS Value="linux"/>
     </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <GenerateDebugInfo Value="False"/>
+        <UseLineInfoUnit Value="False"/>
+      </Debugging>
+    </Linking>
     <Other>
       <CustomOptions Value="-dNO_LIBZMQ"/>
-      <OtherDefines Count="1">
-        <Define0 Value="NO_LIBZMQ"/>
-      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>

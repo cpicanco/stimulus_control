@@ -13,14 +13,18 @@ type
 
   TBackground = class(TForm)
     ButtonStart: TButton;
+    EditParticipant: TEdit;
     OpenDialog: TOpenDialog;
-    RadioGroup1: TRadioGroup;
+    RadioGroupCondition: TRadioGroup;
     InterTrial: TTimer;
     procedure ButtonStartClick(Sender: TObject);
     procedure InterTrialStopTimer(Sender: TObject);
     procedure InterTrialTimer(Sender: TObject);
+    procedure RadioGroupConditionSelectionChanged(Sender: TObject);
     procedure TrialEnd(Sender: TObject);
   private
+    FHeader : string;
+    FFilename : string;
     procedure Play;
   public
     {$IFDEF WINDOWS}
@@ -115,89 +119,17 @@ begin
   end;
 end;
 
-procedure MakeConfigurationFile;
+procedure MakeConfigurationFile(ACondition : integer);
 {
   Consistentes: B1A1, B2A2, C1A1, C2A2, B1C1, B2C2, C1B1, C2B2.
   Inconsistentes: B1A2, B2A1, C1A2, C2A1, B1C2, B2C1, C1B2, C2B1.
 }
 var
-  SSTrials : array [0..5, 0..3] of integer;
-  MTSTrials : array [0..3, 0..7] of integer;
   ConsistentPairs : array [0..7] of TStmPair;
   InconsistePairs : array [0..7] of TStmPair;
   AllPairs : array [0..15] of TStmPair;
-  i, j : integer;
   r, t : integer;
   StmPair : TStmPair;
-  procedure WriteMTSTrial(AConPair, AIncPair : TStmPair);
-  var
-    Comparisons : TStringList;
-    i : integer;
-  begin
-    Comparisons := TStringList.Create;
-    Comparisons.Append(BndComparisons[0]);
-    Comparisons.Append(BndComparisons[1]);
-    for i := 0 to Comparisons.Count -1 do
-      Comparisons.Exchange(Random(2), i);
-
-    i := ConfigurationFile.TrialCount[1]+1;
-    with ConfigurationFile do
-    begin
-      WriteToTrial(i, _Kind, T_MTS);
-      WriteToTrial(i, _ITI, '6000');
-      WriteToTrial(i, _SampleType, BoolToStr(False));
-      WriteToTrial(i, _Delay, '0');
-
-      WriteToTrial(i, _Samp+_cStm, AppExt(AConPair.A));
-      WriteToTrial(i, _Samp+_cBnd, BndSample);
-      WriteToTrial(i, _Samp+_cSch, 'CRF');
-      WriteToTrial(i, _Samp+_cMsg, AConPair.A);
-
-      WriteToTrial(i, _NumComp, '2');
-      WriteToTrial(i, _Comp+'1'+_cStm, AppExt(AConPair.B));
-      WriteToTrial(i, _Comp+'1'+_cBnd, Comparisons[0]);
-      WriteToTrial(i, _Comp+'1'+_cSch, 'FR 2');
-      WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.B + '-' + Comparisons[0]);
-
-      WriteToTrial(i, _Comp+'2'+_cStm, AppExt(AIncPair.B));
-      WriteToTrial(i, _Comp+'2'+_cBnd, Comparisons[1]);
-      WriteToTrial(i, _Comp+'2'+_cSch, 'FR 2');
-      WriteToTrial(i, _Comp+'2'+_cMsg, AIncPair.B + '-' + Comparisons[1]);
-    end;
-  end;
-
-  procedure WriteSSTrial(AConPair : TStmPair);
-  var
-    Comparisons : TStringList;
-    i : integer;
-  begin
-    Comparisons := TStringList.Create;
-    Comparisons.Append(BndComparisons[0]);
-    Comparisons.Append(BndComparisons[1]);
-    for i := 0 to Comparisons.Count -1 do
-      Comparisons.Exchange(Random(2), i);
-
-    i := ConfigurationFile.TrialCount[1]+1;
-    with ConfigurationFile do
-    begin
-      WriteToTrial(i, _Kind, T_MTS);
-      WriteToTrial(i, _ITI, '9000');
-      WriteToTrial(i, _SampleType, BoolToStr(True));
-      WriteToTrial(i, _Delay, '500');
-
-      WriteToTrial(i, _Samp+_cStm, AppExt(AConPair.B));
-      WriteToTrial(i, _Samp+_cBnd, BndCenter);
-      WriteToTrial(i, _Samp+_cSch, 'FT 2000');
-      WriteToTrial(i, _Samp+_cMsg, AConPair.B + '-' + BndCenter);
-
-      WriteToTrial(i, _NumComp, '1');
-      WriteToTrial(i, _Comp+'1'+_cStm, AppExt(AConPair.A));
-      WriteToTrial(i, _Comp+'1'+_cBnd, BndCenter);
-      WriteToTrial(i, _Comp+'1'+_cSch, 'FT 2000');
-      WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.A + '-' + BndCenter);
-    end;
-  end;
-
   procedure WriteMSGTrial(AMsg : integer);
   var
     M1 : string =
@@ -208,19 +140,19 @@ var
     'Pressione a BARRA DE ESPAÇO no teclado para começar.';
 
     M2 : string =
+    'Agora, nesta parte, você verá um símbolo na parte superior da ' +
+    'tela e DEVERÁ CLICAR NELE. Em seguida, aparecerão dois símbolos ' +
+    'na parte inferior da tela.' +
+    'Você DEVERÁ ESCOLHER CLICANDO DUAS VEZES SOBRE UM DELES. ' +
+    'Pressione a BARRA DE ESPAÇO no teclado para começar.';
+
+    M3 : string =
     'Agora, nesta fase, você verá uma figura na tela que junta dois símbolos. ' +
     'Abaixo dessa figura haverá uma escala com os itens: ' + LineEnding + LineEnding +
     '"Tenho certeza que não vi, Acho que não vi, Não sei, Acho que vi, Tenho certeza que vi". ' + LineEnding + LineEnding +
     'Você DEVERÁ CLICAR SOBRE UM desses itens para indicar o quanto você lembra ' +
     'de ter visto os símbolos da figura na fase anterior, ' +
     'independente da ordem em que os símbolos aparecem. ' +
-    'Pressione a BARRA DE ESPAÇO no teclado para começar.';
-
-    M3 : string =
-    'Agora, nesta parte, você verá um símbolo na parte superior da ' +
-    'tela e DEVERÁ CLICAR NELE. Em seguida, aparecerão dois símbolos ' +
-    'na parte inferior da tela.' +
-    'Você DEVERÁ ESCOLHER CLICANDO SOBRE UM DELES. ' +
     'Pressione a BARRA DE ESPAÇO no teclado para começar.';
   i : integer;
   begin
@@ -235,6 +167,171 @@ var
         2 : WriteToTrial(i, _Msg, M3);
       end;
     end;
+  end;
+
+  procedure WriteSSBloc;
+  var
+    i, j : integer;
+    SSTrials : array [0..5, 0..3] of integer;
+    procedure WriteSSTrial(AConPair : TStmPair);
+    var
+      Comparisons : TStringList;
+      i : integer;
+    begin
+      Comparisons := TStringList.Create;
+      Comparisons.Append(BndComparisons[0]);
+      Comparisons.Append(BndComparisons[1]);
+      for i := 0 to Comparisons.Count -1 do
+        Comparisons.Exchange(Random(2), i);
+
+      i := ConfigurationFile.TrialCount[1]+1;
+      with ConfigurationFile do
+      begin
+        WriteToTrial(i, _Kind, T_MTS);
+        WriteToTrial(i, _ITI, '9000');
+        WriteToTrial(i, _SampleType, BoolToStr(True));
+        WriteToTrial(i, _Delay, '500');
+
+        WriteToTrial(i, _Samp+_cStm, AppExt(AConPair.B));
+        WriteToTrial(i, _Samp+_cBnd, BndCenter);
+        WriteToTrial(i, _Samp+_cSch, 'FT 2000');
+        WriteToTrial(i, _Samp+_cMsg, AConPair.B + '-' + BndCenter);
+
+        WriteToTrial(i, _NumComp, '1');
+        WriteToTrial(i, _Comp+'1'+_cStm, AppExt(AConPair.A));
+        WriteToTrial(i, _Comp+'1'+_cBnd, BndCenter);
+        WriteToTrial(i, _Comp+'1'+_cSch, 'FT 2000');
+        WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.A + '-' + BndCenter);
+      end;
+    end;
+  begin
+    // SS trials
+    WriteMSGTrial(0);
+    for i := Low(SSTrials) to High(SSTrials) do
+      for j := Low(SSTrials[i]) to High(SSTrials[i]) do
+        SSTrials[i, j] := j;
+
+    for i := Low(SSTrials) to High(SSTrials) do
+      for j := Low(SSTrials[i]) to High(SSTrials[i]) do
+        begin
+          r := Random(Length(SSTrials[i]));
+          t := SSTrials[i, r];
+          SSTrials[i, r] := SSTrials[i, j];
+          SSTrials[i, j] := t;
+        end;
+
+    for i := Low(SSTrials) to High(SSTrials) do
+      begin
+        for j := Low(SSTrials[i]) to High(SSTrials[i]) do
+        begin
+          WriteSSTrial(ConsistentPairs[SSTrials[i, j]]);
+          //WriteLn(ConsistentPairs[SSTrials[i, j]].B + ' - '+
+          //ConsistentPairs[SSTrials[i, j]].A);
+
+        end;
+        //WriteLn('');
+      end;
+  end;
+
+  procedure WriteMTSBloc;
+  var
+    i, j : integer;
+    MTSTrials : array [0..2, 0..7] of integer;
+    procedure WriteMTSTrial(AConPair, AIncPair : TStmPair);
+    var
+      Comparisons : TStringList;
+      i : integer;
+    begin
+      Comparisons := TStringList.Create;
+      Comparisons.Append(BndComparisons[0]);
+      Comparisons.Append(BndComparisons[1]);
+      for i := 0 to Comparisons.Count -1 do
+        Comparisons.Exchange(Random(2), i);
+
+      i := ConfigurationFile.TrialCount[1]+1;
+      with ConfigurationFile do
+      begin
+        WriteToTrial(i, _Kind, T_MTS);
+        WriteToTrial(i, _ITI, '6000');
+        WriteToTrial(i, _SampleType, BoolToStr(False));
+        WriteToTrial(i, _Delay, '0');
+
+        WriteToTrial(i, _Samp+_cStm, AppExt(AConPair.A));
+        WriteToTrial(i, _Samp+_cBnd, BndSample);
+        WriteToTrial(i, _Samp+_cSch, 'CRF');
+        WriteToTrial(i, _Samp+_cMsg, AConPair.A);
+
+        WriteToTrial(i, _NumComp, '2');
+        WriteToTrial(i, _Comp+'1'+_cStm, AppExt(AConPair.B));
+        WriteToTrial(i, _Comp+'1'+_cBnd, Comparisons[0]);
+        WriteToTrial(i, _Comp+'1'+_cSch, 'FR 2');
+        WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.B + '-' + Comparisons[0]);
+
+        WriteToTrial(i, _Comp+'2'+_cStm, AppExt(AIncPair.B));
+        WriteToTrial(i, _Comp+'2'+_cBnd, Comparisons[1]);
+        WriteToTrial(i, _Comp+'2'+_cSch, 'FR 2');
+        WriteToTrial(i, _Comp+'2'+_cMsg, AIncPair.B + '-' + Comparisons[1]);
+      end;
+    end;
+  begin
+    // MTS Trials
+    WriteMSGTrial(1);
+    for i := Low(MTSTrials) to High(MTSTrials) do
+      for j := Low(MTSTrials[i]) to High(MTSTrials[i]) do
+        MTSTrials[i, j] := j;
+
+    for i := Low(MTSTrials) to High(MTSTrials) do
+      for j := Low(MTSTrials[i]) to High(MTSTrials[i]) do
+        begin
+          r := Random(Length(MTSTrials[i]));
+          t := MTSTrials[i, r];
+          MTSTrials[i, r] := MTSTrials[i, j];
+          MTSTrials[i, j] := t;
+        end;
+
+    for i := Low(MTSTrials) to High(MTSTrials) do
+    begin
+      for j := Low(MTSTrials[i]) to High(MTSTrials[i]) do
+      begin
+        WriteMTSTrial(
+          ConsistentPairs[MTSTrials[i,j]], InconsistePairs[MTSTrials[i,j]]);
+        //WriteLn(
+        //  ConsistentPairs[MTSTrials[i,j]].A, ' - ',
+        //  ConsistentPairs[MTSTrials[i,j]].B);
+      end;
+      //WriteLn('');
+    end;
+  end;
+
+  procedure WriteLikertBloc;
+  var
+    i : integer;
+  begin
+    // MemoryTest
+    WriteMSGTrial(2);
+    for i := Low(AllPairs) to High(AllPairs) do
+    case i of
+      0..7 : AllPairs[i] := ConsistentPairs[i];
+      8..15: AllPairs[i] := InconsistePairs[i-8];
+    end;
+
+    for i := Low(AllPairs) to High(AllPairs) do
+    begin
+      r := Random(16);
+      StmPair := AllPairs[r];
+      AllPairs[r] := AllPairs[i];
+      AllPairs[i] := StmPair;
+    end;
+
+    with ConfigurationFile do
+      for i := Low(AllPairs) to High(AllPairs) do
+      begin
+        t := ConfigurationFile.TrialCount[1] + 1;
+        WriteToTrial(t, _Kind, T_LIK);
+        WriteToTrial(t, _ITI, '3000');
+        WriteToTrial(t, _Left, AppExt(AllPairs[i].A));
+        WriteToTrial(t, _Right, AppExt(AllPairs[i].B));
+      end;
   end;
 
 begin
@@ -256,78 +353,59 @@ begin
   InconsistePairs[6].A := 'C1'; InconsistePairs[6].B := 'B2';
   InconsistePairs[7].A := 'C2'; InconsistePairs[7].B := 'B1';
 
-  // SS trials
-  WriteMSGTrial(0);
-  for i := Low(SSTrials) to High(SSTrials) do
-    for j := Low(SSTrials[i]) to High(SSTrials[i]) do
-      SSTrials[i, j] := j;
-
-  for i := Low(SSTrials) to High(SSTrials) do
-    for j := Low(SSTrials[i]) to High(SSTrials[i]) do
+  case ACondition of
+    0 :
       begin
-        r := Random(Length(SSTrials[i]));
-        t := SSTrials[i, j];
-        SSTrials[i, r] := SSTrials[i, j];
-        SSTrials[i, j] := t;
+        WriteSSBloc;
+        WriteLikertBloc;
+
+        WriteSSBloc;
+        WriteSSBloc;
+        WriteSSBloc;
+
+        WriteSSBloc;
+        WriteLikertBloc;
+      end;
+    1 :
+      begin
+        WriteSSBloc;
+        WriteLikertBloc;
+
+        WriteSSBloc;
+        WriteMTSBloc;
+
+        WriteSSBloc;
+        WriteMTSBloc;
+
+        WriteSSBloc;
+        WriteMTSBloc;
+
+        WriteSSBloc;
+        WriteLikertBloc;
       end;
 
-  for i := Low(SSTrials) to High(SSTrials) do
-    for j := Low(SSTrials[i]) to High(SSTrials[i]) do
-      WriteSSTrial(ConsistentPairs[SSTrials[i, j]]);
-
-  // MTS Trials
-  WriteMSGTrial(1);
-  for i := Low(MTSTrials) to High(MTSTrials) do
-    for j := Low(MTSTrials[i]) to High(MTSTrials[i]) do
-      MTSTrials[i, j] := j;
-
-  for i := Low(MTSTrials) to High(MTSTrials) do
-    for j := Low(MTSTrials[i]) to High(MTSTrials[i]) do
-      begin
-        r := Random(Length(MTSTrials[i]));
-        t := MTSTrials[i, j];
-        MTSTrials[i, r] := MTSTrials[i, j];
-        MTSTrials[i, j] := t;
-      end;
-
-  for i := Low(MTSTrials) to High(MTSTrials) do
-    for j := Low(MTSTrials[i]) to High(MTSTrials[i]) do
-      WriteMTSTrial(
-        ConsistentPairs[MTSTrials[i,j]], InconsistePairs[MTSTrials[i,j]]);
-
-  // MemoryTest
-  WriteMSGTrial(2);
-  for i := Low(AllPairs) to High(AllPairs) do
-  case i of
-    0..7 : AllPairs[i] := ConsistentPairs[i];
-    8..15: AllPairs[i] := InconsistePairs[i-8];
   end;
-
-  for i := Low(AllPairs) to High(AllPairs) do
-  begin
-    r := Random(16);
-    StmPair := AllPairs[r];
-    AllPairs[r] := AllPairs[i];
-    AllPairs[i] := StmPair;
-  end;
-
-  with ConfigurationFile do
-    for i := Low(AllPairs) to High(AllPairs) do
-    begin
-      t := ConfigurationFile.TrialCount[1] + 1;
-      WriteToTrial(t, _Kind, T_LIK);
-      WriteToTrial(t, _ITI, '3000');
-      WriteToTrial(t, _Left, AppExt(AllPairs[i].A));
-      WriteToTrial(t, _Right, AppExt(AllPairs[i].B));
-    end;
   ConfigurationFile.Invalidate;
   ConfigurationFile.UpdateFile;
 end;
 
 procedure TBackground.ButtonStartClick(Sender: TObject);
+var
+  SessionName : string;
 begin
   ButtonStart.Hide;
+  RadioGroupCondition.Hide;
+  EditParticipant.Hide;
   {$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
+
+  SessionName := RadioGroupCondition.Items[RadioGroupCondition.ItemIndex];
+  FFilename := '000';
+  FHeader := HSUBJECT_NAME + #9 + EditParticipant.Text + LineEnding +
+             HSESSION_NAME + #9 + SessionName + LineEnding +
+             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
+
+  FFilename := GlobalContainer.RootData + DirectorySeparator + FFilename;
+  CreateLogger(LGTimestamps, FFilename, FHeader);
   Play;
 end;
 
@@ -335,6 +413,7 @@ procedure TBackground.InterTrialStopTimer(Sender: TObject);
 var
   CurrentTrial : integer;
   TotalTrials : integer;
+  Footer : string;
 begin
   TotalTrials := ConfigurationFile.TrialCount[1]-1;
   CurrentTrial := GlobalContainer.CounterManager.CurrentTrial;
@@ -344,6 +423,8 @@ begin
   if CurrentTrial > TotalTrials-1 then
   begin
     ShowMessage('Fim.');
+    Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
+    FreeLogger(LGTimestamps,Footer);
     WindowState := wsNormal;
     Exit;
   end;
@@ -353,6 +434,11 @@ end;
 procedure TBackground.InterTrialTimer(Sender: TObject);
 begin
   InterTrial.Enabled := False;
+end;
+
+procedure TBackground.RadioGroupConditionSelectionChanged(Sender: TObject);
+begin
+  MakeConfigurationFile(RadioGroupCondition.ItemIndex);
 end;
 
 procedure TBackground.TrialEnd(Sender: TObject);
@@ -367,6 +453,7 @@ var
   IndTrial: Integer;
   TrialConfig : TCfgTrial;
 begin
+  //Mouse.CursorPos := Random(Screen.Width), Random(Screen.Height);
   IndTrial := GlobalContainer.CounterManager.CurrentTrial;
   TrialConfig := ConfigurationFile.Trial[1, IndTrial+1];
   try
@@ -415,9 +502,6 @@ end;
 {$ENDIF}
 
 var
-  Footer : string;
-  LHeader : string;
-  FFilename : string = '';
   FSessionFile : string;
 
 initialization
@@ -432,23 +516,10 @@ initialization
   ConfigurationFile.Invalidate;
   Randomize;
   RandomizeStimuli;
-  MakeConfigurationFile;
-
-  if (FFilename = #0) or (FFilename = '') then
-    FFilename := '000';
-
-  LHeader := HSUBJECT_NAME + #9 + 'name' + LineEnding +
-             HSESSION_NAME + #9 + 'name' + LineEnding +
-             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
-
-  FFilename := GlobalContainer.RootData + DirectorySeparator + FFilename;
-
-  CreateLogger(LGTimestamps, FFilename, LHeader);
+  MakeConfigurationFile(0);
 
 finalization;
   ConfigurationFile.Free;
-  Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
-  FreeLogger(LGTimestamps,Footer);
 
 end.
 
