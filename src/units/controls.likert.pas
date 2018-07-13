@@ -58,7 +58,7 @@ constructor TLikertScale.Create(AOwner: TComponent; AParent : TWinControl);
 begin
   inherited Create(AOwner);
   OnClick := @ShowConfirmationButton;
-  Parent := TWinControl(AParent);
+  Parent := AParent;
   Items.Append('Tenho certeza que não vi.');
   Items.Append('Acho que não vi.');
   Items.Append('Não sei.');
@@ -79,7 +79,7 @@ begin
   FConfirmationButton.AnchorSide[akBottom].Control := Self;
   FConfirmationButton.Anchors := FConfirmationButton.Anchors - [akTop];
   FConfirmationButton.Anchors := FConfirmationButton.Anchors + [akBottom];
-  FConfirmationButton.Parent := TWinControl(AParent);
+  FConfirmationButton.Parent := AParent;
 
   FTitle := TLabel.Create(Self);
   FTitle.Caption := 'O quanto você lembra desta imagem?';
@@ -88,7 +88,7 @@ begin
   FTitle.Align := alTop;
   FTitle.Layout := tlCenter;
   FTitle.Alignment := taCenter;
-  FTitle.Parent := TWinControl(AParent);
+  FTitle.Parent := AParent;
 
   FImage1 := TKey.Create(Self);
   FImage1.Width := 300;
@@ -98,7 +98,7 @@ begin
   FImage1.Left := (AParent.Width div 3) - (FImage1.Width div 2);
   FImage1.Top := (AParent.Height div 2) - (FImage1.Height div 2);
   FImage1.Show;
-  FImage1.Parent := TWinControl(AParent);
+  FImage1.Parent := AParent;
 
   FImage2 := TKey.Create(Self);
   FImage2.Width := 300;
@@ -108,7 +108,7 @@ begin
   FImage2.Left := AParent.Width - (AParent.Width div 3) - (FImage2.Width div 2);
   FImage2.Top := AParent.Height - (AParent.Height div 2) - (FImage2.Height div 2);
   FImage2.Show;
-  FImage2.Parent := TWinControl(AParent);
+  FImage2.Parent := AParent;
 end;
 
 function TLikertScale.AsString: string;
