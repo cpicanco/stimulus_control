@@ -23,8 +23,10 @@ type
 
   function GetSaveDataProc(ADataLogger: TLoggers): TDataProcedure;
   function GetLogger(ADataLogger: TLoggers) : TRegData;
+  function CreateLogger(ADataLogger: TLoggers;
+    AFilename, AHeader : string) : string;
+
   procedure FreeLogger(ADataLogger: TLoggers; AFooter : string);
-  procedure CreateLogger(ADataLogger: TLoggers; AFilename, AHeader : string);
 
 implementation
 
@@ -58,7 +60,10 @@ begin
     end;
 end;
 
-procedure CreateLogger(ADataLogger: TLoggers; AFilename, AHeader: string);
+function CreateLogger(ADataLogger: TLoggers; AFilename, AHeader: string) : string;
+var
+  LRegData : TRegData;
+
   function Ext(LG : TLoggers): string;
   begin
     case LG of
@@ -73,10 +78,12 @@ procedure CreateLogger(ADataLogger: TLoggers; AFilename, AHeader: string);
     Result.SaveData(AHeader);
   end;
 begin
+  LRegData := RegData;
   case ADataLogger of
-    LGTimestamps: GTimestampLogger := RegData;
-    LGData: GDataLogger := RegData;
+    LGTimestamps: GTimestampLogger := LRegData;
+    LGData: GDataLogger := LRegData;
   end;
+  Result := LRegData.FileName;
 end;
 
 
