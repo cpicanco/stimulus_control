@@ -441,6 +441,7 @@ begin
 
   FDataFile := GlobalContainer.RootData + DirectorySeparator + FDataFile;
   CreateLogger(LGTimestamps, FDataFile, FHeader);
+  GlobalContainer.CounterManager.CurrentTrial:=27;
   Play;
 end;
 
@@ -488,8 +489,6 @@ end;
 
 procedure TBackground.TrialEnd(Sender: TObject);
 begin
-  if Assigned(Trial) then
-    FreeAndNil(Trial);
   InterTrial.Enabled := True;
 end;
 
@@ -498,7 +497,7 @@ var
   IndTrial: Integer;
   TrialConfig : TCfgTrial;
 begin
-  //Mouse.CursorPos := Random(Screen.Width), Random(Screen.Height);
+  if Assigned(Trial) then FreeAndNil(Trial);
   IndTrial := GlobalContainer.CounterManager.CurrentTrial;
   TrialConfig := ConfigurationFile.Trial[1, IndTrial+1];
   try
