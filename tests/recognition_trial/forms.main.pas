@@ -441,15 +441,14 @@ begin
 
   FDataFile := GlobalContainer.RootData + DirectorySeparator + FDataFile;
   CreateLogger(LGTimestamps, FDataFile, FHeader);
-  GlobalContainer.CounterManager.CurrentTrial:=27;
   Play;
 end;
 
 procedure TBackground.FormKeyPress(Sender: TObject; var Key: char);
 begin
-  case key of
-    't' : ShowTrialConsole;
-  end;
+  //case key of
+  //  't' : ShowTrialConsole;
+  //end;
 end;
 
 procedure TBackground.InterTrialStopTimer(Sender: TObject);
