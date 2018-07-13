@@ -27,27 +27,26 @@ type
   TCounterManager = class(TComponent)
   private
   {Current Session}
-    FBkGndResponses : integer;
-    FConsequences : integer;
-    FCorrections : integer;
-    FCscCorrections : integer;
-    FCscHits : integer;
-    FCscMisses : integer;
-    FCscNones : integer;
+    FSessionBackGroundResponses : integer;
+    FSessionConsequences : integer;
+    FSessionCorrections : integer;
+    FSessionCscCorrections : integer;
+    FSessionCscHits : integer;
+    FSessionCscMisses : integer;
+    FSessionCscNones : integer;
+    FSessionHighCscCorrections : integer;
+    FSessionHighCscHits : integer;
+    FSessionHighCscMisses : integer;
+    FSessionHighCscNones : integer;
+    FSessionHits : integer;
+    FSessionMisses : integer;
+    FSessionNones : integer;
+    FSessionStmResponses : integer;
+    FSessionTrials : integer;
+    FSessionVirtualHits : integer;
     FCurrentBlc : integer;
-    FHighCscCorrections : integer;
-    FHighCscHits : integer;
-    FHighCscMisses : integer;
-    FHighCscNones : integer;
-    FHits : integer;
-    FMisses : integer;
-    FNones : integer;
-    FOnBlcRepetition: TNotifyEvent;
-    FStmResponses : integer;
-    FTrials : integer;
-    FBlcTrials : integer;
-    FVirtualHits : integer;
   {Current Blc}
+    FBlcTrials : integer;
     FBlcRepetitions : integer;
     FBlcBkGndResponses : integer;
     FBlcConsequences : integer;
@@ -65,17 +64,18 @@ type
     FBlcMisses : integer;
     FBlcNones : integer;
     FBlcStmResponses : integer;
+    FBlcVirtualHitLoop : integer;
+    FBlcVirtualTrial : integer;
+    FBlcVirtualTrialLoop : integer;
+    FBlcVirtualTrialValue : Integer;
     FCurrentTrial : integer;
-    FVirtualHitLoop : integer;
-    FVirtualTrial : integer;
-    FVirtualTrialLoop : integer;
-    FVirtualTrialValue : Integer;
   {Current Trial}
     FTrialBkGndResponses : integer;
     FTrialStmResponses : integer;
   {Current Stm}
     FStmCounter : integer;
   {Events}
+    FOnBlcRepetition: TNotifyEvent;
     FOnBeginBlc: TNotifyEvent;
     FOnBeginSess: TNotifyEvent;
     FOnBeginTrial: TNotifyEvent;
@@ -115,34 +115,35 @@ type
     procedure SetCurrentTrial(ATrial : integer);
     procedure _VirtualTrialFix;
     procedure SetVirtualTrialValue(Value : integer);
+    property CurrentBlc : integer read FCurrentBlc write FCurrentBlc;
+    property CurrentTrial : integer read FCurrentTrial write SetCurrentTrial;
   {Current Trial}
     property TrialStmResponses  : integer read FTrialStmResponses;
     property TrialBkGndResponses : integer read FTrialBkGndResponses;
   {Current Session}
-    property BkGndResponses : integer read FBkGndResponses;
-    property Consequences : integer read FConsequences;
-    property Corrections : integer read FCorrections;
-    property CscCorrections : integer read FCscCorrections;
-    property CscHits : integer read FCscHits;
-    property CscMisses : integer read FCscMisses;
-    property CscNones : integer read FCscNones;
-    property CurrentBlc : integer read FCurrentBlc write FCurrentBlc;
-    property HighCscCorrections : integer read FHighCscCorrections;
-    property HighCscHits : integer read FHighCscHits;
-    property HighCscMisses : integer read FHighCscMisses;
-    property HighCscNones : integer read FHighCscNones;
-    property Hits : integer read FHits;
-    property Misses : integer read FMisses;
-    property Nones : integer read FNones;
-    property StmResponses : integer read FStmResponses;
-    property Trials : integer read FTrials;
+    property SessionBkGndResponses : integer read FSessionBackGroundResponses;
+    property SessionConsequences : integer read FSessionConsequences;
+    property SessionCorrections : integer read FSessionCorrections;
+    property SessionCscCorrections : integer read FSessionCscCorrections;
+    property SessionCscHits : integer read FSessionCscHits;
+    property SessionCscMisses : integer read FSessionCscMisses;
+    property SessionCscNones : integer read FSessionCscNones;
+    property SessionHighCscCorrections : integer read FSessionHighCscCorrections;
+    property SessionHighCscHits : integer read FSessionHighCscHits;
+    property SessionHighCscMisses : integer read FSessionHighCscMisses;
+    property SessionHighCscNones : integer read FSessionHighCscNones;
+    property SessionHits : integer read FSessionHits;
+    property SessionMisses : integer read FSessionMisses;
+    property SessionNones : integer read FSessionNones;
+    property SessionStmResponses : integer read FSessionStmResponses;
+    property SessionTrials : integer read FSessionTrials;
     property BlcTrials : integer read FBlcTrials;
-    property VirtualHits : integer read FVirtualHits;
+    property SessionVirtualHits : integer read FSessionVirtualHits;
   {Current Blc}
-    property VirtualTrialValue : Integer read FVirtualTrialValue;
-    property VirtualHitLoop : integer read FVirtualHitLoop write FVirtualHitLoop;
-    property VirtualTrialLoop : integer read FVirtualTrialLoop write FVirtualTrialLoop;
-    property VirtualTrial : integer read FVirtualTrial;
+    property BlcVirtualTrialValue : Integer read FBlcVirtualTrialValue;
+    property BlcVirtualHitLoop : integer read FBlcVirtualHitLoop write FBlcVirtualHitLoop;
+    property BlcVirtualTrialLoop : integer read FBlcVirtualTrialLoop write FBlcVirtualTrialLoop;
+    property BlcVirtualTrial : integer read FBlcVirtualTrial;
     property BlcBkGndResponses : integer read FBlcBkGndResponses;
     property BlcStmResponses : integer read FBlcStmResponses;
     property BlcConsequences : integer read FBlcConsequences;
@@ -160,7 +161,6 @@ type
     property BlcCscNones : integer read FBlcCscNones;
     property BlcHighCscNones : integer read FBlcHighCscNones;
     property BlcRepetitions : integer read FBlcRepetitions write FBlcRepetitions;
-    property CurrentTrial : integer read FCurrentTrial write SetCurrentTrial;
   {Each Stm}
     property StmCounter : integer read FStmCounter;
   {Events}
@@ -190,28 +190,28 @@ constructor TCounterManager.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   { Session - 17 }
-  FBkGndResponses := 0;
-  FStmResponses := 0;
-  FConsequences := 0;
-  FCorrections := 0;
-  FCscCorrections := 0;
-  FHighCscCorrections := 0;
-  FHits := 0;
-  FCscHits := 0;
-  FHighCscHits := 0;
-  FMisses := 0;
-  FCscMisses := 0;
-  FHighCscMisses := 0;
-  FNones := 0;
-  FCscNones := 0;
-  FHighCscNones := 0;
-  FTrials := 0;
+  FSessionBackGroundResponses := 0;
+  FSessionStmResponses := 0;
+  FSessionConsequences := 0;
+  FSessionCorrections := 0;
+  FSessionCscCorrections := 0;
+  FSessionHighCscCorrections := 0;
+  FSessionHits := 0;
+  FSessionCscHits := 0;
+  FSessionHighCscHits := 0;
+  FSessionMisses := 0;
+  FSessionCscMisses := 0;
+  FSessionHighCscMisses := 0;
+  FSessionNones := 0;
+  FSessionCscNones := 0;
+  FSessionHighCscNones := 0;
+  FSessionTrials := 0;
   FCurrentBlc := 0;
-  FVirtualHits := 0;
+  FSessionVirtualHits := 0;
   { Blocs - 20 }
-  FVirtualHitLoop := 0;
-  FVirtualTrial := 0;
-  FVirtualTrialLoop := 0;
+  FBlcVirtualHitLoop := 0;
+  FBlcVirtualTrial := 0;
+  FBlcVirtualTrialLoop := 0;
   FBlcBkGndResponses := 0;
   FBlcStmResponses := 0;
   FBlcConsequences := 0;
@@ -229,7 +229,7 @@ begin
   FBlcCscNones := 0;
   FBlcHighCscNones := 0;
   FCurrentTrial := 0;
-{ Trials }
+{ SessionTrials }
   FTrialStmResponses := 0;
 
   { events }
@@ -259,8 +259,8 @@ var
 begin
   if AGlobal then
     begin
-      LHits := Hits;
-      LBaseTrials := Trials;
+      LHits := SessionHits;
+      LBaseTrials := SessionTrials;
     end
   else
     begin
@@ -273,7 +273,7 @@ end;
 procedure TCounterManager.SetCurrentTrial(ATrial: integer);
 begin
   OnNotCorrection(Self);
-  Inc(FTrials);
+  Inc(FSessionTrials);
   Inc(FBlcTrials);
   FTrialBkGndResponses := 0;
   FTrialStmResponses := 0;
@@ -299,22 +299,22 @@ end;
 
 procedure TCounterManager.BkGndResponse(Sender: TObject);
 begin
-  Inc(FBkGndResponses);
+  Inc(FSessionBackGroundResponses);
   Inc(FTrialBkGndResponses);
 end;
 
 procedure TCounterManager.Consequence(Sender: TObject);
 begin
-  Inc(FConsequences);
+  Inc(FSessionConsequences);
   Inc(FBlcConsequences);
 end;
 
 procedure TCounterManager.Correction(Sender: TObject);
 begin
-  Inc(FTrials);
+  Inc(FSessionTrials);
   Inc(FBlcTrials);
-  Inc(FCorrections);
-  Inc(FCscCorrections);
+  Inc(FSessionCorrections);
+  Inc(FSessionCscCorrections);
   Inc(FBlcCorrections);
   Inc(FBlcCscCorrections);
 end;
@@ -326,8 +326,8 @@ end;
 
 procedure TCounterManager.EndBlc(Sender: TObject);
 begin
-  FVirtualHitLoop := 0;
-  FVirtualTrial := 0;
+  FBlcVirtualHitLoop := 0;
+  FBlcVirtualTrial := 0;
   FBlcBkGndResponses := 0;
   FBlcStmResponses := 0;
   FBlcConsequences := 0;
@@ -357,7 +357,7 @@ end;
 
 procedure TCounterManager.EndTrial(Sender: TObject);
 begin
-  Inc(FTrials);
+  Inc(FSessionTrials);
   Inc(FBlcTrials);
   Inc(FCurrentTrial);
   FTrialBkGndResponses := 0;
@@ -372,22 +372,22 @@ end;
 //FVirtualTrialValue é definido pelo usuário e determina o valor máximo do FVirtualTrialLoop
 procedure TCounterManager.Hit(Sender: TObject);
 begin
-  Inc(FVirtualHits);
-  Inc(FVirtualHitLoop);
-  FOnHitResult := FVirtualHitLoop;
+  Inc(FSessionVirtualHits);
+  Inc(FBlcVirtualHitLoop);
+  FOnHitResult := FBlcVirtualHitLoop;
 
-    if FVirtualTrialLoop = FVirtualTrialValue then
+    if FBlcVirtualTrialLoop = FBlcVirtualTrialValue then
     begin
       ///bloco onhit
-      if FVirtualHitLoop = FVirtualTrialValue + 1 then
+      if FBlcVirtualHitLoop = FBlcVirtualTrialValue + 1 then
         begin
-          FVirtualHitLoop := 0;
-          Inc(FHits);              //Contador de corretas na sessão
-          Inc(FCscHits);           //Contador de corretas consecutivas na sessão
+          FBlcVirtualHitLoop := 0;
+          Inc(FSessionHits);              //Contador de corretas na sessão
+          Inc(FSessionCscHits);           //Contador de corretas consecutivas na sessão
           Inc(FBlcHits);           //Contador de corretas no bloco
           Inc(FBlcCscHits);        //Contador de corretas consecutivas do bloco
           Inc(FBlcCsqHits);        //Contador de corretas consecutivas para liberação de consequências
-        end else FVirtualHitLoop := 0;
+        end else FBlcVirtualHitLoop := 0;
        ///
     end;
   //
@@ -396,17 +396,17 @@ begin
   FBlcCscMisses := 0;
   if FBlcCscHits > FBlcHighCscHits then FBlcHighCscHits := FBlcCscHits;
 
-  if FCscMisses > FHighCscMisses then FHighCscMisses := FCscMisses;
-  FCscMisses := 0;
-  if FCscHits > FHighCscHits then FHighCscHits := FCscHits;
+  if FSessionCscMisses > FSessionHighCscMisses then FSessionHighCscMisses := FSessionCscMisses;
+  FSessionCscMisses := 0;
+  if FSessionCscHits > FSessionHighCscHits then FSessionHighCscHits := FSessionCscHits;
 end;
 
 procedure TCounterManager.Miss(Sender: TObject);
 begin
   FBlcCsqHits := 0; //Para a liberação de consequências
-  FVirtualHitLoop := 0;
-  Inc(FMisses);
-  Inc(FCscMisses);
+  FBlcVirtualHitLoop := 0;
+  Inc(FSessionMisses);
+  Inc(FSessionCscMisses);
   Inc(FBlcMisses);
   Inc(FBlcCscMisses);
 
@@ -414,9 +414,9 @@ begin
   FBlcCscHits := 0;
   if FBlcCscMisses > FBlcHighCscMisses then FBlcHighCscMisses := FBlcCscMisses;
 
-  if FCscHits > FHighCscHits then FHighCscHits := FCscHits;
-  FCscHits := 0;
-  if FCscmisses > FHighCscMisses then FHighCscMisses := FCscmisses;
+  if FSessionCscHits > FSessionHighCscHits then FSessionHighCscHits := FSessionCscHits;
+  FSessionCscHits := 0;
+  if FSessionCscMisses > FSessionHighCscMisses then FSessionHighCscMisses := FSessionCscMisses;
 end;
 
 procedure TCounterManager.NotCorrection(Sender : TObject);
@@ -424,19 +424,19 @@ begin
   if FBlcCscCorrections > FBlcHighCscCorrections  then FBlcHighCscCorrections := FBlcCscCorrections;
   FBlcCscCorrections := 0;
 
-  if FCscCorrections > FHighCscCorrections  then FHighCscCorrections := FCscCorrections;
-  FCscCorrections := 0;
+  if FSessionCscCorrections > FSessionHighCscCorrections  then FSessionHighCscCorrections := FSessionCscCorrections;
+  FSessionCscCorrections := 0;
 
-  if FVirtualTrialLoop = FVirtualTrialValue then
+  if FBlcVirtualTrialLoop = FBlcVirtualTrialValue then
     begin
-      FVirtualTrialLoop := 0;
-      Inc(FVirtualTrial);
+      FBlcVirtualTrialLoop := 0;
+      Inc(FBlcVirtualTrial);
 
       //Bloco onhit
     end
   else
     begin
-      Inc(FVirtualTrialLoop);
+      Inc(FBlcVirtualTrialLoop);
     end;
 end;
 
@@ -448,19 +448,19 @@ end;
 
 procedure TCounterManager.CustomNxtTrial(Sender: TObject);
 begin
-  Inc(FTrials);
+  Inc(FSessionTrials);
 end;
 
 procedure TCounterManager.SetVirtualTrialValue(Value: integer);
 begin
   if Value <= 0 then
-    FVirtualTrialValue := 0
-  else FVirtualTrialValue := Value - 1;
+    FBlcVirtualTrialValue := 0
+  else FBlcVirtualTrialValue := Value - 1;
 end;
 
 procedure TCounterManager.StmResponse(Sender: TObject);
 begin
-  Inc(FStmResponses);
+  Inc(FSessionStmResponses);
   Inc(FBlcStmResponses);
   Inc(FTrialStmResponses);
 end;
@@ -473,12 +473,12 @@ end;
 
 procedure TCounterManager._VirtualTrialFix;
 begin
-  if FVirtualTrialValue <= 0 then
+  if FBlcVirtualTrialValue <= 0 then
   else
     begin
-     // ShowMessage('A=' + IntToStr(FVirtualTrialLoop) + #32 + 'B=' + IntToStr(FVirtualTrialValue));
-      Inc(FCurrentTrial,FVirtualTrialValue - FVirtualTrialLoop);
-      FVirtualTrialLoop := FVirtualTrialValue;
+     // ShowMessage('A=' + IntToStr(FBlcVirtualTrialLoop) + #32 + 'B=' + IntToStr(FBlcVirtualTrialValue));
+      Inc(FCurrentTrial,FBlcVirtualTrialValue - FBlcVirtualTrialLoop);
+      FBlcVirtualTrialLoop := FBlcVirtualTrialValue;
     end;
 end;
 

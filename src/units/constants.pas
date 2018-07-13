@@ -211,6 +211,7 @@ const
   T_MTS = 'MTS';
   T_Simple = 'SIMPLE';
   T_LIK = 'LIKERT';
+  T_CLS = 'CLS';
 
   { Schedules }
   T_RR  = 'RR';

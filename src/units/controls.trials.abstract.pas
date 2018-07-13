@@ -492,7 +492,7 @@ begin
   SaveData(TimestampToStr(TickCount - TimeStart) + #9 +
            IntToStr(CounterManager.CurrentBlc+1) + #9 +
            IntToStr(CounterManager.CurrentTrial+1) + #9 +
-           IntToStr(CounterManager.Trials+1) + #9 + // Current trial cycle
+           IntToStr(CounterManager.SessionTrials+1) + #9 + // Current trial cycle
            Configurations.Name + #9 +
            ACode + LineEnding)
 end;
