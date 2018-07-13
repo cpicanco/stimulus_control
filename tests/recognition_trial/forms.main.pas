@@ -434,13 +434,14 @@ begin
   {$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
 
   SessionName := RadioGroupCondition.Items[RadioGroupCondition.ItemIndex];
-  FDataFile := '000';
+  FDataFile := '001';
   FHeader := HSUBJECT_NAME + #9 + EditParticipant.Text + LineEnding +
              HSESSION_NAME + #9 + SessionName + LineEnding +
              HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
 
-  FDataFile := GlobalContainer.RootData + DirectorySeparator + FDataFile;
-  CreateLogger(LGTimestamps, FDataFile, FHeader);
+  FDataFile := GlobalContainer.RootData + FDataFile;
+  FDataFile := CreateLogger(LGTimestamps, FDataFile, FHeader);
+  CopyFile(FSessionFile, ExtractFileNameWithoutExt(FDataFile)+'.ini');
   Play;
 end;
 
@@ -461,13 +462,11 @@ begin
   TotalTrials := ConfigurationFile.TrialCount[1]-1;
   CurrentTrial := GlobalContainer.CounterManager.CurrentTrial;
   GlobalContainer.CounterManager.CurrentTrial:= CurrentTrial+1;
-
   if CurrentTrial > TotalTrials-1 then
   begin
     ShowMessage('Fim.');
     Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
     FreeLogger(LGTimestamps,Footer);
-    CopyFile(FSessionFile, ExtractFileNameWithoutExt(FDataFile)+'.ini');
     WindowState := wsNormal;
     Exit;
   end;
