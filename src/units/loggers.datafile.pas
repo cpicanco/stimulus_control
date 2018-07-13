@@ -68,28 +68,28 @@ var
   FilePath, LExtension: string;
 begin
   if AFileName <> '' then
-      begin
-        ForceDirectoriesUTF8(ExtractFilePath(AFilename));
-        FilePath := ExtractFilePath(AFilename);
-        LExtension := ExtractFileExt(AFilename);
-        i := 0;
+    begin
+      ForceDirectoriesUTF8(ExtractFilePath(AFilename));
+      FilePath := ExtractFilePath(AFilename);
+      LExtension := ExtractFileExt(AFilename);
+      i := 0;
 
-        // ensure to never override an exinting file
-        while FileExistsUTF8(AFilename) do begin
-          Inc(i);
-          AFilename := FilePath + StringOfChar(#48, 3 - Length(IntToStr(i))) + IntToStr(i) + LExtension;
-        end;
+      // ensure to never override an exinting file
+      while FileExistsUTF8(AFilename) do begin
+        Inc(i);
+        AFilename := FilePath + StringOfChar(#48, 3 - Length(IntToStr(i))) + IntToStr(i) + LExtension;
+      end;
 
-        FSessionNumber := i;
+      FSessionNumber := i;
 
-        // as override is impossible, don't mind about an Assign/Rewrite conditional
-        System.Assign(FFile, AFilename);
-        System.Rewrite(FFile);
-        {$ifdef DEBUG}
-          WriteLn(FFile, mt_Debug + 'Saving data to:' + AFilename );
-        {$endif}
-        Result := AFilename;
-     end;
+      // as override is impossible, don't mind about an Assign/Rewrite conditional
+      System.Assign(FFile, AFilename);
+      System.Rewrite(FFile);
+      {$ifdef DEBUG}
+        WriteLn(FFile, mt_Debug + 'Saving data to:' + AFilename );
+      {$endif}
+      Result := AFilename;
+   end;
 end;
 
 constructor TRegData.Create(AOwner: TComponent; AFileName: String);
@@ -112,6 +112,7 @@ end;
 procedure TRegData.SaveData(AData: string);
 begin
   Write(FFile, AData);
+  System.Flush(FFile);
 end;
 
 procedure TRegData.SaveLine(ALine: string);
