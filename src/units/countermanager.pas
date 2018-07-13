@@ -112,6 +112,7 @@ type
   public
     constructor Create (AOwner : TComponent); override;
     function HitPorcentage(AGlobal : Boolean = False) : integer;
+    procedure SetCurrentTrial(ATrial : integer);
     procedure _VirtualTrialFix;
     procedure SetVirtualTrialValue(Value : integer);
   {Current Trial}
@@ -159,7 +160,7 @@ type
     property BlcCscNones : integer read FBlcCscNones;
     property BlcHighCscNones : integer read FBlcHighCscNones;
     property BlcRepetitions : integer read FBlcRepetitions write FBlcRepetitions;
-    property CurrentTrial : integer read FCurrentTrial write FCurrentTrial;
+    property CurrentTrial : integer read FCurrentTrial write SetCurrentTrial;
   {Each Stm}
     property StmCounter : integer read FStmCounter;
   {Events}
@@ -267,6 +268,17 @@ begin
       LBaseTrials := BlcTrials;
     end;
   Result := (LHits*100) div LBaseTrials;
+end;
+
+procedure TCounterManager.SetCurrentTrial(ATrial: integer);
+begin
+  OnNotCorrection(Self);
+  Inc(FTrials);
+  Inc(FBlcTrials);
+  FTrialBkGndResponses := 0;
+  FTrialStmResponses := 0;
+
+  FCurrentTrial := ATrial;
 end;
 
 procedure TCounterManager.BeginBlc(Sender: TObject);

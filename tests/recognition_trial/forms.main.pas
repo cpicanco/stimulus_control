@@ -18,6 +18,7 @@ type
     RadioGroupCondition: TRadioGroup;
     InterTrial: TTimer;
     procedure ButtonStartClick(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure InterTrialStopTimer(Sender: TObject);
     procedure InterTrialTimer(Sender: TObject);
     procedure RadioGroupConditionSelectionChanged(Sender: TObject);
@@ -25,6 +26,7 @@ type
   private
     FHeader : string;
     procedure Play;
+    procedure ShowTrialConsole;
   public
     {$IFDEF WINDOWS}
     OriginalBounds: TRect;
@@ -442,6 +444,13 @@ begin
   Play;
 end;
 
+procedure TBackground.FormKeyPress(Sender: TObject; var Key: char);
+begin
+  case key of
+    't' : ShowTrialConsole;
+  end;
+end;
+
 procedure TBackground.InterTrialStopTimer(Sender: TObject);
 var
   CurrentTrial : integer;
@@ -451,8 +460,7 @@ var
 begin
   TotalTrials := ConfigurationFile.TrialCount[1]-1;
   CurrentTrial := GlobalContainer.CounterManager.CurrentTrial;
-  GlobalContainer.CounterManager.OnNotCorrection(Sender);
-  GlobalContainer.CounterManager.OnTrialEnd(Sender);
+  GlobalContainer.CounterManager.CurrentTrial:= CurrentTrial+1;
 
   if CurrentTrial > TotalTrials-1 then
   begin
@@ -511,8 +519,23 @@ begin
     Trial.Configurations := TrialConfig;
     Trial.OnTrialEnd := @TrialEnd;
     Trial.Play;
+    Cursor := Trial.Cursor;
   finally
     TrialConfig.SList.Free;
+  end;
+end;
+
+procedure TBackground.ShowTrialConsole;
+var
+  LNextTrial : string;
+  LNextTrialI : integer;
+begin
+  LNextTrial := InputBox('Trial Console', 'Insert the Next Trial', '-');
+  LNextTrialI := StrToIntDef(LNextTrial, -1);
+  if LNextTrialI <> -1 then
+  begin
+    while Trial = nil do Application.ProcessMessages;
+    GlobalContainer.CounterManager.CurrentTrial := LNextTrialI;
   end;
 end;
 
