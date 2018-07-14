@@ -14,8 +14,9 @@ unit Controls.Trials.MatchingToSample;
 interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls
-
-  , Controls.Trials.SimpleDiscrimination
+  , Controls.Trials.Abstract
+  , Controls.Trials.Helpers
+  , Controls.Stimuli.Key
   //, interface_plp
   ;
 
@@ -27,9 +28,26 @@ type
     SampBkndRespCount,
     DelaBkndRespCount : integer;
     SampLatency,
-    SampleBegin,
-    Delay_Begin : Extended;
+    SampleShow,
+    SampleHide : Extended;
     //SampleMsg : string
+  end;
+
+  TKeySupport = record
+    Key : TKey; // response key
+    Csq : BYTE; // PLP consequence
+    Usb : string; // USB consequence
+    Msg : string; // Report Message
+    Nxt : string; // Next Trial
+    Res : string; // Trial Result: MISS, NONE or HIT.
+    IET : string; // Intertrial interval
+    TO_ : Integer; // Timeout consequence
+  end;
+
+  TConsequenceSupport = record
+    ReportMessage,
+    Rs232Code : string;
+    PLPCode : BYTE;
   end;
 
 
@@ -43,23 +61,37 @@ type
     Successive and Simultaneous
     With or Without delay
   }
-  TMTS = Class(TSimpl)
+  TMTS = class sealed(TTrial)
   private
     FSampleType : TSampleType;
     FDelay : TTimer;
     FSample : TKeySupport;
     FSDataSupport : TSampleDataSupport;
-    procedure BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+    procedure SampleBackgroundMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure DelayEnd(Sender: TObject);
     procedure SampleConsequence(Sender: TObject);
     procedure SampleResponse(Sender: TObject);
-    procedure TrialBeforeEnd(Sender: TObject);
     procedure VisibleSample(AValue: Boolean);
+  private
+    FDataSupport : TDataSupport;
+    FConsequence : TConsequenceSupport;
+    //FConsequenceFired : Boolean;
+    FNumComp : Integer;
+    FComparisons : array of TKeySupport;
+    procedure ComparBackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure ComparisonConsequence(Sender : TObject);
+    procedure ComparisonResponse(Sender : TObject);
+    procedure ComparisonStart(Sender: TObject);
+    procedure VisibleComparisons(AValue: Boolean);
+  private
+    procedure TrialBeforeEnd(Sender: TObject);
+    procedure TrialResult(Sender: TObject);
     function GetHeader : string;
   protected
     // TTrial
-    procedure TrialStart(Sender: TObject); override;
+    procedure TrialStart(Sender: TObject);
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TCustomControl); override;
@@ -69,7 +101,7 @@ type
 
 implementation
 
-uses strutils, constants, timestamps, Controls.Stimuli.Key
+uses StrUtils, Constants, Timestamps
   , Session.ConfigurationFile
   ;
 
@@ -78,12 +110,13 @@ begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialStart := @TrialStart;
-
+  Header := Header + #9 + GetHeader;
   FDelay := nil;
 end;
 
 procedure TMTS.Play(ACorrection : Boolean);
 var
+  i : integer;
   s1: string;
   R: TRect;
   LDelayed : Boolean;
@@ -93,37 +126,37 @@ begin
   inherited Play(ACorrection);
   LParameters := Configurations.SList;
   with FSample do
-    begin
-      // Owner is TGraphicControl
-      Key:= TKey.Create(Self);
-      Key.Cursor:= Self.Cursor;
-      Key.OnConsequence:= @SampleConsequence;
-      Key.OnResponse:= @SampleResponse;
+  begin
+    // Owner is TGraphicControl
+    Key:= TKey.Create(Self);
+    Key.Cursor:= Self.Cursor;
+    Key.OnConsequence:= @SampleConsequence;
+    Key.OnResponse:= @SampleResponse;
 
-      // Parent is TCustomControl/TForm
-      Key.Parent:= Self.Parent;
+    // Parent is TCustomControl/TForm
+    Key.Parent:= Self.Parent;
 
-      // BND
-      s1:= LParameters.Values[_Samp + _cBnd];
-      R.Top:= StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
-      R.Left:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
-      R.Right:= StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
-      R.Bottom:= StrToIntDef(ExtractDelimited(4,s1,[#32]),100);
-      Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
+    // BND
+    s1:= LParameters.Values[_Samp + _cBnd];
+    R.Top:= StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
+    R.Left:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
+    R.Right:= StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
+    R.Bottom:= StrToIntDef(ExtractDelimited(4,s1,[#32]),100);
+    Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
-      // STM
-      s1:= LParameters.Values[_Samp + _cStm] + #32;
-      Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);  // must be set before fullpath
-      Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]),$0000FF);
-      Key.Filename:= RootMedia + ExtractDelimited(1,s1,[#32]);
+    // STM
+    s1:= LParameters.Values[_Samp + _cStm] + #32;
+    Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);  // must be set before fullpath
+    Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]),$0000FF);
+    Key.Filename:= RootMedia + ExtractDelimited(1,s1,[#32]);
 
-      // SCH
-      Key.Schedule.Load(LParameters.Values[_Samp + _cSch]);
-      AddToClockList(Key.Schedule);
+    // SCH
+    Key.Schedule.Load(LParameters.Values[_Samp + _cSch]);
+    Key.Schedule.Enabled := False;
 
-      // MSG
-      Msg:= LParameters.Values[_Samp + _cMsg];
-    end;
+    // MSG
+    Msg:= LParameters.Values[_Samp + _cMsg];
+  end;
 
   // DELAY
   LDelayed := StrToBoolDef(LParameters.Values[_SampleType], False);
@@ -141,11 +174,47 @@ begin
     FDelay.Interval:= LDelay;
   end;
 
+  FNumComp := StrToIntDef(LParameters.Values[_NumComp], 0);
+  SetLength(FComparisons, FNumComp);
+  for i := Low(FComparisons) to High(FComparisons) do
+  with FComparisons[i] do
+  begin
+    // Owner is TGraphicControl
+    Key := TKey.Create(Self);
+    Key.Tag := i;
+    Key.Cursor := Self.Cursor;
+
+    s1 := LParameters.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
+    R.Top := StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
+    R.Left := StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
+    R.Bottom := StrToIntDef(ExtractDelimited(3,s1,[#32]),100);
+    R.Right := StrToIntDef(ExtractDelimited(4,s1,[#32]),100);
+    Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
+
+    s1 := LParameters.Values[_Comp + IntToStr(i + 1) + _cStm] + #32;
+    Key.Filename := RootMedia + ExtractDelimited(1,s1,[#32]);
+
+    Key.Schedule.Load(LParameters.Values[_Comp + IntToStr(i + 1) + _cSch]);
+    Key.Schedule.Enabled := False;
+
+    Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
+    Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]), $0000FF); //clRed
+
+    Csq := StrToIntDef(LParameters.Values[_Comp + IntToStr(i + 1) + _cCsq], 0);
+    Usb := LParameters.Values[_Comp+IntToStr(i+1)+_cUsb];
+    Msg := LParameters.Values[_Comp + IntToStr(i + 1) + _cMsg];
+    Res := LParameters.Values[_Comp + IntToStr(i + 1) + _cRes];
+    Nxt := LParameters.Values[_Comp + IntToStr(i + 1) + _cNxt];
+    TO_ := StrToIntDef(LParameters.Values[_Comp + IntToStr(i + 1) + _cTO], 0);
+    IET := LParameters.Values[_Comp + IntToStr(I + 1) + _cIET];
+  end;
+
   if Self.ClassType = TMTS then Config(Self);
 end;
 
 function TMTS.AsString: string;
 var
+  i : integer;
   LTrial : TStringList;
 begin
   LTrial := TStringList.Create;
@@ -172,7 +241,20 @@ begin
     LTrial.Values[_Samp + _cSch] := Key.Schedule.AsString;
     LTrial.Values[_Samp + _cMsg] := Msg;
   end;
-  LTrial.Append(inherited AsString);
+
+  LTrial.Values[_NumComp] := IntToStr(Length(FComparisons));
+  for i := Low(FComparisons) to High(FComparisons) do
+  with FComparisons[i] do
+  begin
+    LTrial.Values[_Comp + IntToStr(i + 1) + _cSch] := Key.Schedule.AsString;
+    LTrial.Values[_Comp + IntToStr(i + 1) + _cBnd] := Key.BoundsAsString;
+    LTrial.Values[_Comp + IntToStr(i + 1) + _cStm] := ExtractFileName(Key.Filename);
+    LTrial.Values[_Comp + IntToStr(i + 1) + _cMsg] := Msg;
+    LTrial.Values[_Comp + IntToStr(i + 1) + _cRes] := Res;
+    LTrial.Values[_Comp + IntToStr(i + 1) + _cNxt] := Nxt;
+    LTrial.Values[_Comp + IntToStr(i + 1) + _cIET] := IET;
+  end;
+
   LTrial.EndUpdate;
   Result := LTrial.Text;
   LTrial.Free;
@@ -181,31 +263,72 @@ end;
 procedure TMTS.DelayEnd(Sender: TObject);
 begin
   FDelay.Enabled:= False;
-  inherited TrialStart(Sender);
+  ComparisonStart(Sender);
 end;
 
 procedure TMTS.SampleConsequence(Sender: TObject);
 begin
+  if Assigned(FSample.Key.OnConsequence) then
+  begin
+    FSample.Key.OnConsequence := nil;
+    FSample.Key.Schedule.Enabled := False;
+  end;
   case FSampleType of
-    sampSimultaneous: { do nothing };
+    sampSimultaneous:
+      if Assigned(FDelay) then
+      begin
+        FDelay.Enabled := True;
+        FSDataSupport.SampleHide := TickCount - TimeStart;
+      end;
+
     sampSuccessive:
       begin
         if FSample.Key.Kind.stmAudio then
           FSample.Key.Stop;
-        VisibleSample(False);
+        if Assigned(FDelay) then
+        begin
+          FDelay.Enabled := True;
+          VisibleSample(False);
+        end else
+        begin
+          ComparisonStart(Sender);
+        end;
       end;
   end;
+end;
 
-  if Assigned(FSample.Key.OnConsequence) then
-  begin
-    FSample.Key.OnConsequence := nil;
-    if Assigned(FDelay) then
+procedure TMTS.ComparisonConsequence(Sender: TObject);
+var
+{$IFDEF RS232}i: PtrInt;{$ENDIF}
+  i: Integer;
+begin
+  //if not FConsequenceFired then
+  //  FConsequenceFired := True;
+
+  {$IFDEF RS232}
+  if Sender is TKey then
     begin
-      FDelay.Enabled := True;
-      FSDataSupport.Delay_Begin := TickCount;
-    end else
-      inherited TrialStart(Sender);
+      i := TKey(Sender).Tag;
+      FConsequence.PLPCode:= FComparisons[i].Csq;
+      FConsequence.RS232Code := FComparisons[i].Usb;
+      Dispenser(FConsequence.PLPCode, FConsequence.RS232Code);
+    end;
+  {$ENDIF}
+
+  //CounterManager.OnConsequence(Sender);
+  //if Assigned(OnConsequence) then OnConsequence(Sender);
+  if LimitedHold = 0 then
+  begin
+    VisibleComparisons(False);
+    for i := Low(FComparisons) to High(FComparisons) do
+    with FComparisons[i] do
+    begin
+      Key.OnConsequence := nil;
+      Key.OnResponse := nil;
+      Key.Schedule.Enabled := False;
+    end;
   end;
+  EndTrial(Sender);
 end;
 
 procedure TMTS.SampleResponse(Sender: TObject);
@@ -226,13 +349,47 @@ begin
       end;
 end;
 
+procedure TMTS.ComparisonResponse(Sender: TObject);
+var
+  LResponseTime : Extended;
+begin
+  if Sender is TKey then
+    if TKey(Sender).Visible then
+      begin
+        LResponseTime := LogEvent(FComparisons[TKey(Sender).Tag].Msg + #9 +
+                                  TKey(Sender).LastResponseLog);
+
+        if FDataSupport.Latency = TimeStart then
+          FDataSupport.Latency := LResponseTime;
+
+        if Assigned(OnStmResponse) then OnStmResponse (Self);
+      end;
+end;
+
 procedure TMTS.VisibleSample(AValue: Boolean);
 begin
   FSample.Key.Visible := AValue;
   if FSample.Key.Visible then
-    LogEvent('Sample.Show,'+FSample.Msg)
+    FSDataSupport.SampleShow := LogEvent('Sample.Show,'+FSample.Msg)
   else
-    LogEvent('Sample.Hide,'+FSample.Msg);
+    FSDataSupport.SampleHide := LogEvent('Sample.Hide,'+FSample.Msg);
+end;
+
+procedure TMTS.VisibleComparisons(AValue: Boolean);
+var
+  i : integer;
+  CmpMsg : string = '';
+begin
+  for i := Low(FComparisons) to High(FComparisons) do
+    CmpMsg := CmpMsg + FComparisons[I].Msg + ',';
+
+  for i := Low(FComparisons) to High(FComparisons) do
+    FComparisons[i].Key.Visible := AValue;
+
+  if AValue then
+    FDataSupport.StmBegin := LogEvent('Comparisons.Show,'+ CmpMsg)
+  else
+    FDataSupport.StmEnd := LogEvent('Comparisons.Hide,'+ CmpMsg);
 end;
 
 function TMTS.GetHeader: string;
@@ -241,12 +398,14 @@ begin
             rsReportRspModLat + #9 +
             rsReportStmModBeg + #9 +
             rsReportStmModEnd + #9 +
-            rsReportStmModDur + #9 +
-            rsReportStmModDel + #9 +
-            rsReportRspModFrq + #9 + #9 + #9;
+            rsReportStmCmp + #9 +
+            rsReportRspCmp + #9 +
+            rsReportRspCmpLat + #9 +
+            rsReportStmCmpBeg + #9 +
+            rsReportStmCmpEnd;
 end;
 
-procedure TMTS.BackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+procedure TMTS.SampleBackgroundMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
   aStimulus : string;
@@ -267,36 +426,74 @@ begin
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;
 
+procedure TMTS.ComparBackgroundMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  LogEvent('BK.C' + #9 + IntToStr(X) + #9 + IntToStr(Y));
+  //Inc(FDataSupport.BackgroundResponses); // local
+  //CounterManager.OnBkgndResponse(Self); // global
+  if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
+end;
+
 procedure TMTS.TrialStart(Sender: TObject);
 begin
   FSDataSupport.SampLatency := TimeStart;
-  FSDataSupport.SampleBegin := TickCount;
+  FSDataSupport.SampleShow := TickCount;
   VisibleSample(True);
-  VisibleComparisons(False);
 
+  FSample.Key.Schedule.Enabled := True;
   if FSample.Key.Kind.stmAudio then
     FSample.Key.Play;
 
   // todo: video autostart?
   // if FSample.Key.Kind.stmImage = stmVideo then
   //   FSample.Key.Play;
-
-  OnMouseDown := @BackgroundMouseDown;
+  case FSampleType of
+    sampSimultaneous :
+      if not Assigned(FDelay) then
+        ComparisonStart(Sender)
+      else
+        OnMouseDown := @SampleBackgroundMouseDown;
+    sampSuccessive : OnMouseDown := @SampleBackgroundMouseDown;
+  end;
 end;
 
+procedure TMTS.ComparisonStart(Sender: TObject);
+var
+  i: Integer;
+begin
+  with FDataSupport do
+  begin
+    Latency := TimeStart;
+    StmEnd := TimeStart;
+  end;
+  for i := Low(FComparisons) to High(FComparisons) do
+  with FComparisons[i] do
+  begin
+    Key.OnConsequence := @ComparisonConsequence;
+    Key.OnResponse := @ComparisonResponse;
+    // Parent is TCustomControl/TForm
+    Key.Parent := Self.Parent;
+    Key.Schedule.Enabled := True;
+  end;
+  VisibleComparisons(True);
+  OnMouseDown := @ComparBackgroundMouseDown;
+end;
 
 procedure TMTS.WriteData(Sender: TObject);
 var
   Pos_Mod : string = '';
   Lat_Mod : string = '';
-  Dur_Mod : string = '';
   Atr_Mod : string = '';
-  Frq_Mod : string = '';
-  End_Mod : string = '';
   Beg_Mod : string = '';
+  Pos_Cmp : string = '';
+  Lat_Cmp : string = '';
+  Res_Cmp : string = '';
+  End_Cmp: string = '';
+  Beg_Cmp: string = '';
+  i: Integer;
 begin
   inherited WriteData(Sender);
-  Header := Header + #9 + GetHeader;
   case FSample.Msg of
     '','AUTO':Pos_Mod:= FSample.Key.ShortName+' - '+'('+IntToStr(FSample.Key.Top)+','+IntToStr(FSample.Key.Left)+')';
     else
@@ -307,42 +504,91 @@ begin
     Lat_Mod := #32#32#32#32#32#32 + 'NA'
   else Lat_Mod := TimestampToStr(FSDataSupport.SampLatency - TimeStart);
 
-  case FSampleType of
-    sampSuccessive:
-      Dur_Mod := TimestampToStr(FSDataSupport.Delay_Begin - FSDataSupport.SampleBegin);
-    sampSimultaneous:
-      Dur_Mod := TimestampToStr(TickCount - FSDataSupport.SampleBegin);
-  end;
 
   if Assigned(FDelay) then
-    Atr_Mod := TimestampToStr(FSDataSupport.Delay_Begin - TimeStart)
+    Atr_Mod := TimestampToStr(FSDataSupport.SampleHide)
   else
     Atr_Mod := #32#32#32#32#32#32 + 'NA';
 
-  Frq_Mod := _Samp + '=' +
-             IntToStr(FSample.Key.ResponseCount) + #9 +
-             'BK.S='+ IntToStr(FSDataSupport.SampBkndRespCount) + #9 +
-             'BK.D='+ IntToStr(FSDataSupport.DelaBkndRespCount);
+  //Frq_Mod := _Samp + '=' +
+  //           IntToStr(FSample.Key.ResponseCount) + #9 +
+  //           'BK.S='+ IntToStr(FSDataSupport.SampBkndRespCount) + #9 +
+  //           'BK.D='+ IntToStr(FSDataSupport.DelaBkndRespCount);
 
-  Beg_Mod := TimestampToStr(FDataSupport.StmBegin - TimeStart);
-  End_Mod := TimestampToStr(FDataSupport.StmEnd - TimeStart);
+  Beg_Mod := TimestampToStr(FSDataSupport.SampleShow);
 
-  Data := Data + #9 +
+  // comparisons
+  for i:= Low(FComparisons) to High(FComparisons) do
+  begin
+    if FComparisons[i].Msg = '' then FComparisons[i].Msg:= '-';
+    Pos_Cmp:= Pos_Cmp + FComparisons[i].Msg + #32;
+  end;
+
+  if FConsequence.ReportMessage = '' then FConsequence.ReportMessage := '-';
+  Res_Cmp:= FConsequence.ReportMessage;
+
+  if FDataSupport.Latency = TimeStart then
+    Lat_Cmp := #32#32#32#32#32#32 + 'NA'
+  else
+    Lat_Cmp := TimestampToStr(FDataSupport.Latency);
+
+  //Disp:= RightStr(IntToBin(FConsequence.PLPCode, 9)+#0, 8);
+  //uDisp := FConsequence.RS232Code;
+  Beg_Cmp := TimestampToStr(FDataSupport.StmBegin);
+  End_Cmp := TimestampToStr(FDataSupport.StmEnd);
+
+  Data := Data +
           Pos_Mod + #9 +
           Lat_Mod + #9 +
           Beg_Mod + #9 +
-          End_Mod + #9 +
-          Dur_Mod + #9 +
           Atr_Mod + #9 +
-          Frq_Mod;
 
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+          Pos_Cmp + #9 +
+          Res_Cmp + #9 +
+          Lat_Cmp + #9 +
+          Beg_Cmp + #9 +
+          End_Cmp;
 end;
 
 procedure TMTS.TrialBeforeEnd(Sender: TObject);
 begin
   TrialResult(Sender);
-  WriteData(Sender);
+  WriteData(Self);
+end;
+
+procedure TMTS.TrialResult(Sender: TObject);
+var i : integer;
+begin
+  FDataSupport.StmEnd := TickCount - TimeStart;
+  FResponseEnabled:= False;
+
+  if Sender is TKey then
+    begin
+      i := TKey(Sender).Tag;
+      TimeOut := FComparisons[i].TO_;
+      IETConsequence := FComparisons[i].IET;
+
+      case FComparisons[i].Res of
+        T_HIT : Result := T_HIT;
+        T_MISS : Result := T_MISS;
+      else
+        Result := T_NONE;
+      end;
+
+      if FComparisons[i].Nxt = T_CRT then
+        NextTrial := T_CRT
+      else
+        NextTrial := FComparisons[i].Nxt;
+
+      case FComparisons[i].Msg of
+        '','AUTO' :
+          FConsequence.ReportMessage := TKey(Sender).ShortName+' - ' +
+                                       '('+IntToStr(TKey(Sender).Top) +
+                                       ','+IntToStr(TKey(Sender).Left)+')';
+        else
+          FConsequence.ReportMessage:= FComparisons[i].Msg;
+      end;
+    end;
 end;
 
 end.

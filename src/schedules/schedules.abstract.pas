@@ -119,6 +119,9 @@ begin
       StartClock;
     end else
       StopClock;
+  end else
+  begin
+    if AValue then Reset;
   end;
 end;
 

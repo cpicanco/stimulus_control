@@ -9,7 +9,6 @@ uses
   , Controls
   , Controls.Likert
   , Controls.Trials.Abstract
-  , Controls.Trials.Helpers
   ;
 
 type
@@ -21,16 +20,24 @@ type
     Right : string;
   end;
 
+  TDataLine = record
+    BackgroundResponses,
+    Responses : integer;
+    Latency,
+    StmBegin,
+    StmEnd : Extended;
+    LikertScale : string;
+  end;
+
   { TLikert }
 
   TLikert = class(TTrial)
   private
-    FDataSupport : TDataSupport;
+    FDataLine : TDataLine;
     FLikertScale : TLikertScale;
     procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialStart(Sender: TObject);
-    procedure LikertScaleSelectionChange(Sender: TObject);
-    procedure LikertScaleConfirmation(Sender: TObject);
+    procedure LikertScaleClick(Sender: TObject);
   protected
     procedure WriteData(Sender: TObject); override;
   public
@@ -50,41 +57,32 @@ uses Constants, Timestamps, Session.ConfigurationFile;
 
 procedure TLikert.TrialBeforeEnd(Sender: TObject);
 begin
-  FDataSupport.StmEnd := TickCount;
+  FDataLine.StmEnd := TickCount;
   WriteData(Self);
 end;
 
 procedure TLikert.TrialStart(Sender: TObject);
 begin
   FLikertScale.Show;
-  FDataSupport.StmBegin := TickCount;
+  FDataLine.StmBegin := TickCount;
 end;
 
-procedure TLikert.LikertScaleSelectionChange(Sender: TObject);
+procedure TLikert.LikertScaleClick(Sender: TObject);
 begin
-  LogEvent('selection_change,' + FLikertScale.AsString);
-end;
-
-procedure TLikert.LikertScaleConfirmation(Sender: TObject);
-begin
-  LogEvent('confirmation,' + FLikertScale.AsString);
-  FDataSupport.Latency := TickCount;
+  FDataLine.Latency := LogEvent('LikertScaleClick,' + FLikertScale.AsString);
+  FDataLine.LikertScale := FLikertScale.AsString;
   EndTrial(Sender);
 end;
 
 procedure TLikert.WriteData(Sender: TObject);
-var LStart, LDuration, LLatency : string;
+var LStart, LDuration : string;
 begin
   inherited WriteData(Sender);
-  LStart := TimestampToStr(FDataSupport.StmBegin - TimeStart);
-  LDuration := TimestampToStr(FDataSupport.StmEnd - TimeStart);
-  LLatency := TimestampToStr(FDataSupport.Latency - TimeStart);
+  LStart := TimestampToStr(FDataLine.StmBegin - TimeStart);
   Data := Data +
     LStart + #9 +
-    LDuration + #9 +
-    LLatency + #9 +
-    FLikertScale.AsString;
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
+    TimestampToStr(FDataLine.Latency) + #9 +
+    FDataLine.LikertScale;
 end;
 
 constructor TLikert.Create(AOwner: TCustomControl);
@@ -93,12 +91,10 @@ begin
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialStart := @TrialStart;
   FLikertScale := TLikertScale.Create(Self, Self.Parent);
-  FLikertScale.OnConfirmation := @LikertScaleConfirmation;
-  FLikertScale.OnSelectionChanged := @LikertScaleSelectionChange;
+  FLikertScale.OnClick := @LikertScaleClick;
   Header :=
     Header + #9 +
     rsReportStmBeg + #9 +
-    rsReportStmDur + #9 +
     rsReportRspLat + #9 +
     rsReportEvent;
 

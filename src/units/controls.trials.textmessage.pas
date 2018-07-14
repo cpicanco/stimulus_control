@@ -111,6 +111,7 @@ function TMessageTrial.AsString: string;
 begin
   Result := '';
 end;
+
 //
 //procedure TMessageTrial.MessageMouseUp(Sender: TObject; Button: TMouseButton;
 //  Shift: TShiftState; X, Y: Integer);
@@ -151,7 +152,7 @@ end;
 procedure TMessageTrial.Play(ACorrection : Boolean);
 var
   LFontColor : Integer;
-  LAudioFile : string;
+  {$IFDEF AUDIO}LAudioFile : string;{$ENDIF}
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
@@ -210,7 +211,6 @@ begin
   aDuration := TimestampToStr(FDataSupport.StmEnd - TimeStart);
 
   Data := Data + aStart + #9 + aDuration + #9 + FMessage.Caption;
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
 end;
 
 end.

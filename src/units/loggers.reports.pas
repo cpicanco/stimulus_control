@@ -17,6 +17,9 @@ uses Loggers.DataFile, Session.Configuration;
 
 type
 
+  { TDataProcedure }
+  TDataProcedure = procedure (S : string) of object;
+
   // LGData have blc, trial data.
   // LGTimestamps for stm and response data.
   TLoggers = (LGData, LGTimestamps);

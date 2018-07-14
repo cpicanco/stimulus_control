@@ -22,9 +22,6 @@ uses Classes, ComCtrls, SysUtils,  Dialogs, Forms
 
 type
 
-  { TDataProcedure }
-  TDataProcedure = procedure (S : string) of object;
-
   TCfgTrial = record
     Id : integer;
     Name: string;

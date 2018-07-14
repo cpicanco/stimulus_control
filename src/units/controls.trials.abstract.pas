@@ -15,6 +15,7 @@ interface
 
 uses Controls, ExtCtrls, Classes, SysUtils
   , Session.Configuration
+  , Loggers.Reports
   , CounterManager
   , Schedules
   {$IFDEF RS232}
@@ -36,7 +37,6 @@ type
     FConfigurations: TCfgTrial;
     FClock : TTimer;
     FLogEvent: TDataProcedure;
-    FClockList : array of TThreadMethod;
     FData,
     FFilename,
     FHeader,
@@ -54,7 +54,6 @@ type
     procedure BeginStarter;
     procedure SetRootMedia(AValue: string);
     procedure SetTestMode(AValue: Boolean);
-    procedure StartClockList;
     procedure StartTrial(Sender: TObject);
     procedure TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -100,10 +99,8 @@ type
     {$ifdef DEBUG}
       procedure ClockStatus(msg : string);
     {$endif}
-    procedure AddToClockList(AClockStart : TThreadMethod); overload;
-    procedure AddToClockList(ASchedule: TSchedule); overload;
+    function LogEvent(ACode: string) : Extended;
     procedure EndTrial(Sender: TObject);
-    procedure LogEvent(ACode: string);
     procedure Config(Sender: TObject);
     procedure WriteData(Sender: TObject); virtual;
     property OnTrialKeyDown : TKeyEvent read FOnTrialKeyDown write SetOnTrialKeyDown;
@@ -149,7 +146,6 @@ type
     property OnMiss: TNotifyEvent read FOnMiss write SetOnMiss;
     property OnNone: TNotifyEvent read FOnNone write SetOnNone;
     property OnStmResponse: TNotifyEvent read FOnStmResponse write SetOnStmResponse;
-    property OnTrialWriteData: TNotifyEvent read FOnTrialWriteData write SetOnTrialWriteData;
   end;
 
 resourcestring
@@ -260,7 +256,6 @@ end;
 
 procedure TTrial.EndTrialThread(Sender: TObject);
 begin
-  FClock.OnStopTimer := nil;
   FClock.Enabled := False;
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.EndTrial2');
@@ -357,14 +352,14 @@ begin
   FClock.Interval := FLimitedHold;
   FClock.Enabled := False;
   FClock.OnTimer := @EndTrialThread;
-  FClock.OnStopTimer := @EndTrialThread;
+  //FClock.OnStopTimer := @EndTrialThread;
 
   // setup report header
-  // descendents should concatenate its own data, if any, to in their OnCreate method
+  // descendents should concatenate its own data, if any, to their OnCreate method
   Header := rsReportCsqRes;
 
   // setup timestamps header
-  // descendents should concatenate its own data, if any, to in their OnCreate method
+  // descendents should concatenate its own data, if any, to their OnCreate method
   HeaderTimestamps := rsReportTime + #9 +
                       rsReportBlocID + #9 +
                       rsReportTrialID + #9 +
@@ -452,33 +447,17 @@ begin
   TCustomControl(Parent).SetFocus;
 end;
 
-procedure TTrial.AddToClockList(AClockStart: TThreadMethod);
-begin
-  SetLength(FClockList, Length(FClockList) + 1);
-  FClockList[Length(FClockList) - 1] := AClockStart;
-end;
-
 procedure TTrial.BeginStarter;
 begin
   FResponseEnabled:= True;
   Show;
 end;
 
-procedure TTrial.StartClockList;
-var
-  i : integer;
+procedure TTrial.StartTrial(Sender: TObject);
 begin
   if FClock.Interval > 0 then
     FClock.Enabled := True;
-  for i := 0 to Length(FClockList) -1 do
-    TThreadMethod(FClockList[i]);
-  SetLength(FClockList, 0);
-end;
-
-procedure TTrial.StartTrial(Sender: TObject);
-begin
   LogEvent('TS');
-  StartClockList;
   FResponseEnabled := True;
   Show;
   SetFocus;
@@ -487,22 +466,15 @@ begin
   if Assigned(OnTrialStart) then OnTrialStart(Sender);
 end;
 
-procedure TTrial.LogEvent(ACode: string);
+function TTrial.LogEvent(ACode: string): Extended;
 begin
-  SaveData(TimestampToStr(TickCount - TimeStart) + #9 +
+  Result := TickCount - TimeStart;
+  SaveData(TimestampToStr(Result) + #9 +
            IntToStr(CounterManager.CurrentBlc+1) + #9 +
            IntToStr(CounterManager.CurrentTrial+1) + #9 +
-           IntToStr(CounterManager.Trials+1) + #9 + // Current trial cycle
+           IntToStr(CounterManager.SessionTrials+1) + #9 + // Current trial cycle
            Configurations.Name + #9 +
            ACode + LineEnding)
-end;
-
-procedure TTrial.AddToClockList(ASchedule: TSchedule);
-begin
-  if ASchedule.Loaded then
-    AddToClockList(@ASchedule.Start)
-  else
-    raise Exception.Create(ExceptionNoScheduleFound);
 end;
 
 procedure TTrial.SetOnTrialBeforeEnd(AValue: TNotifyEvent);

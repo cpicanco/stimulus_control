@@ -23,6 +23,7 @@ type
     procedure InterTrialTimer(Sender: TObject);
     procedure RadioGroupConditionSelectionChanged(Sender: TObject);
     procedure TrialEnd(Sender: TObject);
+    procedure WriteTrialData(Sender : TObject);
   private
     FHeader : string;
     procedure Play;
@@ -74,7 +75,9 @@ type
   end;
 
 var
-  FDataFile : string;
+  FITIBegin, FITIEnd : Extended;
+  FLastTrialHeader : string = '';
+  FDataFile,
   FSessionFile : string;
   Trial : TTrial;
   ConfigurationFile : TConfigurationFile;
@@ -154,30 +157,31 @@ var
   AllPairs : array [0..15] of TStmPair;
   r, t : integer;
   StmPair : TStmPair;
+  LWelcome : string = 'Seja bem-vindo(a). ';
   procedure WriteMSGTrial(AMsg : integer);
   var
     M1 : string =
-    'Seja bem-vindo(a). ' +
     'Durante esta fase serão apresentados alguns símbolos. ' +
     'VOCÊ DEVERÁ PRESTAR MUITA ATENÇÃO NOS SÍMBOLOS. ' +
     'Esta fase durará alguns minutos. ' +
     'Pressione a BARRA DE ESPAÇO no teclado para começar.';
 
     M2 : string =
-    'Agora, nesta parte, você verá um símbolo na parte superior da tela e dois ' +
-    'símbolos na parte inferior da tela. Você DEVERÁ ESCOLHER ENTRE ' +
-    'OS DOIS SIMBOLOS QUE ESTÃO NA PARTE INFEIROR DA TELA. ' +
-    'PARA ISSO VOCÊ DEVE CLICAR SOBRE UM DOS DOIS. Pressione ' +
-    'a BARRA DE ESPAÇO no teclado para começar.';
+    'Agora você ' +
+    'verá algumas vezes um símbolo na parte superior da tela e dois abaixo dele. ' +
+    'Nessa etapa, você deverá prestar muita atenção ao símbolo na parte superior e ' +
+    'ESCOLHER UM DOS DOIS SÍMBOLOS NA PARTE DE BAIXO ' +
+    'CLICANDO NELE COM O MOUSE. Preste atenção, pois isso acontecerá ' +
+    'algumas vezes. Pressione a BARRA DE ESPAÇO no teclado para começar.';
 
     M3 : string =
-    'Agora, nesta fase, você verá uma figura na tela que junta dois símbolos. ' +
-    'Abaixo dessa figura haverá uma escala com os itens: ' + LineEnding + LineEnding +
-    '"Tenho certeza que não vi, Acho que não vi, Não sei, Acho que vi, Tenho certeza que vi". ' + LineEnding + LineEnding +
-    'Você DEVERÁ CLICAR SOBRE UM desses itens para indicar o quanto você lembra ' +
-    'de ter visto os símbolos da figura na fase anterior, ' +
-    'independente da ordem em que os símbolos aparecem. ' +
-    'Pressione a BARRA DE ESPAÇO no teclado para começar.';
+    'Agora, nesta fase, você verá um par de símbolos na parte superior da tela. ' +
+    'Abaixo deste par haverá a escala com as opções:' + LineEnding + LineEnding +
+    '"Tenho certeza que não vi, Acho que não vi, Não sei, Acho que vi, Tenho certeza que vi."' + LineEnding + LineEnding +
+    'Você deverá ESCOLHER UMA DESSAS OPÇÕES CLICANDO NELA com o cursor do mouse para ' +
+    'indicar o quanto você lembra de ter visto esse par na fase anterior. Preste ' +
+    'atenção, pois isso acontecerá algumas vezes. Pressione a BARRA DE '+
+    'ESPAÇO no teclado para começar.';
   i : integer;
   begin
     i := ConfigurationFile.TrialCount[1]+1;
@@ -191,7 +195,10 @@ var
       WriteToTrial(i, _Kind, T_MSG);
       WriteToTrial(i, _ITI, '3000');
       case AMsg of
-        0 : WriteToTrial(i, _Msg, M1);
+        0 : if i = 1 then
+              WriteToTrial(i, _Msg, LWelcome+M1)
+            else
+              WriteToTrial(i, _Msg, M1);
         1 : WriteToTrial(i, _Msg, M2);
         2 : WriteToTrial(i, _Msg, M3);
       end;
@@ -221,18 +228,18 @@ var
         WriteToTrial(i, _Kind, T_MTS);
         WriteToTrial(i, _ITI, '3000');
         WriteToTrial(i, _SampleType, BoolToStr(True));
-        WriteToTrial(i, _Delay, '500');
+        WriteToTrial(i, _Delay, '10');
 
         WriteToTrial(i, _Samp+_cStm, AppExt(AConPair.B));
         WriteToTrial(i, _Samp+_cBnd, BndCenter);
         WriteToTrial(i, _Samp+_cSch, 'FT 1500');
-        WriteToTrial(i, _Samp+_cMsg, AConPair.B + '-' + BndCenter);
+        WriteToTrial(i, _Samp+_cMsg, AConPair.B);
 
         WriteToTrial(i, _NumComp, '1');
         WriteToTrial(i, _Comp+'1'+_cStm, AppExt(AConPair.A));
         WriteToTrial(i, _Comp+'1'+_cBnd, BndCenter);
         WriteToTrial(i, _Comp+'1'+_cSch, 'FT 1500');
-        WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.A + '-' + BndCenter);
+        WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.A);
       end;
     end;
   begin
@@ -282,7 +289,7 @@ var
       i := ConfigurationFile.TrialCount[1]+1;
       with ConfigurationFile do
       begin
-        WriteToTrial(i, _Name, 'Teste MTS - '+AConPair.A+' '+AConPair.B);
+        WriteToTrial(i, _Name, 'Teste MTS - '+AConPair.A+' '+AConPair.B+' '+AIncPair.B);
         WriteToTrial(i, _Kind, T_MTS);
         WriteToTrial(i, _ITI, '1000');
         WriteToTrial(i, _SampleType, BoolToStr(False));
@@ -290,18 +297,20 @@ var
 
         WriteToTrial(i, _Samp+_cStm, AppExt(AConPair.A));
         WriteToTrial(i, _Samp+_cBnd, BndSample);
-        WriteToTrial(i, _Samp+_cSch, 'FT 1');
+        WriteToTrial(i, _Samp+_cSch, 'EXT');
         WriteToTrial(i, _Samp+_cMsg, AConPair.A);
 
         WriteToTrial(i, _NumComp, '2');
         WriteToTrial(i, _Comp+'1'+_cStm, AppExt(AConPair.B));
         WriteToTrial(i, _Comp+'1'+_cBnd, Comparisons[0]);
         WriteToTrial(i, _Comp+'1'+_cSch, 'CRF');
+        WriteToTrial(i, _Comp+'1'+_cRes, 'HIT');
         WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.B + '-' + Comparisons[0]);
 
         WriteToTrial(i, _Comp+'2'+_cStm, AppExt(AIncPair.B));
         WriteToTrial(i, _Comp+'2'+_cBnd, Comparisons[1]);
         WriteToTrial(i, _Comp+'2'+_cSch, 'CRF');
+        WriteToTrial(i, _Comp+'2'+_cRes, 'MISS');
         WriteToTrial(i, _Comp+'2'+_cMsg, AIncPair.B + '-' + Comparisons[1]);
       end;
     end;
@@ -428,8 +437,11 @@ procedure TBackground.ButtonStartClick(Sender: TObject);
 var
   SessionName : string;
 begin
+  ButtonStart.Enabled:=False;
   ButtonStart.Hide;
+  RadioGroupCondition.Enabled:=False;
   RadioGroupCondition.Hide;
+  EditParticipant.Enabled:=False;
   EditParticipant.Hide;
   {$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
 
@@ -440,8 +452,10 @@ begin
              HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
 
   FDataFile := GlobalContainer.RootData + FDataFile;
+  CreateLogger(LGData, FDataFile, FHeader);
   FDataFile := CreateLogger(LGTimestamps, FDataFile, FHeader);
   CopyFile(FSessionFile, ExtractFileNameWithoutExt(FDataFile)+'.ini');
+  GlobalContainer.TimeStart := TickCount;
   Play;
 end;
 
@@ -457,8 +471,11 @@ var
   CurrentTrial : integer;
   TotalTrials : integer;
   Footer : string;
-  MouseOnSet : TPoint = (x:683; y :165);
+  MouseOnset : TPoint;
 begin
+  FITIEnd := TickCount - GlobalContainer.TimeStart; ;
+  WriteTrialData(Trial);
+
   TotalTrials := ConfigurationFile.TrialCount[1]-1;
   CurrentTrial := GlobalContainer.CounterManager.CurrentTrial;
   GlobalContainer.CounterManager.CurrentTrial:= CurrentTrial+1;
@@ -467,10 +484,13 @@ begin
     ShowMessage('Fim.');
     Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
     FreeLogger(LGTimestamps,Footer);
+    FreeLogger(LGData, Footer);
     WindowState := wsNormal;
     Exit;
   end;
-  Mouse.CursorPos := MouseOnSet;
+  MouseOnset.X := Screen.Width div 2;
+  MouseOnset.Y := Screen.Height div 2;
+  Mouse.CursorPos := MouseOnset;
   Play;
 end;
 
@@ -488,6 +508,50 @@ end;
 procedure TBackground.TrialEnd(Sender: TObject);
 begin
   InterTrial.Enabled := True;
+  FITIBegin := TickCount - GlobalContainer.TimeStart;
+end;
+
+procedure TBackground.WriteTrialData(Sender: TObject);
+var
+  SaveData : TDataProcedure;
+  i : integer;
+  LTrialID, LTrialName, ITIData, NewData, LReportLn : string;
+  LTrial : TTrial;
+const
+  DoNotApply = #32#32#32#32#32#32 + 'NA';
+begin
+  LTrial := TTrial(Sender);
+  SaveData := GetSaveDataProc(LGData);
+  if LTrial.Header <> FLastTrialHeader then
+    LReportLn := rsReportTrialID + #9 +
+                 rsReportTrialName + #9 +
+                 rsReportITIBeg + #9 +
+                 rsReportITIEnd + #9 +
+                 LTrial.Header + LineEnding;
+  FLastTrialHeader := LTrial.Header;
+  LTrialID := IntToStr(GlobalContainer.CounterManager.CurrentTrial + 1);
+
+  // Trial Name
+  i := GlobalContainer.CounterManager.CurrentTrial;
+  LTrialName := ConfigurationFile.Trial[1, i+1].Name;
+  if LTrialName = '' then
+    LTrialName := '--------';
+
+  // pre
+  NewData := LTrialID + #9 + LTrialName;
+
+  // iti
+  if GlobalContainer.CounterManager.SessionTrials = 0 then
+    ITIData := DoNotApply + #9 + TimestampToStr(0)
+  else
+    ITIData :=
+      TimestampToStr(FITIBegin) + #9 +
+      TimestampToStr(FITIEnd);
+
+  // write data
+  LReportLn :=
+    LReportLn + NewData + #9 + ITIData + #9 + LTrial.Data + LineEnding;
+  SaveData(LReportLn);
 end;
 
 procedure TBackground.Play;
@@ -507,9 +571,9 @@ begin
     end;
 
     Trial.SaveData := GetSaveDataProc(LGTimestamps);
-    if GlobalContainer.CounterManager.Trials = 0 then
+    if GlobalContainer.CounterManager.SessionTrials = 0 then
     begin
-      Trial.SaveData(HFIRST_TIMESTAMP + #9 + TimestampToStr(TickCount) + LineEnding + LineEnding);
+      Trial.SaveData(HFIRST_TIMESTAMP + #9 + TimestampToStr(GlobalContainer.TimeStart) + LineEnding + LineEnding);
       Trial.SaveData(Trial.HeaderTimestamps + LineEnding);
     end;
 
