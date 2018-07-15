@@ -31,6 +31,15 @@ type
 
   procedure FreeLogger(ADataLogger: TLoggers; AFooter : string);
 
+resourcestring
+  HSUBJECT_NAME      = 'Nome_Sujeito:';
+  HSESSION_NAME      = 'Nome_Sessão:';
+  HFIRST_TIMESTAMP   = 'Primeira_Timestamp:';
+  HBEGIN_TIME        = 'Início:';
+  HEND_TIME          = 'Término:';
+  HSESSION_CANCELED  = '----------Sessão Cancelada----------';
+  HTEST_MODE         = '(Modo de Teste)';
+
 implementation
 
 var

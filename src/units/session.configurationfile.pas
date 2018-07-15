@@ -52,6 +52,9 @@ type
     property Trial[BlocIndex, TrialIndex : integer] : TCfgTrial read GetTrial {write SetTrial};
   end;
 
+var
+  ConfigurationFile : TConfigurationFile;
+
 implementation
 
 uses constants, strutils;

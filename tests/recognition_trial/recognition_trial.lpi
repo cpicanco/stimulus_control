@@ -58,15 +58,12 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="2">
+    <RequiredPackages Count="1">
       <Item1>
-        <PackageName Value="lazvlc"/>
-      </Item1>
-      <Item2>
         <PackageName Value="LCL"/>
-      </Item2>
+      </Item1>
     </RequiredPackages>
-    <Units Count="6">
+    <Units Count="7">
       <Unit0>
         <Filename Value="recognition_trial.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -90,15 +87,20 @@
         <UnitName Value="Controls.Likert"/>
       </Unit3>
       <Unit4>
-        <Filename Value="../../src/units/session.prototype.pas"/>
+        <Filename Value="../../src/units/session.blocssimple.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Session.Prototype"/>
+        <UnitName Value="Session.BlocsSimple"/>
       </Unit4>
       <Unit5>
-        <Filename Value="../../src/units/controls.trials.clickandsound.pas"/>
+        <Filename Value="../../src/units/session.backgrounds.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Controls.Trials.ClickAndSound"/>
+        <UnitName Value="Session.Backgrounds"/>
       </Unit5>
+      <Unit6>
+        <Filename Value="../../src/units/experiments.ravi.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Ravi"/>
+      </Unit6>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -117,6 +119,7 @@
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
+      <SmartLinkUnit Value="True"/>
       <Checks>
         <IOChecks Value="True"/>
         <RangeChecks Value="True"/>
@@ -127,6 +130,9 @@
       <TargetCPU Value="x86_64"/>
       <TargetOS Value="linux"/>
     </CodeGeneration>
+    <Linking>
+      <LinkSmart Value="True"/>
+    </Linking>
     <Other>
       <CustomOptions Value="-dNO_LIBZMQ"/>
       <OtherDefines Count="1">
