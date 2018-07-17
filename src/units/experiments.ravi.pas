@@ -24,9 +24,19 @@ type
   end;
 
 var
+  StimuliNames : array [0..5] of string = ('', '', '', '', '', '');
   BndCenter : string = '234 533 300 300';
   BndSample : string = '15 533 300 300';
   BndComparisons : array [0..1] of string = ('400 333 300 300', '400 733 300 300');
+
+const
+    A1 = 'A1';
+    A2 = 'A2';
+    B1 = 'B1';
+    B2 = 'B2';
+    C1 = 'C1';
+    C2 = 'C2';
+    DefaultStimuliNames : array [0..5] of string = (A1, A2, B1, B2, C1, C2);
 
 function Letter(AComparison : string): string;
 begin
@@ -38,28 +48,26 @@ end;
 
 function AppExt(Stm : string) : string;
 begin
-  Result := Stm + '.png';
+  case Stm of
+    A1 :  Result := StimuliNames[0];
+    A2 :  Result := StimuliNames[1];
+    B1 :  Result := StimuliNames[2];
+    B2 :  Result := StimuliNames[3];
+    C1 :  Result := StimuliNames[4];
+    C2 :  Result := StimuliNames[5];
+  end;
+  Result := Result + '.png';
 end;
 
 procedure RandomizeStimuli;
 var
   StimuliList : TStringList;
   i : integer;
-  SourcePath : string;
-  DestinPath : string;
-  SrcFile : string;
-  DstFile : string;
-
 const
   Stimuli : array [0..17] of string = (
   '¶', '@', '$', '€', '&', '#', '%', '≡', '∞',
   '∑', '↔', 'ℓ', 'β', 'Δ', 'π', 'Φ', 'Ψ', 'Ω');
-
-  DefaultStimuliNames : array [0..5] of string =
-    ('A1', 'A2', 'B1', 'B2', 'C1', 'C2');
 begin
-  SourcePath := GlobalContainer.RootMedia+'PNG'+DirectorySeparator;
-  DestinPath := GlobalContainer.RootMedia;
   StimuliList := TStringList.Create;
   StimuliList.Duplicates := dupError;
   try
@@ -70,11 +78,9 @@ begin
     for i := Low(DefaultStimuliNames) to High(DefaultStimuliNames) do
     begin
       //WriteLn(DefaultStimuliNames[i], '=', StimuliList[i]);
-      SrcFile := SourcePath + AppExt(StimuliList[i]);
-      DstFile := DestinPath + AppExt(DefaultStimuliNames[i]);
+      StimuliNames[i] := StimuliList[i];
       ConfigurationFile.WriteString(
         _Main, DefaultStimuliNames[i], StimuliList[i]);
-      CopyFile(SrcFile, DstFile);
     end;
   finally
     StimuliList.Free;
@@ -325,23 +331,23 @@ var
   end;
 
 begin
-  ConsistentPairs[0].A := 'B1'; ConsistentPairs[0].B := 'A1';
-  ConsistentPairs[1].A := 'B2'; ConsistentPairs[1].B := 'A2';
-  ConsistentPairs[2].A := 'C1'; ConsistentPairs[2].B := 'A1';
-  ConsistentPairs[3].A := 'C2'; ConsistentPairs[3].B := 'A2';
-  ConsistentPairs[4].A := 'B1'; ConsistentPairs[4].B := 'C1';
-  ConsistentPairs[5].A := 'B2'; ConsistentPairs[5].B := 'C2';
-  ConsistentPairs[6].A := 'C1'; ConsistentPairs[6].B := 'B1';
-  ConsistentPairs[7].A := 'C2'; ConsistentPairs[7].B := 'B2';
+  ConsistentPairs[0].A := B1; ConsistentPairs[0].B := A1;
+  ConsistentPairs[1].A := B2; ConsistentPairs[1].B := A2;
+  ConsistentPairs[2].A := C1; ConsistentPairs[2].B := A1;
+  ConsistentPairs[3].A := C2; ConsistentPairs[3].B := A2;
+  ConsistentPairs[4].A := B1; ConsistentPairs[4].B := C1;
+  ConsistentPairs[5].A := B2; ConsistentPairs[5].B := C2;
+  ConsistentPairs[6].A := C1; ConsistentPairs[6].B := B1;
+  ConsistentPairs[7].A := C2; ConsistentPairs[7].B := B2;
 
-  InconsistePairs[0].A := 'B1'; InconsistePairs[0].B := 'A2';
-  InconsistePairs[1].A := 'B2'; InconsistePairs[1].B := 'A1';
-  InconsistePairs[2].A := 'C1'; InconsistePairs[2].B := 'A2';
-  InconsistePairs[3].A := 'C2'; InconsistePairs[3].B := 'A1';
-  InconsistePairs[4].A := 'B1'; InconsistePairs[4].B := 'C2';
-  InconsistePairs[5].A := 'B2'; InconsistePairs[5].B := 'C1';
-  InconsistePairs[6].A := 'C1'; InconsistePairs[6].B := 'B2';
-  InconsistePairs[7].A := 'C2'; InconsistePairs[7].B := 'B1';
+  InconsistePairs[0].A := B1; InconsistePairs[0].B := A2;
+  InconsistePairs[1].A := B2; InconsistePairs[1].B := A1;
+  InconsistePairs[2].A := C1; InconsistePairs[2].B := A2;
+  InconsistePairs[3].A := C2; InconsistePairs[3].B := A1;
+  InconsistePairs[4].A := B1; InconsistePairs[4].B := C2;
+  InconsistePairs[5].A := B2; InconsistePairs[5].B := C1;
+  InconsistePairs[6].A := C1; InconsistePairs[6].B := B2;
+  InconsistePairs[7].A := C2; InconsistePairs[7].B := B1;
 
   NewConfigurationFile;
   case ACondition of
