@@ -119,7 +119,6 @@
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
-      <SmartLinkUnit Value="True"/>
       <Checks>
         <IOChecks Value="True"/>
         <RangeChecks Value="True"/>
@@ -130,9 +129,6 @@
       <TargetCPU Value="x86_64"/>
       <TargetOS Value="linux"/>
     </CodeGeneration>
-    <Linking>
-      <LinkSmart Value="True"/>
-    </Linking>
     <Other>
       <CustomOptions Value="-dNO_LIBZMQ"/>
       <OtherDefines Count="1">

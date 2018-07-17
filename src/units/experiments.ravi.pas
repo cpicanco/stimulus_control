@@ -4,10 +4,6 @@ unit Experiments.Ravi;
 
 interface
 
-uses
-  Classes, SysUtils;
-
-procedure NewConfigurationFile;
 procedure MakeConfigurationFile(ACondition : integer);
 
 var
@@ -15,8 +11,7 @@ var
 
 implementation
 
-uses Forms
-   , FileUtil
+uses Classes, SysUtils, Forms, FileUtil
    , Constants
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
@@ -33,10 +28,57 @@ var
   BndSample : string = '15 533 300 300';
   BndComparisons : array [0..1] of string = ('400 333 300 300', '400 733 300 300');
 
+function Letter(AComparison : string): string;
+begin
+  case AComparison of
+  '400 333 300 300' : Result := 'E';
+  '400 733 300 300' : Result := 'D';
+  end;
+end;
 
 function AppExt(Stm : string) : string;
 begin
   Result := Stm + '.png';
+end;
+
+procedure RandomizeStimuli;
+var
+  StimuliList : TStringList;
+  i : integer;
+  SourcePath : string;
+  DestinPath : string;
+  SrcFile : string;
+  DstFile : string;
+
+const
+  Stimuli : array [0..17] of string = (
+  '¶', '@', '$', '€', '&', '#', '%', '≡', '∞',
+  '∑', '↔', 'ℓ', 'β', 'Δ', 'π', 'Φ', 'Ψ', 'Ω');
+
+  DefaultStimuliNames : array [0..5] of string =
+    ('A1', 'A2', 'B1', 'B2', 'C1', 'C2');
+begin
+  SourcePath := GlobalContainer.RootMedia+'PNG'+DirectorySeparator;
+  DestinPath := GlobalContainer.RootMedia;
+  StimuliList := TStringList.Create;
+  StimuliList.Duplicates := dupError;
+  try
+    for i := Low(Stimuli) to High(Stimuli) do StimuliList.Append(Stimuli[i]);
+    for i := Low(Stimuli) to High(Stimuli) do
+      StimuliList.Exchange(Random(Length(Stimuli)), i);
+
+    for i := Low(DefaultStimuliNames) to High(DefaultStimuliNames) do
+    begin
+      //WriteLn(DefaultStimuliNames[i], '=', StimuliList[i]);
+      SrcFile := SourcePath + AppExt(StimuliList[i]);
+      DstFile := DestinPath + AppExt(DefaultStimuliNames[i]);
+      ConfigurationFile.WriteString(
+        _Main, DefaultStimuliNames[i], StimuliList[i]);
+      CopyFile(SrcFile, DstFile);
+    end;
+  finally
+    StimuliList.Free;
+  end;
 end;
 
 procedure NewConfigurationFile;
@@ -51,42 +93,8 @@ begin
   ConfigurationFile.CacheUpdates := True;
   ConfigurationFile.WriteString(_Main, _NumBlc, '2');
   ConfigurationFile.WriteToBloc(1, _Name, 'Memory Test - SS');
+  RandomizeStimuli;
   ConfigurationFile.Invalidate;
-end;
-
-procedure RandomizeStimuli;
-var
-  StimuliList : TStringList;
-  i : integer;
-  SourcePath : string;
-  DestinPath : string;
-  SrcFile : string;
-  DstFile : string;
-  Stimuli : array [0..17] of string = (
-  '¶', '@', '$', '€', '&', '#', '%', '≡', '∞',
-  '∑', '↔', 'ℓ', 'β', 'Δ', 'π', 'Φ', 'Ψ', 'Ω');
-  DefaultStimuliNames : array [0..5] of string =
-    ('A1', 'A2', 'B1', 'B2', 'C1', 'C2');
-begin
-  SourcePath := GlobalContainer.RootMedia+'PNG'+DirectorySeparator;
-  DestinPath := GlobalContainer.RootMedia;
-  StimuliList := TStringList.Create;
-  try
-    for i := Low(Stimuli) to High(Stimuli) do StimuliList.Append(Stimuli[i]);
-    for i := Low(Stimuli) to High(Stimuli) do
-      StimuliList.Exchange(Random(Length(Stimuli)), i);
-
-    for i := Low(DefaultStimuliNames) to High(DefaultStimuliNames) do
-    begin
-      SrcFile := SourcePath + AppExt(StimuliList[i]);
-      DstFile := DestinPath + AppExt(DefaultStimuliNames[i]);
-      ConfigurationFile.WriteString(
-        _Main, DefaultStimuliNames[i], StimuliList[i]);
-      CopyFile(SrcFile, DstFile);
-    end;
-  finally
-    StimuliList.Free;
-  end;
 end;
 
 procedure MakeConfigurationFile(ACondition : integer);
@@ -186,7 +194,6 @@ var
       end;
     end;
   begin
-    // SS trials
     WriteMSGTrial(0);
     for i := Low(SSTrials) to High(SSTrials) do
       for j := Low(SSTrials[i]) to High(SSTrials[i]) do
@@ -248,17 +255,16 @@ var
         WriteToTrial(i, _Comp+'1'+_cBnd, Comparisons[0]);
         WriteToTrial(i, _Comp+'1'+_cSch, 'CRF');
         WriteToTrial(i, _Comp+'1'+_cRes, 'HIT');
-        WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.B + '-' + Comparisons[0]);
+        WriteToTrial(i, _Comp+'1'+_cMsg, AConPair.B + '-' + Letter(Comparisons[0]));
 
         WriteToTrial(i, _Comp+'2'+_cStm, AppExt(AIncPair.B));
         WriteToTrial(i, _Comp+'2'+_cBnd, Comparisons[1]);
         WriteToTrial(i, _Comp+'2'+_cSch, 'CRF');
         WriteToTrial(i, _Comp+'2'+_cRes, 'MISS');
-        WriteToTrial(i, _Comp+'2'+_cMsg, AIncPair.B + '-' + Comparisons[1]);
+        WriteToTrial(i, _Comp+'2'+_cMsg, AIncPair.B + '-' + Letter(Comparisons[1]));
       end;
     end;
   begin
-    // MTS Trials
     WriteMSGTrial(1);
     for i := Low(MTSTrials) to High(MTSTrials) do
       for j := Low(MTSTrials[i]) to High(MTSTrials[i]) do
@@ -291,7 +297,6 @@ var
   var
     i : integer;
   begin
-    // MemoryTest
     WriteMSGTrial(2);
     for i := Low(AllPairs) to High(AllPairs) do
     case i of
@@ -338,6 +343,7 @@ begin
   InconsistePairs[6].A := 'C1'; InconsistePairs[6].B := 'B2';
   InconsistePairs[7].A := 'C2'; InconsistePairs[7].B := 'B1';
 
+  NewConfigurationFile;
   case ACondition of
     0 :
       begin
@@ -378,8 +384,6 @@ end;
 
 initialization
   Randomize;
-  NewConfigurationFile;
-  RandomizeStimuli;
   MakeConfigurationFile(0);
 
 finalization;

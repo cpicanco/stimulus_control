@@ -57,12 +57,6 @@ var
   FDataFile : string;
   Bloc : TBloc;
 
-procedure ClearConfigurationFile;
-begin
-  ConfigurationFile.Free;
-  NewConfigurationFile;
-end;
-
 procedure TBackground.ButtonStartClick(Sender: TObject);
 var
   SessionName : string;
@@ -126,7 +120,7 @@ end;
 
 procedure TBackground.RadioGroupConditionSelectionChanged(Sender: TObject);
 begin
-  ClearConfigurationFile;
+  ConfigurationFile.Free;
   MakeConfigurationFile(RadioGroupCondition.ItemIndex);
 end;
 
