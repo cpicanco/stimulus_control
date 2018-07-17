@@ -21,7 +21,7 @@ type
     FITIBegin, FITIEnd : Extended;
     FLastTrialHeader : string;
     FTrial : TTrial;
-    procedure PlayTrial;
+    procedure PlayTrial(ABloc, ATrial : integer);
     procedure TrialEnd(Sender: TObject);
     procedure WriteTrialData(Sender: TObject);
   private
@@ -54,17 +54,15 @@ uses Constants
 
 { TBloc }
 
-procedure TBloc.PlayTrial;
+procedure TBloc.PlayTrial(ABloc, ATrial: integer);
 var
-  IndTrial: Integer;
-  TrialConfig : TCfgTrial;
+  ATrialConfig : TCfgTrial;
 begin
   if Assigned(FTrial) then FreeAndNil(FTrial);
-  IndTrial := FCounterManager.CurrentTrial;
-  TrialConfig := ConfigurationFile.Trial[1, IndTrial+1];
+  ATrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
   try
-    FInterTrial.Interval := StrToIntDef(TrialConfig.SList.Values[_ITI], 0);
-    case TrialConfig.Kind of
+    FInterTrial.Interval := StrToIntDef(ATrialConfig.SList.Values[_ITI], 0);
+    case ATrialConfig.Kind of
       T_MSG : FTrial := TMessageTrial.Create(Background);
       T_MTS : FTrial := TMTS.Create(Background);
       T_LIK : FTrial := TLikert.Create(Background);
@@ -77,34 +75,22 @@ begin
       FTrial.SaveData(FTrial.HeaderTimestamps + LineEnding);
     end;
 
-    FTrial.Configurations := TrialConfig;
+    FTrial.Configurations := ATrialConfig;
     FTrial.OnTrialEnd := @TrialEnd;
     FTrial.Play;
     Background.Cursor := FTrial.Cursor;
   finally
-    TrialConfig.SList.Free;
+    ATrialConfig.SList.Free;
   end;
 end;
 
 procedure TBloc.InterTrialStopTimer(Sender: TObject);
-var
-  LCurrentBloc : integer;
-  LCurrentTrial : integer;
-  LTotalTrials : integer;
 begin
   if Assigned(OnIntertrialStop) then OnIntertrialStop(Sender);
   FITIEnd := TickCount - GlobalContainer.TimeStart;
   WriteTrialData(FTrial);
-
-  LCurrentBloc := FCounterManager.CurrentBlc;
-  LTotalTrials := ConfigurationFile.TrialCount[LCurrentBloc+1];
-  LCurrentTrial := FCounterManager.CurrentTrial;
-  if LCurrentTrial < LTotalTrials -1 then
-  begin
-    FCounterManager.CurrentTrial:= LCurrentTrial+1;
-    PlayTrial;
-  end else
-    if Assigned(OnEndBloc) then OnEndBloc(Sender);
+  FCounterManager.CurrentTrial := FCounterManager.CurrentTrial+1;
+  Play;
 end;
 
 procedure TBloc.InterTrialTimer(Sender: TObject);
@@ -187,8 +173,16 @@ begin
 end;
 
 procedure TBloc.Play;
+var
+  LCurrentBloc, LCurrentTrial, LTotalTrials : integer;
 begin
-  PlayTrial;
+  LCurrentBloc := FCounterManager.CurrentBlc;
+  LTotalTrials := ConfigurationFile.Bloc[LCurrentBloc+1].NumTrials;
+  LCurrentTrial := FCounterManager.CurrentTrial;
+  if LCurrentTrial <= LTotalTrials -1 then
+    PlayTrial(LCurrentBloc, LCurrentTrial)
+  else
+    if Assigned(OnEndBloc) then OnEndBloc(Self);
 end;
 
 end.
