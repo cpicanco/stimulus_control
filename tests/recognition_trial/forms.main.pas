@@ -18,6 +18,7 @@ type
     RadioGroupCondition: TRadioGroup;
     procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure InterTrialStop(Sender: TObject);
     procedure EndBloc(Sender: TObject);
     //procedure FormKeyPress(Sender: TObject; var Key: char);
@@ -49,6 +50,7 @@ uses FileUtil
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
    , Experiments.Ravi
+   , Forms.CheckStimuli
    ;
 
 { TBackground }
@@ -67,6 +69,7 @@ begin
   RadioGroupCondition.Hide;
   EditParticipant.Enabled:=False;
   EditParticipant.Hide;
+  FormCheckStimuli.Hide;
   Session.Backgrounds.Background := Self;
   {$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
 
@@ -89,6 +92,14 @@ begin
   Bloc := TBloc.Create(Self);
   Bloc.OnEndBloc := @EndBloc;
   Bloc.OnInterTrialStop := @InterTrialStop;
+
+  FormCheckStimuli := TFormCheckStimuli.Create(Application);
+  MakeConfigurationFile(0);
+end;
+
+procedure TBackground.FormDestroy(Sender: TObject);
+begin
+  ConfigurationFile.Free;
 end;
 
 procedure TBackground.InterTrialStop(Sender: TObject);

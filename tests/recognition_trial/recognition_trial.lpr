@@ -14,6 +14,7 @@ uses
 {$R *.res}
 
 begin
+  Randomize;
   RequireDerivedFormResource:=True;
   Application.Scaled:=True;
   Application.Initialize;

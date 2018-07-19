@@ -12,6 +12,7 @@ var
 implementation
 
 uses Classes, SysUtils, Forms, FileUtil
+   , Forms.CheckStimuli
    , Constants
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
@@ -30,13 +31,13 @@ var
   BndComparisons : array [0..1] of string = ('400 333 300 300', '400 733 300 300');
 
 const
-    A1 = 'A1';
-    A2 = 'A2';
-    B1 = 'B1';
-    B2 = 'B2';
-    C1 = 'C1';
-    C2 = 'C2';
-    DefaultStimuliNames : array [0..5] of string = (A1, A2, B1, B2, C1, C2);
+  A1 = 'A1';
+  A2 = 'A2';
+  B1 = 'B1';
+  B2 = 'B2';
+  C1 = 'C1';
+  C2 = 'C2';
+  DefaultStimuliNames : array [0..5] of string = (A1, A2, B1, B2, C1, C2);
 
 function Letter(AComparison : string): string;
 begin
@@ -61,6 +62,7 @@ end;
 
 procedure RandomizeStimuli;
 var
+  Checklist : array [0..5] of string = ('', '', '', '', '', '');
   StimuliList : TStringList;
   i : integer;
 const
@@ -84,6 +86,13 @@ begin
     end;
   finally
     StimuliList.Free;
+  end;
+
+  for i := Low(DefaultStimuliNames) to High(DefaultStimuliNames) do
+  begin
+    Checklist[i] := GlobalContainer.RootMedia+AppExt(DefaultStimuliNames[i]);
+    FormCheckStimuli.ShowStimuli(Checklist);
+    FormCheckStimuli.Show;
   end;
 end;
 
@@ -387,12 +396,5 @@ begin
   ConfigurationFile.Invalidate;
   ConfigurationFile.UpdateFile;
 end;
-
-initialization
-  Randomize;
-  MakeConfigurationFile(0);
-
-finalization;
-  ConfigurationFile.Free;
 
 end.

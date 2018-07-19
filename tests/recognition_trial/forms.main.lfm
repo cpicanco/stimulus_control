@@ -1,13 +1,14 @@
 object Background: TBackground
-  Left = 500
+  Left = 105
   Height = 240
-  Top = 256
+  Top = 45
   Width = 320
   Caption = 'Background'
   ClientHeight = 240
   ClientWidth = 320
   Color = clWhite
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   LCLVersion = '1.8.4.0'
   WindowState = wsFullScreen
   object ButtonStart: TButton
