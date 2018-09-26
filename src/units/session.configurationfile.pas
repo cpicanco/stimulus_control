@@ -81,8 +81,8 @@ begin
     Inc(Result);
 end;
 
-class function TConfigurationFile.TrialSection(BlocIndex, TrialIndex: integer
-  ): string;
+class function TConfigurationFile.TrialSection(BlocIndex,
+  TrialIndex: integer): string;
 begin
   Result := BlocSection(BlocIndex) + ' - ' + _Trial + IntToStr(TrialIndex);
 end;
@@ -188,7 +188,7 @@ var
 begin
   WriteInteger(_Main,_NumBlc,BlocCount);
   for i := 0 to BlocCount-1 do
-    WriteString(BlocSection(i+1),_NumTrials,IntToStr(TrialCount[i+1])+' 1');
+    WriteString(BlocSection(i+1),_NumTrials,TrialCount[i+1].ToString+' 1');
 end;
 
 procedure TConfigurationFile.ReadPositionsInBloc(ABloc: integer;

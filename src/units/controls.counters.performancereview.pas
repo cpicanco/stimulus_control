@@ -5,9 +5,7 @@ unit Controls.Counters.PerformanceReview;
 interface
 
 uses
-  Classes, SysUtils, StdCtrls, Controls, Graphics
-  , Controls.Stimuli.Key
-  ;
+  Classes, SysUtils, StdCtrls, Controls, Graphics;
 
 type
 
@@ -17,7 +15,6 @@ type
   private
     FX : integer; // Center
     FHeader : TLabel;
-    FImage : TKey;
     function GetCaption: string;
     procedure SetCaption(AValue: string);
   protected
@@ -26,7 +23,6 @@ type
     constructor Create(ABackground:TComponent); override;
     procedure CentralizeLeft;
     procedure CentralizeRight;
-    procedure LoadImage(AImagePath : string);
     procedure Show;
     property Caption : string read GetCaption write SetCaption;
   end;
@@ -62,14 +58,6 @@ begin
   Parent := TCustomControl(ABackground);
   Align := alClient;
   FX := Width div 2;
-  FImage := TKey.Create(Self);
-  with FImage do
-    begin
-      Cursor := -1;
-      Width := 200;
-      Height := 200;
-      Parent := TCustomControl(ABackground);
-    end;
 
   FHeader := TLabel.Create(Self);
   with FHeader do
@@ -79,14 +67,14 @@ begin
       Alignment := taCenter;
 
       // anchor bindings
-      Anchors := [akLeft,akBottom, akRight];
-      AnchorSideBottom.Control := FImage;
-      AnchorSideBottom.Side := asrTop;
-      AnchorSideLeft.Control := FImage;
-      AnchorSideLeft.Side := asrLeft;
-      AnchorSideRight.Control := FImage;
-      AnchorSideRight.Side := asrRight;
-      BorderSpacing.Bottom := 25;
+      //Anchors := [akLeft,akBottom, akRight];
+      //AnchorSideBottom.Control := FImage;
+      //AnchorSideBottom.Side := asrTop;
+      //AnchorSideLeft.Control := FImage;
+      //AnchorSideLeft.Side := asrLeft;
+      //AnchorSideRight.Control := FImage;
+      //AnchorSideRight.Side := asrRight;
+      //BorderSpacing.Bottom := 25;
 
       //Layout := tlCenter;
       WordWrap := False;
@@ -103,8 +91,8 @@ var
   LOwner : TCustomControl;
 begin
   LOwner := TCustomControl(Owner);
-  FImage.Left := (LOwner.Width div 4) - (FImage.Width div 2);
-  FImage.Top := (LOwner.Height div 2) - (FImage.Height div 2);
+  FHeader.Left := (LOwner.Width div 4) - (FHeader.Width div 2);
+  FHeader.Top := (LOwner.Height div 2) - (FHeader.Height div 2);
 end;
 
 procedure TCounterPR.CentralizeRight;
@@ -112,19 +100,13 @@ var
   LOwner : TCustomControl;
 begin
   LOwner := TCustomControl(Owner);
-  FImage.Left := LOwner.Width - (LOwner.Width div 4) - (FImage.Width div 2);
-  FImage.Top := LOwner.Height - (LOwner.Height div 2) - (FImage.Height div 2);
-end;
-
-procedure TCounterPR.LoadImage(AImagePath: string);
-begin
-  FImage.Filename := AImagePath;
+  FHeader.Left := LOwner.Width - (LOwner.Width div 4) - (FHeader.Width div 2);
+  FHeader.Top := LOwner.Height - (LOwner.Height div 2) - (FHeader.Height div 2);
 end;
 
 procedure TCounterPR.Show;
 begin
   FHeader.Show;
-  FImage.Show;
 end;
 
 end.

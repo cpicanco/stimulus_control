@@ -49,6 +49,8 @@ uses Constants
    , Session.Configuration.GlobalContainer
    , Controls.Trials.Likert
    , Controls.Trials.MatchingToSample
+   , Controls.Trials.GoNoGo.Maues
+   , Controls.Trials.PerformanceReview
    , Controls.Trials.TextMessage
    ;
 
@@ -66,6 +68,8 @@ begin
       T_MSG : FTrial := TMessageTrial.Create(Background);
       T_MTS : FTrial := TMTS.Create(Background);
       T_LIK : FTrial := TLikert.Create(Background);
+      T_GNG : FTrial := TGNG.Create(Background);
+      T_PFR : FTrial := TPerformanceReview.Create(Background);
     end;
 
     FTrial.SaveData := GetSaveDataProc(LGTimestamps);

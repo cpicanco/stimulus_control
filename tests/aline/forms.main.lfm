@@ -1,0 +1,61 @@
+object Background: TBackground
+  Left = 491
+  Height = 240
+  Top = 127
+  Width = 320
+  Caption = 'Background'
+  ClientHeight = 240
+  ClientWidth = 320
+  Color = clWhite
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '1.8.4.0'
+  WindowState = wsFullScreen
+  object ButtonStart: TButton
+    Left = 16
+    Height = 56
+    Top = 144
+    Width = 248
+    Caption = 'Começar'
+    OnClick = ButtonStartClick
+    TabOrder = 0
+  end
+  object RadioGroupCondition: TRadioGroup
+    Left = 16
+    Height = 86
+    Top = 48
+    Width = 248
+    AutoFill = True
+    Caption = 'Condição'
+    ChildSizing.LeftRightSpacing = 6
+    ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+    ChildSizing.EnlargeVertical = crsHomogenousChildResize
+    ChildSizing.ShrinkHorizontal = crsScaleChilds
+    ChildSizing.ShrinkVertical = crsScaleChilds
+    ChildSizing.Layout = cclLeftToRightThenTopToBottom
+    ChildSizing.ControlsPerLine = 1
+    ClientHeight = 66
+    ClientWidth = 244
+    Font.Color = clBlack
+    ItemIndex = 0
+    Items.Strings = (
+      '1 - Avaliação de Memória'
+      '2 - Avaliação por MTS'
+    )
+    OnSelectionChanged = RadioGroupConditionSelectionChanged
+    ParentFont = False
+    TabOrder = 1
+  end
+  object EditParticipant: TEdit
+    Left = 16
+    Height = 28
+    Top = 8
+    Width = 169
+    TabOrder = 2
+    Text = 'Participante'
+  end
+  object OpenDialog: TOpenDialog
+    left = 264
+    top = 152
+  end
+end

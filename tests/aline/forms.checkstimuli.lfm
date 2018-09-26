@@ -1,0 +1,11 @@
+object FormCheckStimuli: TFormCheckStimuli
+  Left = 11
+  Height = 584
+  Top = 141
+  Width = 275
+  HorzScrollBar.Page = 1
+  VertScrollBar.Page = 1
+  AutoScroll = True
+  Caption = 'Conferir estímulos'
+  LCLVersion = '1.8.4.0'
+end

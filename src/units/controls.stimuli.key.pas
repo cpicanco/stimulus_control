@@ -51,12 +51,14 @@ type
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
     FOnEndMedia: TNotifyEvent;
+    FPenWidth: integer;
     procedure AutoDestroy(Sender: TObject);
     procedure Consequence(Sender: TObject);
     function GetShortName: string;
     procedure Response(Sender: TObject);
     procedure KeyMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure SetPenWidth(AValue: integer);
     procedure VideoResponse(Sender : TObject);
     procedure VideoClick(Sender : TObject);
   protected
@@ -70,6 +72,8 @@ type
     procedure Stop;
     procedure FullScreen;
     procedure Centralize(AControl : TControl = nil);
+    procedure CentralizeLeft;
+    procedure CentralizeRight;
     procedure AutoDestroyIn(AInterval : integer);
     procedure SetOriginalSize;
     property Schedule : TSchedule read FSchedule;
@@ -81,6 +85,7 @@ type
     property LastResponseLog : string read FLastResponseLog;
     property ResponseCount : integer read FResponseCount;
     property ShortName : string read GetShortName;
+    property PenWidth : integer read FPenWidth write SetPenWidth;
   public
     property OnConsequence: TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write FOnResponse;
@@ -170,6 +175,25 @@ begin
   Top  := (LHeight div 2) - (Height div 2);
 end;
 
+procedure TKey.CentralizeLeft;
+var
+  LOwner : TCustomControl;
+begin
+  LOwner := TCustomControl(Parent);
+  Left := (LOwner.Width div 4) - (Width div 2);
+  Top := (LOwner.Height div 2) - (Height div 2);
+end;
+
+procedure TKey.CentralizeRight;
+var
+  LOwner : TCustomControl;
+begin
+  LOwner := TCustomControl(Parent);
+  Left := LOwner.Width - (LOwner.Width div 4) - (Width div 2);
+  Top := LOwner.Height - (LOwner.Height div 2) - (Height div 2);
+end;
+
+
 procedure TKey.AutoDestroyIn(AInterval: integer);
 begin
   FSchedule.Load('FT '+IntToStr(AInterval));
@@ -198,7 +222,7 @@ procedure TKey.Paint;
       begin
         Font.Size:= 48;
         Font.Color:= clWhite;
-        Pen.Width := 3;
+        Pen.Width := FPenWidth;
         Pen.Color := Edge;
         Brush.Color:= Color;//FBorderColor;
         //FillRect(Rect(0, 0, Width, Height));
@@ -425,6 +449,12 @@ begin
   Inc(FResponseCount);
   if FSchedule.Loaded then
      FSchedule.DoResponse;
+end;
+
+procedure TKey.SetPenWidth(AValue: integer);
+begin
+  if FPenWidth=AValue then Exit;
+  FPenWidth:=AValue;
 end;
 
 procedure TKey.SetVisible(AValue: Boolean);

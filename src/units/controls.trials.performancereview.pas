@@ -13,7 +13,8 @@ unit Controls.Trials.PerformanceReview;
 
 interface
 
-uses LCLIntf, Classes, SysUtils, Graphics
+uses Classes, SysUtils, Graphics
+    , Controls
     , Controls.Trials.Abstract
     , Controls.Trials.Helpers
     , Controls.Counters.PerformanceReview
@@ -37,7 +38,7 @@ type
   protected
     procedure WriteData(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
     destructor Destroy; override;
     procedure Play(ACorrection : Boolean=False);override;
   end;
@@ -48,14 +49,14 @@ resourcestring
 
 implementation
 
-uses timestamps, Session.Configuration;
+uses timestamps, Session.Configuration.GlobalContainer;
 
 { TPerformanceReview }
 
 procedure TPerformanceReview.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if (key = 32) { space } then
-    EndTrial(Self);
+  if Key = 32 then
+    EndTrial(Sender);
 end;
 
 procedure TPerformanceReview.TrialBeforeEnd(Sender: TObject);
@@ -83,13 +84,9 @@ begin
   Data :=  Data +
            TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
            LLatency;
-
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
-constructor TPerformanceReview.Create(AOwner: TComponent);
-var
-  LCfgTrial : TCfgTrial;
+constructor TPerformanceReview.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -99,18 +96,10 @@ begin
   Header := 'StmBegin' + #9 +
              '_Latency';
   Data := '';
-  LCfgTrial.Id := 0;
-  LCfgTrial.Kind:= 'PRW';
-  LCfgTrial.Name := 'Performance Review';
-  LCfgTrial.NumComp:=0;
-  LCfgTrial.SList:=TStringList.Create;
-  CfgTrial := LCfgTrial;
 end;
 
 destructor TPerformanceReview.Destroy;
 begin
-  if Assigned(CfgTrial.SList) then
-    CfgTrial.SList.Free;
   FHitsCounter.Free;
   FMissCounter.Free;
   inherited Destroy;
@@ -118,17 +107,14 @@ end;
 
 procedure TPerformanceReview.Play(ACorrection: Boolean);
 begin
-  FIscorrection := ACorrection;
   RootMedia:= GlobalContainer.RootMedia;
 
   FHitsCounter := TCounterPR.Create(Owner);
-  FHitsCounter.Caption := RSLabelHits+#32+IntToStr(CounterManager.Hits);
-  FHitsCounter.LoadImage(RootMedia+'CSQ1.png');
+  FHitsCounter.Caption := RSLabelHits+#32+IntToStr(CounterManager.BlcHits);
   FHitsCounter.CentralizeLeft;
 
   FMissCounter := TCounterPR.Create(Owner);
-  FMissCounter.Caption := RSLabelMiss+#32+IntToStr(CounterManager.Misses);
-  FMissCounter.LoadImage(RootMedia+'CSQ2.png');
+  FMissCounter.Caption := RSLabelMiss+#32+IntToStr(CounterManager.BlcMisses);
   FMissCounter.CentralizeRight;
 
   if Self.ClassType = TPerformanceReview then Config(Self);

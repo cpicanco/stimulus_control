@@ -98,6 +98,9 @@ const
   // GNG
   _PopUpTime = 'ConsequenceTime';
   _PresentConsequenceJustOnce = 'PresentConsequenceJustOnce';
+  _ScreenSide = 'ScreenSide';
+  _ResponseStyle = 'ResponseStyle';
+  _Category = 'Category';
 
   // SIMPLE
   _NumComp = 'NumComp';   // number of stimuli on screen / comparisons
@@ -211,6 +214,7 @@ const
   T_MTS = 'MTS';
   T_Simple = 'SIMPLE';
   T_LIK = 'LIKERT';
+  T_PFR = 'PERFORMANCE';
 
   { Schedules }
   T_RR  = 'RR';
@@ -253,6 +257,9 @@ resourcestring
   rsReportRspLat = 'R.Latencia';
   rsReportRspFrq = 'R.Frequencia';
   rsReportRspExp = 'R.Prevista';
+
+  rsReportRspStl = 'R.Esperada';
+  rsReportScrSid = 'S.PosicaoNaTela';
 
   rsReportStmCmp = 'S.Comparacoes';
   rsReportStmCmpBeg = 'S.Comparacoes.Inicio';
