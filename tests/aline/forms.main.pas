@@ -5,27 +5,30 @@ unit Forms.Main;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
+  Spin;
 
 type
 
   { TBackground }
 
   TBackground = class(TForm)
+    ButtonShowStimuli: TButton;
     ButtonStart: TButton;
     EditParticipant: TEdit;
-    OpenDialog: TOpenDialog;
+    LabelSessionBlocs: TLabel;
+    PanelConfigurations: TPanel;
     RadioGroupCondition: TRadioGroup;
+    SpinEditSessionBlocs: TSpinEdit;
+    procedure ButtonShowStimuliClick(Sender: TObject);
     procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure InterTrialStop(Sender: TObject);
-    procedure EndBloc(Sender: TObject);
-    //procedure FormKeyPress(Sender: TObject; var Key: char);
-    procedure RadioGroupConditionSelectionChanged(Sender: TObject);
+    //procedure InterTrialStop(Sender: TObject);
+    procedure EndSession(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: char);
+    procedure ExperimentParametersChange(Sender: TObject);
   private
-    FHeader : string;
-    //procedure ShowTrialConsole;
+    procedure ShowTrialConsole;
   public
     {$IFDEF WINDOWS}
     OriginalBounds: TRect;
@@ -42,13 +45,11 @@ implementation
 
 {$R *.lfm}
 
-uses FileUtil
-   , Timestamps
-   , Loggers.Reports
-   , Session.BlocsSimple
-   , Session.Backgrounds
+uses
+     Session.Backgrounds
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
+   , SessionSimple
    , Experiments.Maues
    , Forms.CheckStimuli
    ;
@@ -56,98 +57,72 @@ uses FileUtil
 { TBackground }
 
 var
-  FDataFile : string;
-  Bloc : TBloc;
+  LSession : TSession;
 
 procedure TBackground.ButtonStartClick(Sender: TObject);
-var
-  SessionName : string;
 begin
-  ButtonStart.Enabled:=False;
-  ButtonStart.Hide;
-  RadioGroupCondition.Enabled:=False;
-  RadioGroupCondition.Hide;
-  EditParticipant.Enabled:=False;
-  EditParticipant.Hide;
-  FormCheckStimuli.Hide;
+  PanelConfigurations.Hide;
+  if FormCheckStimuli.Visible then
+    FormCheckStimuli.Hide;
+
   Session.Backgrounds.Background := Self;
   {$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
+  LSession.Play(RadioGroupCondition.Items[RadioGroupCondition.ItemIndex], EditParticipant.Text);
+end;
 
-  SessionName := RadioGroupCondition.Items[RadioGroupCondition.ItemIndex];
-  FDataFile := '001';
-  FHeader := HSUBJECT_NAME + #9 + EditParticipant.Text + LineEnding +
-             HSESSION_NAME + #9 + SessionName + LineEnding +
-             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
-
-  FDataFile := GlobalContainer.RootData + FDataFile;
-  CreateLogger(LGData, FDataFile, FHeader);
-  FDataFile := CreateLogger(LGTimestamps, FDataFile, FHeader);
-  CopyFile(ConfigurationFilename, ExtractFileNameWithoutExt(FDataFile)+'.ini');
-  GlobalContainer.TimeStart := TickCount;
-  Bloc.Play;
+procedure TBackground.ButtonShowStimuliClick(Sender: TObject);
+begin
+  ShowStimuli;
 end;
 
 procedure TBackground.FormCreate(Sender: TObject);
 begin
-  Bloc := TBloc.Create(Self);
-  Bloc.OnEndBloc := @EndBloc;
-  Bloc.OnInterTrialStop := @InterTrialStop;
-
-  FormCheckStimuli := TFormCheckStimuli.Create(Application);
-  MakeConfigurationFile(0);
+  LSession := TSession.Create(Self);
+  LSession.OnEndSession:=@EndSession;
 end;
 
-procedure TBackground.FormDestroy(Sender: TObject);
-begin
-  ConfigurationFile.Free;
-end;
+//procedure TBackground.InterTrialStop(Sender: TObject);
+//var
+//  MouseOnset : TPoint;
+//begin
+//  MouseOnset.X := Screen.Width div 2;
+//  MouseOnset.Y := Screen.Height div 2;
+//  Mouse.CursorPos := MouseOnset;
+//end;
 
-procedure TBackground.InterTrialStop(Sender: TObject);
-var
-  MouseOnset : TPoint;
-begin
-  MouseOnset.X := Screen.Width div 2;
-  MouseOnset.Y := Screen.Height div 2;
-  Mouse.CursorPos := MouseOnset;
-end;
-
-procedure TBackground.EndBloc(Sender: TObject);
-var
-  Footer : string;
+procedure TBackground.EndSession(Sender: TObject);
 begin
   ShowMessage('Fim.');
-  Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
-  FreeLogger(LGTimestamps,Footer);
-  FreeLogger(LGData, Footer);
   WindowState := wsNormal;
 end;
 
-//procedure TBackground.FormKeyPress(Sender: TObject; var Key: char);
-//begin
-//  case key of
-//    't' : ShowTrialConsole;
-//  end;
-//end;
-
-procedure TBackground.RadioGroupConditionSelectionChanged(Sender: TObject);
+procedure TBackground.FormKeyPress(Sender: TObject; var Key: char);
 begin
-  ConfigurationFile.Free;
-  MakeConfigurationFile(RadioGroupCondition.ItemIndex);
+  case key of
+    't' : ShowTrialConsole;
+  end;
 end;
 
-//procedure TBackground.ShowTrialConsole;
-//var
-//  LNextTrial : string;
-//  LNextTrialI : integer;
-//begin
-//  LNextTrial := InputBox('Trial Console', 'Insert the Next Trial', '-');
-//  LNextTrialI := StrToIntDef(LNextTrial, -1);
-//  if LNextTrialI <> -1 then
-//  begin
-//    //while Trial = nil do Application.ProcessMessages;
-//    GlobalContainer.CounterManager.CurrentTrial := LNextTrialI;
-//  end;
-//end;
+procedure TBackground.ExperimentParametersChange(Sender: TObject);
+begin
+  ConfigurationFile.Free;
+  MakeConfigurationFile(RadioGroupCondition.ItemIndex, SpinEditSessionBlocs.Value);
+end;
+
+
+procedure TBackground.ShowTrialConsole;
+var
+  LNextTrial : string;
+  LNextTrialI : integer;
+begin
+  LNextTrial := InputBox('Trial Console', 'Insert the Next Trial', '-');
+  LNextTrialI := StrToIntDef(LNextTrial, -1);
+  if LNextTrialI <> -1 then
+  begin
+    //while Trial = nil do Application.ProcessMessages;
+    GlobalContainer.CounterManager.CurrentTrial := LNextTrialI;
+  end;
+end;
 
 {$IFDEF WINDOWS}
 // http://wiki.freepascal.org/Application_full_screen_mode
@@ -159,7 +134,7 @@ begin
     OriginalBounds := BoundsRect;
 
     BorderStyle := bsNone;
-    BoundsRect := Screen.DesktopRect;
+    BoundsRect := Screen.MonitorFromWindow(Handle).BoundsRect;
   end else begin
     // From full screen
     BorderStyle := bsSizeable;

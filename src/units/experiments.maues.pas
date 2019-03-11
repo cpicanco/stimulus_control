@@ -4,11 +4,12 @@ unit Experiments.Maues;
 
 interface
 
-procedure MakeConfigurationFile(ACondition : integer);
+procedure MakeConfigurationFile(ACondition, ASessionBlocs : integer);
 procedure ShowStimuli;
 
 var
   ConfigurationFilename : string;
+  SessionBlocs : integer = 3;
 
 implementation
 
@@ -17,11 +18,12 @@ uses Classes, SysUtils, Forms, FileUtil
    , Constants
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
-   , Controls.Trials.GoNoGo.Maues
    ;
 
 type
 
+  TResponseStyle = (Go, NoGo);
+  TScreenSide = (ssLeft, ssRight);
   TExperimentalCategory = (InNatura, Processed, Control);
 
   TGoNoGoTrial = record
@@ -36,26 +38,26 @@ type
 var
   TrialsInNatura : TGoNoGoTrials;
   TrialsProcessed : TGoNoGoTrials;
-  TrialsControlA : TGoNoGoTrials;
-  TrialsControlB : TGoNoGoTrials;
-  TrialsControl1 : TGoNoGoTrials;
-  TrialsControl2 : TGoNoGoTrials;
+  TrialsClothesGo : TGoNoGoTrials;
+  TrialsClothesNoGo : TGoNoGoTrials;
+  TrialsHomeGo : TGoNoGoTrials;
+  TrialsHomeNoGo : TGoNoGoTrials;
 
 const
   FolderInNatura =
-   'condicao_experimental_in_natura_go'+DirectorySeparator;
+   'in_natura_go'+DirectorySeparator;
 
   FolderProcessed =
-   'condicao_experimental_ultraprocessados_no_go'+DirectorySeparator;
+   'ultraprocessados_nogo'+DirectorySeparator;
 
-  FolderControlIntra =
-   'condicao_experimental_controle'+DirectorySeparator;
+  FolderControlClothes =
+   'controle_vestuario'+DirectorySeparator;
 
-  FolderControlInter =
-   'condicao_controle'+DirectorySeparator;
+  FolderControlHome =
+   'controle_casa'+DirectorySeparator;
 
   Folders : array [0..3] of string =
-   (FolderInNatura, FolderProcessed, FolderControlIntra, FolderControlInter);
+   (FolderInNatura, FolderProcessed, FolderControlClothes, FolderControlHome);
 
   StmDuration = 1250;
 
@@ -63,10 +65,27 @@ const
 
   ITI = 1250;
 
+procedure RandomizeStimuli(var Rand : array of integer);
+var
+  i, t, r : integer;
+begin
+  for i := Low(Rand) to High(Rand) do
+  begin
+    r := Random(Length(Rand));
+    t := Rand[r];
+    Rand[r] := Rand[i];
+    Rand[i] := t;
+  end;
+end;
+
 procedure SetupStimuli;
 var
   i : integer;
   Folder : String;
+  LTrialsClothes : TGoNoGoTrials;
+  LTrialsHome : TGoNoGoTrials;
+  R : array [0..17] of integer =
+   (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
 
   procedure FindFilesFor(out AStimuliArray: TGoNoGoTrials; AFolder : string);
   const
@@ -100,10 +119,27 @@ begin
 
   FindFilesFor(TrialsInNatura,  GlobalContainer.RootMedia+FolderInNatura);
   FindFilesFor(TrialsProcessed, GlobalContainer.RootMedia+FolderProcessed);
-  FindFilesFor(TrialsControlA,  GlobalContainer.RootMedia+FolderControlIntra);
-  FindFilesFor(TrialsControlB,  GlobalContainer.RootMedia+FolderControlIntra);
-  FindFilesFor(TrialsControl1,  GlobalContainer.RootMedia+FolderControlInter);
-  FindFilesFor(TrialsControl2,  GlobalContainer.RootMedia+FolderControlInter);
+  FindFilesFor(LTrialsClothes,  GlobalContainer.RootMedia+FolderControlClothes);
+  FindFilesFor(LTrialsHome,  GlobalContainer.RootMedia+FolderControlHome);
+
+  SetLength(TrialsClothesNoGo, 9);
+  SetLength(TrialsClothesGo, 9);
+  SetLength(TrialsHomeGo, 9);
+  SetLength(TrialsHomeNoGo, 9);
+  RandomizeStimuli(R);
+
+  for i:= Low(LTrialsClothes) to High(LTrialsClothes) do
+  case i of
+    0..8  : TrialsClothesGo[i] := LTrialsClothes[R[i]];
+    9..17 : TrialsClothesNoGo[i-9] := LTrialsClothes[R[i]];
+  end;
+
+  RandomizeStimuli(R);
+  for i:= Low(LTrialsHome) to High(LTrialsHome) do
+  case i of
+    0..8  : TrialsHomeGo[i] := LTrialsHome[R[i]];
+    9..17 : TrialsHomeNoGo[i-9] := LTrialsHome[R[i]];
+  end;
 
   for i := Low(TrialsInNatura) to High(TrialsInNatura) do
   begin
@@ -119,32 +155,32 @@ begin
     TrialsProcessed[i].ScreenSide := RandomScreenSide;
   end;
 
-  for i := Low(TrialsControlA) to High(TrialsControlA) do
+  for i := Low(TrialsClothesGo) to High(TrialsClothesGo) do
   begin
-    TrialsControlA[i].Category := Control;
-    TrialsControlA[i].ResponseStyle := Go;
-    TrialsControlA[i].ScreenSide := RandomScreenSide;
+    TrialsClothesGo[i].Category := Control;
+    TrialsClothesGo[i].ResponseStyle := Go;
+    TrialsClothesGo[i].ScreenSide := RandomScreenSide;
   end;
 
-  for i := Low(TrialsControlB) to High(TrialsControlB) do
+  for i := Low(TrialsClothesNoGo) to High(TrialsClothesNoGo) do
   begin
-    TrialsControlB[i].Category := Control;
-    TrialsControlB[i].ResponseStyle := NoGo;
-    TrialsControlB[i].ScreenSide := RandomScreenSide;
+    TrialsClothesNoGo[i].Category := Control;
+    TrialsClothesNoGo[i].ResponseStyle := NoGo;
+    TrialsClothesNoGo[i].ScreenSide := RandomScreenSide;
   end;
 
-  for i := Low(TrialsControl1) to High(TrialsControl1) do
+  for i := Low(TrialsHomeGo) to High(TrialsHomeGo) do
   begin
-    TrialsControl1[i].Category := Control;
-    TrialsControl1[i].ResponseStyle := Go;
-    TrialsControl1[i].ScreenSide := RandomScreenSide;
+    TrialsHomeGo[i].Category := Control;
+    TrialsHomeGo[i].ResponseStyle := Go;
+    TrialsHomeGo[i].ScreenSide := RandomScreenSide;
   end;
 
-  for i := Low(TrialsControl2) to High(TrialsControl2) do
+  for i := Low(TrialsHomeNoGo) to High(TrialsHomeNoGo) do
   begin
-    TrialsControl2[i].Category := Control;
-    TrialsControl2[i].ResponseStyle := NoGo;
-    TrialsControl2[i].ScreenSide := RandomScreenSide;
+    TrialsHomeNoGo[i].Category := Control;
+    TrialsHomeNoGo[i].ResponseStyle := NoGo;
+    TrialsHomeNoGo[i].ScreenSide := RandomScreenSide;
   end;
 end;
 
@@ -163,7 +199,7 @@ begin
   ConfigurationFile.Invalidate;
 end;
 
-procedure MakeConfigurationFile(ACondition : integer);
+procedure MakeConfigurationFile(ACondition, ASessionBlocs: integer);
 {
   bloco 1
   1 mensagem
@@ -252,6 +288,10 @@ procedure MakeConfigurationFile(ACondition : integer);
       t, r, i, j : integer;
       GoNoGoTrialsMask : array [0..8, 0..3] of integer;
       GoNoGoTrials : array [0..8, 0..3] of TGoNoGoTrial;
+      R1 : array [0..8] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8);
+      R2 : array [0..8] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8);
+      R3 : array [0..8] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8);
+      R4 : array [0..8] of integer = (0, 1, 2, 3, 4, 5, 6, 7, 8);
     begin
       // initialize mask with ordered indexes
       for i := Low(GoNoGoTrialsMask) to High(GoNoGoTrialsMask) do
@@ -268,25 +308,29 @@ procedure MakeConfigurationFile(ACondition : integer);
           GoNoGoTrialsMask[i, j] := t;
         end;
 
+      RandomizeStimuli(R1);
+      RandomizeStimuli(R2);
+      RandomizeStimuli(R3);
+      RandomizeStimuli(R4);
       if Experimental then
       begin
         // use mask to assign trials
         for i := Low(GoNoGoTrials) to High(GoNoGoTrials) do
         begin
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 0]] := TrialsInNatura[i];
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 1]] := TrialsProcessed[i];
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 2]] := TrialsControlA[i];
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 3]] := TrialsControlB[i];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 0]] := TrialsInNatura[R1[i]];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 1]] := TrialsProcessed[R2[i]];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 2]] := TrialsClothesGo[R3[i]];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 3]] := TrialsClothesNoGo[R4[i]];
         end;
       end else
       begin
         // use mask to assign trials
         for i := Low(GoNoGoTrials) to High(GoNoGoTrials) do
         begin
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 0]] := TrialsControl1[i];
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 1]] := TrialsControl2[i];
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 2]] := TrialsControl1[i+9];
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 3]] := TrialsControl2[i+9];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 0]] := TrialsClothesGo[R1[i]];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 1]] := TrialsClothesNoGo[R2[i]];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 2]] := TrialsHomeGo[R3[i]];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 3]] := TrialsHomeNoGo[R4[i]];
         end;
       end;
 
@@ -305,14 +349,14 @@ begin
   NewConfigurationFile;
   case ACondition of
     0 :
-      for i := 1 to 3 do
+      for i := 1 to ASessionBlocs do
       begin
         ConfigurationFile.WriteToBloc(i, _Name, 'Experimental '+i.ToString);
         if i = 1 then WriteMSGTrial(i);
         WriteBloc(True, i);
       end;
     1 :
-      for i := 1 to 3 do
+      for i := 1 to ASessionBlocs do
       begin
         ConfigurationFile.WriteToBloc(i, _Name, 'Controle '+i.ToString);
         if i = 1 then WriteMSGTrial(i);
@@ -338,24 +382,24 @@ begin
     Stimuli[i] := TrialsProcessed[i].Filename;
   FormCheckStimuli.ShowStimuli(Stimuli, 1);
 
-  SetLength(Stimuli, Length(TrialsControlA));
-  for i := Low(TrialsControlA) to High(TrialsControlA) do
-    Stimuli[i] := TrialsControlA[i].Filename;
+  SetLength(Stimuli, Length(TrialsHomeGo));
+  for i := Low(TrialsHomeGo) to High(TrialsHomeGo) do
+    Stimuli[i] := TrialsHomeGo[i].Filename;
   FormCheckStimuli.ShowStimuli(Stimuli, 2);
 
-  SetLength(Stimuli, Length(TrialsControlB));
-  for i := Low(TrialsControlB) to High(TrialsControlB) do
-    Stimuli[i] := TrialsControlB[i].Filename;
+  SetLength(Stimuli, Length(TrialsHomeNoGo));
+  for i := Low(TrialsHomeNoGo) to High(TrialsHomeNoGo) do
+    Stimuli[i] := TrialsHomeNoGo[i].Filename;
   FormCheckStimuli.ShowStimuli(Stimuli, 3);
 
-  SetLength(Stimuli, Length(TrialsControl1));
-  for i := Low(TrialsControl1) to High(TrialsControl1) do
-    Stimuli[i] := TrialsControl1[i].Filename;
+  SetLength(Stimuli, Length(TrialsClothesGo));
+  for i := Low(TrialsClothesGo) to High(TrialsClothesGo) do
+    Stimuli[i] := TrialsClothesGo[i].Filename;
   FormCheckStimuli.ShowStimuli(Stimuli, 4);
 
-  SetLength(Stimuli, Length(TrialsControl2));
-  for i := Low(TrialsControl2) to High(TrialsControl2) do
-    Stimuli[i] := TrialsControl2[i].Filename;
+  SetLength(Stimuli, Length(TrialsClothesNoGo));
+  for i := Low(TrialsClothesNoGo) to High(TrialsClothesNoGo) do
+    Stimuli[i] := TrialsClothesNoGo[i].Filename;
   FormCheckStimuli.ShowStimuli(Stimuli, 5);
   FormCheckStimuli.Show;
 end;

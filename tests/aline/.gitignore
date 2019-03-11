@@ -1,0 +1,9 @@
+*/backup/*
+backup/*
+docs/*
+lib/*
+data/*
+experiment_deb64
+*.exe
+*.res
+*.ini

@@ -116,8 +116,11 @@ end;
 
 procedure TBloc.TrialEnd(Sender: TObject);
 begin
-  FInterTrial.Enabled := True;
-  FITIBegin := TickCount - GlobalContainer.TimeStart;
+  if FInterTrial.Interval > 0 then
+  begin
+    FInterTrial.Enabled := True;
+    FITIBegin := TickCount - GlobalContainer.TimeStart;
+  end else InterTrialStopTimer(Sender);
 end;
 
 procedure TBloc.WriteTrialData(Sender: TObject);
@@ -130,6 +133,10 @@ const
   DoNotApply = #32#32#32#32#32#32 + 'NA';
 begin
   LTrial := TTrial(Sender);
+  case LTrial.Result of
+    'HIT' : FCounterManager.OnHit(Sender);
+    'MISS': FCounterManager.OnMiss(Sender);
+  end;
   SaveData := GetSaveDataProc(LGData);
   if LTrial.Header <> FLastTrialHeader then
     LReportLn := rsReportTrialID + #9 +

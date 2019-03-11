@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2018 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -32,7 +32,8 @@ type
     FHitsCounter : TCounterPR;
     FMissCounter : TCounterPR;
     FDataSupport : TDataSupport;
-    procedure TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure TrialKeyUp(Sender: TObject;
+      var Key: Word; Shift: TShiftState);
     procedure TrialStart(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
   protected
@@ -40,6 +41,7 @@ type
   public
     constructor Create(AOwner: TCustomControl); override;
     destructor Destroy; override;
+    function AsString : string; override;
     procedure Play(ACorrection : Boolean=False);override;
   end;
 
@@ -53,10 +55,15 @@ uses timestamps, Session.Configuration.GlobalContainer;
 
 { TPerformanceReview }
 
-procedure TPerformanceReview.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TPerformanceReview.TrialKeyUp(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
 begin
   if Key = 32 then
+  begin
+    if FDataSupport.Latency = TimeStart then
+      FDataSupport.Latency := TickCount;
     EndTrial(Sender);
+  end;
 end;
 
 procedure TPerformanceReview.TrialBeforeEnd(Sender: TObject);
@@ -100,20 +107,27 @@ end;
 
 destructor TPerformanceReview.Destroy;
 begin
-  FHitsCounter.Free;
-  FMissCounter.Free;
+
   inherited Destroy;
+end;
+
+function TPerformanceReview.AsString: string;
+begin
+  Result := '';
 end;
 
 procedure TPerformanceReview.Play(ACorrection: Boolean);
 begin
+  inherited Play(ACorrection);
   RootMedia:= GlobalContainer.RootMedia;
 
-  FHitsCounter := TCounterPR.Create(Owner);
+  FHitsCounter := TCounterPR.Create(Self);
+  FHitsCounter.Cursor := Cursor;
   FHitsCounter.Caption := RSLabelHits+#32+IntToStr(CounterManager.BlcHits);
   FHitsCounter.CentralizeLeft;
 
-  FMissCounter := TCounterPR.Create(Owner);
+  FMissCounter := TCounterPR.Create(Self);
+  FHitsCounter.Cursor := Cursor;
   FMissCounter.Caption := RSLabelMiss+#32+IntToStr(CounterManager.BlcMisses);
   FMissCounter.CentralizeRight;
 

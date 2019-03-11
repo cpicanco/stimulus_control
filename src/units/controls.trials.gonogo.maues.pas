@@ -25,18 +25,16 @@ uses LCLIntf, Controls, Classes, SysUtils, LazFileUtils
 type
 
   TResponseStyle = (Go, NoGo);
-  TScreenSide = (ssLeft, ssRight);
+  TScreenSide = (ssNone, ssLeft, ssRight);
 
   { TGNG }
 
   TGNG = Class(TTrial)
   private
-    FPresentConsequenceJustOnce : Boolean;
-    FConsequenceFired : Boolean;
+    FGoResponseFired : TScreenSide;
     FDataSupport : TDataSupport;
     FStimulus : TKey;
     {$IFDEF AUDIO}FSound : TBassStream;{$ENDIF}
-    FPopUpTime : integer;
     FSchedule : TSchedule;
     FResponseStyle : TResponseStyle;
     FScreenSide : TScreenSide;
@@ -54,6 +52,7 @@ type
     constructor Create(AOwner: TCustomControl); override;
     destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
+    function AsString : string; override;
     //procedure DispenserPlusCall; override;
 
   end;
@@ -71,7 +70,7 @@ begin
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
   OnTrialPaint := @TrialPaint;
-
+  FGoResponseFired := ssNone;
   Header :=  Header + #9 +
              rsReportStmBeg + #9 +
              rsReportRspLat + #9 +
@@ -91,17 +90,19 @@ end;
 procedure TGNG.TrialResult(Sender: TObject);
 begin
   if Result = T_NONE then
-    begin
-      if FConsequenceFired then
-        case FResponseStyle of
-          Go: Result := T_HIT;
-          NoGo: Result := T_MISS;
-        end
-      else
-        case FResponseStyle of
-          Go: Result := T_MISS;
-          NoGo: Result := T_HIT;
-        end;
+    case FResponseStyle of
+      Go:
+        if (FGoResponseFired <> ssNone) and
+           (FGoResponseFired = FScreenSide) then
+          Result := T_HIT
+        else
+          Result := T_MISS;
+
+      NoGo:
+        if (FGoResponseFired = ssNone) then
+          Result := T_HIT
+        else
+          Result := T_MISS;
     end;
 end;
 
@@ -114,32 +115,34 @@ begin
 end;
 
 procedure TGNG.Consequence(Sender: TObject);
-  procedure DoConsequence;
-  begin
-    FConsequenceFired := True;
-    TrialResult(Sender);
-    if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
-  end;
-
 begin
-  if FPresentConsequenceJustOnce then
-    begin
-      if not FConsequenceFired then
-        DoConsequence;
-    end
-  else
-    DoConsequence;
+  TrialResult(Sender);
+  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
 end;
 
 procedure TGNG.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if Key = 32 then
-    begin
-      LogEvent('R');
-      FSchedule.DoResponse;
-    end;
-end;
+  if FGoResponseFired = ssNone then
+  begin
+    case Key of
+      67,  99 :
+        begin
+          FGoResponseFired := ssLeft;
+          LogEvent('c');
+          if FScreenSide = ssLeft then
+            FSchedule.DoResponse;
+        end;
 
+      77, 109 :
+        begin
+          FGoResponseFired := ssRight;
+          LogEvent('m');
+          if FScreenSide = ssRight then
+            FSchedule.DoResponse;
+        end;
+    end;
+  end;
+end;
 
 procedure TGNG.TrialPaint;
 var
@@ -150,8 +153,8 @@ begin
       R := FStimulus.BoundsRect;
       if InflateRect(R,100,100) then
       case FResponseStyle of
-        Go : Canvas.Pen.Width := 15;
-        NoGo : Canvas.Pen.Width := 5;
+        Go : Canvas.Pen.Width := 5;
+        NoGo : Canvas.Pen.Width := 15;
       end;
       Canvas.Rectangle(R);
     end;
@@ -159,14 +162,15 @@ end;
 procedure TGNG.Play(ACorrection: Boolean);
 var
   s1, LName, LWidth, LHeight : string;
+  LConfiguration : TStringList;
 begin
   inherited Play(ACorrection);
-  FPresentConsequenceJustOnce := StrToBoolDef(Configurations.SList.Values[_PresentConsequenceJustOnce],True);
+  LConfiguration := Configurations.SList;
 
-  s1:= Configurations.SList.Values[_Comp + IntToStr(1) +_cStm] + #32;
+  s1:= LConfiguration.Values[_Comp + IntToStr(1) +_cStm] + #32;
   LName := RootMedia + ExtractDelimited(1,s1,[#32]);
 
-  s1:= Configurations.SList.Values[_Comp + IntToStr(1) +_cBnd] + #32;
+  s1:= LConfiguration.Values[_Comp + IntToStr(1) +_cBnd] + #32;
   LWidth := ExtractDelimited(1,s1,[#32]);
   LHeight := ExtractDelimited(2,s1,[#32]);
 
@@ -185,10 +189,9 @@ begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
       Load(CRF);
-      Enabled := False;
     end;
 
-  case UpperCase(Configurations.SList.Values[_ResponseStyle]) of
+  case UpperCase(LConfiguration.Values[_ResponseStyle]) of
     'GO'   : FResponseStyle := Go;
     'NOGO' : FResponseStyle := NoGo;
   end;
@@ -200,6 +203,11 @@ begin
   if Self.ClassType = TGNG then Config(Self);
 end;
 
+function TGNG.AsString: string;
+begin
+  Result := '';
+end;
+
 procedure TGNG.TrialStart(Sender: TObject);
 begin
   case FScreenSide of
@@ -208,9 +216,9 @@ begin
   end;
 
   FStimulus.Show;
-  FConsequenceFired := False;
   FDataSupport.Latency := TimeStart;
   FDataSupport.StmBegin := TickCount;
+  FSchedule.Start;
 end;
 
 procedure TGNG.WriteData(Sender: TObject);

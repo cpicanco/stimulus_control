@@ -65,7 +65,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="8">
+    <Units Count="9">
       <Unit0>
         <Filename Value="change_food_habits_go_nogo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -111,6 +111,11 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Forms.CheckStimuli"/>
       </Unit7>
+      <Unit8>
+        <Filename Value="../../src/units/sessionsimple.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="SessionSimple"/>
+      </Unit8>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

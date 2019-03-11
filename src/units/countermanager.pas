@@ -364,7 +364,6 @@ begin
   FTrialStmResponses := 0;
 end;
 
-//cada Trial.Consequence pode produzir um 'acerto' ou um 'erro';
 //TBlc.TrialTerminate, TCounterManager.Hit, TCounterManager.NotCorrection,
 //permitem definir quando incrementar um acerto tendo como base os valores dos contadores:
 //FVirtualTrialValue, FVirtualTrialLoop, FVirtualHitLoop e FVirtualTrial
