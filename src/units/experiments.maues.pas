@@ -222,8 +222,10 @@ procedure MakeConfigurationFile(ACondition, ASessionBlocs: integer);
     'Serão apresentadas a você algumas imagens na tela do notebook. ' +
     'Para selecionar uma imagem à esquerda, pressione a tecla “c” do teclado. ' +
     'Para selecionar uma à direita, pressione “m”. ' +
-    'A tarefa se assemelha a um jogo, você terá acesso a um contador de pontos ' +
-    'que lhe dará o total de erros e de acertos. Aperte barra de espaço para começar.';
+    'Você deve pressionar as teclas na presença de imagens envoltas na moldura fina, ' +
+    'e não pressionar diante das envoltas em moldura grossa. ' +
+    'A tarefa se assemelha a um jogo, você terá acesso a um contador de pontos que lhe ' +
+    'dará o total de erros e de acertos. Aperte a barra de espaço para começar.';
 
   i : integer;
   begin

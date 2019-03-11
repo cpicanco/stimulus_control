@@ -68,12 +68,12 @@ object Background: TBackground
       Top = 144
       Width = 152
       Font.Style = [fsBold]
-      MaxValue = 5
+      MaxValue = 6
       MinValue = 3
       OnChange = ExperimentParametersChange
       ParentFont = False
       TabOrder = 3
-      Value = 3
+      Value = 6
     end
     object LabelSessionBlocs: TLabel
       Left = 16
