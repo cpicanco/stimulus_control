@@ -78,7 +78,7 @@ end;
 constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  MakeConfigurationFile(0, 3);
+  MakeConfigurationFile(0, 6);
   FBloc := TBloc.Create(Self);
   FBloc.OnEndBloc := @EndBloc;
   //FBloc.OnInterTrialStop := @InterTrialStop;

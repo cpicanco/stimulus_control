@@ -98,9 +98,9 @@ end;
 
 procedure TBackground.FormKeyPress(Sender: TObject; var Key: char);
 begin
-  case key of
-    't' : ShowTrialConsole;
-  end;
+  //case key of
+  //  't' : ShowTrialConsole;
+  //end;
 end;
 
 procedure TBackground.ExperimentParametersChange(Sender: TObject);

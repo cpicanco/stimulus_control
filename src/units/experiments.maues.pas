@@ -40,8 +40,8 @@ var
   TrialsProcessed : TGoNoGoTrials;
   TrialsClothesGo : TGoNoGoTrials;
   TrialsClothesNoGo : TGoNoGoTrials;
-  TrialsHomeGo : TGoNoGoTrials;
-  TrialsHomeNoGo : TGoNoGoTrials;
+  TrialsHome : TGoNoGoTrials;
+  TrialsTools : TGoNoGoTrials;
 
 const
   FolderInNatura =
@@ -50,14 +50,21 @@ const
   FolderProcessed =
    'ultraprocessados_nogo'+DirectorySeparator;
 
+  FolderControlHome =
+   'controle_casa_go'+DirectorySeparator;
+
+  FolderControlTools =
+   'controle_ferramentas_nogo'+DirectorySeparator;
+
   FolderControlClothes =
    'controle_vestuario'+DirectorySeparator;
 
-  FolderControlHome =
-   'controle_casa'+DirectorySeparator;
-
-  Folders : array [0..3] of string =
-   (FolderInNatura, FolderProcessed, FolderControlClothes, FolderControlHome);
+  Folders : array [0..4] of string = (
+    FolderInNatura,
+    FolderProcessed,
+    FolderControlHome,
+    FolderControlTools,
+    FolderControlClothes);
 
   StmDuration = 1250;
 
@@ -83,7 +90,6 @@ var
   i : integer;
   Folder : String;
   LTrialsClothes : TGoNoGoTrials;
-  LTrialsHome : TGoNoGoTrials;
   R : array [0..17] of integer =
    (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
 
@@ -119,26 +125,20 @@ begin
 
   FindFilesFor(TrialsInNatura,  GlobalContainer.RootMedia+FolderInNatura);
   FindFilesFor(TrialsProcessed, GlobalContainer.RootMedia+FolderProcessed);
+  FindFilesFor(TrialsHome,  GlobalContainer.RootMedia+FolderControlHome);
+  FindFilesFor(TrialsTools,  GlobalContainer.RootMedia+FolderControlTools);
   FindFilesFor(LTrialsClothes,  GlobalContainer.RootMedia+FolderControlClothes);
-  FindFilesFor(LTrialsHome,  GlobalContainer.RootMedia+FolderControlHome);
 
   SetLength(TrialsClothesNoGo, 9);
   SetLength(TrialsClothesGo, 9);
-  SetLength(TrialsHomeGo, 9);
-  SetLength(TrialsHomeNoGo, 9);
+  SetLength(TrialsHome, 9);
+  SetLength(TrialsTools, 9);
   RandomizeStimuli(R);
 
   for i:= Low(LTrialsClothes) to High(LTrialsClothes) do
   case i of
     0..8  : TrialsClothesGo[i] := LTrialsClothes[R[i]];
     9..17 : TrialsClothesNoGo[i-9] := LTrialsClothes[R[i]];
-  end;
-
-  RandomizeStimuli(R);
-  for i:= Low(LTrialsHome) to High(LTrialsHome) do
-  case i of
-    0..8  : TrialsHomeGo[i] := LTrialsHome[R[i]];
-    9..17 : TrialsHomeNoGo[i-9] := LTrialsHome[R[i]];
   end;
 
   for i := Low(TrialsInNatura) to High(TrialsInNatura) do
@@ -169,18 +169,18 @@ begin
     TrialsClothesNoGo[i].ScreenSide := RandomScreenSide;
   end;
 
-  for i := Low(TrialsHomeGo) to High(TrialsHomeGo) do
+  for i := Low(TrialsHome) to High(TrialsHome) do
   begin
-    TrialsHomeGo[i].Category := Control;
-    TrialsHomeGo[i].ResponseStyle := Go;
-    TrialsHomeGo[i].ScreenSide := RandomScreenSide;
+    TrialsHome[i].Category := Control;
+    TrialsHome[i].ResponseStyle := Go;
+    TrialsHome[i].ScreenSide := RandomScreenSide;
   end;
 
-  for i := Low(TrialsHomeNoGo) to High(TrialsHomeNoGo) do
+  for i := Low(TrialsTools) to High(TrialsTools) do
   begin
-    TrialsHomeNoGo[i].Category := Control;
-    TrialsHomeNoGo[i].ResponseStyle := NoGo;
-    TrialsHomeNoGo[i].ScreenSide := RandomScreenSide;
+    TrialsTools[i].Category := Control;
+    TrialsTools[i].ResponseStyle := NoGo;
+    TrialsTools[i].ScreenSide := RandomScreenSide;
   end;
 end;
 
@@ -331,8 +331,8 @@ procedure MakeConfigurationFile(ACondition, ASessionBlocs: integer);
         begin
           GoNoGoTrials[i, GoNoGoTrialsMask[i, 0]] := TrialsClothesGo[R1[i]];
           GoNoGoTrials[i, GoNoGoTrialsMask[i, 1]] := TrialsClothesNoGo[R2[i]];
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 2]] := TrialsHomeGo[R3[i]];
-          GoNoGoTrials[i, GoNoGoTrialsMask[i, 3]] := TrialsHomeNoGo[R4[i]];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 2]] := TrialsHome[R3[i]];
+          GoNoGoTrials[i, GoNoGoTrialsMask[i, 3]] := TrialsTools[R4[i]];
         end;
       end;
 
@@ -384,14 +384,14 @@ begin
     Stimuli[i] := TrialsProcessed[i].Filename;
   FormCheckStimuli.ShowStimuli(Stimuli, 1);
 
-  SetLength(Stimuli, Length(TrialsHomeGo));
-  for i := Low(TrialsHomeGo) to High(TrialsHomeGo) do
-    Stimuli[i] := TrialsHomeGo[i].Filename;
+  SetLength(Stimuli, Length(TrialsHome));
+  for i := Low(TrialsHome) to High(TrialsHome) do
+    Stimuli[i] := TrialsHome[i].Filename;
   FormCheckStimuli.ShowStimuli(Stimuli, 2);
 
-  SetLength(Stimuli, Length(TrialsHomeNoGo));
-  for i := Low(TrialsHomeNoGo) to High(TrialsHomeNoGo) do
-    Stimuli[i] := TrialsHomeNoGo[i].Filename;
+  SetLength(Stimuli, Length(TrialsTools));
+  for i := Low(TrialsTools) to High(TrialsTools) do
+    Stimuli[i] := TrialsTools[i].Filename;
   FormCheckStimuli.ShowStimuli(Stimuli, 3);
 
   SetLength(Stimuli, Length(TrialsClothesGo));
