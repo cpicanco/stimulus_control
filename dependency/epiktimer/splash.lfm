@@ -1,0 +1,64 @@
+object Form3: TForm3
+  Left = 475
+  Height = 167
+  Top = 384
+  Width = 400
+  HorzScrollBar.Page = 401
+  VertScrollBar.Page = 168
+  Caption = 'EpikTimer Demo Initialization - Please wait'
+  ClientHeight = 167
+  ClientWidth = 400
+  Position = poScreenCenter
+  LCLVersion = '1.1'
+  Visible = True
+  object Progressbar1: TProgressBar
+    Left = 60
+    Height = 20
+    Top = 105
+    Width = 294
+    DragCursor = crDefault
+    Max = 9
+    Min = 1
+    Position = 1
+    Smooth = True
+    Step = 1
+    TabOrder = 0
+    TabStop = True
+  end
+  object Label1: TLabel
+    Left = 5
+    Height = 15
+    Top = 25
+    Width = 164
+    Alignment = taCenter
+    Caption = 'EpikTimer Test application'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 0
+    Height = 15
+    Top = 65
+    Width = 147
+    Alignment = taCenter
+    Caption = 'Beta release: 7-3-2003'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 0
+    Height = 15
+    Top = 45
+    Width = 281
+    Alignment = taCenter
+    Caption = 'By Tom Lisjac <vlx@users.sourceforge.net>'
+    ParentColor = False
+  end
+  object Label4: TLabel
+    Left = 0
+    Height = 15
+    Top = 135
+    Width = 202
+    Alignment = taCenter
+    Caption = 'System initializing... please wait'
+    ParentColor = False
+  end
+end

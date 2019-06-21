@@ -1,0 +1,27 @@
+object Form1: TForm1
+  Left = 333
+  Height = 302
+  Top = 211
+  Width = 585
+  Caption = 'Form1'
+  ClientHeight = 302
+  ClientWidth = 585
+  OnCreate = FormCreate
+  LCLVersion = '1.8.0.4'
+  object PanelOperandum: TPanel
+    Left = 176
+    Height = 146
+    Top = 88
+    Width = 206
+    Caption = 'Operandum, click me!'
+    TabOrder = 0
+    OnClick = PanelOperandumClick
+  end
+  object ScheduleVR: TSchedule
+    ScheduleName = VR
+    Parameter1 = 5
+    Parameter2 = 3
+    left = 120
+    top = 88
+  end
+end
