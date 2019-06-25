@@ -14,10 +14,9 @@ uses
 
 begin
   Randomize;
-  RequireDerivedFormResource:=True;
-  Application.CreateForm(TBackground, Background);
   Application.Scaled:=True;
   Application.Initialize;
+  Application.CreateForm(TBackground, Background);
   Application.Run;
 end.
 
