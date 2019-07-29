@@ -19,6 +19,7 @@ uses LCLIntf, Controls, Classes, SysUtils, LazFileUtils
   , Controls.Trials.Helpers
   , Controls.Stimuli.Text
   , Controls.GoLeftGoRight
+  , Stimuli.Image
   , Schedules
   {$IFDEF AUDIO}, Audio.Bass_nonfree {$ENDIF}
   ;
