@@ -16,6 +16,10 @@ Stimulus Control is a fork of EAM (https://github.com/eep-lab/eam).
 
 **[Instructions to compile the prototype here](https://github.com/cpicanco/stimulus_control/wiki)**.
 
+### Works that cited Stimulus Control
+
+Cedro, Á.M., Borges, J., Diniz, M.L.N. et al. Psychol Rec (2019) 69: 379. https://doi.org/10.1007/s40732-019-00346-5
+
 ### Some features
 
   - Text Messages
