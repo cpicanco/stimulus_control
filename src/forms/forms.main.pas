@@ -58,6 +58,7 @@ uses
 
 var
   LSession : TSession;
+  Initialized : Boolean = False;
 
 procedure TBackground.ButtonStartClick(Sender: TObject);
 begin
@@ -80,6 +81,7 @@ begin
   LSession := TSession.Create(Self);
   LSession.OnEndSession:=@EndSession;
   SpinEditSessionBlocs.Value := SessionBlocs;
+  Initialized:=True;
 end;
 
 //procedure TBackground.InterTrialStop(Sender: TObject);
@@ -106,8 +108,11 @@ end;
 
 procedure TBackground.ExperimentParametersChange(Sender: TObject);
 begin
-  ConfigurationFile.Free;
-  MakeConfigurationFile(RadioGroupCondition.ItemIndex, SpinEditSessionBlocs.Value);
+  if Initialized then
+  begin
+    ConfigurationFile.Free;
+    MakeConfigurationFile(RadioGroupCondition.ItemIndex, SpinEditSessionBlocs.Value);
+  end;
 end;
 
 

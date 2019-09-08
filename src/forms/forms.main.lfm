@@ -9,7 +9,7 @@ object Background: TBackground
   Color = clWhite
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.0.2.0'
   WindowState = wsFullScreen
   object PanelConfigurations: TPanel
     Left = 3
@@ -53,6 +53,7 @@ object Background: TBackground
       OnClick = ExperimentParametersChange
       ParentFont = False
       TabOrder = 1
+      Visible = False
     end
     object EditParticipant: TEdit
       Left = 16
@@ -93,6 +94,7 @@ object Background: TBackground
       Caption = 'Mostrar Estímulos'
       OnClick = ButtonShowStimuliClick
       TabOrder = 4
+      Visible = False
     end
   end
 end

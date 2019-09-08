@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2019 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -21,7 +21,7 @@ uses LCLIntf, Controls, Classes, SysUtils, LazFileUtils
   , Controls.GoLeftGoRight
   , Stimuli.Image
   , Schedules
-  {$IFDEF AUDIO}, Audio.Bass_nonfree {$ENDIF}
+  , Consequences
   ;
 
 type
@@ -32,15 +32,14 @@ type
 
   TGNG = Class(TTrial)
   private
-    FGoResponseFired : TButtonSide;
+    FButtonResponse : TButtonSide;
     FDataSupport : TDataSupport;
     FSample : TLabelStimulus;
     FComparison : TLabelStimulus;
     FOperandum : TGoLeftGoRight;
-
-    {$IFDEF AUDIO}FSound : TBassStream;{$ENDIF}
     FSchedule : TSchedule;
     FButtonSide : TButtonSide;
+    FConsequence : TConsequence;
     procedure ButtonLeftClick(Sender: TObject);
     procedure ButtonRightClick(Sender: TObject);
     procedure TrialPaint;
@@ -57,9 +56,10 @@ type
     constructor Create(AOwner: TCustomControl); override;
     destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
+    procedure StopConsequence; override;
+    function StartConsequence : integer; override;
     function AsString : string; override;
-    //procedure DispenserPlusCall; override;
-
+    function HasConsequence: Boolean; override;
   end;
 
 implementation
@@ -75,7 +75,7 @@ begin
   OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
   OnTrialPaint := @TrialPaint;
-  FGoResponseFired := ssNone;
+  FButtonResponse := ssNone;
   Header :=  Header + #9 +
              rsReportStmBeg + #9 +
              rsReportRspLat + #9 +
@@ -94,14 +94,17 @@ end;
 procedure TGNG.TrialResult(Sender: TObject);
 begin
   if Result = T_NONE then
-    case FGoResponseFired of
-      ssNone: Result := T_MISS;
+  begin
+    case FButtonResponse of
+      ssNone: Result := T_NONE;
       ssLeft, ssRight:
-        if FGoResponseFired = FButtonSide then
+        if FButtonResponse = FButtonSide then
           Result := T_HIT
         else
           Result := T_MISS;
     end;
+    FConsequence := NextConsequence(Result = T_HIT);
+  end;
 end;
 
 procedure TGNG.TrialBeforeEnd(Sender: TObject);
@@ -114,13 +117,13 @@ end;
 
 procedure TGNG.Consequence(Sender: TObject);
 begin
-  TrialResult(Sender);
   if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+  EndTrial(Sender);
 end;
 
 procedure TGNG.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  //if FGoResponseFired = ssNone then
+  //if FButtonResponse = ssNone then
   //begin
   //  case Key of
   //    67,  99 :
@@ -144,28 +147,29 @@ begin
     begin
       R := FSample.BoundsRect;
       if InflateRect(R,50,50) then
-      case FButtonSide of
-        ssLeft : Canvas.Pen.Width := 5;
-        ssRight : Canvas.Pen.Width := 15;
+      begin
+        Canvas.Pen.Color := $2e7aff;
+        Canvas.Pen.Width := 15;
       end;
+
       Canvas.Rectangle(R);
     end;
 end;
 
 procedure TGNG.ButtonLeftClick(Sender: TObject);
 begin
-  FGoResponseFired := ssLeft;
+  FButtonResponse := ssLeft;
   LogEvent('Verdadeiro');
-  if FButtonSide = ssLeft then
-    FSchedule.DoResponse;
+  //if FButtonSide = ssLeft then //force right response
+  FSchedule.DoResponse;
 end;
 
 procedure TGNG.ButtonRightClick(Sender: TObject);
 begin
-  FGoResponseFired := ssRight;
+  FButtonResponse := ssRight;
   LogEvent('Falso');
-  if FButtonSide = ssRight then
-    FSchedule.DoResponse;
+  //if FButtonSide = ssRight then //force right response
+  FSchedule.DoResponse;
 end;
 
 procedure TGNG.Play(ACorrection: Boolean);
@@ -182,7 +186,7 @@ begin
   with FSample do
     begin
       LoadFromFile(LName);
-      CentralizeLeft;
+      CentralizeTopMiddle;
     end;
 
   s1:= LConfiguration.Values[_Comp + IntToStr(1) +_cStm] + #32;
@@ -192,13 +196,13 @@ begin
   with FComparison do
     begin
       LoadFromFile(LName);
-      CentralizeMiddleRight;
+      CentralizeBottom;
     end;
 
   with TLabelStimulus.Create(Self, Self.Parent) do
   begin
     Caption := 'O computador disse:';
-    Font.Bold := True;;
+    Font.Bold := True;
     CentralizeOnTopOfControl(FComparison);
   end;
 
@@ -222,9 +226,26 @@ begin
   if Self.ClassType = TGNG then Config(Self);
 end;
 
+procedure TGNG.StopConsequence;
+begin
+  FConsequence.Visual.Stop;
+end;
+
+function TGNG.StartConsequence: integer;
+begin
+  FConsequence.Visual.Parent := Self.Parent;
+  Consequences.Play(FConsequence);
+  Result := 1750 + Random(501);
+end;
+
 function TGNG.AsString: string;
 begin
   Result := '';
+end;
+
+function TGNG.HasConsequence: Boolean;
+begin
+  Result := Self.Result <> T_NONE;
 end;
 
 procedure TGNG.TrialStart(Sender: TObject);

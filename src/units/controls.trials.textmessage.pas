@@ -79,7 +79,7 @@ begin
     Anchors := [akLeft,akRight];
     //Layout := tlCenter;
     WordWrap := True;
-    Font.Name := 'TimesNewRoman';
+    Font.Name := 'Arial';
     //OnMouseUp := @MessageMouseUp;
     Parent := TCustomControl(AOwner);
   end;

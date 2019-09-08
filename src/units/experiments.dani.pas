@@ -14,8 +14,10 @@ const
 
 implementation
 
-uses Classes, SysUtils, Forms, FileUtil
+uses Classes, SysUtils, Forms
    , Constants
+   , FileMethods
+   , LazFileUtils
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
    ;
@@ -23,7 +25,7 @@ uses Classes, SysUtils, Forms, FileUtil
 type
 
   TResponseStyle = (Go, NoGo);
-  TScreenSide = (ssLeft, ssRight);
+  //TScreenSide = (ssLeft, ssRight);
   TExperimentalCategory = (Sex, Rape, Control);
 
   TGoNoGoTrial = record
@@ -31,6 +33,7 @@ type
     ComparFilename : string;
     ResponseStyle: TResponseStyle;
     Category : TExperimentalCategory;
+    ID : byte;
   end;
 
   TGoNoGoTrials = array of TGoNoGoTrial;
@@ -90,7 +93,7 @@ const
     FolderClass2B,
     FolderClass2C);
 
-  StmDuration = 10000;
+  LimitedHold = 0;
 
   ITI = 1250;
 
@@ -112,28 +115,11 @@ procedure SetupStimuli;
 var
   Folder : String;
 
-  procedure FindFilesFor(out AStimuliArray: TStringArray; AFolder : string);
-  const
-    Extensions : string =  '*.txt;*.TXT';
-  var
-    Files : TStringList;
-    i : integer;
-  begin
-    Files := TStringList.Create;
-    try
-      FindAllFiles(Files, AFolder, Extensions, True);
-      SetLength(AStimuliArray, Files.Count);
-      for i := Low(AStimuliArray) to High(AStimuliArray) do
-        AStimuliArray[i] := Files[i];
-    finally
-      Files.Free;
-    end;
-  end;
-
   procedure MountTrialsFor(out AGoNoGoTrials: TGoNoGoTrials;
     AStimuli1, AStimuli2 : TStringArray;
     AExperimentalCategory : TExperimentalCategory;
-    AResponseStyle : TResponseStyle);
+    AResponseStyle : TResponseStyle;
+    AID : byte);
   var
     i, j, t : integer;
   begin
@@ -148,6 +134,7 @@ var
         AGoNoGoTrials[t].ComparFilename := AStimuli2[j];
         AGoNoGoTrials[t].Category := AExperimentalCategory;
         AGoNoGoTrials[t].ResponseStyle := AResponseStyle;
+        AGoNoGoTrials[t].ID := AID;
         Inc(t);
       end;
   end;
@@ -177,18 +164,20 @@ begin
   FindFilesFor(Class2BStimuli, GlobalContainer.RootMedia+FolderClass2B);
   FindFilesFor(Class2CStimuli, GlobalContainer.RootMedia+FolderClass2C);
 
-  MountTrialsFor(TrialsRapeABGo,   Class1AStimuli, Class1BStimuli, Rape, Go);
-  MountTrialsFor(TrialsRapeABNoGo, Class1AStimuli, Class2BStimuli, Rape, NoGo);
-  MountTrialsFor(TrialsRapeBCGo,   Class1BStimuli, Class1CStimuli, Rape, Go);
-  MountTrialsFor(TrialsRapeBCNoGo, Class1BStimuli, Class2CStimuli, Rape, NoGo);
-  MountTrialsFor(TrialsRapeACGo,   Class1AStimuli, Class1CStimuli, Rape, Go);
-  MountTrialsFor(TrialsRapeACNoGo, Class1AStimuli, Class2CStimuli, Rape, NoGo);
-  MountTrialsFor(TrialsSexABGo,    Class2AStimuli, Class2BStimuli, Sex,  Go);
-  MountTrialsFor(TrialsSexABNoGo,  Class2AStimuli, Class1BStimuli, Sex,  NoGo);
-  MountTrialsFor(TrialsSexBCGo,    Class2BStimuli, Class2CStimuli, Sex,  Go);
-  MountTrialsFor(TrialsSexBCNoGo,  Class2BStimuli, Class1CStimuli, Sex,  NoGo);
-  MountTrialsFor(TrialsSexACGo,    Class2AStimuli, Class2CStimuli, Sex,  Go);
-  MountTrialsFor(TrialsSexACNoGo,  Class2AStimuli, Class1CStimuli, Sex,  NoGo);
+  MountTrialsFor(TrialsRapeABGo,   Class1AStimuli, Class1BStimuli, Rape, Go, 0);
+  MountTrialsFor(TrialsRapeABNoGo, Class1AStimuli, Class2BStimuli, Rape, NoGo, 1);
+  MountTrialsFor(TrialsSexABGo,    Class2AStimuli, Class2BStimuli, Sex,  Go, 2);
+  MountTrialsFor(TrialsSexABNoGo,  Class2AStimuli, Class1BStimuli, Sex,  NoGo, 3);
+
+  MountTrialsFor(TrialsRapeBCGo,   Class1BStimuli, Class1CStimuli, Rape, Go, 4);
+  MountTrialsFor(TrialsRapeBCNoGo, Class1BStimuli, Class2CStimuli, Rape, NoGo, 5);
+  MountTrialsFor(TrialsSexBCGo,    Class2BStimuli, Class2CStimuli, Sex,  Go, 6);
+  MountTrialsFor(TrialsSexBCNoGo,  Class2BStimuli, Class1CStimuli, Sex,  NoGo, 7);
+
+  MountTrialsFor(TrialsRapeACGo,   Class1AStimuli, Class1CStimuli, Rape, Go, 8);
+  MountTrialsFor(TrialsRapeACNoGo, Class1AStimuli, Class2CStimuli, Rape, NoGo, 9);
+  MountTrialsFor(TrialsSexACGo,    Class2AStimuli, Class2CStimuli, Sex,  Go, 10);
+  MountTrialsFor(TrialsSexACNoGo,  Class2AStimuli, Class1CStimuli, Sex,  NoGo, 11);
 end;
 
 procedure NewConfigurationFile;
@@ -202,6 +191,47 @@ begin
   ConfigurationFile.WriteString(_Main, _NumBlc, '3');
   ConfigurationFile.WriteToBloc(1, _Name, 'SS');
   ConfigurationFile.Invalidate;
+end;
+
+// https://stackoverflow.com/questions/20190110/2d-int-array-shuffle
+function RandomizeTrials(var ATrials : TGoNoGoTrialsArray) : TGoNoGoTrials;
+var
+  r, t, j, i :  integer;
+  temp : TPoint;
+  LTrialsMask : array of array of TPoint;
+begin
+  // initialize
+  SetLength(LTrialsMask, Length(ATrials));
+  for i := Low(LTrialsMask) to High(LTrialsMask) do
+  begin
+    SetLength(LTrialsMask[i], Length(ATrials[i]));
+    for j := Low(LTrialsMask[i]) to High(LTrialsMask[i]) do
+      LTrialsMask[i][j] := Point(i,j);
+  end;
+
+  for i := Low(LTrialsMask) to High(LTrialsMask) do
+  begin
+    for j := Low(LTrialsMask[i]) to High(LTrialsMask[i]) do
+    begin
+        r := Random(i+1);
+        t := Random(j+1);
+        temp := LTrialsMask[i, j];
+        LTrialsMask[i, j] := LTrialsMask[r, t];
+        LTrialsMask[r, t] := temp;
+    end;
+  end;
+
+  SetLength(Result, 0);
+  for i := Low(LTrialsMask) to High(LTrialsMask) do
+  begin
+    for j := Low(LTrialsMask[i]) to High(LTrialsMask[i]) do
+    begin
+      SetLength(Result, Length(Result)+1);
+      Result[High(Result)] := ATrials[LTrialsMask[i][j].x][LTrialsMask[i][j].y];
+    end;
+  end;
+  //for i := Low(Result) to High(Result) do
+  //  WriteLn(Result[i].ID);
 end;
 
 procedure MakeConfigurationFile(ACondition, ASessionBlocs: integer);
@@ -269,7 +299,7 @@ procedure MakeConfigurationFile(ACondition, ASessionBlocs: integer);
         WriteToTrial(i, ABlc, _Kind, T_GNG);
         WriteToTrial(i, ABlc, _ResponseStyle, ResponseStyle);
         WriteToTrial(i, ABlc, _Category, Category);
-        WriteToTrial(i, ABlc, _LimitedHold, StmDuration.ToString);
+        WriteToTrial(i, ABlc, _LimitedHold, LimitedHold.ToString);
         WriteToTrial(i, ABlc, _ITI, ITI.ToString);
         WriteToTrial(i, ABlc, _Samp+_cStm, ExtractMediaName(ATrial.SampleFilename));
         WriteToTrial(i, ABlc, _Comp+'1'+_cStm, ExtractMediaName(ATrial.ComparFilename));
@@ -278,74 +308,36 @@ procedure MakeConfigurationFile(ACondition, ASessionBlocs: integer);
 
     procedure WriteGoNoGoTrials;
     var
-      t, r, i, j : integer;
-      LGoNoGoTrialsMask : array of array of integer;
-      LGoNoGoTrials : TGoNoGoTrialsArray;
-      R1 : array of integer;
-      R2 : array of integer;
-      LTrialsGo : integer;
-      LTrialsNoGo : integer;
+      i : integer;
+      LStructuredTrials : TGoNoGoTrialsArray;
+      LTrialsToWrite : TGoNoGoTrials;
     begin
-      LGoNoGoTrials := TGoNoGoTrialsArray.Create(
-      TrialsRapeABGo,
-      TrialsRapeABNoGo,
-      TrialsSexABGo,
-      TrialsSexABNoGo,
+      LStructuredTrials := TGoNoGoTrialsArray.Create(
+        TrialsRapeABGo,
+        TrialsRapeABNoGo,
+        TrialsSexABGo,
+        TrialsSexABNoGo);
+      LTrialsToWrite := RandomizeTrials(LStructuredTrials);
+      for i := Low(LTrialsToWrite) to High(LTrialsToWrite) do
+        WriteTrial(LTrialsToWrite[i]);
 
-      TrialsRapeBCGo,
-      TrialsRapeBCNoGo,
-      TrialsSexBCGo,
-      TrialsSexBCNoGo,
+      LStructuredTrials := TGoNoGoTrialsArray.Create(
+        TrialsRapeBCGo,
+        TrialsRapeBCNoGo,
+        TrialsSexBCGo,
+        TrialsSexBCNoGo);
+      LTrialsToWrite := RandomizeTrials(LStructuredTrials);
+      for i := Low(LTrialsToWrite) to High(LTrialsToWrite) do
+        WriteTrial(LTrialsToWrite[i]);
 
-      TrialsRapeACGo,
-      TrialsRapeACNoGo,
-      TrialsSexACGo,
-      TrialsSexACNoGo);
-
-
-      // set length based on existing go/no-go trials
-      //LTrialsGo := Length(TrialsGoSex);
-      //LTrialsNoGo := Length(TrialsNoGoSex);
-
-      // initialize mask with ordered indexes
-      //for i := Low(LGoNoGoTrialsMask) to High(LGoNoGoTrialsMask) do
-      //  LGoNoGoTrialsMask[i] := i;
-
-      // randomize mask
-      //for i := Low(LGoNoGoTrialsMask) to High(LGoNoGoTrialsMask) do
-      //  begin
-      //    r := Random(Length(LGoNoGoTrialsMask));
-      //    t := LGoNoGoTrialsMask[r];
-      //    LGoNoGoTrialsMask[i, r] := LGoNoGoTrialsMask[i, j];
-      //    LGoNoGoTrialsMask[i, j] := t;
-      //  end;
-      //
-      //RandomizeStimuli(R1);
-      //RandomizeStimuli(R2);
-      //
-      //if Experimental then
-      //begin
-      //  // use mask to assign trials
-      //  for i := Low(LGoNoGoTrials) to High(LGoNoGoTrials) do
-      //  begin
-      //    LGoNoGoTrials[i, LGoNoGoTrialsMask[i, 0]] := TrialsGoSex[R1[i]];
-      //    LGoNoGoTrials[i, LGoNoGoTrialsMask[i, 1]] := TrialsNoGoSex[R2[i]];
-      //  end;
-      //end else
-      //begin
-      //  // use mask to assign trials
-      //  //for i := Low(LGoNoGoTrials) to High(LGoNoGoTrials) do
-      //  //begin
-      //  //  LGoNoGoTrials[i, LGoNoGoTrialsMask[i, 0]] := TrialsClothesGo[R1[i]];
-      //  //  LGoNoGoTrials[i, LGoNoGoTrialsMask[i, 1]] := TrialsClothesNoGo[R2[i]];
-      //  //  LGoNoGoTrials[i, LGoNoGoTrialsMask[i, 2]] := TrialsHome[R3[i]];
-      //  //  LGoNoGoTrials[i, LGoNoGoTrialsMask[i, 3]] := TrialsTools[R4[i]];
-      //  //end;
-      //end;
-
-      for i := Low(LGoNoGoTrials) to High(LGoNoGoTrials) do
-        for j := Low(LGoNoGoTrials[i]) to High(LGoNoGoTrials[i]) do
-          WriteTrial(LGoNoGoTrials[i][j]);
+      LStructuredTrials := TGoNoGoTrialsArray.Create(
+        TrialsRapeACGo,
+        TrialsRapeACNoGo,
+        TrialsSexACGo,
+        TrialsSexACNoGo);
+      LTrialsToWrite := RandomizeTrials(LStructuredTrials);
+      for i := Low(LTrialsToWrite) to High(LTrialsToWrite) do
+        WriteTrial(LTrialsToWrite[i]);
     end;
   begin
     WriteGoNoGoTrials;
@@ -374,6 +366,14 @@ begin
   end;
   ConfigurationFile.Invalidate;
   ConfigurationFile.UpdateFile;
+end;
+
+operator = (A, B: TGoNoGoTrial) : Boolean;
+begin
+  if (A.ID = B.ID) or (A.ResponseStyle = B.ResponseStyle) then
+    Result := True
+  else
+    Result := False;
 end;
 
 initialization

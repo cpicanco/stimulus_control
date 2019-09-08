@@ -18,6 +18,8 @@ type
     constructor Create(AOwner: TComponent; AParent : TWinControl); reintroduce;
     procedure LoadFromFile(AFilename : string);
     procedure CentralizeLeft;
+    procedure CentralizeTopMiddle;
+    procedure CentralizeBottom;
     procedure CentralizeTopRight;
     procedure CentralizeMiddleRight;
     procedure CentralizeOnTopOfControl(AControl : TGraphicControl);
@@ -64,6 +66,28 @@ begin
   Top := (LParent.Height div 2) - (Height div 2);
 end;
 
+procedure TLabelStimulus.CentralizeTopMiddle;
+var
+  LParent : TCustomControl;
+begin
+  LParent := TCustomControl(Parent);
+  Width := (LParent.Width div 2)-150;
+  Left := (LParent.Width div 2) - (Width div 2);
+  Top := (LParent.Height div 2) - (LParent.Height div 4) - (Height div 2);
+
+  if Top < 250 then Top := 250;
+end;
+
+procedure TLabelStimulus.CentralizeBottom;
+var
+  LParent : TCustomControl;
+begin
+  LParent := TCustomControl(Parent);
+  Width := (LParent.Width div 2)-150;
+  Left := (LParent.Width div 2) - (Width div 2);
+  Top := (LParent.Height div 2) + (LParent.Height div 4) - (Height div 2);
+end;
+
 procedure TLabelStimulus.CentralizeTopRight;
 var
   LParent : TCustomControl;
@@ -90,7 +114,7 @@ var
 begin
   LParent := TCustomControl(Parent);
   Width := (LParent.Width div 2)-150;
-  Left := LParent.Width - (LParent.Width div 4) - (Width div 2);
+  Left := AControl.Left + (AControl.Width div 2) - (Width div 2);
   Top := AControl.Top - Height - 25;
 end;
 

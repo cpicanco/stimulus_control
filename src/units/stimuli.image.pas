@@ -26,14 +26,14 @@ type
 
   TStimulusFigure = class(TStimulus)
   private
-    FBackground : TCustomControl;
     FImage : TLightImage;
     function GetLeft: integer;
+    function GetParent: TWinControl;
     function GetTop: integer;
     function GetWidth: integer;
     function GetHeight: integer;
-    procedure SetBackGround(AValue: TCustomControl);
     procedure SetHeight(AValue: integer);
+    procedure SetParent(AValue: TWinControl);
     procedure SetWidth(AValue: integer);
     procedure SetLeft(AValue: integer);
     procedure SetTop(AValue: integer);
@@ -43,7 +43,9 @@ type
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
     procedure LoadFromFile(AFilename: string); override;
-    property BackGround : TCustomControl read FBackGround write SetBackGround;
+    procedure Start; override;
+    procedure Stop; override;
+    property Parent : TWinControl read GetParent write SetParent;
     property Width : integer read GetWidth write SetWidth;
     property Height : integer read GetHeight write SetHeight;
     property Top : integer read GetTop write SetTop;
@@ -60,6 +62,12 @@ begin
   FImage.Height:=AValue;
 end;
 
+procedure TStimulusFigure.SetParent(AValue: TWinControl);
+begin
+  if FImage.Parent=AValue then Exit;
+  FImage.Parent := AValue;
+end;
+
 function TStimulusFigure.GetWidth: integer;
 begin
   Result := FImage.Width;
@@ -70,16 +78,14 @@ begin
   Result := FImage.Height;
 end;
 
-procedure TStimulusFigure.SetBackGround(AValue: TCustomControl);
-begin
-  if FBackGround=AValue then Exit;
-  FBackGround:=AValue;
-  Fimage.Parent := FBackground;
-end;
-
 function TStimulusFigure.GetLeft: integer;
 begin
   Result := FImage.Left;
+end;
+
+function TStimulusFigure.GetParent: TWinControl;
+begin
+  Result := FImage.Parent;
 end;
 
 function TStimulusFigure.GetTop: integer;
@@ -115,6 +121,7 @@ constructor TStimulusFigure.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FImage := TLightImage.Create(Self);
+  FImage.Visible := False;
 end;
 
 destructor TStimulusFigure.Destroy;
@@ -125,6 +132,17 @@ end;
 procedure TStimulusFigure.LoadFromFile(AFilename: string);
 begin
   FImage.LoadFromFile(AFilename);
+end;
+
+procedure TStimulusFigure.Start;
+begin
+  FImage.Centralize;
+  FImage.Show;
+end;
+
+procedure TStimulusFigure.Stop;
+begin
+  FImage.Hide;
 end;
 
 end.

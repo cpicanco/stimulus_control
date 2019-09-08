@@ -45,6 +45,7 @@ type
     function ShortName : string;
     procedure LoadFromFile(AFilename : string);
     procedure SetOriginalSize;
+    procedure Centralize;
     property Schedule : TSchedule read FSchedule write SetSchedule;
     property EdgeColor : TColor read FEdge write FEdge;
     property Kind: TImageKind read FImageKind;
@@ -56,7 +57,7 @@ type
 
 implementation
 
-uses FileUtil, LazFileUtils;
+uses Forms, FileUtil, LazFileUtils;
 
 { TLightImage }
 
@@ -198,19 +199,61 @@ begin
       FFileName := AFilename;
       Invalidate;
       FImageKind:=ikBitmap;
+      SetOriginalSize;
     end;
 end;
 
 procedure TLightImage.SetOriginalSize;
+var
+  AspectRatio : Double;
 begin
   case FImageKind of
     ikNone: { Do nothing };
     ikBitmap:
       begin
-        Width := FBitmap.Width;
-        Height := FBitmap.Height;
+        AspectRatio := FBitmap.Width / FBitmap.Height;
+
+        if (FBitmap.Width > Screen.Width) and
+           (FBitmap.Height > Screen.Height) then
+        begin
+           if (FBitmap.Height >= FBitmap.Width) then
+             begin
+               Height := Screen.Height;
+               Width:= Round(Height/AspectRatio);
+             end
+           else
+             begin
+               Width := Screen.Width;
+               Height := Round(Width/AspectRatio);
+             end;
+        end;
+
+        if (FBitmap.Width > Screen.Width) and (FBitmap.Height <= Screen.Height) then
+        begin
+          Width := Screen.Width;
+          Height := Round(Width/AspectRatio);
+        end;
+
+        if (FBitmap.Height > Screen.Height) and (FBitmap.Width <= Screen.Width)  then
+        begin
+          Height := Screen.Height;
+          Width:= Round(Height/AspectRatio);
+        end;
+
+        if (FBitmap.Height <= Screen.Height) and
+           (FBitmap.Width <= Screen.Width) then
+        begin
+          Width := FBitmap.Width;
+          Height := FBitmap.Height;
+        end;
       end;
   end;
+end;
+
+procedure TLightImage.Centralize;
+begin
+  Left := (Screen.Width  div 2) - (Width  div 2);
+  Top  := (Screen.Height div 2) - (Height div 2);
 end;
 
 end.

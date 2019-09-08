@@ -117,6 +117,9 @@ type
     constructor Create(AOwner : TCustomControl); virtual; reintroduce;
     destructor Destroy; override;
     function AsString : string; virtual; abstract;
+    function HasConsequence : Boolean; virtual;
+    function StartConsequence : integer; virtual;
+    procedure StopConsequence; virtual;
     procedure Play(ACorrection: Boolean=False); virtual;
     procedure Hide; virtual;
     procedure Show; virtual;
@@ -249,14 +252,13 @@ begin
     DebugLn(mt_Debug + 'TTrial.EndTrial1');
   {$endif}
   if FLimitedHold = 0 then
-    if Assigned(FClock) then
-      //FClock.Enabled := False;
-      EndTrialThread(Sender);
+    EndTrialThread(Sender);
 end;
 
 procedure TTrial.EndTrialThread(Sender: TObject);
 begin
-  FClock.Enabled := False;
+  if Assigned(FClock) then
+    FClock.Enabled := False;
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.EndTrial2');
   {$endif}
@@ -377,6 +379,21 @@ begin
   inherited Destroy;
 end;
 
+function TTrial.HasConsequence: Boolean;
+begin
+  Result := IETConsequence <> T_NONE;
+end;
+
+function TTrial.StartConsequence: integer;
+begin
+
+end;
+
+procedure TTrial.StopConsequence;
+begin
+
+end;
+
 procedure TTrial.Play(ACorrection: Boolean);
 var
   LParameters : TStringList;
@@ -462,7 +479,7 @@ begin
   Show;
   SetFocus;
   if FIsCorrection then
-    if Assigned (OnBeginCorrection) then OnBeginCorrection(Sender);
+    if Assigned(OnBeginCorrection) then OnBeginCorrection(Sender);
   if Assigned(OnTrialStart) then OnTrialStart(Sender);
 end;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
@@ -56,16 +56,20 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <local>
-        <FormatVersion Value="1"/>
-      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
     </RunParams>
-    <RequiredPackages Count="1">
+    <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="castle_base"/>
       </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="14">
       <Unit0>
         <Filename Value="leticia_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -122,6 +126,21 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Image"/>
       </Unit10>
+      <Unit11>
+        <Filename Value="src/units/stimuli.image.base.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Image.Base"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="src/units/consequences.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Consequences"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="src/units/filemethods.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="FileMethods"/>
+      </Unit13>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

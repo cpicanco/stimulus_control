@@ -54,6 +54,7 @@ end;
 constructor TGoLeftGoRight.Create(AOwner: TComponent; ASimbling: TGraphicControl);
 begin
   inherited Create(AOwner);
+  BevelColor:=$1FFFFFFF;
   Height := 60;
   Width := 400;
   Top := ASimbling.Top + ASimbling.Height + 25;

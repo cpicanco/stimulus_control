@@ -18,6 +18,7 @@ type
   private
     FCounterManager : TCounterManager;
     FInterTrial : TTimer;
+    FTrialConsequence : TTimer;
     FITIBegin, FITIEnd : Extended;
     FLastTrialHeader : string;
     FTrial : TTrial;
@@ -27,6 +28,7 @@ type
   private
     FOnEndBloc: TNotifyEvent;
     FOnInterTrialStop: TNotifyEvent;
+    procedure PlayIntertrialInterval(Sender: TObject);
     procedure InterTrialStopTimer(Sender: TObject);
     procedure InterTrialTimer(Sender: TObject);
     procedure SetOnEndBloc(AValue: TNotifyEvent);
@@ -116,13 +118,13 @@ end;
 
 procedure TBloc.TrialEnd(Sender: TObject);
 begin
-  // if there is consequence then play consequence, else play iti
-
-  if FInterTrial.Interval > 0 then
-  begin
-    FInterTrial.Enabled := True;
-    FITIBegin := TickCount - GlobalContainer.TimeStart;
-  end else InterTrialStopTimer(Sender);
+  if FTrial.HasConsequence then
+    begin
+      FTrialConsequence.Interval := FTrial.StartConsequence;
+      FTrialConsequence.Enabled := True;
+    end
+  else
+    PlayInterTrialInterval(Sender);
 end;
 
 procedure TBloc.WriteTrialData(Sender: TObject);
@@ -172,13 +174,34 @@ begin
   SaveData(LReportLn);
 end;
 
+procedure TBloc.PlayIntertrialInterval(Sender: TObject);
+begin
+  if Assigned(FTrialConsequence) then
+  begin
+    FTrialConsequence.Enabled:=False;
+    FTrial.StopConsequence;
+  end;
+  if FInterTrial.Interval > 0 then
+    begin
+      FInterTrial.Enabled := True;
+      FITIBegin := TickCount - GlobalContainer.TimeStart;
+    end
+  else
+    InterTrialStopTimer(Sender);
+end;
+
 constructor TBloc.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FInterTrial := TTimer.Create(Self);
   FInterTrial.Enabled := False;
-  FInterTrial.OnTimer:=@InterTrialTimer;
-  FInterTrial.OnStopTimer:=@InterTrialStopTimer;
+  FInterTrial.OnTimer := @InterTrialTimer;
+  FInterTrial.OnStopTimer := @InterTrialStopTimer;
+
+  FTrialConsequence := TTimer.Create(Self);
+  FTrialConsequence.Enabled := False;
+  FTrialConsequence.OnTimer := @PlayIntertrialInterval;
+
   FCounterManager := GlobalContainer.CounterManager;
   FLastTrialHeader := '';
   FITIBegin := 0;
