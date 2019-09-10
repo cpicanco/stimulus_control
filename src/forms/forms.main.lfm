@@ -1,11 +1,11 @@
 object Background: TBackground
-  Left = 700
-  Height = 292
-  Top = 133
-  Width = 284
+  Left = 517
+  Height = 485
+  Top = 81
+  Width = 618
   Caption = 'Configurar sessão'
-  ClientHeight = 292
-  ClientWidth = 284
+  ClientHeight = 485
+  ClientWidth = 618
   Color = clWhite
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress

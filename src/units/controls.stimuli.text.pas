@@ -5,13 +5,13 @@ unit Controls.Stimuli.Text;
 interface
 
 uses
-  Classes, SysUtils, StdCtrls, Controls;
+  Classes, SysUtils, JvHtControls, Controls;
 
 type
 
   { TLabelStimulus }
 
-  TLabelStimulus = class(TLabel)
+  TLabelStimulus = class(TJvHTLabel)
   private
 
   public
@@ -36,6 +36,7 @@ begin
   inherited Create(AOwner);
   Visible := False;
   Alignment := taCenter;
+  Layout := tlCenter;
   Anchors := [akLeft,akRight];
   Font.Name := 'Arial';
   Font.Color:= clBlack;
@@ -49,8 +50,8 @@ begin
   LStringList := TStringList.Create;
   try
     LStringList.LoadFromFile(AFilename);
-    Caption := LStringList.Text;
-    WordWrap := True;
+    Caption := WrapText(LStringList.Text, '<br>', [#32], 50);
+    //WordWrap := True; // not supported by TJvHTLabel
   finally
     LStringList.Free;
   end;
