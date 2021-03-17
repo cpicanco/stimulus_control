@@ -28,6 +28,8 @@ core
 *.~*~
 *~
 __history
+media/*
+data/*
 backup/*
 */backup/*
 lib/*/*.lfm

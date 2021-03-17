@@ -26,6 +26,7 @@ type
   }
   TCounterManager = class(TComponent)
   private
+    FOnRepeatBlc: TNotifyEvent;
   {Current Session}
     FSessionBackGroundResponses : integer;
     FSessionConsequences : integer;
@@ -75,7 +76,7 @@ type
   {Current Stm}
     FStmCounter : integer;
   {Events}
-    FOnBlcRepetition: TNotifyEvent;
+    //FOnBlcRepetition: TNotifyEvent;
     FOnBeginBlc: TNotifyEvent;
     FOnBeginSess: TNotifyEvent;
     FOnBeginTrial: TNotifyEvent;
@@ -101,14 +102,15 @@ type
     procedure CsqCriterion(Sender : TObject);
     procedure CustomNxtTrial(Sender : TObject);
     procedure EndBlc(Sender : TObject);
+    procedure RepeatBlc(Sender : TObject);
     procedure EndSess(Sender : TObject);
     procedure EndTrial(Sender : TObject);
     procedure Hit(Sender : TObject);
     procedure Miss(Sender : TObject);
     procedure NotCorrection(Sender : TObject);
     procedure StmResponse(Sender : TObject);
-    procedure BlcRepeated(Sender : TObject);
-    procedure SetOnBlcRepetition(AValue: TNotifyEvent);
+    //procedure BlcRepeated(Sender : TObject);
+    //procedure SetOnBlcRepetition(AValue: TNotifyEvent);
   public
     constructor Create (AOwner : TComponent); override;
     function HitPorcentage(AGlobal : Boolean = False) : integer;
@@ -172,6 +174,7 @@ type
     property OnBkGndResponse : TNotifyEvent read FOnBkGndResponse write FOnBkGndResponse;
     property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
     property OnEndBlc: TNotifyEvent read FOnEndBlc write FOnEndBlc;
+    property OnRepeatBlc: TNotifyEvent read FOnRepeatBlc write FOnRepeatBlc;
     property OnEndSess: TNotifyEvent read FOnEndSess write FOnEndSess;
     property OnTrialEnd : TNotifyEvent read FOnTrialEnd write FOnTrialEnd;
     property OnNxtTrial : TNotifyEvent read FOnNxtTrial write FOnNxtTrial;
@@ -180,7 +183,7 @@ type
     property OnMiss: TNotifyEvent read FOnMiss write FOnMiss;
     property OnStmResponse : TNotifyEvent read FOnStmResponse write FOnStmResponse;
     property OnCsqCriterion : TNotifyEvent read FOnCsqCriterion write FOnCsqCriterion;
-    property OnBlcRepetition : TNotifyEvent read FOnBlcRepetition write SetOnBlcRepetition;
+    //property OnBlcRepetition : TNotifyEvent read FOnBlcRepetition write SetOnBlcRepetition;
   end;
 implementation
 
@@ -241,6 +244,7 @@ begin
   OnConsequence := @Consequence;
   OnCorrection := @Correction;
   OnEndBlc := @EndBlc;
+  OnRepeatBlc := @RepeatBlc;
   OnEndSess := @EndSess;
   OnTrialEnd := @EndTrial;
   OnNxtTrial := @CustomNxtTrial;
@@ -249,7 +253,7 @@ begin
   OnStmResponse := @StmResponse;
   OnCsqCriterion := @CsqCriterion;
   OnNotCorrection := @NotCorrection;
-  OnBlcRepetition := @BlcRepeated;
+  //OnBlcRepetition := @BlcRepeated;
 end;
 
 function TCounterManager.HitPorcentage(AGlobal: Boolean): integer;
@@ -346,8 +350,34 @@ begin
   FBlcHighCscNones := 0;
   FCurrentTrial := 0;
   FBlcTrials:= 0;
+  FBlcRepetitions := 0;
 
   Inc(FCurrentBlc);
+end;
+
+procedure TCounterManager.RepeatBlc(Sender: TObject);
+begin
+  FBlcVirtualHitLoop := 0;
+  FBlcVirtualTrial := 0;
+  FBlcBkGndResponses := 0;
+  FBlcStmResponses := 0;
+  FBlcConsequences := 0;
+  FBlcCorrections := 0;
+  FBlcCscCorrections := 0;
+  FBlcHighCscCorrections := 0;
+  FBlcCsqHits := 0;
+  FBlcHits := 0;
+  FBlcCscHits := 0;
+  FBlcHighCscHits := 0;
+  FBlcMisses := 0;
+  FBlcCscMisses := 0;
+  FBlcHighCscMisses := 0;
+  FBlcNones := 0;
+  FBlcCscNones := 0;
+  FBlcHighCscNones := 0;
+  FCurrentTrial := 0;
+  FBlcTrials:= 0;
+  Inc(FBlcRepetitions);
 end;
 
 procedure TCounterManager.EndSess(Sender: TObject);
@@ -439,11 +469,11 @@ begin
     end;
 end;
 
-procedure TCounterManager.SetOnBlcRepetition(AValue: TNotifyEvent);
-begin
-  if FOnBlcRepetition=AValue then Exit;
-  FOnBlcRepetition:=AValue;
-end;
+//procedure TCounterManager.SetOnBlcRepetition(AValue: TNotifyEvent);
+//begin
+//  if FOnBlcRepetition=AValue then Exit;
+//  FOnBlcRepetition:=AValue;
+//end;
 
 procedure TCounterManager.CustomNxtTrial(Sender: TObject);
 begin
@@ -464,10 +494,10 @@ begin
   Inc(FTrialStmResponses);
 end;
 
-procedure TCounterManager.BlcRepeated(Sender: TObject);
-begin
-  Inc(FBlcRepetitions);
-end;
+//procedure TCounterManager.BlcRepeated(Sender: TObject);
+//begin
+//  Inc(FBlcRepetitions);
+//end;
 
 
 procedure TCounterManager._VirtualTrialFix;

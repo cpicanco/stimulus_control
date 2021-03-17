@@ -5,7 +5,7 @@ unit Session.BlocsSimple;
 interface
 
 uses
-  Classes, SysUtils, ExtCtrls, Controls
+  Classes, SysUtils, ExtCtrls, StdCtrls, Controls
   , CounterManager
   , Controls.Trials.Abstract
   ;
@@ -16,6 +16,7 @@ type
 
   TBloc = class(TComponent)
   private
+    FConsequence : TLabel;
     FCounterManager : TCounterManager;
     FInterTrial : TTimer;
     FTrialConsequence : TTimer;
@@ -54,6 +55,10 @@ uses Constants
    , Controls.Trials.GoNoGo.Dani
    , Controls.Trials.PerformanceReview
    , Controls.Trials.TextMessage
+   , Controls.Trials.BeforeAfter
+   , Controls.Trials.ContextualMatchingToSample
+   , Controls.Trials.RelationalFrame
+   , Graphics
    ;
 
 { TBloc }
@@ -65,13 +70,21 @@ begin
   if Assigned(FTrial) then FreeAndNil(FTrial);
   ATrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
   try
+    {$IFDEF DEBUG}
+    FInterTrial.Interval := 100;
+    {$ELSE}
     FInterTrial.Interval := StrToIntDef(ATrialConfig.SList.Values[_ITI], 0);
+    {$ENDIF}
+
     case ATrialConfig.Kind of
       T_MSG : FTrial := TMessageTrial.Create(Background);
       T_MTS : FTrial := TMTS.Create(Background);
       T_LIK : FTrial := TLikert.Create(Background);
       T_GNG : FTrial := TGNG.Create(Background);
       T_PFR : FTrial := TPerformanceReview.Create(Background);
+      T_BAT : FTrial := TBeforeAfter.Create(Background);
+      T_CTX : FTrial := TCMTS.Create(Background);
+      T_RFT : FTrial := TFrame.Create(Background);
     end;
 
     FTrial.SaveData := GetSaveDataProc(LGTimestamps);
@@ -93,6 +106,8 @@ end;
 procedure TBloc.InterTrialStopTimer(Sender: TObject);
 begin
   if Assigned(OnIntertrialStop) then OnIntertrialStop(Sender);
+  FConsequence.Caption:='';
+  FConsequence.Hide;
   FITIEnd := TickCount - GlobalContainer.TimeStart;
   WriteTrialData(FTrial);
   FCounterManager.CurrentTrial := FCounterManager.CurrentTrial+1;
@@ -117,8 +132,25 @@ begin
 end;
 
 procedure TBloc.TrialEnd(Sender: TObject);
+var
+  LTrial : TTrial;
 begin
-  if FTrial.HasConsequence then
+  LTrial := TTrial(Sender);
+  LTrial.Hide;
+  if LTrial.HasConsequence then
+    case LTrial.Result of
+      'HIT' :
+      begin
+        FConsequence.Caption := 'Certo';
+        FConsequence.Show;
+      end;
+      'MISS':
+      begin
+        FConsequence.Caption := 'Errado';
+        FConsequence.Show;
+      end;
+    end;
+  if FInterTrial.Interval > 0 then
     begin
       FTrialConsequence.Interval := FTrial.StartConsequence;
       FTrialConsequence.Enabled := True;
@@ -206,19 +238,87 @@ begin
   FLastTrialHeader := '';
   FITIBegin := 0;
   FITIEnd := 0;
+
+  FConsequence := TLabel.Create(Self);
+  with FConsequence do begin
+    Visible := False;
+    Cursor := -1;
+    Align := alClient;
+    Alignment := taCenter;
+    Anchors := [akLeft,akRight];
+    WordWrap := True;
+    Font.Name := 'Arial';
+    Font.Size := 30;
+    Layout:=tlCenter;
+    //OnMouseUp := @MessageMouseUp;
+  end;
 end;
 
 procedure TBloc.Play;
 var
   LCurrentBloc, LCurrentTrial, LTotalTrials : integer;
+  LBlc : TCfgBlc;
+  function EndCriteriaAchieved(ABlc : TCfgBlc) : Boolean;
+  begin
+    Result := False;
+    if ABlc.CrtConsecutiveHit > 0 then
+      if FCounterManager.BlcCscHits = ABlc.CrtConsecutiveHit then
+      begin
+        Result := True;
+        Exit;
+      end;
+  end;
+
 begin
+  FConsequence.Parent := Background;
   LCurrentBloc := FCounterManager.CurrentBlc;
-  LTotalTrials := ConfigurationFile.Bloc[LCurrentBloc+1].NumTrials;
+  LBlc := ConfigurationFile.Bloc[LCurrentBloc+1];
+  LTotalTrials := LBlc.NumTrials;
   LCurrentTrial := FCounterManager.CurrentTrial;
-  if LCurrentTrial <= LTotalTrials -1 then
+
+  // will check every trial
+  if EndCriteriaAchieved(LBlc) then
+  begin
+    if Assigned(OnEndBloc) then OnEndBloc(Self);
+    Exit;
+  end;
+
+  if (LCurrentTrial <= LTotalTrials -1) then
     PlayTrial(LCurrentBloc, LCurrentTrial)
   else
-    if Assigned(OnEndBloc) then OnEndBloc(Self);
+    begin // will check once per bloc
+      if LBlc.CrtHitValue > 0 then
+        if (FCounterManager.BlcHits < LBlc.CrtHitValue) then
+        begin
+          if LBlc.MaxBlcRepetition > 0 then
+          begin
+            if (FCounterManager.BlcRepetitions < LBlc.MaxBlcRepetition) then
+            begin
+              FCounterManager.OnRepeatBlc(Self);
+              PlayTrial(LCurrentBloc, FCounterManager.CurrentTrial);
+              Exit;
+            end else begin
+              FCounterManager.CurrentBlc := ConfigurationFile.BlocCount;
+              //FCounterManager.OnEndSess(Self);
+            end;
+          end else begin
+            FCounterManager.OnRepeatBlc(Self);
+            PlayTrial(LCurrentBloc, FCounterManager.CurrentTrial);
+            Exit;
+          end;
+        end;
+
+      //if LBlc.CrtConsecutiveHit > 0 then
+      //  if FCounterManager.BlcHighCscHits < LBlc.CrtConsecutiveHit then
+      //  begin
+      //    FCounterManager.OnRepeatBlc(Self);
+      //    PlayTrial(LCurrentBloc, FCounterManager.CurrentTrial);
+      //    if Assigned(OnEndBloc) then OnEndBloc(Self);
+      //    Exit;
+      //  end;
+
+      if Assigned(OnEndBloc) then OnEndBloc(Self);
+    end;
 end;
 
 end.

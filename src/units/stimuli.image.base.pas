@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2019 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2020 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -57,7 +57,7 @@ type
 
 implementation
 
-uses Forms, FileUtil, LazFileUtils;
+uses Forms, FileUtil, LazFileUtils, Session.Configuration.GlobalContainer, Dialogs;
 
 { TLightImage }
 
@@ -94,13 +94,12 @@ procedure TLightImage.Paint;
   begin
     with Canvas do
       begin
-        Font.Size:= 48;
         Font.Color:= clWhite xor Color;
         Pen.Width := FPenWidth;
         Pen.Color := EdgeColor;
         Brush.Color:= Color;//FBorderColor;
         //FillRect(Rect(0, 0, Width, Height));
-        Rectangle(ClientRect);
+        if Caption = '' then Rectangle(ClientRect);
         TextRect(ClientRect,
           (((ClientRect.Right-ClientRect.Left) div 2) - (TextWidth(Caption)div 2)),
           (((ClientRect.Bottom-ClientRect.Top) div 2) - (TextHeight(Caption)div 2)),
@@ -123,6 +122,7 @@ begin
   Width:= 45;
   EdgeColor:= clInactiveCaption;
   OnMouseDown := @ImageMouseDown;
+  Canvas.Font.Size := 24;
 end;
 
 destructor TLightImage.Destroy;
@@ -156,7 +156,7 @@ var
   var LPNG : TPortableNetworkGraphic;
   begin
     LPNG := TPortableNetworkGraphic.Create;
-    LPNG.LoadFromFile(AFilename);
+    LPNG.LoadFromFile(FFileName);
     Width := LPNG.Width;
     Height := LPNG.Height;
     FBitmap.Assign(LPNG);
@@ -169,38 +169,45 @@ var
   var LJPG : TJPEGImage;
   begin
     LJPG := TJPEGImage.Create;
-    LJPG.LoadFromFile(AFilename);
+    LJPG.LoadFromFile(FFileName);
     FBitmap.Assign(LJPG);
     LJPG.Free;
   end;
 
 begin
   if FFileName = AFilename then Exit;
-  FFileName := '';
+
   if FileExists(AFilename) then
+    FFileName := AFilename
+  else
+    FFileName := GlobalContainer.RootMedia + AFilename;
+
+  if not FileExists(FFileName) then
+  begin
+    FFilename := '';
+    Exit;
+  end;
+
+  if Assigned(FBitmap) then
+    FBitmap.Free;
+  FBitmap := TBitmap.Create;
+  with FBitmap do
     begin
-      if Assigned(FBitmap) then
-        FBitmap.Free;
-      FBitmap := TBitmap.Create;
-      with FBitmap do
-        begin
-          Width := Self.Width;
-          Height := Self.Height;
-          Canvas.Brush.Color := Self.Color;
-          Canvas.Rectangle(ClientRect);
-        end;
-      s1:= UpperCase(ExtractFileExt(AFilename));
-      case s1 of
-        // images
-        '.BMP' : FBitmap.LoadFromFile(AFilename);
-        '.JPG' : Load_JPG;
-        '.PNG' : Load_PNG;
-      end;
-      FFileName := AFilename;
-      Invalidate;
-      FImageKind:=ikBitmap;
-      SetOriginalSize;
+      Width := Self.Width;
+      Height := Self.Height;
+      Canvas.Brush.Color := Self.Color;
+      Canvas.Rectangle(ClientRect);
     end;
+  s1:= UpperCase(ExtractFileExt(FFileName));
+  case s1 of
+    // images
+    '.BMP' : FBitmap.LoadFromFile(FFileName);
+    '.JPG' : Load_JPG;
+    '.PNG' : Load_PNG;
+  end;
+  Invalidate;
+  FImageKind:=ikBitmap;
+  SetOriginalSize;
 end;
 
 procedure TLightImage.SetOriginalSize;

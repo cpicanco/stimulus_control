@@ -1,0 +1,7 @@
+[TApplication.Background]
+RadioGroupCondition_ItemIndex=1
+SpinEditOperandumHold_Value=20000
+SpinEditSessionBlocs_Value=1
+SpinEditOperandumDelay_Value=5000
+RadioGroupBehaviour_ItemIndex=2
+EditParticipant_Text=Fulano

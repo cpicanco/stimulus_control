@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2020 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit Session.ConfigurationFile;
 
 {$mode objfpc}{$H+}
@@ -106,6 +115,7 @@ begin
       CrtHitPorcentage := ReadInteger(LBlcSection, _CrtHitPorcentage, -1);
       CrtConsecutiveHit := ReadInteger(LBlcSection, _CrtConsecutiveHit, -1);
       CrtConsecutiveMiss := ReadInteger(LBlcSection, _CrtConsecutiveMiss, -1);
+      CrtHitValue := ReadInteger(LBlcSection, _CrtHitValue, -1);
       CrtMaxTrials:= ReadInteger(LBlcSection, _CrtMaxTrials, -1);
       CrtKCsqHit := ReadInteger(LBlcSection, _CsqCriterion, -1);
       NextBlocOnCriteria := ReadInteger(LBlcSection, _NextBlocOnCriteria, -1);

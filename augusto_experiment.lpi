@@ -5,12 +5,14 @@
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
-      <Title Value="leticia_experiment"/>
+      <Title Value="augusto_experiment"/>
       <Scaled Value="True"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <XPManifest>
         <DpiAware Value="True"/>
+        <TextName Value="Experimentos.RFT.Augusto"/>
+        <TextDesc Value="Experimento do Augusto"/>
       </XPManifest>
     </General>
     <BuildModes Count="2">
@@ -26,15 +28,26 @@
             <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/epiktimer"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
+          <Parsing>
+            <SyntaxOptions>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
           <CodeGeneration>
             <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+              <RangeChecks Value="True"/>
+              <OverflowChecks Value="True"/>
+              <StackChecks Value="True"/>
+            </Checks>
+            <VerifyObjMethodCallValidity Value="True"/>
             <TargetCPU Value="x86_64"/>
             <TargetOS Value="win64"/>
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <GenerateDebugInfo Value="False"/>
-              <UseLineInfoUnit Value="False"/>
+              <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <LinkSmart Value="True"/>
             <Options>
@@ -72,9 +85,9 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="14">
+    <Units Count="25">
       <Unit0>
-        <Filename Value="leticia_experiment.lpr"/>
+        <Filename Value="augusto_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
@@ -144,6 +157,61 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="FileMethods"/>
       </Unit13>
+      <Unit14>
+        <Filename Value="src/units/stimuli.sequence.beforeafter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Sequence.BeforeAfter"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="src/units/serialtimer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="SerialTimer"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="src/units/controls.trials.beforeafter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.BeforeAfter"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="src/units/experiments.beforeafter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.BeforeAfter"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="src/units/stimuli.sequence.contextualmatchingtosample.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Sequence.ContextualMatchingToSample"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="src/units/controls.trials.contextualmatchingtosample.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.ContextualMatchingToSample"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="src/units/controls.trials.relationalframe.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.RelationalFrame"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="src/units/stimuli.sequence.relationalframe.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Sequence.RelationalFrame"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="src/units/testingmethods.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="TestingMethods"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="src/units/experiments.samedifferent.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.SameDifferent"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="src/units/experiments.derivation.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Derivation"/>
+      </Unit24>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -180,7 +248,7 @@
     </Other>
   </CompilerOptions>
   <Debugging>
-    <Exceptions Count="3">
+    <Exceptions Count="4">
       <Item1>
         <Name Value="EAbort"/>
       </Item1>
@@ -190,6 +258,9 @@
       <Item3>
         <Name Value="EFOpenError"/>
       </Item3>
+      <Item4>
+        <Name Value="RunError(219)"/>
+      </Item4>
     </Exceptions>
   </Debugging>
 </CONFIG>
