@@ -57,7 +57,9 @@ begin
   OnTrialStart := @TrialStart;
 
   Header := 'StmBegin' + #9 +
-             '_Latency';
+             '_Latency' + #9 +
+             'Bloc.Hits' + #9 +
+             'Bloc.Misses';
   Result := T_NONE;
   IETConsequence := T_NONE;
   Result := T_NONE;
@@ -120,7 +122,9 @@ begin
 
   Data :=  Data +
            TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
-           LLatency;
+           LLatency + #9 +
+           IntToStr(CounterManager.BlcHits) + #9 +
+           IntToStr(CounterManager.BlcMisses);
 end;
 
 end.

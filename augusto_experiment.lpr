@@ -1,4 +1,4 @@
-program leticia_experiment;
+program augusto_experiment;
 
 {$mode objfpc}{$H+}
 
@@ -17,6 +17,9 @@ begin
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TBackground, Background);
+  {$IFDEF LINUX}
+    Background.WindowState:=wsFullScreen;
+  {$ENDIF}
   Application.Run;
 end.
 

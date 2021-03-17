@@ -278,16 +278,9 @@ begin
   {$ENDIF}
 end;
 
-procedure TKey.SetFileName(AFilename: string);                 //Review required
+procedure TKey.SetFileName(AFilename: string);
 var
   s1 : String;
-
-  LGuessedExtensions : array [0..5] of string = (
-    '.BMP', '.JPG', '.PNG',
-    '.bmp', '.jpg', '.png'
-  );
-
-  LExtension : string;
 
   procedure CreateBitmap;
   begin
@@ -308,22 +301,6 @@ var
     FKind.stmAudio := Audio;
     FKind.stmImage := Image;
   end;
-
-  // Create_GIF;
-
-    {FGifImage := TJvGIFAnimator.Create (Self);
-    FGifImage.Parent := Self;
-    FGifImage.Threaded := False;
-    FGifImage.Visible := False;
-    FGifImage.OnMouseDown := MouseDown;  //2
-    FGifImage.Stretch := True;
-    FGifImage.Align := alClient;
-    FGifImage.Top := 0;
-    FGifImage.Left := 0;
-    FGifImage.Width := Width;
-    FGifImage.Height := Height;
-    FGifImage.Cursor := Self.Cursor;
-    FGifImage.Animate := True; }
 
   procedure Load_PNG(AF:string; Audio: Boolean=False);
   var LPNG : TPortableNetworkGraphic;
@@ -358,29 +335,6 @@ var
     SetKind(Audio, stmPicture);
   end;
 
-  {$IFDEF AUDIO}
-  procedure Load_AUD;
-  begin
-    if Loops > 0 then
-      FAudioPlayer := TBassStream.Create(AFilename,Loops)
-    else
-      FAudioPlayer := TBassStream.Create(AFilename);
-    SetKind(True, TImage.stmNone);
-  end;
-  {$ENDIF}
-
-  {$IFDEF VIDEO}
-  procedure Load_VID;
-  begin
-    FVideoPlayer := TVLCVideoPlayer.Create(Self, Parent);
-    FVideoPlayer.SetEndOfFileEvent(@VideoResponse);
-    FVideoPlayer.SetBounds(Left, Top, Width, Height);
-    FVideoPlayer.LoadFromFile(AFilename);
-    FVideoPlayer.OnClick:=@VideoClick;
-    SetKind(False, TImage.stmVideo);
-  end;
-  {$ENDIF}
-
 begin
   if FFileName = AFilename then Exit;
   FFileName := '';
@@ -392,44 +346,6 @@ begin
         '.BMP' : Load_BMP(AFilename);
         '.JPG' : Load_JPG(AFilename);
         '.PNG' : Load_PNG(AFilename);
-
-        // animation
-        //'.GIF' :
-        //  begin
-        //    FGifImage.Image.LoadFromFile (AFilename);
-        //    SetKind(Audio, stmAnimation);
-        //  end;
-
-        {$IFDEF VIDEO}
-        '.MPG', '.AVI',
-        '.MOV', '.FLV',
-        '.WMV', '.MP4': Load_VID;
-        {$ENDIF}
-
-        {$IFDEF AUDIO}
-        '.WAV','.AIFF','.MP3','.OGG':
-          begin
-            Load_AUD;
-            // note that at this point we already loaded the audio file
-            // the user can associate an image with each audio file sound
-            // the user can place an image file with the same name as the audio file inside rootmedia
-            // we load the image here
-            s1:= AFilename;
-            Delete(s1, pos(Copy(AFilename,Length(AFilename)- 3,4),s1), 4);
-
-            for LExtension in LGuessedExtensions do
-              if FileExists(s1 + LExtension) then
-                begin
-                  case UpperCase(LExtension) of
-                    // images
-                    '.BMP' : Load_BMP(s1 + LExtension, True);
-                    '.JPG' : Load_JPG(s1 + LExtension, True);
-                    '.PNG' : Load_PNG(s1 + LExtension, True);
-                  end;
-                  Break;
-                end;
-          end;
-        {$ENDIF}
       end;
 
       FFileName := AFilename;
@@ -460,13 +376,7 @@ end;
 procedure TKey.SetVisible(AValue: Boolean);
 begin
   inherited SetVisible(AValue);
-  {$IFDEF VIDEO}
-  if Assigned(FVideoPlayer) then
-  if AValue then
-    FVideoPlayer.Show
-  else
-    FVideoPlayer.Hide;
-  {$ENDIF}
+
 end;
 
 function TKey.GetShortName: string;
@@ -482,8 +392,6 @@ begin
   if Assigned(Self) then
   begin
     Inc(FResponseCount);
-    //FLastResponseLog :=
-    //  IntToStr(Mouse.CursorPos.x) + #9 + IntToStr(Mouse.CursorPos.y);
     FSchedule.DoResponse;
   end;
 end;

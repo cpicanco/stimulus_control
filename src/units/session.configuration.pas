@@ -45,7 +45,8 @@ type
     MaxBlcRepetition: Integer;
 
     DefNextBlc: string;
-
+    CrtConsecutive: Integer;
+    CrtHitValue:Integer;
     CrtConsecutiveHit: Integer;
     CrtHitPorcentage : Integer;
     CrtConsecutiveMiss : Integer;

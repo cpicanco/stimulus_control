@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2019 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2020 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -131,7 +131,14 @@ end;
 
 procedure TStimulusFigure.LoadFromFile(AFilename: string);
 begin
-  FImage.LoadFromFile(AFilename);
+  try
+    FImage.LoadFromFile(AFilename);
+  except
+    on E : Exception do
+    begin
+      Exception.Create(E.Message + #32 + AFilename);
+    end;
+  end;
 end;
 
 procedure TStimulusFigure.Start;

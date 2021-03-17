@@ -195,39 +195,45 @@ end;
 
 procedure TTrial.TrialKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if FResponseEnabled and (Key = 27 {ESC}) then
-    begin
-      FResponseEnabled:= False;
-      Invalidate;
-      Exit;
-    end;
+  //if FResponseEnabled and (Key = 27 {ESC}) then
+  //  begin
+  //    FResponseEnabled:= False;
+  //    Invalidate;
+  //    Exit;
+  //  end;
 
-  if (ssCtrl in shift) and (Key = 113 { q }) then
-    begin
-      FResponseEnabled:= False;
-      Data := Data + LineEnding + SESSION_CANCELED + LineEnding;
-      Result := T_NONE;
-      IETConsequence := T_NONE;
-      NextTrial := T_END;
-      FClock.Enabled := False;
-      Exit;
-    end;
+  //if (ssCtrl in shift) and (Key = 113 { q }) then
+  //  begin
+  //    FResponseEnabled:= False;
+  //    Data := Data + LineEnding + SESSION_CANCELED + LineEnding;
+  //    Result := T_NONE;
+  //    IETConsequence := T_NONE;
+  //    NextTrial := T_END;
+  //    FClock.Enabled := False;
+  //    Exit;
+  //  end;
 
-  if (ssCtrl in Shift) and (Key = 13 { Enter }) then
-    begin
-      FResponseEnabled := False;
-      Result := T_NONE;
-      IETConsequence := T_NONE;
-      NextTrial := '0';
-      FClock.Enabled := False;  // EndTrial(Self);
-      Exit;
-    end;
+  //if (ssCtrl in Shift) and (Key = 13 { Enter }) then
+  //  begin
+  //    FResponseEnabled := False;
+  //    Result := T_MISS;
+  //    //IETConsequence := T_NONE;
+  //    NextTrial := '0';
+  //    FClock.Enabled := False;  // EndTrial(Self);
+  //    Exit;
+  //  end;
 
   if Assigned(OnTrialKeyDown) and FResponseEnabled then OnTrialKeyDown(Sender,Key,Shift);
 end;
 
 procedure TTrial.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
+  if (ssCtrl in Shift) and (Key = 13) then
+    begin
+      Result:=T_MISS;
+      if Assigned(OnTrialEnd) then OnTrialEnd(Self);
+    end;
+
   if (not FResponseEnabled) and (Key = 27) { ESC } then
     begin
       FResponseEnabled:= True;
@@ -282,7 +288,7 @@ begin
   if FIsCorrection then
     if Assigned(OnEndCorrection) then OnEndCorrection(Sender);
 
-  if Assigned(OnTrialEnd) then OnTrialEnd(Sender);
+  if Assigned(OnTrialEnd) then OnTrialEnd(Self);
 end;
 
 procedure TTrial.SetConfigurations(AValue: TCfgTrial);
@@ -412,7 +418,9 @@ begin
     Result := T_NONE;
 
   // what will happen during the inter trial interval?
-  IETConsequence := T_NONE;
+  if LParameters.Values[_Consequence] = '' then
+    IETConsequence := T_NONE
+  else IETConsequence := LParameters.Values[_Consequence];
 
   // is it a correction trial?
   if ACorrection then

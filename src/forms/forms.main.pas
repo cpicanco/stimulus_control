@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2020 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit Forms.Main;
 
 {$mode objfpc}{$H+}
@@ -6,29 +15,30 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  Spin;
+  IniPropStorage;
 
 type
 
   { TBackground }
 
   TBackground = class(TForm)
-    ButtonShowStimuli: TButton;
+    Button1: TButton;
     ButtonStart: TButton;
+    ButtonStartAll: TButton;
     EditParticipant: TEdit;
-    LabelSessionBlocs: TLabel;
+    IniPropStorage: TIniPropStorage;
     PanelConfigurations: TPanel;
     RadioGroupCondition: TRadioGroup;
-    SpinEditSessionBlocs: TSpinEdit;
-    procedure ButtonShowStimuliClick(Sender: TObject);
+    RadioGroupBehaviour: TRadioGroup;
+    procedure Button1Click(Sender: TObject);
+    procedure ButtonStartAllClick(Sender: TObject);
     procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     //procedure InterTrialStop(Sender: TObject);
     procedure EndSession(Sender: TObject);
-    procedure FormKeyPress(Sender: TObject; var Key: char);
-    procedure ExperimentParametersChange(Sender: TObject);
+    procedure BeforeStartSession(Sender: TObject);
   private
-    procedure ShowTrialConsole;
+
   public
     {$IFDEF WINDOWS}
     OriginalBounds: TRect;
@@ -46,19 +56,24 @@ implementation
 {$R *.lfm}
 
 uses
-     Session.Backgrounds
-   , Session.ConfigurationFile
+   FileUtil
+   , Session.Backgrounds
    , Session.Configuration.GlobalContainer
+   , Session.ConfigurationFile
    , SessionSimple
-   , Experiments.Dani
-   //, Forms.CheckStimuli
+   , Experiments.BeforeAfter
+   , Experiments.SameDifferent
+   , Experiments.Derivation
+   , Experiments.Augusto
+   , Stimuli.Image.Base
+   , FileMethods
    ;
 
 { TBackground }
 
 var
   LSession : TSession;
-  Initialized : Boolean = False;
+  ConfigurationFilename : string;
 
 procedure TBackground.ButtonStartClick(Sender: TObject);
 begin
@@ -67,31 +82,76 @@ begin
   //  FormCheckStimuli.Hide;
 
   Session.Backgrounds.Background := Self;
-  {$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
+  //{$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
+  case RadioGroupBehaviour.ItemIndex of
+    0 :
+        ConfigurationFilename := Experiments.BeforeAfter.MakeConfigurationFile(
+            RadioGroupCondition.ItemIndex, 2000);
+    1 :
+        ConfigurationFilename := Experiments.SameDifferent.MakeConfigurationFile(
+            RadioGroupCondition.ItemIndex, 2000);
+    2 :
+        ConfigurationFilename := Experiments.Derivation.MakeConfigurationFile(
+            RadioGroupCondition.ItemIndex, 2000);
+  end;
   LSession.Play(RadioGroupCondition.Items[RadioGroupCondition.ItemIndex], EditParticipant.Text);
 end;
 
-procedure TBackground.ButtonShowStimuliClick(Sender: TObject);
+procedure TBackground.ButtonStartAllClick(Sender: TObject);
 begin
+  PanelConfigurations.Hide;
+  Session.Backgrounds.Background := Self;
+  //{$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
+  ConfigurationFilename := Experiments.Augusto.MakeConfigurationFile;
+  LSession.Play(RadioGroupCondition.Items[RadioGroupCondition.ItemIndex], EditParticipant.Text);
+end;
 
+procedure TBackground.Button1Click(Sender: TObject);
+var
+  LDirectory : string;
+  LStimuli : TStringArray;
+  LS : TLightImage;
+  i : integer;
+
+begin
+  LDirectory := GlobalContainer.RootMedia+Experiments.BeforeAfter.FolderTestBefoAfter;
+  FindFilesFor(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
+
+  LDirectory := GlobalContainer.RootMedia+Experiments.BeforeAfter.FolderPreTrainingBefoAfter;
+  AppendFilesTo(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
+
+  LDirectory := GlobalContainer.RootMedia+Experiments.SameDifferent.FolderTestEqualDiff;
+  AppendFilesTo(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
+
+  LDirectory := GlobalContainer.RootMedia+Experiments.SameDifferent.FolderPreTrainingEqualDiff;
+  AppendFilesTo(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
+
+  LDirectory := GlobalContainer.RootMedia+Experiments.Derivation.FolderDerivationTest;
+  AppendFilesTo(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
+
+  i := Length(LStimuli);
+
+  for i := Low(LStimuli) to High(LStimuli) do
+  begin
+    LS := TLightImage.Create(nil);
+    try
+      LS.LoadFromFile(LStimuli[i]);
+    except
+      on E : exception do
+        ShowMessage(LStimuli[i]);
+    end;
+    LS.Left := 0;
+    LS.Top := 0;
+    LS.Free;
+  end;
 end;
 
 procedure TBackground.FormCreate(Sender: TObject);
 begin
   LSession := TSession.Create(Self);
   LSession.OnEndSession:=@EndSession;
-  SpinEditSessionBlocs.Value := SessionBlocs;
-  Initialized:=True;
+  LSession.OnBeforeStart:=@BeforeStartSession;
 end;
-
-//procedure TBackground.InterTrialStop(Sender: TObject);
-//var
-//  MouseOnset : TPoint;
-//begin
-//  MouseOnset.X := Screen.Width div 2;
-//  MouseOnset.Y := Screen.Height div 2;
-//  Mouse.CursorPos := MouseOnset;
-//end;
 
 procedure TBackground.EndSession(Sender: TObject);
 begin
@@ -99,35 +159,9 @@ begin
   Close;
 end;
 
-procedure TBackground.FormKeyPress(Sender: TObject; var Key: char);
+procedure TBackground.BeforeStartSession(Sender: TObject);
 begin
-  //case key of
-  //  't' : ShowTrialConsole;
-  //end;
-end;
-
-procedure TBackground.ExperimentParametersChange(Sender: TObject);
-begin
-  if Initialized then
-  begin
-    ConfigurationFile.Free;
-    MakeConfigurationFile(RadioGroupCondition.ItemIndex, SpinEditSessionBlocs.Value);
-  end;
-end;
-
-
-procedure TBackground.ShowTrialConsole;
-var
-  LNextTrial : string;
-  LNextTrialI : integer;
-begin
-  LNextTrial := InputBox('Trial Console', 'Insert the Next Trial', '-');
-  LNextTrialI := StrToIntDef(LNextTrial, -1);
-  if LNextTrialI <> -1 then
-  begin
-    //while Trial = nil do Application.ProcessMessages;
-    GlobalContainer.CounterManager.CurrentTrial := LNextTrialI;
-  end;
+  CopyFile(ConfigurationFilename, LSession.BaseFilename+'.ini');
 end;
 
 {$IFDEF WINDOWS}

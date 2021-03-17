@@ -38,6 +38,7 @@ const
   // Blc
   _NumTrials = 'NumTrials';
   _CrtHitPorcentage = 'Criteria.HitPorcentage';
+  _CrtHitValue = 'Criteria.HitValue';
   _CrtConsecutiveHit  = 'ConsecutiveHitCriterion';
   _CrtConsecutiveMiss = 'ConsecutiveMissCriterion';
   _CrtMaxTrials = 'MaxTrialCriterion';
@@ -215,6 +216,9 @@ const
   T_Simple = 'SIMPLE';
   T_LIK = 'LIKERT';
   T_PFR = 'PERFORMANCE';
+  T_BAT = 'BEFORE_AFTER';
+  T_CTX = 'EQUAL_DIFFERENT';
+  T_RFT = 'BEFORE_AFTER_EQUAL_DIFFERENT';
 
   { Schedules }
   T_RR  = 'RR';

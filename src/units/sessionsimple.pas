@@ -14,16 +14,21 @@ type
   TSession = class(TComponent)
   private
     FBloc : TBloc;
+    FOnBeforeStart: TNotifyEvent;
     FOnEndSession: TNotifyEvent;
+    function GetBaseFilename: string;
     procedure PlayBloc;
     procedure EndBloc(Sender : TObject);
     procedure EndSession;
+    procedure SetOnBeforeStart(AValue: TNotifyEvent);
     procedure SetOnEndSession(AValue: TNotifyEvent);
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
     procedure Play(ASessionName : string; AParticipantName: string);
     property OnEndSession : TNotifyEvent read FOnEndSession write SetOnEndSession;
+    property OnBeforeStart : TNotifyEvent read FOnBeforeStart write SetOnBeforeStart;
+    property BaseFilename : string read GetBaseFilename;
   end;
 
 implementation
@@ -31,7 +36,7 @@ implementation
 uses
   Timestamps
 , FileUtil
-, Experiments.Dani
+, LazFileUtils
 , Loggers.Reports
 , Session.ConfigurationFile
 , Session.Configuration.GlobalContainer;
@@ -40,7 +45,9 @@ uses
 
 var
   Header : string;
-  DataFile : string;
+  FirstFilename: string = '001';
+  DataFilename : string = '';
+  TimestampsFilename : string = '';
 
 procedure TSession.PlayBloc;
 begin
@@ -51,6 +58,14 @@ begin
       FBloc.Play;
     end
   else EndSession;
+end;
+
+function TSession.GetBaseFilename: string;
+begin
+  if DataFilename = '' then
+    Result := FirstFilename
+  else
+    Result := ExtractFileNameWithoutExt(DataFilename);
 end;
 
 procedure TSession.EndBloc(Sender: TObject);
@@ -69,6 +84,12 @@ begin
   if Assigned(OnEndSession) then OnEndSession(Self);
 end;
 
+procedure TSession.SetOnBeforeStart(AValue: TNotifyEvent);
+begin
+  if FOnBeforeStart=AValue then Exit;
+  FOnBeforeStart:=AValue;
+end;
+
 procedure TSession.SetOnEndSession(AValue: TNotifyEvent);
 begin
   if FOnEndSession=AValue then Exit;
@@ -78,7 +99,8 @@ end;
 constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  MakeConfigurationFile(0, SessionBlocs);
+  //MakeConfigurationFile(0, SessionBlocs);
+  FirstFilename := GlobalContainer.RootData + FirstFilename;
   FBloc := TBloc.Create(Self);
   FBloc.OnEndBloc := @EndBloc;
   //FBloc.OnInterTrialStop := @InterTrialStop;
@@ -90,17 +112,14 @@ begin
   inherited Destroy;
 end;
 
-procedure TSession.Play(ASessionName : string; AParticipantName: string);
+procedure TSession.Play(ASessionName: string; AParticipantName: string);
 begin
-  DataFile := '001';
   Header := HSUBJECT_NAME + #9 + AParticipantName + LineEnding +
             HSESSION_NAME + #9 + ASessionName + LineEnding +
             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
-
-  DataFile := GlobalContainer.RootData + DataFile;
-  CreateLogger(LGData, DataFile, Header);
-  DataFile := CreateLogger(LGTimestamps, DataFile, Header);
-  CopyFile(ConfigurationFilename, ExtractFileNameWithoutExt(DataFile)+'.ini');
+  DataFilename := CreateLogger(LGData, FirstFilename, Header);
+  TimestampsFilename := CreateLogger(LGTimestamps, FirstFilename, Header);
+  if Assigned(OnBeforeStart) then OnBeforeStart(Self);
   GlobalContainer.TimeStart := TickCount;
   PlayBloc;
 end;
