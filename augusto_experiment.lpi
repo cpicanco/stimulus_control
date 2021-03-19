@@ -173,9 +173,9 @@
         <UnitName Value="Controls.Trials.BeforeAfter"/>
       </Unit16>
       <Unit17>
-        <Filename Value="src/units/experiments.beforeafter.pas"/>
+        <Filename Value="src/units/experiments.eduardo.experimento1.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Experiments.BeforeAfter"/>
+        <UnitName Value="Experiments.Eduardo.Experimento1"/>
       </Unit17>
       <Unit18>
         <Filename Value="src/units/stimuli.sequence.contextualmatchingtosample.pas"/>

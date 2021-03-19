@@ -18,12 +18,12 @@ object Background: TBackground
     AnchorSideLeft.Side = asrCenter
     AnchorSideTop.Control = Owner
     AnchorSideTop.Side = asrCenter
-    Left = 160
+    Left = 159
     Height = 412
     Top = 3
-    Width = 278
+    Width = 281
     ClientHeight = 412
-    ClientWidth = 278
+    ClientWidth = 281
     TabOrder = 0
     object EditParticipant: TEdit
       Left = 16
@@ -33,38 +33,13 @@ object Background: TBackground
       TabOrder = 0
       Text = 'Participante'
     end
-    object RadioGroupBehaviour: TRadioGroup
+    object RadioGroupMode: TRadioGroup
       Left = 16
       Height = 86
-      Top = 152
+      Top = 96
       Width = 248
       AutoFill = True
-      Caption = 'Comportamento'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 1
-      ClientHeight = 66
-      ClientWidth = 244
-      Font.Color = clBlack
-      ItemIndex = 0
-      Items.Strings = (
-        'Antes-Depois'
-        'Igual-Diferente'
-        'Derivação '
-      )
-      TabOrder = 2
-    end
-    object RadioGroupCondition: TRadioGroup
-      Left = 16
-      Height = 86
-      Top = 240
-      Width = 248
-      AutoFill = True
-      Caption = 'Condição'
+      Caption = 'Modo'
       ChildSizing.LeftRightSpacing = 6
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
@@ -79,34 +54,25 @@ object Background: TBackground
         'Treino'
         'Teste'
       )
-      TabOrder = 3
-    end
-    object ButtonStart: TButton
-      Left = 16
-      Height = 56
-      Top = 328
-      Width = 248
-      Caption = 'Começar Etapa'
-      OnClick = ButtonStartClick
-      TabOrder = 4
+      TabOrder = 2
     end
     object ButtonStartAll: TButton
       Left = 16
       Height = 56
       Top = 32
       Width = 248
-      Caption = 'Começar Experimento Completo'
+      Caption = 'Começar Experimento'
       OnClick = ButtonStartAllClick
       TabOrder = 1
     end
-    object Button1: TButton
+    object ValidateStimuli: TButton
       Left = 16
       Height = 49
-      Top = 96
-      Width = 99
-      Caption = 'Button1'
-      OnClick = Button1Click
-      TabOrder = 5
+      Top = 352
+      Width = 248
+      Caption = 'Validar Estímulos'
+      OnClick = ValidateStimuliClick
+      TabOrder = 3
     end
   end
   object IniPropStorage: TIniPropStorage

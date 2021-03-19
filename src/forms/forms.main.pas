@@ -15,37 +15,28 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  IniPropStorage;
+  IniPropStorage, ComCtrls;
 
 type
 
   { TBackground }
 
   TBackground = class(TForm)
-    Button1: TButton;
-    ButtonStart: TButton;
     ButtonStartAll: TButton;
     EditParticipant: TEdit;
     IniPropStorage: TIniPropStorage;
     PanelConfigurations: TPanel;
-    RadioGroupCondition: TRadioGroup;
-    RadioGroupBehaviour: TRadioGroup;
-    procedure Button1Click(Sender: TObject);
+    RadioGroupMode: TRadioGroup;
+    ValidateStimuli: TButton;
+    procedure ValidateStimuliClick(Sender: TObject);
     procedure ButtonStartAllClick(Sender: TObject);
-    procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    //procedure InterTrialStop(Sender: TObject);
     procedure EndSession(Sender: TObject);
     procedure BeforeStartSession(Sender: TObject);
   private
 
   public
-    {$IFDEF WINDOWS}
-    OriginalBounds: TRect;
-    OriginalWindowState: TWindowState;
-    ScreenBounds: TRect;
-    procedure SwitchFullScreen;
-    {$ENDIF}
+
   end;
 
 var
@@ -61,10 +52,7 @@ uses
    , Session.Configuration.GlobalContainer
    , Session.ConfigurationFile
    , SessionSimple
-   , Experiments.BeforeAfter
-   , Experiments.SameDifferent
-   , Experiments.Derivation
-   , Experiments.Augusto
+   , Experiments.Eduardo
    , Stimuli.Image.Base
    , FileMethods
    ;
@@ -75,38 +63,34 @@ var
   LSession : TSession;
   ConfigurationFilename : string;
 
-procedure TBackground.ButtonStartClick(Sender: TObject);
-begin
-  PanelConfigurations.Hide;
-  //if FormCheckStimuli.Visible then
-  //  FormCheckStimuli.Hide;
-
-  Session.Backgrounds.Background := Self;
-  //{$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
-  case RadioGroupBehaviour.ItemIndex of
-    0 :
-        ConfigurationFilename := Experiments.BeforeAfter.MakeConfigurationFile(
-            RadioGroupCondition.ItemIndex, 2000);
-    1 :
-        ConfigurationFilename := Experiments.SameDifferent.MakeConfigurationFile(
-            RadioGroupCondition.ItemIndex, 2000);
-    2 :
-        ConfigurationFilename := Experiments.Derivation.MakeConfigurationFile(
-            RadioGroupCondition.ItemIndex, 2000);
-  end;
-  LSession.Play(RadioGroupCondition.Items[RadioGroupCondition.ItemIndex], EditParticipant.Text);
-end;
+//procedure TBackground.ButtonStartClick(Sender: TObject);
+//begin
+//  PanelConfigurations.Hide;
+//
+//  Session.Backgrounds.Background := Self;
+//  case RadioGroupBehaviour.ItemIndex of
+//    0 :
+//        ConfigurationFilename := Experiments.BeforeAfter.MakeConfigurationFile(
+//            RadioGroupMode.ItemIndex, 2000);
+//    1 :
+//        ConfigurationFilename := Experiments.SameDifferent.MakeConfigurationFile(
+//            RadioGroupMode.ItemIndex, 2000);
+//    2 :
+//        ConfigurationFilename := Experiments.Derivation.MakeConfigurationFile(
+//            RadioGroupMode.ItemIndex, 2000);
+//  end;
+//  LSession.Play(RadioGroupMode.Items[RadioGroupMode.ItemIndex], EditParticipant.Text);
+//end;
 
 procedure TBackground.ButtonStartAllClick(Sender: TObject);
 begin
   PanelConfigurations.Hide;
   Session.Backgrounds.Background := Self;
-  //{$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
-  ConfigurationFilename := Experiments.Augusto.MakeConfigurationFile;
-  LSession.Play(RadioGroupCondition.Items[RadioGroupCondition.ItemIndex], EditParticipant.Text);
+  ConfigurationFilename := Experiments.Eduardo.MakeConfigurationFile;
+  LSession.Play(RadioGroupMode.Items[RadioGroupMode.ItemIndex], EditParticipant.Text);
 end;
 
-procedure TBackground.Button1Click(Sender: TObject);
+procedure TBackground.ValidateStimuliClick(Sender: TObject);
 var
   LDirectory : string;
   LStimuli : TStringArray;
@@ -163,28 +147,6 @@ procedure TBackground.BeforeStartSession(Sender: TObject);
 begin
   CopyFile(ConfigurationFilename, LSession.BaseFilename+'.ini');
 end;
-
-{$IFDEF WINDOWS}
-// http://wiki.freepascal.org/Application_full_screen_mode
-procedure TBackground.SwitchFullScreen;
-begin
-  if BorderStyle <> bsNone then begin
-    // To full screen
-    OriginalWindowState := WindowState;
-    OriginalBounds := BoundsRect;
-
-    BorderStyle := bsNone;
-    BoundsRect := Screen.MonitorFromWindow(Handle).BoundsRect;
-  end else begin
-    // From full screen
-    BorderStyle := bsSizeable;
-    if OriginalWindowState = wsMaximized then
-      WindowState := wsMaximized
-    else
-      BoundsRect := OriginalBounds;
-  end;
-end;
-{$ENDIF}
 
 end.
 

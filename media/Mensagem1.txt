@@ -1,1 +1,1 @@
-Um computador está fazendo observações sobre histórias envolvendo casais. Sua tarefa é ajudar o computador, dizendo se uma observação é verdadeira ou falsa. Uma mensagem aparecerá quando você acertar ou errar. Ao final, um contador lhe mostrará o total de erros e de acertos. Aperte a barra de espaço no teclado para começar.
+Mensagem 1
