@@ -27,8 +27,6 @@ type
     IniPropStorage: TIniPropStorage;
     PanelConfigurations: TPanel;
     RadioGroupMode: TRadioGroup;
-    ValidateStimuli: TButton;
-    procedure ValidateStimuliClick(Sender: TObject);
     procedure ButtonStartAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure EndSession(Sender: TObject);
@@ -63,25 +61,6 @@ var
   LSession : TSession;
   ConfigurationFilename : string;
 
-//procedure TBackground.ButtonStartClick(Sender: TObject);
-//begin
-//  PanelConfigurations.Hide;
-//
-//  Session.Backgrounds.Background := Self;
-//  case RadioGroupBehaviour.ItemIndex of
-//    0 :
-//        ConfigurationFilename := Experiments.BeforeAfter.MakeConfigurationFile(
-//            RadioGroupMode.ItemIndex, 2000);
-//    1 :
-//        ConfigurationFilename := Experiments.SameDifferent.MakeConfigurationFile(
-//            RadioGroupMode.ItemIndex, 2000);
-//    2 :
-//        ConfigurationFilename := Experiments.Derivation.MakeConfigurationFile(
-//            RadioGroupMode.ItemIndex, 2000);
-//  end;
-//  LSession.Play(RadioGroupMode.Items[RadioGroupMode.ItemIndex], EditParticipant.Text);
-//end;
-
 procedure TBackground.ButtonStartAllClick(Sender: TObject);
 begin
   PanelConfigurations.Hide;
@@ -90,45 +69,6 @@ begin
   LSession.Play(RadioGroupMode.Items[RadioGroupMode.ItemIndex], EditParticipant.Text);
 end;
 
-procedure TBackground.ValidateStimuliClick(Sender: TObject);
-var
-  LDirectory : string;
-  LStimuli : TStringArray;
-  LS : TLightImage;
-  i : integer;
-
-begin
-  LDirectory := GlobalContainer.RootMedia+Experiments.BeforeAfter.FolderTestBefoAfter;
-  FindFilesFor(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
-
-  LDirectory := GlobalContainer.RootMedia+Experiments.BeforeAfter.FolderPreTrainingBefoAfter;
-  AppendFilesTo(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
-
-  LDirectory := GlobalContainer.RootMedia+Experiments.SameDifferent.FolderTestEqualDiff;
-  AppendFilesTo(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
-
-  LDirectory := GlobalContainer.RootMedia+Experiments.SameDifferent.FolderPreTrainingEqualDiff;
-  AppendFilesTo(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
-
-  LDirectory := GlobalContainer.RootMedia+Experiments.Derivation.FolderDerivationTest;
-  AppendFilesTo(LStimuli, LDirectory, '*.bmp;*.png;*.jpg');
-
-  i := Length(LStimuli);
-
-  for i := Low(LStimuli) to High(LStimuli) do
-  begin
-    LS := TLightImage.Create(nil);
-    try
-      LS.LoadFromFile(LStimuli[i]);
-    except
-      on E : exception do
-        ShowMessage(LStimuli[i]);
-    end;
-    LS.Left := 0;
-    LS.Top := 0;
-    LS.Free;
-  end;
-end;
 
 procedure TBackground.FormCreate(Sender: TObject);
 begin

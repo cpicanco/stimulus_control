@@ -212,6 +212,7 @@ const
   T_FPFN = 'FPFN';
   T_MRD = 'MRD';
   T_MSG = 'MSG';
+  T_HTM = 'HTMLM';
   T_MTS = 'MTS';
   T_Simple = 'SIMPLE';
   T_LIK = 'LIKERT';

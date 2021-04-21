@@ -2,11 +2,11 @@ object Background: TBackground
   Left = 255
   Height = 419
   Top = 120
-  Width = 598
+  Width = 1055
   BorderStyle = bsNone
   Caption = 'Configurar sessão'
   ClientHeight = 419
-  ClientWidth = 598
+  ClientWidth = 1055
   Color = clWhite
   OnCreate = FormCreate
   Position = poScreenCenter
@@ -18,7 +18,7 @@ object Background: TBackground
     AnchorSideLeft.Side = asrCenter
     AnchorSideTop.Control = Owner
     AnchorSideTop.Side = asrCenter
-    Left = 159
+    Left = 387
     Height = 412
     Top = 3
     Width = 281
@@ -54,7 +54,7 @@ object Background: TBackground
         'Treino'
         'Teste'
       )
-      TabOrder = 2
+      TabOrder = 1
     end
     object ButtonStartAll: TButton
       Left = 16
@@ -63,16 +63,7 @@ object Background: TBackground
       Width = 248
       Caption = 'Começar Experimento'
       OnClick = ButtonStartAllClick
-      TabOrder = 1
-    end
-    object ValidateStimuli: TButton
-      Left = 16
-      Height = 49
-      Top = 352
-      Width = 248
-      Caption = 'Validar Estímulos'
-      OnClick = ValidateStimuliClick
-      TabOrder = 3
+      TabOrder = 2
     end
   end
   object IniPropStorage: TIniPropStorage

@@ -58,6 +58,7 @@ uses Constants
    , Controls.Trials.BeforeAfter
    , Controls.Trials.ContextualMatchingToSample
    , Controls.Trials.RelationalFrame
+   , Controls.Trials.HTMLMessage
    , Graphics
    ;
 
@@ -78,6 +79,7 @@ begin
 
     case ATrialConfig.Kind of
       T_MSG : FTrial := TMessageTrial.Create(Background);
+      T_HTM : FTrial := THTMLMessage.Create(Background);
       T_MTS : FTrial := TMTS.Create(Background);
       T_LIK : FTrial := TLikert.Create(Background);
       T_GNG : FTrial := TGNG.Create(Background);
