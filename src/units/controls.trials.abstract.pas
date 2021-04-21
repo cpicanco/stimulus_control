@@ -392,7 +392,8 @@ end;
 
 function TTrial.StartConsequence: integer;
 begin
-
+  // uses ITI by default, overrided as needed
+  Result := StrToIntDef(Configurations.SList.Values[_ITI], 0);
 end;
 
 procedure TTrial.StopConsequence;
