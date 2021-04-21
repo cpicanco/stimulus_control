@@ -48,11 +48,8 @@ uses
    FileUtil
    , Session.Backgrounds
    , Session.Configuration.GlobalContainer
-   , Session.ConfigurationFile
    , SessionSimple
    , Experiments.Eduardo
-   , Stimuli.Image.Base
-   , FileMethods
    ;
 
 { TBackground }
