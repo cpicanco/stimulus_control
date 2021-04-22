@@ -106,6 +106,7 @@ const
   // SIMPLE
   _NumComp = 'NumComp';   // number of stimuli on screen / comparisons
   _cBnd = 'Bnd';          // top left width height
+  _cCap = 'Cap';
   _cStm = 'Stm';          // stimulus path
   _cSch = 'Sch';          // reinforcement schedule
   _cMsg = 'Msg';          // message sent to the report {REGDATA}
@@ -213,6 +214,7 @@ const
   T_MRD = 'MRD';
   T_MSG = 'MSG';
   T_HTM = 'HTMLM';
+  T_CHO = 'CHOICE';
   T_MTS = 'MTS';
   T_Simple = 'SIMPLE';
   T_LIK = 'LIKERT';

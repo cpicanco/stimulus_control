@@ -59,7 +59,9 @@ uses Constants
    , Controls.Trials.ContextualMatchingToSample
    , Controls.Trials.RelationalFrame
    , Controls.Trials.HTMLMessage
+   , Controls.Trials.BinaryChoice
    , Graphics
+   , Dialogs
    ;
 
 { TBloc }
@@ -68,7 +70,9 @@ procedure TBloc.PlayTrial(ABloc, ATrial: integer);
 var
   ATrialConfig : TCfgTrial;
 begin
-  if Assigned(FTrial) then FreeAndNil(FTrial);
+  if Assigned(FTrial) then
+    FreeAndNil(FTrial);
+
   ATrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
   try
     {$IFDEF DEBUG}
@@ -80,6 +84,7 @@ begin
     case ATrialConfig.Kind of
       T_MSG : FTrial := TMessageTrial.Create(Background);
       T_HTM : FTrial := THTMLMessage.Create(Background);
+      T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
       T_MTS : FTrial := TMTS.Create(Background);
       T_LIK : FTrial := TLikert.Create(Background);
       T_GNG : FTrial := TGNG.Create(Background);
@@ -106,11 +111,17 @@ begin
 end;
 
 procedure TBloc.InterTrialStopTimer(Sender: TObject);
+var
+  LNextTrial : integer;
 begin
   if Assigned(OnIntertrialStop) then OnIntertrialStop(Sender);
   FITIEnd := TickCount - GlobalContainer.TimeStart;
   WriteTrialData(FTrial);
-  FCounterManager.CurrentTrial := FCounterManager.CurrentTrial+1;
+
+  LNextTrial := StrToIntDef(FTrial.NextTrial, 1);
+  FCounterManager.CurrentTrial := FCounterManager.CurrentTrial+LNextTrial;
+  if FCounterManager.CurrentTrial < 0 then
+    Exception.Create('Exception. CurrentTrial cannot be less than zero.');
   Play;
 end;
 
@@ -265,6 +276,12 @@ var
     Result := False;
     if ABlc.CrtConsecutiveHit > 0 then
       if FCounterManager.BlcCscHits = ABlc.CrtConsecutiveHit then
+      begin
+
+        Exit;
+      end;
+    if ABlc.CrtMaxTrials > 0 then
+      if ABlc.CrtMaxTrials <= FCounterManager.BlcTrials  then
       begin
         Result := True;
         Exit;
