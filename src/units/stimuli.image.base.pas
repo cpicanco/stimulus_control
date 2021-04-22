@@ -31,12 +31,12 @@ type
     FOnMouseDown: TMouseEvent;
     FOnResponse: TNotifyEvent;
     FPenWidth: integer;
-    procedure ImageMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
     procedure SetOnMouseDown(AValue: TMouseEvent);
     procedure SetOnResponse(AValue: TNotifyEvent);
     procedure SetSchedule(AValue: TSchedule);
   protected
+    procedure MouseDown(Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -46,6 +46,8 @@ type
     procedure LoadFromFile(AFilename : string);
     procedure SetOriginalSize;
     procedure Centralize;
+    procedure CentralizeLeft;
+    procedure CentralizeRight;
     property Schedule : TSchedule read FSchedule write SetSchedule;
     property EdgeColor : TColor read FEdge write FEdge;
     property Kind: TImageKind read FImageKind;
@@ -61,14 +63,12 @@ uses Forms, FileUtil, LazFileUtils, Session.Configuration.GlobalContainer, Dialo
 
 { TLightImage }
 
-procedure TLightImage.ImageMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TLightImage.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
 begin
-  if Assigned(OnMouseDown) then
-  begin
-    if Assigned(FSchedule) then FSchedule.DoResponse;
-    OnMouseDown(Sender,Button, Shift, X, Y);
-  end;
+  inherited MouseDown(Button, Shift, X, Y);
+  if Assigned(FSchedule) then FSchedule.DoResponse;
+  if Assigned(OnMouseDown) then OnMouseDown(Self, Button, Shift, X, Y);
 end;
 
 procedure TLightImage.SetOnMouseDown(AValue: TMouseEvent);
@@ -90,8 +90,18 @@ begin
 end;
 
 procedure TLightImage.Paint;
+var
+  LTextStyle : TTextStyle;
+
   procedure PaintKey(Color : TColor);
   begin
+    LTextStyle := Canvas.TextStyle;
+    LTextStyle.SingleLine:=False;
+    LTextStyle.Wordbreak:=True;
+    LTextStyle.Clipping:=False;
+    LTextStyle.Alignment:=taCenter;
+    LTextStyle.Layout:=tlCenter;
+    Canvas.TextStyle := LTextStyle;
     with Canvas do
       begin
         Font.Color:= clWhite xor Color;
@@ -100,6 +110,7 @@ procedure TLightImage.Paint;
         Brush.Color:= Color;//FBorderColor;
         //FillRect(Rect(0, 0, Width, Height));
         if Caption = '' then Rectangle(ClientRect);
+        Rectangle(ClientRect);
         TextRect(ClientRect,
           (((ClientRect.Right-ClientRect.Left) div 2) - (TextWidth(Caption)div 2)),
           (((ClientRect.Bottom-ClientRect.Top) div 2) - (TextHeight(Caption)div 2)),
@@ -116,13 +127,13 @@ end;
 constructor TLightImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FPenWidth := 10;
   FImageKind:=ikNone;
   Visible := False;
-  Height:= 45;
-  Width:= 45;
+  Height:= 200;
+  Width:= 300;
   EdgeColor:= clInactiveCaption;
-  OnMouseDown := @ImageMouseDown;
-  Canvas.Font.Size := 24;
+  Canvas.Font.Size := 20;
 end;
 
 destructor TLightImage.Destroy;
@@ -261,6 +272,18 @@ procedure TLightImage.Centralize;
 begin
   Left := (Screen.Width  div 2) - (Width  div 2);
   Top  := (Screen.Height div 2) - (Height div 2);
+end;
+
+procedure TLightImage.CentralizeLeft;
+begin
+  Left := (Screen.Width  div 4) - (Width  div 2);
+  Top  := (Screen.Height div 2) - (Height div 2);
+end;
+
+procedure TLightImage.CentralizeRight;
+begin
+  Left := Screen.Width - (Screen.Width  div 4) - (Width  div 2);
+  Top  := Screen.Height - (Screen.Height div 2) - (Height div 2);
 end;
 
 end.

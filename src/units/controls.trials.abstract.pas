@@ -17,7 +17,6 @@ uses Controls, ExtCtrls, Classes, SysUtils
   , Session.Configuration
   , Loggers.Reports
   , CounterManager
-  , Schedules
   {$IFDEF RS232}
   , Devices.RS232i
   {$ENDIF}
@@ -42,8 +41,7 @@ type
     FHeader,
     FHeaderTimestamps,
     FResult,
-    FIETConsequence,
-    FNextTrial : string;
+    FIETConsequence : string;
     FStarterLatency : Extended;
     FLimitedHold,
     FTimeOut : Integer;
@@ -70,6 +68,7 @@ type
     FOnTrialEnd: TNotifyEvent;
     FOnTrialKeyDown: TKeyEvent;
     FOnTrialKeyUp: TKeyEvent;
+    FOnTrialMouseDown: TMouseEvent;
     FOnTrialPaint: TPaintEvent;
     FOnTrialStart: TNotifyEvent;
     FOnTrialWriteData: TNotifyEvent;
@@ -90,6 +89,7 @@ type
     procedure SetOnStmResponse(AValue: TNotifyEvent);
     procedure SetOnTrialKeyDown(AValue: TKeyEvent);
     procedure SetOnTrialKeyUp(AValue: TKeyEvent);
+    procedure SetOnTrialMouseDown(AValue: TMouseEvent);
     procedure SetOnTrialPaint(AValue: TPaintEvent);
     procedure SetOnTrialStart(AValue: TNotifyEvent);
     procedure SetOnTrialWriteData(AValue: TNotifyEvent);
@@ -107,8 +107,12 @@ type
     property OnTrialKeyUp : TKeyEvent read FOnTrialKeyUp write SetOnTrialKeyUp;
     property OnTrialPaint: TPaintEvent read FOnTrialPaint write SetOnTrialPaint;
     property OnTrialStart: TNotifyEvent read FOnTrialStart write SetOnTrialStart;
+    property OnTrialMouseDown: TMouseEvent read FOnTrialMouseDown write SetOnTrialMouseDown;
   protected
+    FNextTrial : string;
     CounterManager : TCounterManager;
+    procedure MouseDown(Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;
     {$IFDEF RS232}
     procedure Dispenser(AParallelPort: Byte; ARS232: string);
@@ -250,6 +254,14 @@ begin
     end;
 
   if Assigned(OnTrialKeyUp) and FResponseEnabled then OnTrialKeyUp(Sender,Key,Shift);
+end;
+
+procedure TTrial.MouseDown(Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  inherited MouseDown(Button, Shift, X, Y);
+  { do something }
+  if Assigned(OnTrialMouseDown) then OnTrialMouseDown(Self, Button, Shift, X, Y);
 end;
 
 procedure TTrial.EndTrial(Sender: TObject);
@@ -579,6 +591,12 @@ procedure TTrial.SetOnTrialKeyUp(AValue: TKeyEvent);
 begin
   if FOnTrialKeyUp = AValue then Exit;
   FOnTrialKeyUp := AValue;
+end;
+
+procedure TTrial.SetOnTrialMouseDown(AValue: TMouseEvent);
+begin
+  if FOnTrialMouseDown=AValue then Exit;
+  FOnTrialMouseDown:=AValue;
 end;
 
 procedure TTrial.SetOnTrialPaint(AValue: TPaintEvent);
