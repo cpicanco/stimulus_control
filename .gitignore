@@ -51,3 +51,4 @@ lib/x86_64-win64/augusto_experiment.compiled
 lib/x86_64-linux/augusto_experiment.compiled
 experiment.zip
 configuracoes
+*.zip
