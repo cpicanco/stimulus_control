@@ -76,6 +76,7 @@ type
     procedure Load(AScheduleName : TScheduleName;
       AParameter1: Cardinal = 0; AParameter2: Cardinal = 0); overload;
     procedure Start;
+    procedure Stop;
     property AsString : string read GetScheduleString write Load;
     property Loaded : Boolean read GetLoaded;
     property ScheduleNameAsString : string read GetScheduleNameAsString;
@@ -411,6 +412,16 @@ begin
         get_caller_frame(get_frame)
   else
     FSchedule.Start;
+end;
+
+procedure TSchedule.Stop;
+begin
+  if FName = UnknownSchedule then
+     raise Exception.Create(RSErrorUnknownScheduleAction) at
+        get_caller_addr(get_frame),
+        get_caller_frame(get_frame)
+  else
+    FSchedule.Enabled:=False;
 end;
 
 end.

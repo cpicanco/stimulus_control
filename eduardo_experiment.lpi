@@ -88,7 +88,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="25">
+    <Units Count="24">
       <Unit0>
         <Filename Value="eduardo_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -112,109 +112,104 @@
         <UnitName Value="Session.Backgrounds"/>
       </Unit3>
       <Unit4>
-        <Filename Value="src/units/experiments.dani.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Experiments.Dani"/>
-      </Unit4>
-      <Unit5>
         <Filename Value="src/units/sessionsimple.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="SessionSimple"/>
-      </Unit5>
-      <Unit6>
+      </Unit4>
+      <Unit5>
         <Filename Value="src/forms/forms.main.lfm"/>
         <IsPartOfProject Value="True"/>
-      </Unit6>
-      <Unit7>
+      </Unit5>
+      <Unit6>
         <Filename Value="src/units/controls.stimuli.text.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Stimuli.Text"/>
-      </Unit7>
-      <Unit8>
+      </Unit6>
+      <Unit7>
         <Filename Value="src/units/controls.goleftgoright.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.GoLeftGoRight"/>
-      </Unit8>
-      <Unit9>
+      </Unit7>
+      <Unit8>
         <Filename Value="src/units/stimuli.abstract.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Abstract"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="src/units/stimuli.choice.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Choice"/>
       </Unit9>
       <Unit10>
-        <Filename Value="src/units/stimuli.image.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Stimuli.Image"/>
-      </Unit10>
-      <Unit11>
         <Filename Value="src/units/stimuli.image.base.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Image.Base"/>
-      </Unit11>
-      <Unit12>
+      </Unit10>
+      <Unit11>
         <Filename Value="src/units/consequences.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Consequences"/>
-      </Unit12>
-      <Unit13>
+      </Unit11>
+      <Unit12>
         <Filename Value="src/units/filemethods.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="FileMethods"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="src/units/stimuli.game.freesquare.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Game.FreeSquare"/>
       </Unit13>
       <Unit14>
-        <Filename Value="src/units/stimuli.sequence.beforeafter.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Stimuli.Sequence.BeforeAfter"/>
-      </Unit14>
-      <Unit15>
         <Filename Value="src/units/serialtimer.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="SerialTimer"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="src/units/controls.trials.freesquare.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.FreeSquare"/>
       </Unit15>
       <Unit16>
-        <Filename Value="src/units/controls.trials.beforeafter.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Controls.Trials.BeforeAfter"/>
-      </Unit16>
-      <Unit17>
         <Filename Value="src/units/experiments.eduardo.experimento1.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Experiments.Eduardo.Experimento1"/>
-      </Unit17>
-      <Unit18>
+      </Unit16>
+      <Unit17>
         <Filename Value="src/units/stimuli.sequence.contextualmatchingtosample.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Sequence.ContextualMatchingToSample"/>
-      </Unit18>
-      <Unit19>
+      </Unit17>
+      <Unit18>
         <Filename Value="src/units/controls.trials.contextualmatchingtosample.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.ContextualMatchingToSample"/>
-      </Unit19>
-      <Unit20>
+      </Unit18>
+      <Unit19>
         <Filename Value="src/units/controls.trials.relationalframe.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.RelationalFrame"/>
-      </Unit20>
-      <Unit21>
+      </Unit19>
+      <Unit20>
         <Filename Value="src/units/stimuli.sequence.relationalframe.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Sequence.RelationalFrame"/>
-      </Unit21>
-      <Unit22>
+      </Unit20>
+      <Unit21>
         <Filename Value="src/units/testingmethods.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="TestingMethods"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="src/units/controls.trials.textinput.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.TextInput"/>
       </Unit22>
       <Unit23>
-        <Filename Value="src/units/experiments.samedifferent.pas"/>
+        <Filename Value="src/units/stimuli.image.movingsquare.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Experiments.SameDifferent"/>
+        <UnitName Value="Stimuli.Image.MovingSquare"/>
       </Unit23>
-      <Unit24>
-        <Filename Value="src/units/experiments.derivation.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Experiments.Derivation"/>
-      </Unit24>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

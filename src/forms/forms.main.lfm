@@ -1,7 +1,7 @@
 object Background: TBackground
-  Left = 255
+  Left = 266
   Height = 419
-  Top = 120
+  Top = 156
   Width = 1055
   BorderStyle = bsNone
   Caption = 'Configurar sessão'
@@ -10,7 +10,7 @@ object Background: TBackground
   Color = clWhite
   OnCreate = FormCreate
   Position = poScreenCenter
-  SessionProperties = 'RadioGroupBehaviour.ItemIndex;RadioGroupCondition.ItemIndex;SpinEditOperandumDelay.Value;SpinEditSessionBlocs.Value;EditParticipant.Text'
+  SessionProperties = 'EditParticipant.Text;RadioGroupBehaviour.ItemIndex;RadioGroupCondition.ItemIndex;SpinEditOperandumDelay.Value;SpinEditSessionBlocs.Value;RadioGroupDesign.ItemIndex'
   LCLVersion = '2.0.10.0'
   WindowState = wsFullScreen
   object PanelConfigurations: TPanel
@@ -19,10 +19,10 @@ object Background: TBackground
     AnchorSideTop.Control = Owner
     AnchorSideTop.Side = asrCenter
     Left = 387
-    Height = 412
-    Top = 3
+    Height = 229
+    Top = 95
     Width = 281
-    ClientHeight = 412
+    ClientHeight = 229
     ClientWidth = 281
     TabOrder = 0
     object EditParticipant: TEdit
@@ -33,29 +33,6 @@ object Background: TBackground
       TabOrder = 0
       Text = 'Participante'
     end
-    object RadioGroupMode: TRadioGroup
-      Left = 16
-      Height = 86
-      Top = 96
-      Width = 248
-      AutoFill = True
-      Caption = 'Modo'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 1
-      ClientHeight = 66
-      ClientWidth = 244
-      ItemIndex = 0
-      Items.Strings = (
-        'Treino'
-        'Teste'
-      )
-      TabOrder = 1
-    end
     object ButtonStartAll: TButton
       Left = 16
       Height = 56
@@ -63,6 +40,31 @@ object Background: TBackground
       Width = 248
       Caption = 'Começar Experimento'
       OnClick = ButtonStartAllClick
+      TabOrder = 1
+    end
+    object RadioGroupDesign: TRadioGroup
+      Left = 16
+      Height = 117
+      Top = 104
+      Width = 189
+      AutoFill = True
+      Caption = 'Delineamento'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 1
+      ClientHeight = 97
+      ClientWidth = 185
+      ItemIndex = 0
+      Items.Strings = (
+        'ABA'
+        'ACA'
+        'CA'
+        'BA'
+      )
       TabOrder = 2
     end
   end

@@ -35,6 +35,8 @@ type
     function RandomAmplitude(AValue, AAmplitude: Cardinal) : Cardinal;
     procedure Pass;
     procedure SetEnabled(AValue: Boolean);
+    procedure SetOnConsequence(AValue: TNotifyEvent);
+    procedure SetOnResponse(AValue: TNotifyEvent);
   protected
     function GetInterval : Cardinal;
     function GetParameter1: Cardinal; virtual; abstract;
@@ -57,8 +59,8 @@ type
     procedure DoResponse; virtual; abstract;
     procedure Reset; virtual; abstract;
     procedure Start; virtual;
-    property OnConsequence : TNotifyEvent read FOnConsequence write FOnConsequence;
-    property OnResponse : TNotifyEvent read FOnResponse write FOnResponse;
+    property OnConsequence : TNotifyEvent read FOnConsequence write SetOnConsequence;
+    property OnResponse : TNotifyEvent read FOnResponse write SetOnResponse;
     property Responses : Cardinal read FResponseCounter;
   published
     property Parameter1 : Cardinal read GetParameter1 write SetParameter1;
@@ -83,7 +85,7 @@ procedure TSchedules.Consequence;
 begin
   Reset;
   if Assigned(OnConsequence) then
-    FOnConsequence(Self);
+    OnConsequence(Self);
 end;
 
 procedure TSchedules.Response;
@@ -123,6 +125,18 @@ begin
   begin
     if AValue then Reset;
   end;
+end;
+
+procedure TSchedules.SetOnConsequence(AValue: TNotifyEvent);
+begin
+  if FOnConsequence=AValue then Exit;
+  FOnConsequence:=AValue;
+end;
+
+procedure TSchedules.SetOnResponse(AValue: TNotifyEvent);
+begin
+  if FOnResponse=AValue then Exit;
+  FOnResponse:=AValue;
 end;
 
 function TSchedules.GetInterval: Cardinal;

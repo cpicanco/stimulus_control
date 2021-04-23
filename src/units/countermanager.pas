@@ -26,6 +26,7 @@ type
   }
   TCounterManager = class(TComponent)
   private
+    FBlcPoints: integer;
     FOnRepeatBlc: TNotifyEvent;
   {Current Session}
     FSessionBackGroundResponses : integer;
@@ -163,6 +164,7 @@ type
     property BlcCscNones : integer read FBlcCscNones;
     property BlcHighCscNones : integer read FBlcHighCscNones;
     property BlcRepetitions : integer read FBlcRepetitions write FBlcRepetitions;
+    property BlcPoints : integer read FBlcPoints write FBlcPoints;
   {Each Stm}
     property StmCounter : integer read FStmCounter;
   {Events}
@@ -232,6 +234,7 @@ begin
   FBlcCscNones := 0;
   FBlcHighCscNones := 0;
   FCurrentTrial := 0;
+  FBlcPoints := 0;
 { SessionTrials }
   FTrialStmResponses := 0;
 
@@ -351,6 +354,7 @@ begin
   FCurrentTrial := 0;
   FBlcTrials:= 0;
   FBlcRepetitions := 0;
+  FBlcPoints:=0;
 
   Inc(FCurrentBlc);
 end;
@@ -377,6 +381,7 @@ begin
   FBlcHighCscNones := 0;
   FCurrentTrial := 0;
   FBlcTrials:= 0;
+  FBlcPoints := 0;
   Inc(FBlcRepetitions);
 end;
 

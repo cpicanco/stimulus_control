@@ -4,7 +4,7 @@ unit Experiments.Eduardo;
 
 interface
 
-function MakeConfigurationFile : string;
+function MakeConfigurationFile(ADesign : string) : string;
 
 implementation
 
@@ -14,10 +14,10 @@ uses FileMethods
    , Session.ConfigurationFile
    ;
 
-function MakeConfigurationFile : string;
+function MakeConfigurationFile(ADesign : string) : string;
 begin
   Result := NewConfigurationFile;
-  Experiments.Eduardo.Experimento1.WriteToConfigurationFile;
+  Experiments.Eduardo.Experimento1.WriteToConfigurationFile(ADesign);
   ConfigurationFile.Invalidate;
   ConfigurationFile.UpdateFile;
 end;

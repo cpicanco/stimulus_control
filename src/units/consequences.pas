@@ -30,7 +30,7 @@ type
   end;
 
 function NextConsequence(AHit : Boolean) : TConsequence;
-procedure Play(AConsequence : TConsequence);
+procedure Play(AConsequence: TConsequence);
 
 implementation
 

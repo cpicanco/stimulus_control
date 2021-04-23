@@ -214,7 +214,9 @@ const
   T_MRD = 'MRD';
   T_MSG = 'MSG';
   T_HTM = 'HTMLM';
+  T_EO1 = 'OP1';
   T_CHO = 'CHOICE';
+  T_INP = 'TXTINP';
   T_MTS = 'MTS';
   T_Simple = 'SIMPLE';
   T_LIK = 'LIKERT';

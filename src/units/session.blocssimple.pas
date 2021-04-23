@@ -8,6 +8,7 @@ uses
   Classes, SysUtils, ExtCtrls, StdCtrls, Controls
   , CounterManager
   , Controls.Trials.Abstract
+  , Stimuli.Image
   ;
 
 type
@@ -16,7 +17,8 @@ type
 
   TBloc = class(TComponent)
   private
-    FConsequence : TLabel;
+    //FConsequence : TLabel;
+    FConsequence : TStimulusFigure;
     FCounterManager : TCounterManager;
     FInterTrial : TTimer;
     FTrialConsequence : TTimer;
@@ -50,17 +52,19 @@ uses Constants
    , Session.Configuration
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
-   , Controls.Trials.Likert
-   , Controls.Trials.MatchingToSample
-   , Controls.Trials.GoNoGo.Dani
-   , Controls.Trials.PerformanceReview
+   //, Controls.Trials.Likert
+   //, Controls.Trials.MatchingToSample
+   //, Controls.Trials.PerformanceReview
+   //, Controls.Trials.BeforeAfter
+   //, Controls.Trials.ContextualMatchingToSample
+   //, Controls.Trials.RelationalFrame
    , Controls.Trials.TextMessage
-   , Controls.Trials.BeforeAfter
-   , Controls.Trials.ContextualMatchingToSample
-   , Controls.Trials.RelationalFrame
    , Controls.Trials.HTMLMessage
    , Controls.Trials.BinaryChoice
+   , Controls.Trials.TextInput
+   , Controls.Trials.FreeSquare
    , Graphics
+   , Consequences
    , Dialogs
    ;
 
@@ -75,23 +79,19 @@ begin
 
   ATrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
   try
-    {$IFDEF DEBUG}
-    FInterTrial.Interval := 100;
-    {$ELSE}
-    FInterTrial.Interval := StrToIntDef(ATrialConfig.SList.Values[_ITI], 0);
-    {$ENDIF}
-
     case ATrialConfig.Kind of
       T_MSG : FTrial := TMessageTrial.Create(Background);
       T_HTM : FTrial := THTMLMessage.Create(Background);
       T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
-      T_MTS : FTrial := TMTS.Create(Background);
-      T_LIK : FTrial := TLikert.Create(Background);
-      T_GNG : FTrial := TGNG.Create(Background);
-      T_PFR : FTrial := TPerformanceReview.Create(Background);
-      T_BAT : FTrial := TBeforeAfter.Create(Background);
-      T_CTX : FTrial := TCMTS.Create(Background);
-      T_RFT : FTrial := TFrame.Create(Background);
+      T_INP : FTrial := TTextInput.Create(Background);
+      T_EO1 : FTrial := TFreeSquareTrial.Create(Background);
+      //T_MTS : FTrial := TMTS.Create(Background);
+      //T_LIK : FTrial := TLikert.Create(Background);
+      //T_GNG : FTrial := TGNG.Create(Background);
+      //T_PFR : FTrial := TPerformanceReview.Create(Background);
+      //T_BAT : FTrial := TBeforeAfter.Create(Background);
+      //T_CTX : FTrial := TCMTS.Create(Background);
+      //T_RFT : FTrial := TFrame.Create(Background);
     end;
 
     FTrial.SaveData := GetSaveDataProc(LGTimestamps);
@@ -156,13 +156,16 @@ begin
         case LTrial.Result of
           'HIT' :
           begin
-            FConsequence.Caption := 'Certo';
-            FConsequence.Show;
+            //FConsequence.Caption := 'Certo';
+            //FConsequence.Show;
+              FConsequence.Start;
+              Background.Color := clPurple;
           end;
           'MISS':
           begin
-            FConsequence.Caption := 'Errado';
-            FConsequence.Show;
+            //FConsequence.Caption := 'Errado';
+            //FConsequence.Show;
+            Background.Color := clBlack;
           end;
         end;
     end
@@ -223,9 +226,17 @@ begin
   begin
     FTrialConsequence.Enabled:=False;
     FTrial.StopConsequence;
-    FConsequence.Caption:='';
-    FConsequence.Hide;
+    //FConsequence.Caption:='';
+    //FConsequence.Hide;
+    FConsequence.Stop;
+    Background.Color := clWhite;
   end;
+
+  {$IFDEF DEBUG}
+  FInterTrial.Interval := 100;
+  {$ELSE}
+  FInterTrial.Interval := Round(StrToFloatDef(FTrial.Configurations.SList.Values[_ITI], 0));
+  {$ENDIF}
   if FInterTrial.Interval > 0 then
     begin
       FInterTrial.Enabled := True;
@@ -252,19 +263,23 @@ begin
   FITIBegin := 0;
   FITIEnd := 0;
 
-  FConsequence := TLabel.Create(Self);
-  with FConsequence do begin
-    Visible := False;
-    Cursor := -1;
-    Align := alClient;
-    Alignment := taCenter;
-    Anchors := [akLeft,akRight];
-    WordWrap := True;
-    Font.Name := 'Arial';
-    Font.Size := 30;
-    Layout:=tlCenter;
-    //OnMouseUp := @MessageMouseUp;
-  end;
+  //FConsequence := TLabel.Create(Self);
+  //with FConsequence do begin
+  //  Visible := False;
+  //  Cursor := -1;
+  //  Align := alClient;
+  //  Alignment := taCenter;
+  //  Anchors := [akLeft,akRight];
+  //  WordWrap := True;
+  //  Font.Name := 'Arial';
+  //  Font.Size := 30;
+  //  Layout:=tlCenter;
+  //  Caption:='';
+  //  //OnMouseUp := @MessageMouseUp;
+  //end;
+
+  FConsequence := TStimulusFigure.Create(Self);
+  FConsequence.LoadFromFile('Acerto.png');
 end;
 
 procedure TBloc.Play;

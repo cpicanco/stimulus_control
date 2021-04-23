@@ -7,7 +7,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit controls.trials.HTMLMessage;
+unit Controls.Trials.TextInput;
 
 {$mode objfpc}{$H+}
 
@@ -21,14 +21,16 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, StdCtrls, Graphics, IpHtml
 
 type
 
-  { THTMLMessage }
+  { TTextInput }
 
-  THTMLMessage = class(TTrial)
+  TTextInput = class(TTrial)
     procedure EndButtonClick(Sender : TObject);
   private
+    FResponse : string;
     FEndButton : TButton;
     FDataSupport : TDataSupport;
-    FMessage : TIpHtmlPanel;
+    FMessage : TLabel;
+    FEdit : TEdit;
     procedure TrialBeforeEnd(Sender: TObject);
     procedure TrialStart(Sender: TObject);
   protected
@@ -43,122 +45,125 @@ type
 implementation
 
 uses
-  Constants
+  constants
   , Timestamps
   ;
 
-constructor THTMLMessage.Create(AOwner: TCustomControl);
+constructor TTextInput.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
   //OnTrialKeyUp := @TrialKeyUp;
   OnTrialStart := @TrialStart;
 
-  FMessage := TIpHtmlPanel.Create(Self);
+  FMessage := TLabel.Create(Self);
   with FMessage do begin
-    Anchors := [akLeft,akRight];
-    AllowTextSelect := False;
-    FixedTypeface := 'Times New Roman';
-    DefaultTypeFace := 'default';
-    DefaultFontSize := 20;
-    FlagErrors := False;
-    ShowHints := False;
     Visible := False;
-    WantTabs := False;
+    Alignment := taCenter;
+    Anchors := [akLeft,akRight];
+    //Layout := tlCenter;
+    WordWrap := True;
+    Font.Name := 'Times New Roman';
+    //OnMouseUp := @MessageMouseUp;
+    Font.Size:=22;
+    Width := 640;
     Parent := TCustomControl(AOwner);
-    //OnKeyUp:=@TrialKeyUp;
-    //OnMouseDown:=@TrialMouseDown;
-    Height := (Self.Height div 3) * 2;
-    Width := (Self.Width div 8) * 5;
-    Left := (Self.Width - Width) div 2;
-    Top := (Self.Height - Height) div 2;
+  end;
+
+  FEdit := TEdit.Create(Self);
+  with FEdit do begin
+    Visible := False;
+    Font.Size := 20;
+    Font.Name := 'Times New Roman';
+    Width := 200;
+    Height := 50;
+    Parent := TCustomControl(AOwner);
   end;
 
   FEndButton := TButton.Create(Self);
   with FEndButton do begin
+    Visible := False;
     Caption := 'Continuar';
     AutoSize := True;
     Font.Name:='Times New Roman';
     Font.Size := 15;
-    Top := FMessage.BoundsRect.Bottom + 10;
-    Left := FMessage.BoundsRect.Right - Width - 50;
     OnClick := @EndButtonClick;
     Parent := TCustomControl(AOwner);
   end;
 
   Header := Header + #9 +
             rsReportStmBeg + #9 +
-            rsReportStmDur;
+            rsReportStmDur + #9 +
+            'Resposta';
 
   Result := T_NONE;
   IETConsequence := T_NONE;
   Result := T_NONE;
+  FResponse := 'Sem Resposta';
 end;
 
-destructor THTMLMessage.Destroy;
+destructor TTextInput.Destroy;
 begin
   inherited Destroy;
 end;
 
-function THTMLMessage.AsString: string;
+function TTextInput.AsString: string;
 begin
   Result := '';
 end;
 
-procedure THTMLMessage.EndButtonClick(Sender: TObject);
+procedure TTextInput.EndButtonClick(Sender: TObject);
 begin
-   EndTrial(Sender);
+  FResponse := FEdit.Text;
+  EndTrial(Sender);
 end;
 
-procedure THTMLMessage.TrialBeforeEnd(Sender: TObject);
+procedure TTextInput.TrialBeforeEnd(Sender: TObject);
 begin
   FDataSupport.StmEnd := TickCount;
   WriteData(Self);
 end;
 
 
-procedure THTMLMessage.Play(ACorrection : Boolean);
+procedure TTextInput.Play(ACorrection : Boolean);
 var
   LParameters : TStringList;
-  LMessage : string;
 begin
   inherited Play(ACorrection);
   LParameters := Configurations.SList;
-  with FMessage do
-    begin
-       LMessage := LParameters.Values[_Msg];
-       LMessage :=
-       '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"'+
-       '<html>' +
-         '<head>' +
-           '<meta http-equiv="content-type" content="text/html; charset=UTF-8">' +
-           '<style type="text/css">' +
-             '.container {text-align: center;}' +
-           '</style>' +
-         '</head>' +
-         '<body><div class=container>'+LMessage+'</div></body>' +
-       '</html>';
-       FMessage.SetHtmlFromStr(LMessage);
-    end;
+  FMessage.Caption := LParameters.Values[_Msg];
 
-  if Self.ClassType = THTMLMessage then Config(Self);
+  if Self.ClassType = TTextInput then Config(Self);
 end;
 
-procedure THTMLMessage.TrialStart(Sender: TObject);
+procedure TTextInput.TrialStart(Sender: TObject);
 begin
-  FMessage.Visible := True;
+  with FMessage do begin
+    SetBounds((Self.Width - Width) div 2, (Self.Height - Height) div 2, Width, Height);
+    Show;
+  end;
+  with FEdit do begin
+    Top := FMessage.BoundsRect.Bottom + 20;
+    Left := (Self.Width - Width) div 2;
+    Show;
+  end;
+  with FEndButton do begin
+    Top := FEdit.BoundsRect.Bottom + 20;
+    Left := (Self.Width - Width) div 2;
+  end;
+
   Self.SetFocus;
   FDataSupport.StmBegin := TickCount;
 end;
 
-procedure THTMLMessage.WriteData(Sender: TObject);
+procedure TTextInput.WriteData(Sender: TObject);
 var aStart, aDuration : string;
 begin
   inherited WriteData(Sender);
   aStart := TimestampToStr(FDataSupport.StmBegin - TimeStart);
   aDuration := TimestampToStr(FDataSupport.StmEnd - TimeStart);
 
-  Data := Data + aStart + #9 + aDuration;
+  Data := Data + aStart + #9 + aDuration + #9 + FResponse;
 end;
 
 end.

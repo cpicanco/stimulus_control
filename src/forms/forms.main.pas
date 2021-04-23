@@ -26,7 +26,8 @@ type
     EditParticipant: TEdit;
     IniPropStorage: TIniPropStorage;
     PanelConfigurations: TPanel;
-    RadioGroupMode: TRadioGroup;
+    RadioGroupDesign: TRadioGroup;
+    procedure Button1Click(Sender: TObject);
     procedure ButtonStartAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure EndSession(Sender: TObject);
@@ -50,6 +51,7 @@ uses
    , Session.Configuration.GlobalContainer
    , SessionSimple
    , Experiments.Eduardo
+   , Experiments.Eduardo.Experimento1
    ;
 
 { TBackground }
@@ -62,8 +64,16 @@ procedure TBackground.ButtonStartAllClick(Sender: TObject);
 begin
   PanelConfigurations.Hide;
   Session.Backgrounds.Background := Self;
-  ConfigurationFilename := Experiments.Eduardo.MakeConfigurationFile;
-  LSession.Play(RadioGroupMode.Items[RadioGroupMode.ItemIndex], EditParticipant.Text);
+  ConfigurationFilename :=
+    Experiments.Eduardo.MakeConfigurationFile(
+      RadioGroupDesign.Items[RadioGroupDesign.ItemIndex]
+    );
+  LSession.Play('Experimento 1', EditParticipant.Text);
+end;
+
+procedure TBackground.Button1Click(Sender: TObject);
+begin
+  Experiments.Eduardo.Experimento1.WriteChoices;
 end;
 
 
