@@ -17,7 +17,7 @@ uses Controls, ExtCtrls, Classes, SysUtils
   , Session.Configuration
   , Loggers.Reports
   , CounterManager
-  , Schedules
+  //, Schedules
   {$IFDEF RS232}
   , Devices.RS232i
   {$ENDIF}
@@ -392,7 +392,7 @@ end;
 
 function TTrial.StartConsequence: integer;
 begin
-
+  Result := 2000;
 end;
 
 procedure TTrial.StopConsequence;

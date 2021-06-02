@@ -109,7 +109,10 @@ end;
 
 function TFrame.HasConsequence: Boolean;
 begin
-  Result := (Self.Result <> T_NONE) and StrToBool(IETConsequence);
+  if (IETConsequence = 'P') or (IETConsequence = 'R') then
+    Result := (Self.Result <> T_NONE)
+  else
+    Result := (Self.Result <> T_NONE) and StrToBool(IETConsequence);
 end;
 
 procedure TFrame.Play(ACorrection: Boolean);
@@ -123,9 +126,7 @@ begin
   FStimulus.OnEndSerialTimer:=@EnableResponses;
 
   FExpectedResponse.LoadFromParameters(LParameters);
-  //WriteLn(FExpectedResponse.FrameToStr);
   FResponse := FExpectedResponse.KeySequenceFromFrame(Self);
-  //ShowMessage(FResponse.SeqToString);
   FResponse.OnEndCapturing:=@TrialEndKeyCapturing;
 
   if Self.ClassType = TFrame then Config(Self);
@@ -134,11 +135,18 @@ end;
 procedure TFrame.TrialResult(Sender: TObject);
 begin
   Result := T_NONE;
-
-  if FResponse.ContainsRecordedSequence then
-    Result := T_HIT
-  else
-    Result:=T_MISS;
+  case IETConsequence of
+    'P' :
+      if FResponse.ContainsRecordedSequence then
+        Result := T_MISS
+      else
+        Result := T_HIT;
+    else
+      if FResponse.ContainsRecordedSequence then
+        Result := T_HIT
+      else
+        Result:=T_MISS;
+  end;
 
   //if HasConsequence then
   //  Consequences.Play(NextConsequence(Result = T_HIT));

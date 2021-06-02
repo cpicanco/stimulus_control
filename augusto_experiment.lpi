@@ -58,9 +58,6 @@
           </Linking>
           <Other>
             <CustomOptions Value="-dNO_LIBZMQ"/>
-            <OtherDefines Count="1">
-              <Define0 Value="NO_LIBZMQ"/>
-            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item2>
@@ -208,9 +205,9 @@
         <UnitName Value="Experiments.SameDifferent"/>
       </Unit23>
       <Unit24>
-        <Filename Value="src/units/experiments.derivation.pas"/>
+        <Filename Value="src/units/experiments.secondderivation.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Experiments.Derivation"/>
+        <UnitName Value="Experiments.SecondDerivation"/>
       </Unit24>
     </Units>
   </ProjectOptions>

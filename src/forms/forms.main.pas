@@ -22,16 +22,18 @@ type
   { TBackground }
 
   TBackground = class(TForm)
-    Button1: TButton;
+    ButtonReplication: TButton;
+    ButtonB: TButton;
     ButtonStart: TButton;
-    ButtonStartAll: TButton;
+    ButtonA: TButton;
     EditParticipant: TEdit;
     IniPropStorage: TIniPropStorage;
     PanelConfigurations: TPanel;
     RadioGroupCondition: TRadioGroup;
     RadioGroupBehaviour: TRadioGroup;
     procedure Button1Click(Sender: TObject);
-    procedure ButtonStartAllClick(Sender: TObject);
+    procedure ButtonAClick(Sender: TObject);
+    procedure ButtonBClick(Sender: TObject);
     procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     //procedure InterTrialStop(Sender: TObject);
@@ -59,11 +61,11 @@ uses
    FileUtil
    , Session.Backgrounds
    , Session.Configuration.GlobalContainer
-   , Session.ConfigurationFile
    , SessionSimple
    , Experiments.BeforeAfter
    , Experiments.SameDifferent
    , Experiments.Derivation
+   , Experiments.SecondDerivation
    , Experiments.Augusto
    , Stimuli.Image.Base
    , FileMethods
@@ -93,16 +95,31 @@ begin
     2 :
         ConfigurationFilename := Experiments.Derivation.MakeConfigurationFile(
             RadioGroupCondition.ItemIndex, 2000);
+    3 :
+        ConfigurationFilename := Experiments.SecondDerivation.MakeConfigurationFileHigh(
+            RadioGroupCondition.ItemIndex, 2000);
+    4 :
+        ConfigurationFilename := Experiments.SecondDerivation.MakeConfigurationFileLow(
+            RadioGroupCondition.ItemIndex, 2000);
   end;
   LSession.Play(RadioGroupCondition.Items[RadioGroupCondition.ItemIndex], EditParticipant.Text);
 end;
 
-procedure TBackground.ButtonStartAllClick(Sender: TObject);
+procedure TBackground.ButtonAClick(Sender: TObject);
 begin
   PanelConfigurations.Hide;
   Session.Backgrounds.Background := Self;
   //{$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
-  ConfigurationFilename := Experiments.Augusto.MakeConfigurationFile;
+  ConfigurationFilename := Experiments.Augusto.MakeSecondConfigurationFileHigh;
+  LSession.Play(RadioGroupCondition.Items[RadioGroupCondition.ItemIndex], EditParticipant.Text);
+end;
+
+procedure TBackground.ButtonBClick(Sender: TObject);
+begin
+  PanelConfigurations.Hide;
+  Session.Backgrounds.Background := Self;
+  //{$IFDEF WINDOWS}SwitchFullScreen;{$ENDIF}
+  ConfigurationFilename := Experiments.Augusto.MakeSecondConfigurationFileLow;
   LSession.Play(RadioGroupCondition.Items[RadioGroupCondition.ItemIndex], EditParticipant.Text);
 end;
 

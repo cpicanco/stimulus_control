@@ -66,7 +66,7 @@ var
 
 const
   LimitedHold = 0;
-  ITI = 3000;
+  ITI = 1000;
 
 operator in (A:integer; B: TArrayOfInteger) : Boolean;
 var

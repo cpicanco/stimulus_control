@@ -106,8 +106,6 @@ end;
 procedure TBloc.InterTrialStopTimer(Sender: TObject);
 begin
   if Assigned(OnIntertrialStop) then OnIntertrialStop(Sender);
-  FConsequence.Caption:='';
-  FConsequence.Hide;
   FITIEnd := TickCount - GlobalContainer.TimeStart;
   WriteTrialData(FTrial);
   FCounterManager.CurrentTrial := FCounterManager.CurrentTrial+1;
@@ -138,22 +136,26 @@ begin
   LTrial := TTrial(Sender);
   LTrial.Hide;
   if LTrial.HasConsequence then
-    case LTrial.Result of
-      'HIT' :
-      begin
-        FConsequence.Caption := 'Certo';
-        FConsequence.Show;
-      end;
-      'MISS':
-      begin
-        FConsequence.Caption := 'Errado';
-        FConsequence.Show;
-      end;
-    end;
-  if FInterTrial.Interval > 0 then
+    FTrialConsequence.Interval := FTrial.StartConsequence
+  else
+    FTrialConsequence.Interval := 0;
+
+  if FTrialConsequence.Interval > 0 then
     begin
-      FTrialConsequence.Interval := FTrial.StartConsequence;
       FTrialConsequence.Enabled := True;
+      if LTrial.HasConsequence then
+        case LTrial.Result of
+          'HIT' :
+          begin
+            FConsequence.Caption := 'Certo';
+            FConsequence.Show;
+          end;
+          'MISS':
+          begin
+            FConsequence.Caption := 'Errado';
+            FConsequence.Show;
+          end;
+        end;
     end
   else
     PlayInterTrialInterval(Sender);
@@ -212,6 +214,8 @@ begin
   begin
     FTrialConsequence.Enabled:=False;
     FTrial.StopConsequence;
+    FConsequence.Caption:='';
+    FConsequence.Hide;
   end;
   if FInterTrial.Interval > 0 then
     begin
