@@ -377,12 +377,12 @@ begin
       0 :
         begin
           SetupStimuli(True);
-          for i := 1 to 4 do
+          for i := 1 to 3 do
           begin
             ConfigurationFile.WriteToBloc(i, _Name, 'Treino Igual-Diferente'+i.ToString);
             case i of
-            1..3 : ConfigurationFile.WriteToBloc(i, _CrtHitValue, '7');
-            4 : ConfigurationFile.WriteToBloc(i, _CrtHitValue, '14');
+            1..2 : ConfigurationFile.WriteToBloc(i, _CrtHitValue, '7');
+            3 : ConfigurationFile.WriteToBloc(i, _CrtHitValue, '14');
             end;
             if i = 1 then WriteTrainingMSGTrial(i);
             WriteBloc(True, i);
@@ -418,7 +418,6 @@ begin
   end;
 
   // testing bloc
-  Inc(i);
   SetupStimuli(False);
   ConfigurationFile.WriteToBloc(i, _Name, 'Teste Igual-Diferente');
   ConfigurationFile.WriteToBloc(i, _CrtHitValue, '14');

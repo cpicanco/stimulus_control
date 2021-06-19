@@ -718,7 +718,7 @@ begin
   ConfigurationFile.WriteToBloc(14, _Name, 'Punição');
   WriteBloc(14);
 
-  ConfigurationFile.WriteToBloc(14, _Name, 'Reforço');
+  ConfigurationFile.WriteToBloc(15, _Name, 'Reforço');
   WriteBloc(15);
 end;
 

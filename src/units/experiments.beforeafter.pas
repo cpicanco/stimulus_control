@@ -484,7 +484,6 @@ begin
   end;
 
   // testing bloc
-  Inc(i);
   SetupStimuli(False);
   ConfigurationFile.WriteToBloc(i, _Name, 'Teste Antes-Depois');
   ConfigurationFile.WriteToBloc(i, _CrtHitValue, '30');
