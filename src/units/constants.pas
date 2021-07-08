@@ -83,7 +83,7 @@ const
   _Style = 'Style';
 
   // MTS
-  _Delayed = 'Delayed';
+  _SampleType = 'Delayed';
   _Delay = 'Delay';
 
   // TCLB

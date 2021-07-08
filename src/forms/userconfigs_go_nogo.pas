@@ -153,7 +153,7 @@ begin
 
   if Length(FTrials) > 0 then
     begin
-      FStimulus.FullPath := FTrials[FCurrentTrial].Path;
+      FStimulus.Filename := FTrials[FCurrentTrial].Path;
       FStimulus.Invalidate;
     end;
   Invalidate;

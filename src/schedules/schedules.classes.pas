@@ -289,6 +289,7 @@ end;
 procedure TTimeSchedule.SetParameter1(AValue: Cardinal);
 begin
   FBaseTimeInterval := AValue;
+  UpdateInterval(FBaseTimeInterval, FIntervalVariation);
 end;
 
 procedure TTimeSchedule.SetParameter2(AValue: Cardinal);

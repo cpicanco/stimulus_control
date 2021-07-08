@@ -37,19 +37,7 @@
             <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;src/prototypes;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
-          <Parsing>
-            <SyntaxOptions>
-              <IncludeAssertionCode Value="True"/>
-            </SyntaxOptions>
-          </Parsing>
           <CodeGeneration>
-            <Checks>
-              <IOChecks Value="True"/>
-              <RangeChecks Value="True"/>
-              <OverflowChecks Value="True"/>
-              <StackChecks Value="True"/>
-            </Checks>
-            <VerifyObjMethodCallValidity Value="True"/>
             <TargetCPU Value="x86_64"/>
             <TargetOS Value="linux"/>
             <Optimizations>
@@ -95,7 +83,19 @@
             <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
+          <Parsing>
+            <SyntaxOptions>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
           <CodeGeneration>
+            <Checks>
+              <IOChecks Value="True"/>
+              <RangeChecks Value="True"/>
+              <OverflowChecks Value="True"/>
+              <StackChecks Value="True"/>
+            </Checks>
+            <VerifyObjMethodCallValidity Value="True"/>
             <TargetCPU Value="i386"/>
             <TargetOS Value="win32"/>
             <Optimizations>
@@ -103,9 +103,6 @@
             </Optimizations>
           </CodeGeneration>
           <Linking>
-            <Debugging>
-              <StripSymbols Value="True"/>
-            </Debugging>
             <Options>
               <Win32>
                 <GraphicApplication Value="True"/>
@@ -144,7 +141,6 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <StripSymbols Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <Options>
@@ -190,7 +186,6 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <StripSymbols Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <Options>
@@ -225,7 +220,19 @@
             <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/epiktimer;dependency/fpc-zmq;dependency/pupil-fpc"/>
             <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
           </SearchPaths>
+          <Parsing>
+            <SyntaxOptions>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
           <CodeGeneration>
+            <Checks>
+              <IOChecks Value="True"/>
+              <RangeChecks Value="True"/>
+              <OverflowChecks Value="True"/>
+              <StackChecks Value="True"/>
+            </Checks>
+            <VerifyObjMethodCallValidity Value="True"/>
             <TargetCPU Value="x86_64"/>
             <TargetOS Value="win64"/>
             <Optimizations>
@@ -233,9 +240,6 @@
             </Optimizations>
           </CodeGeneration>
           <Linking>
-            <Debugging>
-              <StripSymbols Value="True"/>
-            </Debugging>
             <Options>
               <Win32>
                 <GraphicApplication Value="True"/>
@@ -274,7 +278,6 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <StripSymbols Value="True"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <Options>
@@ -313,16 +316,19 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="IDEIntf"/>
+        <PackageName Value="lazvlc"/>
       </Item1>
       <Item2>
-        <PackageName Value="LazControls"/>
+        <PackageName Value="IDEIntf"/>
       </Item2>
       <Item3>
-        <PackageName Value="LCL"/>
+        <PackageName Value="LazControls"/>
       </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
     </RequiredPackages>
     <Units Count="56">
       <Unit0>
@@ -611,6 +617,7 @@
       <Unit54>
         <Filename Value="src/schedules/schedules.classes.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="Schedules.Classes"/>
       </Unit54>
       <Unit55>
         <Filename Value="src/schedules/schedules.pas"/>
@@ -630,7 +637,19 @@
       <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/bass;dependency/synaser;dependency/msgpack-delphi;dependency/fpc-zmq;dependency/pupil-fpc"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)-$(LCLWidgetType)"/>
     </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <IncludeAssertionCode Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
     <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
       <TargetCPU Value="x86_64"/>
       <TargetOS Value="linux"/>
       <Optimizations>
@@ -638,9 +657,6 @@
       </Optimizations>
     </CodeGeneration>
     <Linking>
-      <Debugging>
-        <StripSymbols Value="True"/>
-      </Debugging>
       <Options>
         <Win32>
           <GraphicApplication Value="True"/>
@@ -654,11 +670,6 @@
       <CustomOptions Value="-dUseCThreads
 -dDEBUG
 -dZMQ_STATIC_LINK"/>
-      <OtherDefines Count="3">
-        <Define0 Value="UseCThreads"/>
-        <Define1 Value="DEBUG"/>
-        <Define2 Value="ZMQ_STATIC_LINK"/>
-      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>
