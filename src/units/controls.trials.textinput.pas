@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -38,6 +38,7 @@ type
   public
     constructor Create(AOwner: TCustomControl); override;
     destructor Destroy;override;
+    function ConsequenceInterval: integer; override;
     function AsString : string; override;
     procedure Play(ACorrection : Boolean); override;
   end;
@@ -78,6 +79,7 @@ begin
     Width := 200;
     Height := 50;
     Parent := TCustomControl(AOwner);
+    NumbersOnly:=True;
   end;
 
   FEndButton := TButton.Create(Self);
@@ -107,6 +109,11 @@ begin
   inherited Destroy;
 end;
 
+function TTextInput.ConsequenceInterval: integer;
+begin
+  Result := 0;
+end;
+
 function TTextInput.AsString: string;
 begin
   Result := '';
@@ -115,6 +122,8 @@ end;
 procedure TTextInput.EndButtonClick(Sender: TObject);
 begin
   FResponse := FEdit.Text;
+  if StrToIntDef(FResponse, -1) = 0 then
+    NextTrial :=  '100';
   EndTrial(Sender);
 end;
 

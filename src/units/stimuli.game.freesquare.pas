@@ -121,8 +121,15 @@ begin
 end;
 
 procedure TFreeSquare.FitScreen;
+var
+  R : integer;
 begin
-  FMovingSquare.Centralize;
+  R := Random(3);
+  case R of
+   0: FMovingSquare.Centralize;
+   1: FMovingSquare.CentralizeLeft;
+   2: FMovingSquare.CentralizeRight;
+  end;
 end;
 
 end.

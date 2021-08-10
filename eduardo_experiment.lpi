@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="11"/>
+    <Version Value="12"/>
     <General>
+      <Flags>
+        <CompatibilityMode Value="True"/>
+      </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <MainUnit Value="0"/>
       <Title Value="eduardo_experiment"/>
       <Scaled Value="True"/>
       <ResourceType Value="res"/>
@@ -15,7 +17,7 @@
         <TextDesc Value="Experimento do Augusto"/>
       </XPManifest>
     </General>
-    <BuildModes Count="2">
+    <BuildModes Count="3">
       <Item1 Name="deb64" Default="True"/>
       <Item2 Name="win64">
         <CompilerOptions>
@@ -61,6 +63,50 @@
           </Other>
         </CompilerOptions>
       </Item2>
+      <Item3 Name="browser">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <Target>
+            <Filename Value="experiment_$(BuildMode)"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="src/forms;src/units;src/schedules;dependency/epiktimer"/>
+            <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Parsing>
+            <SyntaxOptions>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+              <RangeChecks Value="True"/>
+              <OverflowChecks Value="True"/>
+              <StackChecks Value="True"/>
+            </Checks>
+            <VerifyObjMethodCallValidity Value="True"/>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="browser"/>
+          </CodeGeneration>
+          <Linking>
+            <LinkSmart Value="True"/>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+          <Other>
+            <CustomOptions Value="-dNO_LIBZMQ"/>
+            <OtherDefines Count="1">
+              <Define0 Value="NO_LIBZMQ"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
+      </Item3>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
@@ -88,7 +134,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="24">
+    <Units Count="26">
       <Unit0>
         <Filename Value="eduardo_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -171,19 +217,19 @@
         <UnitName Value="Controls.Trials.FreeSquare"/>
       </Unit15>
       <Unit16>
-        <Filename Value="src/units/experiments.eduardo.experimento1.pas"/>
+        <Filename Value="src/units/experiments.eduardo.experimento2.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Experiments.Eduardo.Experimento1"/>
+        <UnitName Value="Experiments.Eduardo.Experimento2"/>
       </Unit16>
       <Unit17>
-        <Filename Value="src/units/stimuli.sequence.contextualmatchingtosample.pas"/>
+        <Filename Value="src/units/stimuli.sequence.temporalbissection.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Stimuli.Sequence.ContextualMatchingToSample"/>
+        <UnitName Value="Stimuli.Sequence.TemporalBissection"/>
       </Unit17>
       <Unit18>
-        <Filename Value="src/units/controls.trials.contextualmatchingtosample.pas"/>
+        <Filename Value="src/units/controls.trials.temporalbissection.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Controls.Trials.ContextualMatchingToSample"/>
+        <UnitName Value="Controls.Trials.TemporalBissection"/>
       </Unit18>
       <Unit19>
         <Filename Value="src/units/controls.trials.relationalframe.pas"/>
@@ -210,6 +256,16 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Image.MovingSquare"/>
       </Unit23>
+      <Unit24>
+        <Filename Value="src/units/experiments.eduardo.comum.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo.Comum"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="src/units/stimuli.image.labeled.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Image.Labeled"/>
+      </Unit25>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

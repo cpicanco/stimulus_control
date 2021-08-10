@@ -44,7 +44,6 @@ type
   private
     FTrialType : TTrialType;
     FFirstResponse : Boolean;
-    FCounterRect : TRect;
     //FHasConsequence : Boolean;
     FReportData : TReportData;
     FStimulus : TFreeSquare;
@@ -57,13 +56,12 @@ type
     function GetHeader: string;
   protected
     procedure TrialStart(Sender: TObject); virtual;
-    procedure TrialPaint;
     procedure WriteData(Sender: TObject); override;
   public
     constructor Create(AOwner: TCustomControl); override;
     function AsString : string; override;
-    function HasConsequence: Boolean; override;
-    function StartConsequence: integer; override;
+    function HasVisualConsequence: Boolean; override;
+    function ConsequenceInterval: integer; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -78,7 +76,6 @@ begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialStart := @TrialStart;
-  OnTrialPaint := @TrialPaint;
 
   if Self.ClassType = TFreeSquareTrial then
     Header := Header + #9 + GetHeader;
@@ -100,12 +97,12 @@ begin
   Result := '';
 end;
 
-function TFreeSquareTrial.HasConsequence: Boolean;
+function TFreeSquareTrial.HasVisualConsequence: Boolean;
 begin
   Result := (Self.Result <> T_NONE);
 end;
 
-function TFreeSquareTrial.StartConsequence: integer;
+function TFreeSquareTrial.ConsequenceInterval: integer;
 begin
   Result := 2000;
 end;
@@ -124,7 +121,7 @@ begin
   FStimulus.OnConsequence := @Consequence;
   FStimulus.OnResponse := @Response;
   FStimulus.FitScreen;
-  FCounterRect := Rect((ClientRect.Right div 7)*6, 10, ClientRect.Right-10, 70);
+  FShowCounter := True;
   if Self.ClassType = TFreeSquareTrial then Config(Self);
 end;
 
@@ -137,30 +134,6 @@ begin
   FReportData.CBegin:=LogEvent('C.Start');
   FReportData.ComparisonBegin:=TimestampToStr(FReportData.CBegin);
 end;
-
-procedure TFreeSquareTrial.TrialPaint;
-var
-  LTextStyle : TTextStyle;
-begin
-  LTextStyle := Canvas.TextStyle;
-  LTextStyle.SingleLine:=False;
-  LTextStyle.Wordbreak:=True;
-  LTextStyle.Clipping:=False;
-  LTextStyle.Alignment:=taCenter;
-  LTextStyle.Layout:=tlCenter;
-  Canvas.TextStyle := LTextStyle;
-  with Canvas do
-    begin
-      Font.Size := 22;
-      Font.Color:= 0;
-      Pen.Width := 2;
-      Pen.Color := 0;
-      Rectangle(FCounterRect);
-      TextRect(FCounterRect, FCounterRect.Left, FCounterRect.top,
-        'Pontos: ' + CounterManager.BlcPoints.ToString);
-    end;
-end;
-
 
 procedure TFreeSquareTrial.WriteData(Sender: TObject);
 const
@@ -196,6 +169,7 @@ end;
 procedure TFreeSquareTrial.DelayEnd(Sender: TObject);
 begin
   FTimer.Enabled:=False;
+  Parent.Color := clWhite;
   CounterManager.BlcPoints := CounterManager.BlcPoints +1;
   EndTrial(Self);
 end;
@@ -206,6 +180,7 @@ var
 begin
   FTimer.Enabled:=False;
   FStimulus.Stop;
+  FShowCounter:=False;
   FResponseEnabled := False;
   Invalidate;
 
@@ -225,6 +200,7 @@ begin
       begin
         ITI := 10000-(FReportData.CLatency - FReportData.CBegin);
         Configurations.SList.Values[_ITI] := ITI.ToString;
+        Parent.Color := clPurple;
         FTimer.OnTimer:=@DelayEnd;
         FTimer.Interval := 10000;
         FTimer.Enabled:=True;

@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2020 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -14,8 +14,9 @@ unit Forms.Main;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
-  IniPropStorage, ComCtrls;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
+  ExtCtrls, StdCtrls, IniPropStorage, ComCtrls, Spin,
+  Stimuli.Image.Labeled;
 
 type
 
@@ -24,10 +25,25 @@ type
   TBackground = class(TForm)
     ButtonStartAll: TButton;
     EditParticipant: TEdit;
+    FloatSpinEditScreen: TFloatSpinEdit;
+    FloatSpinEditSquare: TFloatSpinEdit;
+    FloatSpinEditSquareMove: TFloatSpinEdit;
     IniPropStorage: TIniPropStorage;
+    LabelScreenSize: TLabel;
+    LabelSquareMove: TLabel;
+    LabelSquareSize: TLabel;
+    LabelTimeSize: TLabel;
+    PageControl1: TPageControl;
     PanelConfigurations: TPanel;
-    RadioGroupDesign: TRadioGroup;
-    procedure Button1Click(Sender: TObject);
+    RadioGroupDesign1: TRadioGroup;
+    RadioGroupDesign2: TRadioGroup;
+    RadioGroupDesign3: TRadioGroup;
+    RadioGroupDesign4: TRadioGroup;
+    SpinEditTimeSize: TSpinEdit;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    TabSheet3: TTabSheet;
+    TabSheet4: TTabSheet;
     procedure ButtonStartAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure EndSession(Sender: TObject);
@@ -35,7 +51,7 @@ type
   private
 
   public
-
+    FImage : TStimulusLabeledFigure;
   end;
 
 var
@@ -51,7 +67,7 @@ uses
    , Session.Configuration.GlobalContainer
    , SessionSimple
    , Experiments.Eduardo
-   , Experiments.Eduardo.Experimento1
+   , Stimuli.Image.MovingSquare
    ;
 
 { TBackground }
@@ -61,19 +77,52 @@ var
   ConfigurationFilename : string;
 
 procedure TBackground.ButtonStartAllClick(Sender: TObject);
+var
+  LName : string;
 begin
   PanelConfigurations.Hide;
   Session.Backgrounds.Background := Self;
-  ConfigurationFilename :=
-    Experiments.Eduardo.MakeConfigurationFile(
-      RadioGroupDesign.Items[RadioGroupDesign.ItemIndex]
-    );
-  LSession.Play('Experimento 1', EditParticipant.Text);
-end;
+  case PageControl1.TabIndex of
+    0:begin
+      ScreenInCentimeters := FloatSpinEditScreen.Value;
+      SquareSize := FloatSpinEditSquare.Value;
+      SquareMovementSize := FloatSpinEditSquareMove.Value;
+      Granularity := SpinEditTimeSize.Value;
 
-procedure TBackground.Button1Click(Sender: TObject);
-begin
-  Experiments.Eduardo.Experimento1.WriteChoices;
+      ConfigurationFilename :=
+        Experiments.Eduardo.MakeConfigurationFile(
+          RadioGroupDesign1.Items[RadioGroupDesign1.ItemIndex],
+          PageControl1.TabIndex);
+    end;
+
+    1:begin
+      { code }
+      ConfigurationFilename :=
+        Experiments.Eduardo.MakeConfigurationFile(
+          RadioGroupDesign2.Items[RadioGroupDesign2.ItemIndex],
+          PageControl1.TabIndex);
+    end;
+
+    2:begin
+      { code }
+      ConfigurationFilename :=
+        Experiments.Eduardo.MakeConfigurationFile(
+          RadioGroupDesign3.Items[RadioGroupDesign3.ItemIndex],
+          PageControl1.TabIndex);
+    end;
+
+    3:begin
+      { code }
+      ConfigurationFilename :=
+        Experiments.Eduardo.MakeConfigurationFile(
+          RadioGroupDesign4.Items[RadioGroupDesign4.ItemIndex],
+          PageControl1.TabIndex);
+
+      Exit;
+    end;
+  end;
+  LName := 'Experimento '+(PageControl1.TabIndex+1).ToString;
+  LSession.Play(LName, EditParticipant.Text);
 end;
 
 
@@ -82,6 +131,11 @@ begin
   LSession := TSession.Create(Self);
   LSession.OnEndSession:=@EndSession;
   LSession.OnBeforeStart:=@BeforeStartSession;
+
+  FImage := TStimulusLabeledFigure.Create(Self);
+  FImage.Parent := Self;
+  FImage.LoadFromFile('acerto.png');
+  FImage.Start;
 end;
 
 procedure TBackground.EndSession(Sender: TObject);
@@ -94,6 +148,7 @@ procedure TBackground.BeforeStartSession(Sender: TObject);
 begin
   CopyFile(ConfigurationFilename, LSession.BaseFilename+'.ini');
 end;
+
 
 end.
 

@@ -14,6 +14,9 @@ unit Constants;
 interface
 
 const
+  HeaderTabs : string = #9;
+
+const
   DefaultAddress = '127.0.1.1:50020';
 
 const
@@ -62,6 +65,7 @@ const
   _Kind = 'Kind';
   _LimitedHold = 'LimitedHold';
   _Consequence = 'Consequence';
+  _ShowCounter = 'Counter';
 
   // MRD
   _UseMedia = 'UseMedia';
@@ -215,6 +219,7 @@ const
   T_MSG = 'MSG';
   T_HTM = 'HTMLM';
   T_EO1 = 'OP1';
+  T_TMB = 'TMB';
   T_CHO = 'CHOICE';
   T_INP = 'TXTINP';
   T_MTS = 'MTS';

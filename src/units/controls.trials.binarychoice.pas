@@ -13,7 +13,7 @@ unit Controls.Trials.BinaryChoice;
 
 interface
 
-uses LCLIntf, LCLType, Controls, Classes, SysUtils
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, StdCtrls
 
   , Controls.Trials.Abstract
   , Stimuli.Choice
@@ -40,6 +40,7 @@ type
   TBinaryChoiceTrial = class(TTrial)
   private
     //FHasConsequence : Boolean;
+    FLabel : TLabel;
     FReportData : TReportData;
     FStimulus : TBinaryChoice;
     procedure Consequence(Sender: TObject);
@@ -58,13 +59,13 @@ type
   public
     constructor Create(AOwner: TCustomControl); override;
     function AsString : string; override;
-    function HasConsequence: Boolean; override;
+    function HasVisualConsequence: Boolean; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
 implementation
 
-uses Constants, Timestamps, Dialogs;
+uses Constants, Timestamps, Dialogs, Forms, Graphics;
 
 constructor TBinaryChoiceTrial.Create(AOwner: TCustomControl);
 begin
@@ -78,10 +79,27 @@ begin
   {$ENDIF}
 
   if Self.ClassType = TBinaryChoiceTrial then
-    Header := Header + #9 + GetHeader;
+    Header := Header + HeaderTabs + GetHeader;
 
   FStimulus := TBinaryChoice.Create(Self);
   FStimulus.Parent := Self.Parent;
+
+  FLabel := TLabel.Create(Self);
+  with FLabel do begin
+    Visible := False;
+    Cursor := -1;
+    Align := alTop;
+    Alignment := taCenter;
+    Anchors := [akLeft,akRight];
+    BorderSpacing.Top := 50;
+    WordWrap := True;
+    Font.Name := 'Arial';
+    Font.Size := 22;
+    Layout:=tlCenter;
+    Caption:='Clique na alternativa de sua preferência';
+    //OnMouseUp := @MessageMouseUp;
+  end;
+  FLabel.Parent := Self.Parent;
   FResponseEnabled := False;
 end;
 
@@ -97,7 +115,7 @@ begin
   LTrial.Free;
 end;
 
-function TBinaryChoiceTrial.HasConsequence: Boolean;
+function TBinaryChoiceTrial.HasVisualConsequence: Boolean;
 begin
   Result := (Self.Result <> T_NONE) and StrToBool(IETConsequence);
 end;
@@ -122,60 +140,29 @@ end;
 
 procedure TBinaryChoiceTrial.TrialStart(Sender: TObject);
 begin
+  Mouse.CursorPos := Point(Screen.Width div 2, Screen.Height div 2);
   FResponseEnabled:=True;
   FStimulus.Start;
-  FReportData.ComparisonBegin:=TimestampToStr(LogEvent('C.Start'));
+  FReportData.ComparisonBegin:=TimestampToStr(LogEvent(rsReportStmCmpBeg));
 end;
 
 procedure TBinaryChoiceTrial.WriteData(Sender: TObject);
-const
-  HeaderTabs : string = #9;
 begin
   inherited WriteData(Sender);
   Data := Data +
           FReportData.ComparisonChosen + HeaderTabs +
-          FReportData.ComparisonLatency + HeaderTabs +
           FReportData.ComparisonBegin + HeaderTabs +
-          FReportData.ComparisonEnd;
+          FReportData.ComparisonLatency
+          ;
 end;
-
-//procedure TBinaryChoiceTrial.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-//begin
-//  if FResponseEnabled then
-//  case Key of
-//   32: { ShowMessage(Configurations.SList.Text) } ;
-//   77, 109 {M} :
-//     begin
-//       FResponseEnabled := False;
-//       FReportData.ComparisonLatency:=TimestampToStr(LogEvent('C.Latency'));
-//       FReportData.ComparisonChosen:='R-M';
-//       FStimulus.Stop;
-//       EndTrial(Sender);
-//     end;
-//   66, 98  {B} :
-//     begin
-//       FResponseEnabled := False;
-//       FReportData.ComparisonLatency:=TimestampToStr(LogEvent('C.Latency'));
-//       FReportData.ComparisonChosen:='L-B';
-//       FStimulus.Stop;
-//       EndTrial(Sender);
-//     end;
-//  end;
-//end;
-
-//procedure TBinaryChoiceTrial.TrialMouseDown(Sender: TObject;
-//  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-//begin
-//  // Do something
-//end;
 
 function TBinaryChoiceTrial.GetHeader: string;
 begin
-  Result :=  rsReportRspCmp + #9 +    // Msg of the stimulus that have ended the trial
-             rsReportRspCmpLat + #9 + // Latency
-             rsReportStmCmpBeg + #9 +
-             rsReportStmCmpEnd
-             ;
+  Result :=
+    rsReportRspCmp + HeaderTabs +
+    rsReportStmCmpBeg + HeaderTabs +
+    rsReportRspCmpLat
+    ;
 end;
 
 procedure TBinaryChoiceTrial.Consequence(Sender: TObject);

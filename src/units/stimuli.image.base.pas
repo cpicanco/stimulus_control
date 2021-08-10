@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2020 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -17,7 +17,7 @@ uses SysUtils, Classes, Graphics, Controls, Schedules;
 
 type
 
-  TImageKind = (ikNone, ikBitmap);
+  TImageKind = (ikLetter, ikSquare, ikCircle, ikBitmap);
 
   { TLightImage }
 
@@ -31,6 +31,7 @@ type
     FOnMouseDown: TMouseEvent;
     FOnResponse: TNotifyEvent;
     FPenWidth: integer;
+    procedure SetKind(AValue: TImageKind);
     procedure SetOnMouseDown(AValue: TMouseEvent);
     procedure SetOnResponse(AValue: TNotifyEvent);
     procedure SetSchedule(AValue: TSchedule);
@@ -50,7 +51,7 @@ type
     procedure CentralizeRight;
     property Schedule : TSchedule read FSchedule write SetSchedule;
     property EdgeColor : TColor read FEdge write FEdge;
-    property Kind: TImageKind read FImageKind;
+    property Kind: TImageKind read FImageKind write SetKind ;
     property OnMouseDown : TMouseEvent read FOnMouseDown write SetOnMouseDown;
     property Color;
     property Caption;
@@ -77,6 +78,17 @@ begin
   FOnMouseDown:=AValue;
 end;
 
+procedure TLightImage.SetKind(AValue: TImageKind);
+begin
+  if FImageKind=AValue then Exit;
+  case AValue of
+    ikLetter, ikSquare, ikCircle:
+     if Assigned(FBitmap) then FBitmap.Free;
+    ikBitmap: Exit { use LoadFromFile or implement me } ;
+  end;
+  FImageKind:=AValue;
+end;
+
 procedure TLightImage.SetOnResponse(AValue: TNotifyEvent);
 begin
   if FOnResponse=AValue then Exit;
@@ -93,7 +105,7 @@ procedure TLightImage.Paint;
 var
   LTextStyle : TTextStyle;
 
-  procedure PaintKey(Color : TColor);
+  procedure PaintText(Color : TColor);
   begin
     LTextStyle := Canvas.TextStyle;
     LTextStyle.SingleLine:=False;
@@ -117,9 +129,42 @@ var
           Caption);
       end;
   end;
+
+  procedure PaintCircle(Color : TColor);
+  var
+    LCenter : TPoint;
+    LSize : integer;
+  begin
+    LSize := (Width div 2) - 10;
+    LCenter.X := ClientRect.Right - (Width div 2);
+    LCenter.Y := ClientRect.Bottom - (Width div 2);
+
+    Canvas.TextStyle := LTextStyle;
+    with Canvas do
+      begin
+        Pen.Width := FPenWidth;
+        Pen.Color := Color;
+        Brush.Color:= Color;
+        with LCenter do
+          Ellipse(X - LSize, Y - LSize, X + LSize, Y + LSize);
+      end;
+  end;
+
+  procedure PaintSquare(Color : TColor);
+    begin
+      with Canvas do
+        begin
+          Pen.Width := FPenWidth;
+          Pen.Color := Color;
+          Brush.Color:= Color;
+          Rectangle(ClientRect);
+        end;
+    end;
 begin
   case FImageKind of
-    ikNone:   PaintKey(Color);
+    ikLetter: PaintText(Color);
+    ikSquare: PaintSquare(Color);
+    ikCircle: PaintCircle(Color);
     ikBitmap: Canvas.StretchDraw(ClientRect, FBitmap);
   end;
 end;
@@ -128,7 +173,7 @@ constructor TLightImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FPenWidth := 10;
-  FImageKind:=ikNone;
+  FImageKind:=ikLetter;
   Visible := False;
   Height:= 200;
   Width:= 300;
@@ -226,7 +271,6 @@ var
   AspectRatio : Double;
 begin
   case FImageKind of
-    ikNone: { Do nothing };
     ikBitmap:
       begin
         AspectRatio := FBitmap.Width / FBitmap.Height;

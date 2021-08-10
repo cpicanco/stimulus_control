@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -109,6 +109,8 @@ type
     property OnTrialStart: TNotifyEvent read FOnTrialStart write SetOnTrialStart;
     property OnTrialMouseDown: TMouseEvent read FOnTrialMouseDown write SetOnTrialMouseDown;
   protected
+    FCounterRect : TRect;
+    FShowCounter : Boolean;
     FNextTrial : string;
     CounterManager : TCounterManager;
     procedure MouseDown(Button: TMouseButton;
@@ -121,8 +123,8 @@ type
     constructor Create(AOwner : TCustomControl); virtual; reintroduce;
     destructor Destroy; override;
     function AsString : string; virtual; abstract;
-    function HasConsequence : Boolean; virtual;
-    function StartConsequence : integer; virtual;
+    function HasVisualConsequence : Boolean; virtual;
+    function ConsequenceInterval : integer; virtual;
     procedure StopConsequence; virtual;
     procedure Play(ACorrection: Boolean=False); virtual;
     procedure Hide; virtual;
@@ -161,7 +163,7 @@ resourcestring
 implementation
 
 
-uses Constants, Timestamps, Canvas.Helpers
+uses Graphics, Constants, Timestamps, Canvas.Helpers
    , Session.Configuration.GlobalContainer
     {$ifdef DEBUG}
     , Loggers.Debug
@@ -185,6 +187,11 @@ begin
       LogEvent('S');
       BeginStarter;
       Exit;
+    end;
+
+  if FShowCounter then
+    begin
+      FCounterRect := Rect((ClientRect.Right div 7)*6, 10, ClientRect.Right-10, 70);
     end;
 
   StartTrial(Sender);
@@ -321,6 +328,28 @@ begin
 end;
 
 procedure TTrial.Paint;
+  procedure DrawCounter;
+  var
+    LTextStyle : TTextStyle;
+  begin
+    LTextStyle := Canvas.TextStyle;
+    LTextStyle.SingleLine:=False;
+    LTextStyle.Wordbreak:=True;
+    LTextStyle.Clipping:=False;
+    LTextStyle.Alignment:=taCenter;
+    LTextStyle.Layout:=tlCenter;
+    Canvas.TextStyle := LTextStyle;
+    with Canvas do
+      begin
+        Font.Size := 22;
+        Font.Color:= 0;
+        Pen.Width := 2;
+        Pen.Color := 0;
+        Rectangle(FCounterRect);
+        TextRect(FCounterRect, FCounterRect.Left, FCounterRect.Top,
+          'Pontos: ' + CounterManager.BlcPoints.ToString);
+      end;
+  end;
 begin
   inherited Paint;
   if FShowStarter then
@@ -328,6 +357,10 @@ begin
       DrawCenteredCircle(Canvas, Width, Height, 6);
       Exit;
     end;
+
+  if FShowCounter then
+    DrawCounter;
+
   if Assigned(OnTrialPaint) and FResponseEnabled then OnTrialPaint;
 end;
 
@@ -397,12 +430,12 @@ begin
   inherited Destroy;
 end;
 
-function TTrial.HasConsequence: Boolean;
+function TTrial.HasVisualConsequence: Boolean;
 begin
   Result := IETConsequence <> T_NONE;
 end;
 
-function TTrial.StartConsequence: integer;
+function TTrial.ConsequenceInterval: integer;
 begin
   // uses ITI by default, overrided as needed
   Result := StrToIntDef(Configurations.SList.Values[_ITI], 0);
@@ -448,10 +481,13 @@ begin
   FLimitedHold := StrToIntDef(LParameters.Values[_LimitedHold], 0);
   FClock.Interval := FLimitedHold;
 
-  // Present a dot at the screen center. A key response is required before trialstart
+  // Presents a dot at the screen center. A key response is required before trialstart
   FShowStarter := StrToBoolDef(LParameters.Values[_ShowStarter], False);
   if FShowStarter then
     Header := 'Str.Lat.' + #9 + Header;
+
+  // Presents a label "Pontos: x" at the screen top right.
+  FShowCounter := StrToBoolDef(LParameters.Values[_ShowCounter], False);
 
   // image of the mouse cursor
   if TestMode then Cursor:= 0

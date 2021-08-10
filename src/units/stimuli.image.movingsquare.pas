@@ -21,7 +21,8 @@ uses
 
 type
 
-  TDirection = (sdTop, sdRight, sdBottom, sdLeft);
+  TDirection = (sdTop, sdRight, sdBottom, sdLeft,
+                sdTopLeft, sdTopRight, sdBottomLeft, sdBottomRight);
 
   { TMovingSquare }
 
@@ -49,6 +50,8 @@ type
 var
   Granularity : Cardinal = 100;
   ScreenInCentimeters : real = 39.624;
+  SquareSize : real = 0.8;
+  SquareMovementSize : real = 0.53;
 
 implementation
 
@@ -63,10 +66,10 @@ end;
 constructor TMovingSquare.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  Width := Round(0.8*(Screen.Width/ScreenInCentimeters));
+  Width := Round(SquareSize*(Screen.Width/ScreenInCentimeters));
   Height:= Width;
   Color := clGray;
-  MovementSize := Round(0.53*(Screen.Width/ScreenInCentimeters));
+  MovementSize := Round(SquareMovementSize*(Screen.Width/ScreenInCentimeters));
   Direction := sdBottom;
   FTimer := TTimer.Create(Self);
   FTimer.Enabled:=False;
@@ -81,27 +84,110 @@ end;
 procedure TMovingSquare.Move(Sender: TObject);
 var
   R : integer;
+  LLeft : integer;
+  LRight : integer;
+  LBottom : integer;
+  LTop : integer;
+  procedure MoveLeft;
+  begin
+    Left := Left-MovementSize;
+  end;
+
+  procedure MoveTop;
+  begin
+    Top := Top-MovementSize;
+  end;
+
+  procedure MoveRight;
+  begin
+    Left := Left+MovementSize;
+  end;
+
+  procedure MoveBottom;
+  begin
+    Top := Top+MovementSize
+  end;
+
 begin
-  R := Random(4);
+  R := Random(8);
   case R of
     0: Direction := sdLeft;
     1: Direction := sdTop;
     2: Direction := sdRight;
     3: Direction := sdBottom;
+    4: Direction := sdTopLeft;
+    5: Direction := sdTopRight;
+    6: Direction := sdBottomLeft;
+    7: Direction := sdBottomRight;
   end;
 
   case Direction of
-    sdLeft: if Left <= 0 then Direction := sdRight;
-    sdTop: if Top <= 0 then Direction := sdBottom;
-    sdRight: if Left >= (Parent.Width-Width) then Direction := sdLeft;
-    sdBottom: if Top >= (Parent.Height-Height) then Direction := sdTop;
+    sdLeft: if BoundsRect.Left <= 0 then Direction := sdRight;
+    sdTop: if BoundsRect.Top <= 0 then Direction := sdBottom;
+    sdRight: if BoundsRect.Right >= Parent.Width then Direction := sdLeft;
+    sdBottom: if BoundsRect.Bottom >= Parent.Height then Direction := sdTop;
+    sdTopLeft:
+        if (BoundsRect.Top <= 0) and (BoundsRect.Left <= 0) then
+          Direction := sdBottomRight
+        else
+          begin
+            if BoundsRect.Top <= 0 then Direction := sdBottomLeft;
+            if BoundsRect.Left <= 0 then Direction := sdTopRight;
+          end;
+
+    sdTopRight:
+        if (BoundsRect.Top <= 0) and (BoundsRect.Right >= Parent.Width) then
+          Direction := sdBottomLeft
+        else
+          begin
+            if BoundsRect.Top <= 0 then Direction := sdBottomRight;
+            if BoundsRect.Right >= Parent.Width then Direction := sdTopLeft;
+          end;
+
+    sdBottomLeft:
+        if (BoundsRect.Bottom >= Parent.Height) and (BoundsRect.Left <= 0) then
+          Direction := sdBottomRight
+        else
+          begin
+            if BoundsRect.Bottom >= Parent.Height then Direction := sdTopLeft;
+            if BoundsRect.Left <= 0 then Direction := sdBottomRight;
+          end;
+
+    sdBottomRight:
+        if (BoundsRect.Bottom >= Parent.Height) and
+           (BoundsRect.Right  >= Parent.Width)  then
+          Direction := sdTopLeft
+        else
+          begin
+            if BoundsRect.Bottom >= Parent.Height then Direction := sdTopRight;
+            if BoundsRect.Right >= Parent.Width then Direction := sdBottomLeft;
+          end;
   end;
 
   case Direction of
-    sdLeft: Left := Left-MovementSize;
-    sdTop: Top := Top-MovementSize;
-    sdRight: Left := Left+MovementSize;
-    sdBottom: Top := Top+MovementSize;
+    sdLeft: MoveLeft;
+    sdTop: MoveTop;
+    sdRight: MoveRight;
+    sdBottom: MoveBottom;
+    sdTopLeft:begin
+      MoveTop;
+      MoveLeft;
+    end;
+
+    sdTopRight:begin
+      MoveTop;
+      MoveRight;
+    end;
+
+    sdBottomLeft:begin
+      MoveBottom;
+      MoveLeft;
+    end;
+
+    sdBottomRight:begin
+      MoveBottom;
+      MoveRight;
+    end;
   end;
 end;
 
@@ -131,7 +217,7 @@ end;
 
 procedure TMovingSquare.Start;
 begin
-  //FTimer.Enabled := True;
+  FTimer.Enabled := True;
 end;
 
 procedure TMovingSquare.Stop;

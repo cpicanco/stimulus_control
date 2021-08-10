@@ -1,0 +1,232 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
+unit Controls.Trials.TemporalBissection;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls
+
+  , Controls.Trials.Abstract
+  , Stimuli.Sequence.TemporalBissection
+  , Consequences
+  ;
+
+type
+
+  TReportData = record
+    SampleBegin   : string;
+    ComparisonBegin   : string;
+    ComparisonLatency : string;
+    ComparisonChosen  : string;
+  end;
+
+  { TTBMTS }
+
+  {
+    Implements MTS for temporal bissection
+    sample at the center
+    comparisons at left right centers
+  }
+  TTBMTS = class(TTrial)
+  private
+    FHasConsequenceInterval : Boolean;
+    FTimer : TTimer;
+    FReportData : TReportData;
+    FStimulus : TTBSequence;
+    FParticipantResponse : TTBExpectedResponse;
+    procedure Consequence(Sender: TObject);
+    procedure TrialBeforeEnd(Sender: TObject);
+    function GetHeader: string;
+    procedure PurpleScreen(Sender: TObject);
+  protected
+    procedure TrialStart(Sender: TObject); virtual;
+    procedure WriteData(Sender: TObject); override;
+    procedure TrialResult(Sender: TObject);
+    procedure EnableResponses(Sender : TObject);
+  public
+    constructor Create(AOwner: TCustomControl); override;
+    function AsString : string; override;
+    function HasVisualConsequence: Boolean; override;
+    function ConsequenceInterval: integer; override;
+    procedure Play(ACorrection : Boolean); override;
+  end;
+
+implementation
+
+uses Forms, Graphics, StrUtils, Constants, Timestamps;
+
+constructor TTBMTS.Create(AOwner: TCustomControl);
+begin
+  inherited Create(AOwner);
+  OnTrialBeforeEnd := @TrialBeforeEnd;
+  OnTrialStart := @TrialStart;
+
+  if Self.ClassType = TTBMTS then
+    Header := Header + #9 + GetHeader;
+
+  FStimulus := TTBSequence.Create(Self);
+  FStimulus.Parent := Self.Parent;
+  FResponseEnabled := False;
+  FTimer := TTimer.Create(Self);
+  FTimer.Enabled := False;
+  FTimer.Interval:= 2000;
+  FTimer.OnTimer := @PurpleScreen;
+end;
+
+function TTBMTS.AsString: string;
+var
+  LTrial : TStringList;
+begin
+  LTrial := TStringList.Create;
+  LTrial.BeginUpdate;
+  { implement me }
+  LTrial.EndUpdate;
+  Result := LTrial.Text;
+  LTrial.Free;
+end;
+
+function TTBMTS.HasVisualConsequence: Boolean;
+begin
+  Result := (Self.Result <> T_NONE);
+end;
+
+function TTBMTS.ConsequenceInterval: integer;
+begin
+  if FHasConsequenceInterval then
+    Result := 2000
+  else
+    Result := 0;
+end;
+
+procedure TTBMTS.Play(ACorrection: Boolean);
+var
+  LParameters : TStringList;
+begin
+  inherited Play(ACorrection);
+  FHasConsequenceInterval := True;
+  FStimulus.Cursor := -1;
+  FShowCounter:=True;
+  LParameters := Configurations.SList;
+  FStimulus.LoadFromParameters(LParameters);
+  FStimulus.SetScheduleConsequence(@Consequence);
+  FStimulus.FitScreen;
+  FStimulus.OnEndSerialTimer:=@EnableResponses;
+
+  if Self.ClassType = TTBMTS then Config(Self);
+end;
+
+procedure TTBMTS.TrialResult(Sender: TObject);
+begin
+  //if FStimulus.ExpectedResponse = tbNone then Exit;
+
+end;
+
+procedure TTBMTS.EnableResponses(Sender: TObject);
+begin
+  Mouse.CursorPos := Point(Screen.Width div 2, Screen.Height div 2);
+  FResponseEnabled:=True;
+  FStimulus.Cursor := 0;
+  Cursor := 0;
+  FReportData.ComparisonBegin := TimestampToStr(LogEvent(rsReportStmCmpBeg));
+end;
+
+procedure TTBMTS.TrialStart(Sender: TObject);
+begin
+  FResponseEnabled:=False;
+  FStimulus.Start;
+  FReportData.SampleBegin := TimestampToStr(LogEvent(rsReportStmModBeg));
+end;
+
+procedure TTBMTS.WriteData(Sender: TObject);
+begin
+  inherited WriteData(Sender);
+  Data := Data +
+    FStimulus.SampleDuration.ToString + HeaderTabs +
+    FReportData.SampleBegin + HeaderTabs +
+    FReportData.ComparisonBegin + HeaderTabs +
+    FReportData.ComparisonLatency + HeaderTabs +
+    FReportData.ComparisonChosen
+    ;
+end;
+
+function TTBMTS.GetHeader: string;
+begin
+  Result :=
+    rsReportStmMod + HeaderTabs +
+    rsReportStmModBeg + HeaderTabs +
+    rsReportStmCmpBeg + HeaderTabs +
+    rsReportRspCmpLat + HeaderTabs +
+    rsReportRspCmp
+    ;
+end;
+
+procedure TTBMTS.PurpleScreen(Sender: TObject);
+begin
+  FTimer.Enabled := False;
+  Parent.Color := clWhite;
+  EndTrial(Self);
+end;
+
+procedure TTBMTS.Consequence(Sender: TObject);
+var
+  LName  : string;
+begin
+  FResponseEnabled := False;
+  FShowCounter:=False;
+  FReportData.ComparisonChosen := TComponent(Sender).Name;
+  FReportData.ComparisonLatency:=
+    TimestampToStr(LogEvent(FReportData.ComparisonChosen+'.Latency'));
+  FStimulus.Stop;
+  case FReportData.ComparisonChosen of
+    'Left' :  FParticipantResponse:=tbLeft;
+    'Right':  FParticipantResponse:=tbRight;
+  end;
+
+  if FStimulus.ExpectedResponse = FParticipantResponse then
+    begin
+      Result := T_HIT;
+      // Read Consequence Probability;
+      LName := IETConsequence + #32;
+
+      case FParticipantResponse of
+        tbLeft :
+          FHasConsequenceInterval := StrToBool(ExtractDelimited(1,LName,[#32]));
+
+        tbRight:
+          FHasConsequenceInterval := StrToBool(ExtractDelimited(2,LName,[#32]));
+      end;
+
+      if FHasConsequenceInterval then begin
+        Parent.Color := clPurple;
+        Cursor := -1;
+        CounterManager.BlcPoints := CounterManager.BlcPoints + 1;
+        FTimer.Enabled := True;
+      end else begin
+        Parent.Color := clBlack;
+        Cursor := -1;
+        FTimer.Enabled := True;
+      end;
+    end
+  else
+    begin
+      Result := T_MISS;
+      EndTrial(Sender);
+    end;
+end;
+
+procedure TTBMTS.TrialBeforeEnd(Sender: TObject);
+begin
+  WriteData(Self);
+end;
+
+
+end.

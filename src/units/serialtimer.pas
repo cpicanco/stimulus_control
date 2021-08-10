@@ -45,6 +45,7 @@ type
     procedure Start;
     procedure Stop;
     procedure Restart;
+    function Interval(AItem : Cardinal) : Cardinal;
     property CurrentItem : Cardinal read FCurrentItem write SetCurrentItem;
     property OnEndTimeSerie : TNotifyEvent read FOnEndTimeSerie write SetOnEndTimeSerie;
   end;
@@ -139,6 +140,11 @@ begin
   if FTimer.Enabled then Stop;
   FCurrentItem := 0;
   Start;
+end;
+
+function TSerialTimer.Interval(AItem: Cardinal): Cardinal;
+begin
+  Result := FTimerItems[AItem].Interval;
 end;
 
 

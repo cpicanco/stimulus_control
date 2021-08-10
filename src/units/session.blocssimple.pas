@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit Session.BlocsSimple;
 
 {$mode objfpc}{$H+}
@@ -8,7 +17,7 @@ uses
   Classes, SysUtils, ExtCtrls, StdCtrls, Controls
   , CounterManager
   , Controls.Trials.Abstract
-  , Stimuli.Image
+  , Stimuli.Image.Labeled
   ;
 
 type
@@ -17,8 +26,8 @@ type
 
   TBloc = class(TComponent)
   private
-    //FConsequence : TLabel;
-    FConsequence : TStimulusFigure;
+    FWaitLabel : TLabel;
+    FConsequence : TStimulusLabeledFigure;
     FCounterManager : TCounterManager;
     FInterTrial : TTimer;
     FTrialConsequence : TTimer;
@@ -38,6 +47,7 @@ type
     procedure SetOnInterTrialStop(AValue: TNotifyEvent);
   public
     constructor Create(AOwner : TComponent); override;
+    procedure BeforePlay;
     procedure Play;
     property OnEndBloc : TNotifyEvent read FOnEndBloc write SetOnEndBloc;
     property OnInterTrialStop : TNotifyEvent read FOnInterTrialStop write SetOnInterTrialStop;
@@ -63,6 +73,7 @@ uses Constants
    , Controls.Trials.BinaryChoice
    , Controls.Trials.TextInput
    , Controls.Trials.FreeSquare
+   , Controls.Trials.TemporalBissection
    , Graphics
    , Consequences
    , Dialogs
@@ -85,6 +96,7 @@ begin
       T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
       T_INP : FTrial := TTextInput.Create(Background);
       T_EO1 : FTrial := TFreeSquareTrial.Create(Background);
+      T_TMB : FTrial := TTBMTS.Create(Background);
       //T_MTS : FTrial := TMTS.Create(Background);
       //T_LIK : FTrial := TLikert.Create(Background);
       //T_GNG : FTrial := TGNG.Create(Background);
@@ -114,6 +126,7 @@ procedure TBloc.InterTrialStopTimer(Sender: TObject);
 var
   LNextTrial : integer;
 begin
+  FWaitLabel.Hide;
   if Assigned(OnIntertrialStop) then OnIntertrialStop(Sender);
   FITIEnd := TickCount - GlobalContainer.TimeStart;
   WriteTrialData(FTrial);
@@ -148,18 +161,19 @@ var
 begin
   LTrial := TTrial(Sender);
   LTrial.Hide;
-  FTrialConsequence.Interval := FTrial.StartConsequence;
+  Background.Cursor := -1;
+  FTrialConsequence.Interval := LTrial.ConsequenceInterval;
   if FTrialConsequence.Interval > 0 then
     begin
       FTrialConsequence.Enabled := True;
-      if LTrial.HasConsequence then
+      if LTrial.HasVisualConsequence then
         case LTrial.Result of
           'HIT' :
           begin
             //FConsequence.Caption := 'Certo';
             //FConsequence.Show;
               FConsequence.Start;
-              Background.Color := clPurple;
+              Background.Color := clWhite;
           end;
           'MISS':
           begin
@@ -239,6 +253,9 @@ begin
   {$ENDIF}
   if FInterTrial.Interval > 0 then
     begin
+      if (FTrial is TFreeSquareTrial) or
+         (FTrial is TTBMTS) then
+        FWaitLabel.Show;
       FInterTrial.Enabled := True;
       FITIBegin := TickCount - GlobalContainer.TimeStart;
     end
@@ -263,23 +280,31 @@ begin
   FITIBegin := 0;
   FITIEnd := 0;
 
-  //FConsequence := TLabel.Create(Self);
-  //with FConsequence do begin
-  //  Visible := False;
-  //  Cursor := -1;
-  //  Align := alClient;
-  //  Alignment := taCenter;
-  //  Anchors := [akLeft,akRight];
-  //  WordWrap := True;
-  //  Font.Name := 'Arial';
-  //  Font.Size := 30;
-  //  Layout:=tlCenter;
-  //  Caption:='';
-  //  //OnMouseUp := @MessageMouseUp;
-  //end;
+  FWaitLabel := TLabel.Create(Self);
+  with FWaitLabel do begin
+    Visible := False;
+    Cursor := -1;
+    Align := alClient;
+    Alignment := taCenter;
+    Anchors := [akLeft,akRight];
+    WordWrap := True;
+    Font.Name := 'Arial';
+    Font.Size := 30;
+    Layout:=tlCenter;
+    Caption:='Aguarde';
+    //OnMouseUp := @MessageMouseUp;
+  end;
 
-  FConsequence := TStimulusFigure.Create(Self);
-  FConsequence.LoadFromFile('Acerto.png');
+  FConsequence := TStimulusLabeledFigure.Create(Self);
+  FConsequence.HideCursor;
+  FConsequence.LoadFromFile('acerto.png');
+end;
+
+procedure TBloc.BeforePlay;
+begin
+  FWaitLabel.Parent := Background;
+  FConsequence.Parent := Background;
+  Background.Cursor := -1;
 end;
 
 procedure TBloc.Play;
@@ -304,7 +329,6 @@ var
   end;
 
 begin
-  FConsequence.Parent := Background;
   LCurrentBloc := FCounterManager.CurrentBlc;
   LBlc := ConfigurationFile.Bloc[LCurrentBloc+1];
   LTotalTrials := LBlc.NumTrials;
@@ -342,6 +366,18 @@ begin
           end;
         end;
 
+      if (LBlc.CrtHitPorcentage > 0) and (LBlc.CrtHitPorcentage <= 100) then
+      begin
+        if (Round((FCounterManager.BlcHits * 100)/LBlc.NumTrials) >= LBlc.CrtHitPorcentage) then
+        begin
+          if LBlc.NextBlocOnCriteria > 0 then begin
+            FCounterManager.CurrentBlc := LBlc.NextBlocOnCriteria-1;
+          end else begin
+            FCounterManager.CurrentBlc := ConfigurationFile.BlocCount;
+          end;
+        end;
+      end;
+
       //if LBlc.CrtConsecutiveHit > 0 then
       //  if FCounterManager.BlcHighCscHits < LBlc.CrtConsecutiveHit then
       //  begin
@@ -350,6 +386,7 @@ begin
       //    if Assigned(OnEndBloc) then OnEndBloc(Self);
       //    Exit;
       //  end;
+
 
       if Assigned(OnEndBloc) then OnEndBloc(Self);
     end;

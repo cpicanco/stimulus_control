@@ -54,6 +54,7 @@ begin
   with GlobalContainer.CounterManager do
   if CurrentBlc < ConfigurationFile.BlocCount then
     begin
+      FBloc.BeforePlay;
       SetVirtualTrialValue(ConfigurationFile.Bloc[CurrentBlc+1].VirtualTrialValue);
       FBloc.Play;
     end

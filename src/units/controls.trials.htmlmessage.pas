@@ -1,13 +1,13 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit controls.trials.HTMLMessage;
+unit Controls.Trials.HTMLMessage;
 
 {$mode objfpc}{$H+}
 
@@ -36,6 +36,7 @@ type
   public
     constructor Create(AOwner: TCustomControl); override;
     destructor Destroy;override;
+    function ConsequenceInterval: integer; override;
     function AsString : string; override;
     procedure Play(ACorrection : Boolean); override;
   end;
@@ -55,6 +56,7 @@ begin
   OnTrialStart := @TrialStart;
 
   FMessage := TIpHtmlPanel.Create(Self);
+  FMessage.Visible := False;
   with FMessage do begin
     Anchors := [akLeft,akRight];
     AllowTextSelect := False;
@@ -63,15 +65,15 @@ begin
     DefaultFontSize := 20;
     FlagErrors := False;
     ShowHints := False;
-    Visible := False;
     WantTabs := False;
-    Parent := TCustomControl(AOwner);
+
     //OnKeyUp:=@TrialKeyUp;
     //OnMouseDown:=@TrialMouseDown;
     Height := (Self.Height div 3) * 2;
     Width := (Self.Width div 8) * 5;
     Left := (Self.Width - Width) div 2;
     Top := (Self.Height - Height) div 2;
+    Parent := TCustomControl(AOwner);
   end;
 
   FEndButton := TButton.Create(Self);
@@ -100,6 +102,11 @@ begin
   inherited Destroy;
 end;
 
+function THTMLMessage.ConsequenceInterval: integer;
+begin
+  Result:=0;
+end;
+
 function THTMLMessage.AsString: string;
 begin
   Result := '';
@@ -107,7 +114,7 @@ end;
 
 procedure THTMLMessage.EndButtonClick(Sender: TObject);
 begin
-   EndTrial(Sender);
+  EndTrial(Sender);
 end;
 
 procedure THTMLMessage.TrialBeforeEnd(Sender: TObject);

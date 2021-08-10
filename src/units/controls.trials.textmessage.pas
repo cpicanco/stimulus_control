@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -45,6 +45,7 @@ type
   public
     constructor Create(AOwner: TCustomControl); override;
     destructor Destroy;override;
+    function ConsequenceInterval: integer; override;
     function AsString : string; override;
     procedure Play(ACorrection : Boolean); override;
   end;
@@ -105,6 +106,11 @@ begin
     FAudio.Free;
   {$ENDIF}
   inherited Destroy;
+end;
+
+function TMessageTrial.ConsequenceInterval: integer;
+begin
+  Result:=0;
 end;
 
 function TMessageTrial.AsString: string;

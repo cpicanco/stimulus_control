@@ -7,14 +7,14 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 }
-unit Stimuli.Image;
+unit Stimuli.Image.Labeled;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, Controls, Graphics
+  Classes, SysUtils, Controls, Graphics, StdCtrls
   , Stimuli.Abstract
   , Stimuli.Image.Base
   , Schedules
@@ -24,8 +24,9 @@ type
 
   { TStimulusFigure }
 
-  TStimulusFigure = class(TStimulus)
+  TStimulusLabeledFigure = class(TStimulus)
   private
+    FLabel : TLabel;
     FImage : TLightImage;
     function GetLeft: integer;
     function GetParent: TWinControl;
@@ -57,80 +58,95 @@ implementation
 
 { TStimulusFigure }
 
-procedure TStimulusFigure.SetHeight(AValue: integer);
+procedure TStimulusLabeledFigure.SetHeight(AValue: integer);
 begin
   if FImage.Height=AValue then Exit;
   FImage.Height:=AValue;
 end;
 
-procedure TStimulusFigure.SetParent(AValue: TWinControl);
+procedure TStimulusLabeledFigure.SetParent(AValue: TWinControl);
 begin
   if FImage.Parent=AValue then Exit;
   FImage.Parent := AValue;
+  FLabel.Parent := AValue;
 end;
 
-function TStimulusFigure.GetWidth: integer;
+function TStimulusLabeledFigure.GetWidth: integer;
 begin
   Result := FImage.Width;
 end;
 
-function TStimulusFigure.GetHeight: integer;
+function TStimulusLabeledFigure.GetHeight: integer;
 begin
   Result := FImage.Height;
 end;
 
-function TStimulusFigure.GetLeft: integer;
+function TStimulusLabeledFigure.GetLeft: integer;
 begin
   Result := FImage.Left;
 end;
 
-function TStimulusFigure.GetParent: TWinControl;
+function TStimulusLabeledFigure.GetParent: TWinControl;
 begin
   Result := FImage.Parent;
 end;
 
-function TStimulusFigure.GetTop: integer;
+function TStimulusLabeledFigure.GetTop: integer;
 begin
   Result := FImage.Top;
 end;
 
-procedure TStimulusFigure.SetLeft(AValue: integer);
+procedure TStimulusLabeledFigure.SetLeft(AValue: integer);
 begin
   if FImage.Left=AValue then Exit;
   FImage.Left:=AValue;
 end;
 
-procedure TStimulusFigure.SetTop(AValue: integer);
+procedure TStimulusLabeledFigure.SetTop(AValue: integer);
 begin
   if FImage.Top=AValue then Exit;
   FImage.Top:=AValue;
 end;
 
-procedure TStimulusFigure.SetSchedule(ASchedule: TSchedule);
+procedure TStimulusLabeledFigure.SetSchedule(ASchedule: TSchedule);
 begin
   inherited SetSchedule(ASchedule);
   FImage.Schedule := Schedule;
 end;
 
-procedure TStimulusFigure.SetWidth(AValue: integer);
+procedure TStimulusLabeledFigure.SetWidth(AValue: integer);
 begin
   if FImage.Width=AValue then Exit;
   FImage.Width:=AValue;
 end;
 
-constructor TStimulusFigure.Create(AOwner: TComponent);
+constructor TStimulusLabeledFigure.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FImage := TLightImage.Create(Self);
   FImage.Visible := False;
+
+  FLabel := TLabel.Create(Self);
+  with FLabel do begin
+    Caption := 'Você ganhou 1 ponto';
+    Font.Name:='Times New Roman';
+    Font.Color := 0;
+    Font.Size := 50;
+    Anchors := [akBottom, akLeft];
+    AnchorSideBottom.Control := FImage;
+    AnchorSideBottom.Side := asrTop;
+    AnchorSideLeft.Control := FImage;
+    AnchorSideLeft.Side := asrCenter;
+    FLabel.Visible := False;
+  end;
 end;
 
-destructor TStimulusFigure.Destroy;
+destructor TStimulusLabeledFigure.Destroy;
 begin
   inherited Destroy;
 end;
 
-procedure TStimulusFigure.LoadFromFile(AFilename: string);
+procedure TStimulusLabeledFigure.LoadFromFile(AFilename: string);
 begin
   try
     FImage.LoadFromFile(AFilename);
@@ -142,19 +158,22 @@ begin
   end;
 end;
 
-procedure TStimulusFigure.Start;
+procedure TStimulusLabeledFigure.Start;
 begin
   FImage.Centralize;
   FImage.Show;
+  FLabel.Show;
 end;
 
-procedure TStimulusFigure.Stop;
+procedure TStimulusLabeledFigure.Stop;
 begin
+  FLabel.Hide;
   FImage.Hide;
 end;
 
-procedure TStimulusFigure.HideCursor;
+procedure TStimulusLabeledFigure.HideCursor;
 begin
+  FLabel.Cursor := -1;
   FImage.Cursor := -1;
 end;
 
