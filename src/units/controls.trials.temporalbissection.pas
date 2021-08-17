@@ -46,8 +46,9 @@ type
     procedure Consequence(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
     function GetHeader: string;
-    procedure PurpleScreen(Sender: TObject);
+    procedure WhiteScreen(Sender: TObject);
   protected
+    procedure Paint; override;
     procedure TrialStart(Sender: TObject); virtual;
     procedure WriteData(Sender: TObject); override;
     procedure TrialResult(Sender: TObject);
@@ -62,7 +63,7 @@ type
 
 implementation
 
-uses Forms, Graphics, StrUtils, Constants, Timestamps;
+uses Forms, Graphics, StrUtils, Constants, Timestamps, Cheats;
 
 constructor TTBMTS.Create(AOwner: TCustomControl);
 begin
@@ -78,8 +79,8 @@ begin
   FResponseEnabled := False;
   FTimer := TTimer.Create(Self);
   FTimer.Enabled := False;
-  FTimer.Interval:= 2000;
-  FTimer.OnTimer := @PurpleScreen;
+  FTimer.Interval:= ConsequenceDuration;
+  FTimer.OnTimer := @WhiteScreen;
 end;
 
 function TTBMTS.AsString: string;
@@ -102,7 +103,7 @@ end;
 function TTBMTS.ConsequenceInterval: integer;
 begin
   if FHasConsequenceInterval then
-    Result := 2000
+    Result := ConsequenceDuration
   else
     Result := 0;
 end;
@@ -114,7 +115,8 @@ begin
   inherited Play(ACorrection);
   FHasConsequenceInterval := True;
   FStimulus.Cursor := -1;
-  FShowCounter:=True;
+  FShowCounter := True;
+  FCounterType := ctSessionPoints;
   LParameters := Configurations.SList;
   FStimulus.LoadFromParameters(LParameters);
   FStimulus.SetScheduleConsequence(@Consequence);
@@ -132,11 +134,25 @@ end;
 
 procedure TTBMTS.EnableResponses(Sender: TObject);
 begin
-  Mouse.CursorPos := Point(Screen.Width div 2, Screen.Height div 2);
   FResponseEnabled:=True;
   FStimulus.Cursor := 0;
   Cursor := 0;
   FReportData.ComparisonBegin := TimestampToStr(LogEvent(rsReportStmCmpBeg));
+  if CheatsModeOn then begin
+    case FStimulus.ExpectedResponse of
+      tbLeft :
+        Mouse.CursorPos := FStimulus.ComparisonLeft.BoundsRect.CenterPoint;
+
+      tbRight:
+        Mouse.CursorPos := FStimulus.ComparisonRight.BoundsRect.CenterPoint;
+
+      tbNone:
+        Mouse.CursorPos := FStimulus.ComparisonRight.BoundsRect.CenterPoint;
+    end;
+
+  end else begin
+    Mouse.CursorPos := Point(Screen.Width div 2, Screen.Height div 2);
+  end;
 end;
 
 procedure TTBMTS.TrialStart(Sender: TObject);
@@ -169,11 +185,32 @@ begin
     ;
 end;
 
-procedure TTBMTS.PurpleScreen(Sender: TObject);
+procedure TTBMTS.WhiteScreen(Sender: TObject);
 begin
   FTimer.Enabled := False;
   Parent.Color := clWhite;
+  Parent.Invalidate;
   EndTrial(Self);
+end;
+
+procedure TTBMTS.Paint;
+begin
+  inherited Paint;
+  if CheatsModeOn then
+  begin
+    case FStimulus.ExpectedResponse of
+      tbLeft :
+        Canvas.Rectangle(FStimulus.ComparisonLeft.BoundsRect);
+
+      tbRight:
+        Canvas.Rectangle(FStimulus.ComparisonRight.BoundsRect);
+
+      tbNone:
+        Canvas.TextOut(0, 0, 'Generalization');
+    end;
+
+    Canvas.TextRect(FStimulus.Sample.BoundsRect, 0,0, IETConsequence);
+  end;
 end;
 
 procedure TTBMTS.Consequence(Sender: TObject);
@@ -203,21 +240,31 @@ begin
 
         tbRight:
           FHasConsequenceInterval := StrToBool(ExtractDelimited(2,LName,[#32]));
+
+        tbNone:
+          { do nothing };
       end;
 
       if FHasConsequenceInterval then begin
-        Parent.Color := clPurple;
+        Parent.Cursor := -1;
         Cursor := -1;
-        CounterManager.BlcPoints := CounterManager.BlcPoints + 1;
-        FTimer.Enabled := True;
+        Parent.Invalidate;
+        CounterManager.SessionPointsTopRight :=
+          CounterManager.SessionPointsTopRight + 1;
+        EndTrial(Sender);
       end else begin
-        Parent.Color := clBlack;
+        Parent.Cursor := -1;
         Cursor := -1;
+        Parent.Color := clBlack;
+        Parent.Invalidate;
         FTimer.Enabled := True;
       end;
     end
   else
     begin
+      Parent.Cursor := -1;
+      Cursor := -1;
+      Parent.Invalidate;
       Result := T_MISS;
       EndTrial(Sender);
     end;

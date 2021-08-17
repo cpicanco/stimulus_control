@@ -20,6 +20,7 @@ implementation
 uses FileMethods
    , Experiments.Eduardo.Experimento1
    , Experiments.Eduardo.Experimento2
+   , Experiments.Eduardo.Experimento3
    , Session.Configuration.GlobalContainer
    , Session.ConfigurationFile
    ;
@@ -30,7 +31,7 @@ begin
   case AExperiment of
     0: Experiments.Eduardo.Experimento1.WriteToConfigurationFile(ADesign);
     1: Experiments.Eduardo.Experimento2.WriteToConfigurationFile(ADesign);
-    //2: Experiments.Eduardo.Experimento3.WriteToConfigurationFile(ADesign);
+    2: Experiments.Eduardo.Experimento3.WriteToConfigurationFile(ADesign);
     //3: Experiments.Eduardo.Experimento4.WriteToConfigurationFile(ADesign);
   end;
   ConfigurationFile.Invalidate;

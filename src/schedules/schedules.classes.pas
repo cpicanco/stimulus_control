@@ -45,7 +45,6 @@ type
     constructor Create; override;
     procedure DoResponse; override;
     procedure Reset; override;
-    procedure Start; override;
   end;
 
   { TIntervalSchedule }
@@ -191,11 +190,6 @@ begin
   UpdateRatio(FCurrentRatio,FBaseResponseRatio,FRatioVariation);
 end;
 
-procedure TRatioSchedule.Start;
-begin
-  Reset;
-end;
-
 { TIntervalSchedule }
 
 constructor TIntervalSchedule.Create;
@@ -268,12 +262,12 @@ end;
 
 procedure TTimeSchedule.Reset;
 begin
-  if FIntervalVariation > 0 then
-    begin
-      StopClock;
-      UpdateInterval(FBaseTimeInterval, FIntervalVariation);
-      StartClock;
-    end;
+  if (FIntervalVariation > 0) or MustUpdate then begin
+    StopClock;
+    UpdateInterval(FBaseTimeInterval, FIntervalVariation);
+    StartClock;
+    if MustUpdate then MustUpdate := False;
+  end;
 end;
 
 function TTimeSchedule.GetParameter1: Cardinal;

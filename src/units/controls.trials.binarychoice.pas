@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -40,6 +40,7 @@ type
   TBinaryChoiceTrial = class(TTrial)
   private
     //FHasConsequence : Boolean;
+    FMessage : TBinaryChoiceMessage;
     FLabel : TLabel;
     FReportData : TReportData;
     FStimulus : TBinaryChoice;
@@ -65,7 +66,7 @@ type
 
 implementation
 
-uses Constants, Timestamps, Dialogs, Forms, Graphics;
+uses Forms, Graphics, Constants, Timestamps;
 
 constructor TBinaryChoiceTrial.Create(AOwner: TCustomControl);
 begin
@@ -87,13 +88,14 @@ begin
   FLabel := TLabel.Create(Self);
   with FLabel do begin
     Visible := False;
-    Cursor := -1;
+    Cursor := 0;
     Align := alTop;
     Alignment := taCenter;
     Anchors := [akLeft,akRight];
     BorderSpacing.Top := 50;
     WordWrap := True;
     Font.Name := 'Arial';
+    Font.Color := 0;
     Font.Size := 22;
     Layout:=tlCenter;
     Caption:='Clique na alternativa de sua preferência';
@@ -127,6 +129,9 @@ begin
   inherited Play(ACorrection);
   LParameters := Configurations.SList;
   FStimulus.LoadFromParameters(LParameters);
+  FMessage := FStimulus.MessageFromParameters(LParameters);
+  FMessage.CurrentTrial := CounterManager.BlcTrials;
+  FStimulus.LoadMessage(FMessage);
   FStimulus.SetScheduleConsequence(@Consequence);
   FStimulus.FitScreen;
 
@@ -167,13 +172,22 @@ end;
 
 procedure TBinaryChoiceTrial.Consequence(Sender: TObject);
 var
-  LName : string;
+  S : string;
 begin
   FResponseEnabled := False;
-  LName := TComponent(Sender).Name;
-  NextTrial := FStimulus.NextTrial(LName);
-  FReportData.ComparisonLatency:=TimestampToStr(LogEvent(LName+'.Latency'));
-  FReportData.ComparisonChosen:=LName;
+  S := TComponent(Sender).Name;
+  FMessage.AComponentName := S;
+  NextTrial := FStimulus.NextTrial(S);
+  FReportData.ComparisonLatency:=TimestampToStr(LogEvent(S +'.Latency'));
+  FReportData.ComparisonChosen:=S;
+
+  FStimulus.NextNow(FMessage);
+  S := FloatToStrF(FMessage.Now, ffFixed, 0, 2);
+  Configurations.SList.Values[_Now] := S;
+
+  S := FloatToStrF(FMessage.LastNow, ffFixed, 0, 2);
+  Configurations.SList.Values[_LastNow] := S;
+
   FStimulus.Stop;
   EndTrial(Sender);
 end;

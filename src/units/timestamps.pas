@@ -15,18 +15,24 @@ interface
 
 uses  SysUtils;
 
-function TimestampToStr(ATimestamp: Extended) : string;
+procedure StartTimestamp(ATimestamp:Extended);
+
 function GetTimeStampF : string; overload;
-function GetTimeStampF (ATimeStart:Extended): string; overload;
+function GetTimeStampF(ATimestamp:Extended): string; overload;
 function TickCount : Extended;
+function TimestampToStr(ATimestamp: Extended) : string;
+function TimestampToStrDelta(ATimestamp: Extended) : string;
 
 implementation
 
 uses Timestamps.Helpers;
 
-function TimestampToStr(ATimestamp: Extended): string;
+var
+  FirstTimestamp : Extended = 0;
+
+procedure StartTimestamp(ATimestamp : Extended);
 begin
-  Result:=FloatToStrF(ATimestamp,ffFixed,0,9)
+  FirstTimestamp := ATimestamp;
 end;
 
 function GetTimeStampF: string;
@@ -34,14 +40,24 @@ begin
   Result:=FloatToStrF(GetCustomTick,ffFixed,0,9)
 end;
 
-function GetTimeStampF(ATimeStart: Extended): string;
+function GetTimeStampF(ATimestamp: Extended): string;
 begin
-  Result:=FloatToStrF(GetCustomTick-ATimeStart,ffFixed,0,9)
+  Result:=FloatToStrF(GetCustomTick-ATimestamp,ffFixed,0,9)
 end;
 
 function TickCount: Extended;
 begin
   Result := GetCustomTick;
+end;
+  
+function TimestampToStr(ATimestamp: Extended): string;
+begin
+  Result:=FloatToStrF(ATimestamp,ffFixed,0,9)
+end;
+
+function TimestampToStrDelta(ATimestamp : Extended) : string;
+begin
+  Result:=FloatToStrF(FirstTimestamp - ATimestamp,ffFixed,0,9)
 end;
 
 

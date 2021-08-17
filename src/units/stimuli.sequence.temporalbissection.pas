@@ -62,11 +62,14 @@ type
     property OnEndSerialTimer : TNotifyEvent read GetOnEndSerialTimer write SetOnEndSerialTimer;
     property SampleDuration : Cardinal read GetSampleDuration;
     property Cursor : integer read GetCursor write SetCursor;
+    property ComparisonLeft  : TLightImage read FImageLeft;
+    property ComparisonRight  : TLightImage read FImageRight;
+    property Sample : TLightImage read FImageMid;
   end;
 
 implementation
 
-uses Forms, Constants;
+uses Forms, Constants, Cheats;
 
 { TTBSequence }
 
@@ -192,19 +195,31 @@ begin
       begin
         { long }
         ExpectedResponse := tbLeft;
-        LTimerItems[0].Interval := 4000;
+        if CheatsModeOn then begin
+          LTimerItems[0].Interval := DurationLong div 10;
+        end else begin
+          LTimerItems[0].Interval := DurationLong;
+        end;
       end;
     'Right' :
       begin
         { short }
         ExpectedResponse := tbRight;
-        LTimerItems[0].Interval := 1000;
+        if CheatsModeOn then begin
+          LTimerItems[0].Interval := DurationShort div 10;
+        end else begin
+          LTimerItems[0].Interval := DurationShort;
+        end;
       end;
     else
       begin
         { generalization }
         ExpectedResponse := tbNone;
-        LTimerItems[0].Interval := LExpectedResponse.ToInteger;
+        if CheatsModeOn then begin
+          LTimerItems[0].Interval := LExpectedResponse.ToInteger div 10;
+        end else begin
+          LTimerItems[0].Interval := LExpectedResponse.ToInteger;
+        end;
       end;
 
   end;

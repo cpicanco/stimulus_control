@@ -25,12 +25,13 @@ uses Controls, ExtCtrls, Classes, SysUtils
 
 type
 
-  { TObjectProcedure }
+  { TCounterType }
+  TCounterType = (ctNone, ctBlocPoints, ctSessionPoints, ctCustom);
 
+  { TPaintEvent }
   TPaintEvent = procedure of object;
 
   { TTrial }
-
   TTrial = class(TGraphicControl)
   private
     FConfigurations: TCfgTrial;
@@ -99,7 +100,8 @@ type
     {$ifdef DEBUG}
       procedure ClockStatus(msg : string);
     {$endif}
-    function LogEvent(ACode: string) : Extended;
+    function LogEvent(ACode: string) : Extended; overload;
+    function LogEvent(ACode: string; ATimestamp: Extended): Extended; overload;
     procedure EndTrial(Sender: TObject);
     procedure Config(Sender: TObject);
     procedure WriteData(Sender: TObject); virtual;
@@ -109,8 +111,10 @@ type
     property OnTrialStart: TNotifyEvent read FOnTrialStart write SetOnTrialStart;
     property OnTrialMouseDown: TMouseEvent read FOnTrialMouseDown write SetOnTrialMouseDown;
   protected
-    FCounterRect : TRect;
     FShowCounter : Boolean;
+    FCounterType : TCounterType;
+    FCounterRectTopRight : TRect;
+    FCounterRectTopLeft : TRect;
     FNextTrial : string;
     CounterManager : TCounterManager;
     procedure MouseDown(Button: TMouseButton;
@@ -130,6 +134,7 @@ type
     procedure Hide; virtual;
     procedure Show; virtual;
     procedure SetFocus; virtual;
+    procedure HideCounter;
     property Configurations: TCfgTrial read FConfigurations write SetConfigurations;
     property Data: string read FData write FData;
     property FileName : string read FFilename write FFilename;
@@ -188,12 +193,6 @@ begin
       BeginStarter;
       Exit;
     end;
-
-  if FShowCounter then
-    begin
-      FCounterRect := Rect((ClientRect.Right div 7)*6, 10, ClientRect.Right-10, 70);
-    end;
-
   StartTrial(Sender);
 end;
 
@@ -328,10 +327,17 @@ begin
 end;
 
 procedure TTrial.Paint;
-  procedure DrawCounter;
+  procedure DrawCounterTopRight;
   var
     LTextStyle : TTextStyle;
+    LPoints : integer;
   begin
+    case FCounterType of
+      ctBlocPoints : LPoints := CounterManager.BlcPoints;
+      ctSessionPoints : LPoints := CounterManager.SessionPointsTopRight;
+      ctCustom : LPoints := CounterManager.SessionPointsTopRight;
+    end;
+
     LTextStyle := Canvas.TextStyle;
     LTextStyle.SingleLine:=False;
     LTextStyle.Wordbreak:=True;
@@ -345,21 +351,58 @@ procedure TTrial.Paint;
         Font.Color:= 0;
         Pen.Width := 2;
         Pen.Color := 0;
-        Rectangle(FCounterRect);
-        TextRect(FCounterRect, FCounterRect.Left, FCounterRect.Top,
-          'Pontos: ' + CounterManager.BlcPoints.ToString);
+        Rectangle(FCounterRectTopRight);
+        TextRect(FCounterRectTopRight, FCounterRectTopRight.Left,
+          FCounterRectTopRight.Top, 'Pontos: ' + LPoints.ToString);
+      end;
+  end;
+
+  procedure DrawCounterTopLeft;
+  var
+    LTextStyle : TTextStyle;
+    LPoints : integer;
+  begin
+    case FCounterType of
+      ctCustom : LPoints := CounterManager.SessionPointsTopLeft;
+      else { do nothing };
+    end;
+
+    LTextStyle := Canvas.TextStyle;
+    LTextStyle.SingleLine:=False;
+    LTextStyle.Wordbreak:=True;
+    LTextStyle.Clipping:=False;
+    LTextStyle.Alignment:=taCenter;
+    LTextStyle.Layout:=tlCenter;
+    Canvas.TextStyle := LTextStyle;
+    with Canvas do
+      begin
+        Font.Size := 22;
+        Font.Color:= 0;
+        Pen.Width := 2;
+        Pen.Color := 0;
+        Rectangle(FCounterRectTopLeft);
+        TextRect(FCounterRectTopLeft, FCounterRectTopLeft.Left,
+          FCounterRectTopLeft.Top, 'Pontos: ' + LPoints.ToString);
       end;
   end;
 begin
   inherited Paint;
-  if FShowStarter then
-    begin
-      DrawCenteredCircle(Canvas, Width, Height, 6);
-      Exit;
-    end;
+  if FShowStarter then begin
+    DrawCenteredCircle(Canvas, Width, Height, 6);
+    Exit;
+  end;
 
-  if FShowCounter then
-    DrawCounter;
+  if FShowCounter then begin
+    case FCounterType of
+      ctNone : { do nothing };
+      ctBlocPoints, ctSessionPoints: DrawCounterTopRight;
+      ctCustom :
+        begin
+          DrawCounterTopRight;
+          DrawCounterTopLeft;
+        end;
+    end;
+  end;
 
   if Assigned(OnTrialPaint) and FResponseEnabled then OnTrialPaint;
 end;
@@ -486,8 +529,23 @@ begin
   if FShowStarter then
     Header := 'Str.Lat.' + #9 + Header;
 
-  // Presents a label "Pontos: x" at the screen top right.
-  FShowCounter := StrToBoolDef(LParameters.Values[_ShowCounter], False);
+  // counters visibility default
+  FShowCounter := False;
+
+  // set counter reacts
+  FCounterRectTopRight :=
+    Rect((ClientRect.Right div 7)*6, 10, ClientRect.Right-10, 70);
+
+  FCounterRectTopLeft :=
+    Rect(10, 10, (ClientRect.Right div 7)-10, 70);
+
+  // how counters/points are presented
+  case StrToIntDef(LParameters.Values[_CounterType], -1) of
+    0 :  FCounterType := ctBlocPoints;
+    1 :  FCounterType := ctSessionPoints;
+    2 :  FCounterType := ctCustom;
+    else FCounterType := ctNone;
+  end;
 
   // image of the mouse cursor
   if TestMode then Cursor:= 0
@@ -521,6 +579,11 @@ begin
   TCustomControl(Parent).SetFocus;
 end;
 
+procedure TTrial.HideCounter;
+begin
+  FShowCounter := False;
+end;
+
 procedure TTrial.BeginStarter;
 begin
   FResponseEnabled:= True;
@@ -548,7 +611,18 @@ begin
            IntToStr(CounterManager.CurrentTrial+1) + #9 +
            IntToStr(CounterManager.SessionTrials+1) + #9 + // Current trial cycle
            Configurations.Name + #9 +
-           ACode + LineEnding)
+           ACode + LineEnding);
+end;
+
+function TTrial.LogEvent(ACode : string; ATimestamp : Extended) : Extended;
+begin
+  Result := ATimestamp - TimeStart;
+  SaveData(TimestampToStr(Result) + #9 +
+           IntToStr(CounterManager.CurrentBlc+1) + #9 +
+           IntToStr(CounterManager.CurrentTrial+1) + #9 +
+           IntToStr(CounterManager.SessionTrials+1) + #9 + // Current trial cycle
+           Configurations.Name + #9 +
+           ACode + LineEnding);
 end;
 
 procedure TTrial.SetOnTrialBeforeEnd(AValue: TNotifyEvent);

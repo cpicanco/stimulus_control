@@ -15,8 +15,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  ExtCtrls, StdCtrls, IniPropStorage, ComCtrls, Spin,
-  Stimuli.Image.Labeled;
+  ExtCtrls, StdCtrls, IniPropStorage, ComCtrls, Spin
+  //, Stimuli.Image.Labeled
+  ;
 
 type
 
@@ -24,14 +25,17 @@ type
 
   TBackground = class(TForm)
     ButtonStartAll: TButton;
+    CheckBoxCheatsMode : TCheckBox;
     EditParticipant: TEdit;
     FloatSpinEditScreen: TFloatSpinEdit;
     FloatSpinEditSquare: TFloatSpinEdit;
+    FloatSpinEditSquareExp3 : TFloatSpinEdit;
     FloatSpinEditSquareMove: TFloatSpinEdit;
     IniPropStorage: TIniPropStorage;
     LabelScreenSize: TLabel;
     LabelSquareMove: TLabel;
     LabelSquareSize: TLabel;
+    LabelSquareSizeExp3 : TLabel;
     LabelTimeSize: TLabel;
     PageControl1: TPageControl;
     PanelConfigurations: TPanel;
@@ -51,7 +55,7 @@ type
   private
 
   public
-    FImage : TStimulusLabeledFigure;
+    //FImage : TStimulusLabeledFigure;
   end;
 
 var
@@ -63,11 +67,13 @@ implementation
 
 uses
    FileUtil
+   , Constants
    , Session.Backgrounds
    , Session.Configuration.GlobalContainer
    , SessionSimple
    , Experiments.Eduardo
    , Stimuli.Image.MovingSquare
+   , Cheats
    ;
 
 { TBackground }
@@ -80,15 +86,15 @@ procedure TBackground.ButtonStartAllClick(Sender: TObject);
 var
   LName : string;
 begin
+  CheatsModeOn := CheckBoxCheatsMode.Checked;
   PanelConfigurations.Hide;
   Session.Backgrounds.Background := Self;
+  ScreenInCentimeters := FloatSpinEditScreen.Value;
   case PageControl1.TabIndex of
     0:begin
-      ScreenInCentimeters := FloatSpinEditScreen.Value;
       SquareSize := FloatSpinEditSquare.Value;
       SquareMovementSize := FloatSpinEditSquareMove.Value;
       Granularity := SpinEditTimeSize.Value;
-
       ConfigurationFilename :=
         Experiments.Eduardo.MakeConfigurationFile(
           RadioGroupDesign1.Items[RadioGroupDesign1.ItemIndex],
@@ -105,6 +111,7 @@ begin
 
     2:begin
       { code }
+      SquareSize := FloatSpinEditSquareExp3.Value;
       ConfigurationFilename :=
         Experiments.Eduardo.MakeConfigurationFile(
           RadioGroupDesign3.Items[RadioGroupDesign3.ItemIndex],
@@ -132,10 +139,10 @@ begin
   LSession.OnEndSession:=@EndSession;
   LSession.OnBeforeStart:=@BeforeStartSession;
 
-  FImage := TStimulusLabeledFigure.Create(Self);
-  FImage.Parent := Self;
-  FImage.LoadFromFile('acerto.png');
-  FImage.Start;
+  //FImage := TStimulusLabeledFigure.Create(Self);
+  //FImage.Parent := Self;
+  //FImage.LoadFromFile('acerto.png');
+  //FImage.Start;
 end;
 
 procedure TBackground.EndSession(Sender: TObject);

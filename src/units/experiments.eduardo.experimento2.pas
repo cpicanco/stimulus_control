@@ -24,6 +24,7 @@ uses Classes, SysUtils
    , Experiments.Eduardo.Comum
    , Session.Configuration.GlobalContainer
    , Session.ConfigurationFile
+   , Cheats
    ;
 
 procedure WriteTemporalBissection(ABlc : integer; AName: string;
@@ -48,14 +49,14 @@ begin
   i := ConfigurationFile.TrialCount[ABlc]+1;
   with ConfigurationFile do
   begin
-    WriteToTrial(i, ABlc, _Name, AName);
+    WriteToTrial(i, ABlc, _Name, AName + #32 + ASampleTime + #32 + AConsequence);
     WriteToTrial(i, ABlc, _Cursor, '-1');
     WriteToTrial(i, ABlc, _Kind, T_TMB);
     WriteToTrial(i, ABlc, _ITI, ITI.ToString);
     WriteToTrial(i, ABlc, _ExpectedResponse, ASampleTime);
 
-    LConsequenceL := HasConsequence(StrToFloat(ExtractDelimited(1,AConsequence,[#32])));
-    LConsequenceR := HasConsequence(StrToFloat(ExtractDelimited(2,AConsequence,[#32])));
+    LConsequenceL := HasConsequence(StrToFloat(ExtractDelimited(1, AConsequence,[#32])));
+    LConsequenceR := HasConsequence(StrToFloat(ExtractDelimited(2, AConsequence,[#32])));
     WriteToTrial(i, ABlc, _Consequence, LConsequenceL.ToString + #32 + LConsequenceR.ToString);
   end;
 end;
@@ -155,7 +156,6 @@ begin
       LTraining.Exchange(i, r);
     end;
 
-
     for i := 0 to 7 do
     begin
       for j := 0 to 4 do
@@ -202,7 +202,7 @@ begin
           '3170', '2520', '2000', '1590', '1260': LConsequence := '0.0 0.0';
         end;
         Inc(j);
-        WriteTemporalBissection(ABlc, 'Temporal Bissection '+(j+1).ToString,
+        WriteTemporalBissection(ABlc, 'Temporal Bissection Test '+(j).ToString + #32 + LStringList[i],
           LStringList[i], LConsequence);
       end;
     until (LTrainingI = 20) and (LTestingI = 40);
@@ -217,25 +217,36 @@ procedure WriteToConfigurationFile(ADesign : string);
 var
   LCondition : char;
   LConditionI : integer = 0;
+  LNextBlocOnCriteria : string;
+
+  procedure SetITIForBCD;
+  begin
+    if CheatsModeOn then begin
+      ITI := TemporalBissectionITI div 10;
+    end else begin
+      ITI := TemporalBissectionITI;
+    end;
+  end;
 
   procedure WriteBCondition;
   var
     i : integer;
   begin
+    SetITIForBCD;
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem B');
     WriteMSG(LConditionI, 'M1', MessageE2B);
 
     // 10 no mínimo, sem critério
     Inc(LConditionI);
-    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B1, 100% reforço');
+    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B1-100% reforço');
     WriteTraining1(LConditionI);
 
     // 60 no mínimo
     for i := 0 to 5 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B2, MIN 60, 50% reforço');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B2-MIN 60-50% reforço');
       WriteTraining2(LConditionI, '0.5 0.5');
     end;
 
@@ -243,9 +254,9 @@ var
     for i := 0 to 3 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B2, MAX 100, 50% reforço, 90% de acerto');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B2-MAX 100-50% reforço-90% de acerto');
       ConfigurationFile.WriteToBloc(LConditionI, _CrtHitPorcentage, '90');
-      ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, '13');
+      ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, LNextBlocOnCriteria);
       WriteTraining2(LConditionI, '0.5 0.5');
     end;
 
@@ -260,6 +271,7 @@ var
   var
     i : integer;
   begin
+    SetITIForBCD;
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem C');
     WriteMSG(LConditionI, 'M1', MessageE2B);
@@ -268,7 +280,7 @@ var
     for i := 0 to 5 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1, MIN 60, 80%/20% reforço');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1-MIN 60-80%/20% reforço');
       WriteTraining2(LConditionI, '0.8 0.2');
     end;
 
@@ -276,9 +288,9 @@ var
     for i := 0 to 3 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1, MAX 100, 80%/20% reforço, 90% de acerto');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1-MAX 100-80%/20% reforço-90% de acerto');
       ConfigurationFile.WriteToBloc(LConditionI, _CrtHitPorcentage, '90');
-      ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, '13');
+      ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, LNextBlocOnCriteria);
       WriteTraining2(LConditionI, '0.8 0.2');
     end;
 
@@ -292,6 +304,7 @@ var
   var
     i : integer;
   begin
+    SetITIForBCD;
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem D');
     WriteMSG(LConditionI, 'M1', MessageE2B);
@@ -300,7 +313,7 @@ var
     for i := 0 to 5 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D1, MIN 60, 20%/80% reforço');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D1-MIN 60-20%/80% reforço');
       WriteTraining2(LConditionI, '0.2 0.8');
     end;
 
@@ -308,9 +321,9 @@ var
     for i := 0 to 3 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D1, MAX 100, 20%/80% reforço, 90% de acerto');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D1-MAX 100-20%/80% reforço-90% de acerto');
       ConfigurationFile.WriteToBloc(LConditionI, _CrtHitPorcentage, '90');
-      ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, '13');
+      ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, LNextBlocOnCriteria);
       WriteTraining2(LConditionI, '0.2 0.8');
     end;
 
@@ -321,13 +334,15 @@ var
   end;
 
 begin
-  ITI := 3000;
   SetupStimuli;
   if (ADesign = 'ABA') then
   begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem A0');
     WriteMSG(LConditionI, 'M0', MessageA0);
+    LNextBlocOnCriteria := '13';
+  end else begin
+    LNextBlocOnCriteria := '12';
   end;
 
   for LCondition in ADesign do

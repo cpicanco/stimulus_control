@@ -1,3 +1,12 @@
+{
+  Stimulus Control
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+
+  The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
+
+  You should have received a copy of the GNU General Public License
+  along with this program. If not, see <http://www.gnu.org/licenses/>.
+}
 unit Experiments.Eduardo.Comum;
 
 {$mode objfpc}{$H+}
@@ -20,6 +29,7 @@ var
   MessageE1A2 : string;
   MessageE1B : string;
   MessageE2B : string;
+  MessageE3B : string;
 
 implementation
 
@@ -42,6 +52,7 @@ begin
   LoadMessageFromFile(MessageE1A2, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA2.html');
   LoadMessageFromFile(MessageE1B,  GlobalContainer.RootMedia+FolderMessages+'1-MensagemB.html');
   LoadMessageFromFile(MessageE2B,  GlobalContainer.RootMedia+FolderMessages+'2-MensagemB.html');
+  LoadMessageFromFile(MessageE3B,  GlobalContainer.RootMedia+FolderMessages+'3-MensagemB.html');
 end;
 
 procedure WriteTXTInput(ABlc : integer; AName: string; AMessage : string);
@@ -63,6 +74,7 @@ procedure WriteMSG(ABlc : integer; AName: string; AMessage : string);
 var
   i : integer;
 begin
+  ITI := SurveyITI;
   i := ConfigurationFile.TrialCount[ABlc]+1;
   with ConfigurationFile do
   begin
@@ -74,8 +86,8 @@ begin
   end;
 end;
 
-procedure WriteChoice(ABlc : integer; AName: string;
-  ALeft: string; ARight: string; ALNextTrial: string; ARNextTrial: string);
+procedure WriteChoice(ABlc : integer; AName : string; ALeft : string;
+  ARight : string; ADelay : string; ALNextTrial : string; ARNextTrial : string);
 var
   i : integer;
 begin
@@ -86,6 +98,7 @@ begin
     WriteToTrial(i, ABlc, _Cursor, '0');
     WriteToTrial(i, ABlc, _Kind, T_CHO);
     WriteToTrial(i, ABlc, _ITI, ITI.ToString);
+    WriteToTrial(i, ABlc, 'Delay', ADelay);
     WriteToTrial(i, ABlc, 'L', ALeft);
     WriteToTrial(i, ABlc, 'L'+_NextTrial, ALNextTrial);
     WriteToTrial(i, ABlc, 'R', ARight);
@@ -99,47 +112,20 @@ var
 
   procedure WriteDiscountBloc(ABlc : integer);
   var
-    i : integer;
-    LNow : real;
-    LLater : real = 100.0;
     LDelay : string;
-    LNextTrial : string;
   begin
     if DelaysIndex > High(Delays) then DelaysIndex := 0;
     LDelay := Delays[DelaysIndex];
-    LNow := 50.0;
-    for i := 0 to 9 do
-      begin
-        case i of
-        0 : LNextTrial := '10';
-        else
-          LNextTrial := '-1';
-        end;
 
-        WriteChoice(ABlc,FloatToStrF(LNow,ffFixed,0,2)+#32+LDelay,
-          'Ganhar '+#13+'R$' + FloatToStrF(LNow,ffFixed,0,2)   + ' reais' + #13 + 'agora',
-          'Ganhar '+#13+'R$' + FloatToStrF(LLater,ffFixed,0,2) + ' reais' + #13 + 'daqui ' + LDelay,
-          '',LNextTrial);
-        LNow := LNow * 0.75;
-      end;
+    WriteChoice(ABlc,FloatToStrF(50.0,ffFixed,0,2)+#32+LDelay,
+      FloatToStrF(50.0, ffFixed, 0,2),
+      FloatToStrF(100.0, ffFixed, 0,2),
+      LDelay,
+      '0','0');
 
-    LNow := 50.0;
-    for i := 0 to 8 do
-      begin
-        case i of
-        0 : LNextTrial := '-10';
-        8 : LNextTrial := '';
-        else
-          LNextTrial := '-1';
-        end;
-        LNow := LNow * 1.25;
-        WriteChoice(ABlc,FloatToStrF(LNow,ffFixed,0,2)+#32+LDelay,
-          'Ganhar '+#13+'R$' + FloatToStrF(LNow,ffFixed,0,2)   + ' reais' + #13 + 'agora',
-          'Ganhar '+#13+'R$' + FloatToStrF(LLater,ffFixed,0,2) + ' reais' + #13 + 'daqui ' + LDelay,
-          LNextTrial,'');
-      end;
     Inc(DelaysIndex);
   end;
+
 
   procedure WriteDemandBloc(ABlc : integer);
   var
@@ -158,6 +144,7 @@ var
         'Quanto você consumiria se cada cigarro custasse R$'+LValues[i]+'?');
   end;
 begin
+  ITI := SurveyITI;
   Inc(ACondition);
   ConfigurationFile.WriteToBloc(ACondition, _Name, 'Mensagem A1');
   WriteMSG(ACondition, 'M1', MessageE1A1);

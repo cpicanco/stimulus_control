@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2020 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -22,8 +22,17 @@ uses
 
 type
 
-  { TBinaryChoice }
+  { TBinaryChoiceMessage }
+  TBinaryChoiceMessage = record
+    CurrentTrial: integer;
+    LastNow : real;
+    Now : real;
+    Later : real;
+    AComponentName : string;
+    Delay: string;
+  end;
 
+  { TBinaryChoice }
   TBinaryChoice = class(TStimulus)
   private
     FParent : TWinControl;
@@ -40,8 +49,12 @@ type
     destructor Destroy; override;
     procedure LoadFromFile(AFilename: string); override;
     procedure LoadFromParameters(AParameters: TStringList);
+    function MessageFromParameters(
+      AParameters : TStringList) : TBinaryChoiceMessage;
+    procedure LoadMessage(AMessage : TBinaryChoiceMessage);
     procedure SetScheduleConsequence(AConsequence : TNotifyEvent);
     function NextTrial(AComponentName : string) : string;
+    procedure NextNow(var AMessage : TBinaryChoiceMessage);
     procedure Start; override;
     procedure Stop; override;
     procedure FitScreen;
@@ -52,7 +65,7 @@ implementation
 
 uses Constants;
 
-{ TStimulusFigure }
+{ TBinaryChoice }
 
 procedure TBinaryChoice.SetParent(AValue: TWinControl);
 begin
@@ -60,6 +73,20 @@ begin
   FParent := AValue;
   FImageLeft.Parent := FParent;
   FImageRight.Parent := FParent;
+end;
+
+procedure TBinaryChoice.LoadMessage(AMessage : TBinaryChoiceMessage);
+begin
+  FImageLeft.Caption :=
+  'Ganhar '+#13+'R$' +
+  FloatToStrF(AMessage.Now, ffFixed, 0, 2) +
+  ' reais' + #13 + 'agora';
+
+  FImageRight.Caption :=
+  'Ganhar '+#13+'R$' +
+  FloatToStrF(AMessage.Later, ffFixed, 0, 2) +
+  ' reais' + #13 + 'daqui ' +
+  AMessage.Delay;
 end;
 
 
@@ -86,6 +113,36 @@ begin
   case AComponentName of
     'Left' : Result := FNextTrialLeft;
     'Right': Result := FNextTrialRight;
+  end;
+end;
+
+procedure TBinaryChoice.NextNow(var AMessage : TBinaryChoiceMessage);
+const
+  LFactor   : real = 0.5;
+var
+  LNow : real;
+  LDelta : real;
+begin
+  case AMessage.CurrentTrial of
+    0 : begin
+      case AMessage.AComponentName of
+        'Left' : LNow := AMessage.Now * 0.50;
+        'Right': LNow := AMessage.Now * 1.50
+      end;
+      AMessage.LastNow := AMessage.Now;
+      AMessage.Now     := LNow;
+    end;
+
+    // recursive logic for geometric progression
+    else
+      LDelta := Abs(AMessage.Now - AMessage.LastNow) * LFactor;
+      AMessage.LastNow := AMessage.Now;
+
+      case AMessage.AComponentName of
+        'Left' : LNow := AMessage.LastNow - LDelta;
+        'Right': LNow := AMessage.LastNow + LDelta;
+      end;
+      AMessage.Now     := LNow;
   end;
 end;
 
@@ -119,10 +176,21 @@ end;
 
 procedure TBinaryChoice.LoadFromParameters(AParameters: TStringList);
 begin
-  FImageLeft.Caption := AParameters.Values['L'];
-  FImageRight.Caption := AParameters.Values['R'];
   FNextTrialLeft := AParameters.Values['L'+_NextTrial];
   FNextTrialRight:= AParameters.Values['R'+_NextTrial];
+end;
+
+function TBinaryChoice.MessageFromParameters(
+  AParameters : TStringList) : TBinaryChoiceMessage;
+begin
+  Result.Delay := AParameters.Values['Delay'];
+  if AParameters.Values[_LastNow] = '' then begin
+    Result.Now := StrToFloatDef(AParameters.Values['L'], 50);
+  end else begin
+    Result.Now := StrToFloat(AParameters.Values[_Now]);
+    Result.LastNow := StrToFloat(AParameters.Values[_LastNow]);
+  end;
+  Result.Later := StrToFloatDef(AParameters.Values['R'], 100);
 end;
 
 procedure TBinaryChoice.Start;

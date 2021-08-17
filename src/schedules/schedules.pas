@@ -75,8 +75,10 @@ type
     procedure Load(ASchedule : string); overload;
     procedure Load(AScheduleName : TScheduleName;
       AParameter1: Cardinal = 0; AParameter2: Cardinal = 0); overload;
-    procedure Start;
-    procedure Stop;
+    function Start : Extended;
+    function Stop : Extended;
+    function Pause : Extended;
+    procedure UseFleshlerHoffmanIntervals;
     property AsString : string read GetScheduleString write Load;
     property Loaded : Boolean read GetLoaded;
     property ScheduleNameAsString : string read GetScheduleNameAsString;
@@ -152,6 +154,7 @@ procedure TSchedule.SetScheduleName(AValue: TScheduleName);
 begin
   LoadScheduleName(AValue);
   case FName of
+    UnknownSchedule : SetParameters(0, 0);
     CRF, EXT: SetParameters(0, 0);
     FR : SetParameters(5, 0);
     FI, FT: SetParameters(5000, 0);
@@ -263,8 +266,6 @@ begin
 end;
 
 procedure TSchedule.SetParameter(i : integer; AValue: Cardinal);
-var
-  LExceptionMessage : String;
 begin
   case i of
     0 : if FSchedule.Parameter1 = AValue then Exit;
@@ -335,10 +336,10 @@ begin
     VR, VI, VT, DRH, DRL:                                // two parameters required
       Result:= IntToStr(FSchedule.Parameter1)+#32+IntToStr(FSchedule.Parameter2);
 
-    UnknownSchedule:
-       raise Exception.Create(RSErrorGettingUnknownScheduleParameters) at
-          get_caller_addr(get_frame),
-          get_caller_frame(get_frame);
+    UnknownSchedule: Result := RSErrorGettingUnknownScheduleParameters;
+       //raise Exception.Create(RSErrorGettingUnknownScheduleParameters) at
+       //   get_caller_addr(get_frame),
+       //   get_caller_frame(get_frame);
   end;
 end;
 
@@ -398,30 +399,50 @@ begin
   SetScheduleName(GetScheduleName(ASchedule));
   SetParameters(ASchedule);
 end;
+
 procedure TSchedule.Load(AScheduleName: TScheduleName; AParameter1: Cardinal;
   AParameter2: Cardinal);
 begin
   LoadScheduleName(AScheduleName);
   SetParameters(AParameter1, AParameter2);
 end;
-procedure TSchedule.Start;
+
+function TSchedule.Start : Extended;
 begin
-  if FName = UnknownSchedule then
+  if FName = UnknownSchedule then begin
      raise Exception.Create(RSErrorUnknownScheduleAction) at
         get_caller_addr(get_frame),
         get_caller_frame(get_frame)
-  else
-    FSchedule.Start;
+  end else begin
+    Result := FSchedule.Start;
+  end;
 end;
 
-procedure TSchedule.Stop;
+function TSchedule.Stop : Extended;
 begin
-  if FName = UnknownSchedule then
+  if FName = UnknownSchedule then begin
      raise Exception.Create(RSErrorUnknownScheduleAction) at
         get_caller_addr(get_frame),
         get_caller_frame(get_frame)
-  else
-    FSchedule.Enabled:=False;
+  end else begin
+    Result := FSchedule.Stop;
+  end;
+end;
+
+function TSchedule.Pause : Extended;
+begin
+  if FName = UnknownSchedule then begin
+     raise Exception.Create(RSErrorUnknownScheduleAction) at
+        get_caller_addr(get_frame),
+        get_caller_frame(get_frame)
+  end else begin
+    Result := FSchedule.Pause;
+  end;
+end;
+
+procedure TSchedule.UseFleshlerHoffmanIntervals;
+begin
+  FSchedule.RandomIntervalType := ritFleshlerHoffman;
 end;
 
 end.

@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2017 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -14,10 +14,24 @@ unit Constants;
 interface
 
 const
-  HeaderTabs : string = #9;
-
-const
   DefaultAddress = '127.0.1.1:50020';
+
+const { Controls.Trials.TemporalBissection }
+  ConsequenceDuration : integer = 2000;
+
+const { Stimuli.Sequence.TemporalBissection }
+  DurationLong  : integer = 4000;
+  DurationShort : integer = 1000;
+
+const  { Experiment 2 }
+  TemporalBissectionITI : integer = 3000;
+
+const  { Experiment 1 and 2 }
+  SurveyITI : integer = 500;
+
+const  { Experiment3 }
+  Experiment3FIValue : integer = 15000;
+  Experiment3FITestValue : integer = 30000;
 
 const
   // Posições
@@ -66,6 +80,7 @@ const
   _LimitedHold = 'LimitedHold';
   _Consequence = 'Consequence';
   _ShowCounter = 'Counter';
+  _CounterType = 'CounterType';
 
   // MRD
   _UseMedia = 'UseMedia';
@@ -124,6 +139,10 @@ const
   // LIKERT
   _Left = 'Left';
   _Right = 'Right';
+
+  // BINARY CHOICE
+  _Now     = 'Now';
+  _LastNow = 'LastNow';
 
   // Identificadores
   _Kplus = 'K+';
@@ -259,15 +278,24 @@ const
   rmKeyMinus = 'Tecla -';
 
 // report headers
+const
+  HeaderTabs : string = #9;
+
 resourcestring
   ExceptionNoScheduleFound = 'Nenhum esquema de reforço encontrado, revise o arquivo de configuração.';
   ExceptionConfigurationNotAllowed = 'A configuração não é permitida.';
+
+  rsReportDelayBeg = 'Atraso.Inicio';
+  rsReportDelayEnd = 'Atraso.Fim';
 
   rsReportPoints = 'Pontos';
   rsReportMsgTxt = 'Mensagem';
   rsReportStmBeg = 'S.Inicio';
   rsReportStmDur = 'S.Duracao';
   rsReportStmEnd = 'S.Fim';
+  rsReportStmEndR = 'S.Fim.Reforco';
+  rsReportStmEndO = 'S.Fim.Omissao';
+
   rsReportRspLat = 'R.Latencia';
   rsReportRspFrq = 'R.Frequencia';
   rsReportRspExp = 'R.Prevista';

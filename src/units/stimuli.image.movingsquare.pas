@@ -28,6 +28,7 @@ type
 
   TMovingSquare = class sealed(TLightImage)
   private
+    FFreezed : Boolean;
     FDirection: TDirection;
     FMovementSize: integer;
     FTimer : TTimer;
@@ -43,6 +44,7 @@ type
     constructor Create(AOwner : TComponent); override;
     procedure Start;
     procedure Stop;
+    procedure Freeze;
     property Direction : TDirection read FDirection write SetDirection;
     property MovementSize : integer read FMovementSize write FMovementSize;
   end;
@@ -66,6 +68,7 @@ end;
 constructor TMovingSquare.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FFreezed := False;
   Width := Round(SquareSize*(Screen.Width/ScreenInCentimeters));
   Height:= Width;
   Color := clGray;
@@ -109,6 +112,7 @@ var
   end;
 
 begin
+  if FFreezed then Exit;
   R := Random(8);
   case R of
     0: Direction := sdLeft;
@@ -217,12 +221,18 @@ end;
 
 procedure TMovingSquare.Start;
 begin
+  if FFreezed then Exit;
   FTimer.Enabled := True;
 end;
 
 procedure TMovingSquare.Stop;
 begin
   FTimer.Enabled := False;
+end;
+
+procedure TMovingSquare.Freeze;
+begin
+  FFreezed := True;
 end;
 
 end.

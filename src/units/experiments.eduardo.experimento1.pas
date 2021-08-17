@@ -6,8 +6,6 @@ interface
 
 procedure WriteToConfigurationFile(ADesign : string);
 
-//procedure WriteChoices;
-
 const
   FolderChoices =
     'tentativas'+DirectorySeparator;
@@ -33,11 +31,12 @@ begin
     WriteToTrial(i, ABlc, _Name, AName);
     WriteToTrial(i, ABlc, _Cursor, '0');
     WriteToTrial(i, ABlc, _Kind, T_EO1);
+    WriteToTrial(i, ABlc, _Schedule, 'FR 2');
     WriteToTrial(i, ABlc, _ITI, ITI.ToString);
     if AHasDelay then
-      WriteToTrial(i, ABlc, 'Type', 'C')
+      WriteToTrial(i, ABlc, 'Type', 'E1C')
     else
-      WriteToTrial(i, ABlc, 'Type', 'B');
+      WriteToTrial(i, ABlc, 'Type', 'E1B');
   end;
 end;
 
@@ -86,7 +85,7 @@ var
   end;
 
 begin
-  ITI := 500;
+  ITI := SurveyITI;
   SetupStimuli;
   if (ADesign = 'ABA') or (ADesign = 'ACA') then
   begin
@@ -102,57 +101,5 @@ begin
     'C': WriteCCondition;
   end;
 end;
-
-//procedure WriteChoices;
-//var
-//  i : integer;
-//  LStringList : TStringList;
-//  LNow : real;
-//  LLater : real = 100.0;
-//  LDelay : string;
-//  LNextTrial : string;
-//begin
-//  LStringList := TStringList.Create;
-//  try
-//    for LDelay in Delays do
-//      begin
-//        LNow := 50.0;
-//        for i := 0 to 9 do
-//          begin
-//            case i of
-//            0 : LNextTrial := '10';
-//            else
-//              LNextTrial := '-1';
-//            end;
-//
-//            LStringList.Append(
-//              'Ganhar R$' + FloatToStrF(LNow,ffFixed,0,2)   + ' reais agora' + #9 +     //left
-//              'Ganhar R$' + FloatToStrF(LLater,ffFixed,0,2) + ' reais daqui ' + LDelay + #9 + //right
-//              LNextTrial);
-//            LNow := LNow * 0.75;
-//          end;
-//
-//        LNow := 50.0;
-//        for i := 0 to 8 do
-//          begin
-//            case i of
-//            0 : LNextTrial := '-10';
-//            8 : LNextTrial := '';
-//            else
-//              LNextTrial := '-1';
-//            end;
-//            LNow := LNow * 1.25;
-//            LStringList.Append(
-//              'Ganhar R$' + FloatToStrF(LNow,ffFixed,0,2)   + ' reais agora' + #9 +
-//              'Ganhar R$' + FloatToStrF(LLater,ffFixed,0,2) + ' reais daqui ' + LDelay + #9 +
-//              LNextTrial);
-//
-//          end;
-//      end;
-//    LStringList.SaveToFile(GlobalContainer.RootMedia+FolderChoices+'desconto.txt');
-//  finally
-//    LStringList.Free;
-//  end;
-//end;
 
 end.

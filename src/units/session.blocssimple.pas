@@ -17,7 +17,7 @@ uses
   Classes, SysUtils, ExtCtrls, StdCtrls, Controls
   , CounterManager
   , Controls.Trials.Abstract
-  , Stimuli.Image.Labeled
+  , Stimuli.Image
   ;
 
 type
@@ -27,7 +27,7 @@ type
   TBloc = class(TComponent)
   private
     FWaitLabel : TLabel;
-    FConsequence : TStimulusLabeledFigure;
+    FConsequence : TStimulusFigure;
     FCounterManager : TCounterManager;
     FInterTrial : TTimer;
     FTrialConsequence : TTimer;
@@ -84,11 +84,23 @@ uses Constants
 procedure TBloc.PlayTrial(ABloc, ATrial: integer);
 var
   ATrialConfig : TCfgTrial;
+  S : string;
 begin
+  ATrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
+
+  if (FTrial is TBinaryChoiceTrial) then begin
+    if FCounterManager.BlcTrials > 0 then begin
+      S := FTrial.Configurations.SList.Values[_LastNow];
+      ATrialConfig.SList.Values[_LastNow] := S;
+
+      S := FTrial.Configurations.SList.Values[_Now];
+      ATrialConfig.SList.Values[_Now] := S;
+    end;
+  end;
+
   if Assigned(FTrial) then
     FreeAndNil(FTrial);
 
-  ATrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
   try
     case ATrialConfig.Kind of
       T_MSG : FTrial := TMessageTrial.Create(Background);
@@ -109,7 +121,9 @@ begin
     FTrial.SaveData := GetSaveDataProc(LGTimestamps);
     if FCounterManager.SessionTrials = 0 then
     begin
-      FTrial.SaveData(HFIRST_TIMESTAMP + #9 + TimestampToStr(GlobalContainer.TimeStart) + LineEnding + LineEnding);
+      FTrial.SaveData(
+        HFIRST_TIMESTAMP + #9 +
+        TimestampToStr(GlobalContainer.TimeStart) + LineEnding + LineEnding);
       FTrial.SaveData(FTrial.HeaderTimestamps + LineEnding);
     end;
 
@@ -169,18 +183,15 @@ begin
       if LTrial.HasVisualConsequence then
         case LTrial.Result of
           'HIT' :
-          begin
-            //FConsequence.Caption := 'Certo';
-            //FConsequence.Show;
+            begin
+              Background.Color := clPurple;
               FConsequence.Start;
-              Background.Color := clWhite;
-          end;
+            end;
+
           'MISS':
-          begin
-            //FConsequence.Caption := 'Errado';
-            //FConsequence.Show;
-            Background.Color := clBlack;
-          end;
+            begin
+              Background.Color := clBlack;
+            end;
         end;
     end
   else
@@ -190,7 +201,8 @@ end;
 procedure TBloc.WriteTrialData(Sender: TObject);
 var
   SaveData : TDataProcedure;
-  i : integer;
+  i, j : integer;
+  LTrialNo, LBlocID, LBlocName,
   LTrialID, LTrialName, ITIData, NewData, LReportLn : string;
   LTrial : TTrial;
 const
@@ -203,22 +215,35 @@ begin
   end;
   SaveData := GetSaveDataProc(LGData);
   if LTrial.Header <> FLastTrialHeader then
-    LReportLn := rsReportTrialID + #9 +
+    LReportLn := rsReportTrialNO + #9 +
+                 rsReportBlocID + #9 +
+                 rsReportBlocName + #9 +
+                 rsReportTrialID + #9 +
                  rsReportTrialName + #9 +
                  rsReportITIBeg + #9 +
                  rsReportITIEnd + #9 +
                  LTrial.Header + LineEnding;
+
+  i := FCounterManager.CurrentTrial;
+  j := FCounterManager.CurrentBlc;
   FLastTrialHeader := LTrial.Header;
-  LTrialID := IntToStr(FCounterManager.CurrentTrial + 1);
+  LTrialNo := (FCounterManager.SessionTrials + 1).ToString;
+  LBlocID := (j + 1).ToString;
+  LBlocName := ConfigurationFile.Bloc[j+1].Name;
+  LTrialID := (i + 1).ToString;
 
   // FTrial Name
-  i := FCounterManager.CurrentTrial;
-  LTrialName := ConfigurationFile.Trial[1, i+1].Name;
+
+  LTrialName := ConfigurationFile.Trial[j+1, i+1].Name;
   if LTrialName = '' then
     LTrialName := '--------';
 
   // pre
-  NewData := LTrialID + #9 + LTrialName;
+  NewData :=
+    LTrialNo  + #9 +
+    LBlocID  + #9 +
+    LBlocName + #9 +
+    LTrialID + #9 + LTrialName;
 
   // iti
   if FCounterManager.SessionTrials = 0 then
@@ -253,9 +278,9 @@ begin
   {$ENDIF}
   if FInterTrial.Interval > 0 then
     begin
-      if (FTrial is TFreeSquareTrial) or
-         (FTrial is TTBMTS) then
+      if (FTrial is TFreeSquareTrial) or (FTrial is TTBMTS) then begin
         FWaitLabel.Show;
+      end;
       FInterTrial.Enabled := True;
       FITIBegin := TickCount - GlobalContainer.TimeStart;
     end
@@ -289,13 +314,14 @@ begin
     Anchors := [akLeft,akRight];
     WordWrap := True;
     Font.Name := 'Arial';
+    Font.Color := 0;
     Font.Size := 30;
     Layout:=tlCenter;
     Caption:='Aguarde';
     //OnMouseUp := @MessageMouseUp;
   end;
 
-  FConsequence := TStimulusLabeledFigure.Create(Self);
+  FConsequence := TStimulusFigure.Create(Self);
   FConsequence.HideCursor;
   FConsequence.LoadFromFile('acerto.png');
 end;

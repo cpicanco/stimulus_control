@@ -43,6 +43,8 @@ type
     FSessionHits : integer;
     FSessionMisses : integer;
     FSessionNones : integer;
+    FSessionPoints : integer;
+    FSessionPoints2 : integer;
     FSessionStmResponses : integer;
     FSessionTrials : integer;
     FSessionVirtualHits : integer;
@@ -140,6 +142,8 @@ type
     property SessionNones : integer read FSessionNones;
     property SessionStmResponses : integer read FSessionStmResponses;
     property SessionTrials : integer read FSessionTrials;
+    property SessionPointsTopRight : integer read FSessionPoints write FSessionPoints;
+    property SessionPointsTopLeft : integer read FSessionPoints2 write FSessionPoints2;
     property BlcTrials : integer read FBlcTrials;
     property SessionVirtualHits : integer read FSessionVirtualHits;
   {Current Blc}
@@ -213,6 +217,7 @@ begin
   FSessionTrials := 0;
   FCurrentBlc := 0;
   FSessionVirtualHits := 0;
+  FSessionPoints := 0;
   { Blocs - 20 }
   FBlcVirtualHitLoop := 0;
   FBlcVirtualTrial := 0;

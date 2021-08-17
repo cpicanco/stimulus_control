@@ -43,8 +43,8 @@ type
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
     procedure LoadFromFile(AFilename: string); override;
-    procedure Start; override;
-    procedure Stop; override;
+    procedure Start;
+    procedure Stop;
     procedure HideCursor;
     property Parent : TWinControl read GetParent write SetParent;
     property Width : integer read GetWidth write SetWidth;
@@ -130,7 +130,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TStimulusFigure.LoadFromFile(AFilename: string);
+procedure TStimulusFigure.LoadFromParameters(AParameters: string);
 begin
   try
     FImage.LoadFromFile(AFilename);

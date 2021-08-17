@@ -15,9 +15,21 @@ unit Schedules.Abstract;
 interface
 
 uses
-  Classes, ExtCtrls;
+  Classes, SysUtils, ExtCtrls;
 
 type
+
+  TPausedState = record
+    MustUpdate   : Boolean;
+    Enabled      : Boolean;
+    TimerEnabled : Boolean;
+    Interval     : Extended;
+    Elapsed      : Extended;
+    Started      : Extended;
+    Paused       : Extended;
+  end;
+
+  TRandomIntervalType = (ritRandomAmplitude, ritFleshlerHoffman);
 
   TClockStartMethod = procedure of object;
 
@@ -26,17 +38,24 @@ type
   // Base class for all schedules. Do not create it directly, use TSchedule instead.
   TSchedules = class
   private
+    FPausedState : TPausedState;
+    FRandomIntervalType : TRandomIntervalType;
     FOnConsequence : TNotifyEvent;
     FOnResponse : TNotifyEvent;
     FResponseCounter : Cardinal;
     FTimer : TTimer;
     function GetEnabled: Boolean;
+    function GetMustUpdate : Boolean;
+    function GetPaused : Boolean;
     function GetStartMethod : TClockStartMethod;
     function RandomAmplitude(AValue, AAmplitude: Cardinal) : Cardinal;
+    function FleshlerHoffman : Cardinal;
     procedure Pass;
     procedure SetEnabled(AValue: Boolean);
+    procedure SetMustUpdate(AValue : Boolean);
     procedure SetOnConsequence(AValue: TNotifyEvent);
     procedure SetOnResponse(AValue: TNotifyEvent);
+    procedure SetPaused(AValue : Boolean);
   protected
     function GetInterval : Cardinal;
     function GetParameter1: Cardinal; virtual; abstract;
@@ -58,14 +77,20 @@ type
     destructor Destroy; override;
     procedure DoResponse; virtual; abstract;
     procedure Reset; virtual; abstract;
-    procedure Start; virtual;
+    function Start : Extended;
+    function Stop : Extended;
+    function Pause : Extended;
+    function Resume : Extended;
     property OnConsequence : TNotifyEvent read FOnConsequence write SetOnConsequence;
     property OnResponse : TNotifyEvent read FOnResponse write SetOnResponse;
     property Responses : Cardinal read FResponseCounter;
+    property RandomIntervalType : TRandomIntervalType read FRandomIntervalType write FRandomIntervalType;
+    property MustUpdate : Boolean read GetMustUpdate write SetMustUpdate;
   published
     property Parameter1 : Cardinal read GetParameter1 write SetParameter1;
     property Parameter2 : Cardinal read GetParameter2 write SetParameter2;
     property Enabled : Boolean read GetEnabled write SetEnabled;
+    property Paused : Boolean read GetPaused write SetPaused;
   end;
 
 resourcestring
@@ -79,31 +104,54 @@ resourcestring
 
 implementation
 
+uses Timestamps;
+
+var
+  FleshlerHoffmanList : TStringList;
+  FleshlerHoffmanValues : array [0..9] of integer =
+    (207, 652, 1154, 1727, 2397, 3202, 4213, 5572, 7665, 13210);
+
+procedure UpdateFleshlerHoffmanList;
+var
+  i : integer;
+begin
+  FleshlerHoffmanList.Clear;
+  for i := Low(FleshlerHoffmanValues) to High(FleshlerHoffmanValues) do begin
+    FleshlerHoffmanList.Append(i.ToString);
+  end;
+end;
+
 { TSchedules }
 
 procedure TSchedules.Consequence;
 begin
-  Reset;
-  if Assigned(OnConsequence) then
-    OnConsequence(Self);
+  if not Paused then begin
+    Reset;
+    if Assigned(OnConsequence) then
+      OnConsequence(Self);
+  end;
 end;
 
 procedure TSchedules.Response;
 begin
-  Inc(FResponseCounter);
-  if Assigned(OnResponse) then
-    OnResponse(Self);
+  if not Paused then begin
+    Inc(FResponseCounter);
+    if Assigned(OnResponse) then
+      OnResponse(Self);
+  end;
 end;
 
 constructor TSchedules.Create;
 begin
   FTimer := nil;
+  FPausedState.Enabled := False;
 end;
 
 constructor TSchedules.Create(OnTimer: TNotifyEvent);
 begin
   FTimer := TTimer.Create(nil);
   FTimer.OnTimer := OnTimer;
+  FRandomIntervalType := ritRandomAmplitude;
 end;
 
 procedure TSchedules.Pass;
@@ -127,6 +175,12 @@ begin
   end;
 end;
 
+procedure TSchedules.SetMustUpdate(AValue : Boolean);
+begin
+  if AValue = FPausedState.MustUpdate then Exit;
+  FPausedState.MustUpdate := AValue;
+end;
+
 procedure TSchedules.SetOnConsequence(AValue: TNotifyEvent);
 begin
   if FOnConsequence=AValue then Exit;
@@ -139,6 +193,40 @@ begin
   FOnResponse:=AValue;
 end;
 
+procedure TSchedules.SetPaused(AValue : Boolean);
+begin
+  FPausedState.Enabled := AValue;
+  if Assigned(FTimer) then begin
+    if FTimer.Enabled then begin
+      if FPausedState.Enabled then begin
+        StopClock;
+        FPausedState.TimerEnabled := True;
+        FPausedState.Paused := TickCount;
+      end else begin
+        { should be unreachable }
+      end;
+    end else begin
+      if FPausedState.Enabled then begin
+        FPausedState.TimerEnabled := False;
+        FPausedState.Paused := TickCount;
+      end else begin
+        if FPausedState.TimerEnabled then begin
+          FPausedState.Elapsed := FPausedState.Elapsed +
+            (FPausedState.Paused - FPausedState.Started);
+          FTimer.Interval :=
+            Round(FPausedState.Interval - (FPausedState.Elapsed*1000));
+          FPausedState.MustUpdate := True;
+          StartClock;
+        end else begin
+          FPausedState.Started := TickCount;
+        end;
+      end;
+    end;
+  end else begin
+    { for now, do nothing }
+  end;
+end;
+
 function TSchedules.GetInterval: Cardinal;
 begin
   Result := FTimer.Interval;
@@ -147,6 +235,7 @@ end;
 procedure TSchedules.StartClock;
 begin
   FTimer.Enabled := True;
+  FPausedState.Started := TickCount;
 end;
 
 procedure TSchedules.StopClock;
@@ -167,11 +256,31 @@ begin
     Result := True;            // ratio
 end;
 
+function TSchedules.GetMustUpdate : Boolean;
+begin
+  Result := FPausedState.MustUpdate;
+end;
+
+function TSchedules.GetPaused : Boolean;
+begin
+  Result := FPausedState.Enabled;
+end;
+
 function TSchedules.RandomAmplitude(AValue, AAmplitude: Cardinal): Cardinal;
 begin
   Result := AValue;
   if AAmplitude > 0 then
     Result := AValue - AAmplitude + Random((2 * AAmplitude) + 1);
+end;
+
+function TSchedules.FleshlerHoffman : Cardinal;
+var
+  R : integer;
+begin
+  if FleshlerHoffmanList.Count = 0 then UpdateFleshlerHoffmanList;
+  R := Random(FleshlerHoffmanList.Count);
+  Result := FleshlerHoffmanValues[FleshlerHoffmanList[R].ToInteger];
+  FleshlerHoffmanList.Delete(R);
 end;
 
 procedure TSchedules.ResetResponses;
@@ -181,7 +290,15 @@ end;
 
 procedure TSchedules.UpdateInterval(ABase: Cardinal; AVariation: Cardinal);
 begin
-  FTimer.Interval := RandomAmplitude(ABase, AVariation);
+  case FRandomIntervalType of
+    ritRandomAmplitude:
+      FTimer.Interval := RandomAmplitude(ABase, AVariation);
+
+    ritFleshlerHoffman:
+      FTimer.Interval := FleshlerHoffman;
+  end;
+  FPausedState.Interval := FTimer.Interval;
+  FPausedState.Elapsed  := 0;
 end;
 
 procedure TSchedules.UpdateRatio(out ATarget: Cardinal; ABase: Cardinal;
@@ -199,11 +316,49 @@ begin
   inherited Destroy;
 end;
 
-procedure TSchedules.Start;
+function TSchedules.Start : Extended;
 begin
-  Reset;
-  if Assigned(FTimer) then
-    StartClock;
+  if Paused then begin
+    Result := Resume;
+  end else begin
+    Reset;
+    if Assigned(FTimer) then begin
+      StartClock;
+      Result := FPausedState.Started;
+    end else begin
+      Result := TickCount;
+    end;
+  end;
+end;
+
+function TSchedules.Stop : Extended;
+begin
+  with FPausedState do begin
+    Enabled := False;
+    Paused := 0;
+    Started := 0;
+    Interval := 0;
+    Elapsed := 0;
+    MustUpdate := False;
+  end;
+
+  Enabled := False;
+  Result := TickCount;
+end;
+
+function TSchedules.Pause : Extended;
+begin
+  if Paused then Exit;
+  Paused := True;
+  Result := FPausedState.Paused;
+end;
+
+function TSchedules.Resume : Extended;
+begin
+  if Paused then begin
+    Paused := False;
+    Result := FPausedState.Started;
+  end;
 end;
 
 procedure TSchedules.ResetClock;
@@ -211,6 +366,14 @@ begin
   FTimer.Enabled:=False;
   FTimer.Enabled:=True;
 end;
+
+initialization
+  FleshlerHoffmanList := TStringList.Create;
+  FleshlerHoffmanList.Sorted := False;
+  UpdateFleshlerHoffmanList;
+
+finalization
+  FleshlerHoffmanList.Free;
 
 end.
 

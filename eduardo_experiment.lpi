@@ -48,6 +48,9 @@
             <TargetOS Value="win64"/>
           </CodeGeneration>
           <Linking>
+            <Debugging>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
             <LinkSmart Value="True"/>
             <Options>
               <Win32>
@@ -134,7 +137,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="26">
+    <Units Count="29">
       <Unit0>
         <Filename Value="eduardo_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -266,6 +269,21 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Image.Labeled"/>
       </Unit25>
+      <Unit26>
+        <Filename Value="src/units/cheats.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Cheats"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="src/units/experiments.eduardo.experimento3.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo.Experimento3"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="src/units/stimuli.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli"/>
+      </Unit28>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

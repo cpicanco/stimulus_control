@@ -14,7 +14,7 @@ uses
 
 begin
   Randomize;
-  Application.Scaled:=True;
+  Application.Scaled := True;
   Application.Initialize;
   Application.CreateForm(TBackground, Background);
   {$IFDEF LINUX}

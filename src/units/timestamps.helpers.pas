@@ -51,8 +51,8 @@ var
   a, b : Extended;
 begin
   clock_gettime(CLOCK_MONOTONIC, @tp);
-  a := tp.tv_sec;
-  b := tp.tv_nsec * 1e-9;
+  a := Extended(tp.tv_sec);
+  b := Extended(tp.tv_nsec) * 1e-9;
   Result := a+b;
 end;
 

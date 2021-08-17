@@ -49,6 +49,8 @@ experiment_deb64
 lib/x86_64-win64/eduardo_experiment.compiled
 lib/x86_64-win64/augusto_experiment.compiled
 lib/x86_64-linux/augusto_experiment.compiled
+src/tests/geometric_progression
+src/tests/lib/x86_64-linux/
 experiment.zip
 configuracoes
 *.zip

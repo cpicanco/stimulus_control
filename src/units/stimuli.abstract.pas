@@ -14,7 +14,7 @@ unit Stimuli.Abstract;
 interface
 
 uses
-  Classes, SysUtils, Controls, Schedules;
+  Classes, SysUtils, Controls, Stimuli, Schedules;
 
 type
 
@@ -34,11 +34,10 @@ type
   protected
     procedure SetSchedule(AValue: TSchedule); virtual;
   public
-    constructor Create(AOwner : TComponent); override;
+    constructor Create(AOwner : TComponent); overload; override;
+    constructor Create(AOwner : TComponent;
+      ASchedule : TSchedule); virtual; overload;
     function AsString : string; virtual;
-    procedure LoadFromFile(AFilename : string); virtual; abstract;
-    procedure Start; virtual; abstract;
-    procedure Stop; virtual; abstract;
     property Schedule : TSchedule read FSchedule write SetSchedule;
     property OnStop : TNotifyEvent read FOnStop write SetOnStop;
     property OnConsequence : TNotifyEvent read FOnConsequence write SetOnConsequence;
@@ -87,11 +86,16 @@ constructor TStimulus.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FSchedule := TSchedule.Create(Self);
-  with FSchedule do
-    begin
-      OnConsequence:= @Consequence;
-      OnResponse:= @Response;
-    end;
+  with FSchedule do begin
+    OnConsequence:= @Self.Consequence;
+    OnResponse:= @Self.Response;
+  end;
+end;
+
+constructor TStimulus.Create(AOwner : TComponent; ASchedule : TSchedule);
+begin
+  inherited Create(AOwner);
+  FSchedule := ASchedule;
 end;
 
 function TStimulus.AsString: string;

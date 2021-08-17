@@ -1,0 +1,74 @@
+object Form1: TForm1
+  Left = 556
+  Height = 386
+  Top = 234
+  Width = 462
+  Caption = 'Form1'
+  ClientHeight = 386
+  ClientWidth = 462
+  Color = clWhite
+  Font.Color = clBlack
+  LCLVersion = '2.1.0.0'
+  object ButtonCreate: TButton
+    Left = 208
+    Height = 49
+    Top = 24
+    Width = 107
+    Caption = 'Create'
+    Font.Color = clWhite
+    OnClick = ButtonCreateClick
+    ParentFont = False
+    TabOrder = 0
+  end
+  object ButtonPause: TButton
+    Left = 347
+    Height = 49
+    Top = 24
+    Width = 104
+    Caption = 'Pause'
+    Font.Color = clCream
+    OnClick = ButtonPauseClick
+    ParentFont = False
+    TabOrder = 1
+  end
+  object ButtonRestart: TButton
+    Left = 347
+    Height = 48
+    Top = 88
+    Width = 104
+    Caption = 'Restart'
+    Font.Color = clCream
+    OnClick = ButtonRestartClick
+    ParentFont = False
+    TabOrder = 2
+  end
+  object Response: TButton
+    Left = 376
+    Height = 25
+    Top = 337
+    Width = 75
+    Caption = 'Response'
+    Font.Color = clWhite
+    OnClick = ResponseClick
+    ParentFont = False
+    TabOrder = 3
+  end
+  object ListBox1: TListBox
+    Left = 8
+    Height = 338
+    Top = 24
+    Width = 148
+    Color = clWhite
+    ItemHeight = 0
+    ScrollWidth = 146
+    TabOrder = 4
+    TopIndex = -1
+  end
+  object Timer2: TTimer
+    Enabled = False
+    Interval = 100
+    OnTimer = Timer2Timer
+    Left = 248
+    Top = 136
+  end
+end

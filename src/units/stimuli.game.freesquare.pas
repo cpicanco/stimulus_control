@@ -15,6 +15,7 @@ interface
 
 uses
   Classes, SysUtils, Controls, Graphics, StdCtrls
+  , Stimuli
   , Stimuli.Abstract
   , Stimuli.Image.MovingSquare
   , Schedules
@@ -24,32 +25,33 @@ type
 
   { TFreeSquare }
 
-  TFreeSquare = class(TStimulus)
+  TFreeSquare = class(TStimulus, IStimuli)
   private
-    FOnConsequence: TNotifyEvent;
+    FFreezed : Boolean;
+    //FOnConsequence: TNotifyEvent;
     FParent : TWinControl;
-    //FBackground : TLightImage;
     FMovingSquare : TMovingSquare;
     function GetParent: TWinControl;
     procedure SetParent(AValue: TWinControl);
-    procedure Consequence(Sender : TObject);
-    procedure Response(Sender : TObject);
-  protected
-    procedure SetSchedule(ASchedule : TSchedule); override;
   public
-    constructor Create(AOwner : TComponent); override;
+    constructor Create(AOwner : TComponent); overload; override;
+    constructor Create(AOwner : TComponent;
+      ASchedule : TSchedule); override;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: string); override;
-    procedure LoadFromParameters(AParameters : TStringList);
-    procedure Start; override;
-    procedure Stop; override;
+    procedure DoExpectedResponse;
     procedure FitScreen;
+    procedure Freeze;
+    procedure Hide;
+    procedure LoadFromFile(AFilename: string);
+    procedure LoadFromParameters(AParameters : TStringList);
+    procedure Start;
+    procedure Stop;
     property Parent : TWinControl read FParent write SetParent;
   end;
 
 implementation
 
-uses Forms;
+uses Forms, Constants;
 
 { TFreeSquare }
 
@@ -60,35 +62,25 @@ begin
   FMovingSquare.Parent := AValue;
 end;
 
-procedure TFreeSquare.Consequence(Sender: TObject);
-begin
-  if Assigned(OnConsequence) then OnConsequence(Sender);
-end;
-
 function TFreeSquare.GetParent: TWinControl;
 begin
   Result := FParent;
 end;
 
-procedure TFreeSquare.Response(Sender: TObject);
-begin
-  if Assigned(OnResponse) then OnResponse(Sender);
-end;
-
-
-procedure TFreeSquare.SetSchedule(ASchedule: TSchedule);
-begin
-  inherited SetSchedule(ASchedule);
-end;
-
-constructor TFreeSquare.Create(AOwner: TComponent);
+constructor TFreeSquare.Create(AOwner : TComponent);
 begin
   inherited Create(AOwner);
-  Schedule.Load(FR, 2);
   Schedule.OnConsequence:=@Consequence;
   Schedule.OnResponse:=@Response;
   FMovingSquare := TMovingSquare.Create(Self);
-  FMovingSquare.Schedule := Schedule;
+end;
+
+constructor TFreeSquare.Create(AOwner : TComponent; ASchedule : TSchedule);
+begin
+  inherited Create(AOwner, ASchedule);
+  Schedule.OnConsequence:=@Consequence;
+  Schedule.OnResponse:=@Response;
+  FMovingSquare := TMovingSquare.Create(Self);
 end;
 
 destructor TFreeSquare.Destroy;
@@ -103,7 +95,8 @@ end;
 
 procedure TFreeSquare.LoadFromParameters(AParameters: TStringList);
 begin
-
+  Schedule.Load(AParameters.Values[_Schedule]);
+  FMovingSquare.Schedule := Schedule;
 end;
 
 procedure TFreeSquare.Start;
@@ -120,10 +113,36 @@ begin
   FMovingSquare.Hide;
 end;
 
+procedure TFreeSquare.Hide;
+begin
+  FMovingSquare.Hide;
+end;
+
+procedure TFreeSquare.Freeze;
+begin
+  FMovingSquare.Freeze;
+  FFreezed := True;
+end;
+
+function TFreeSquare.Target : TControl;
+begin
+  Result := FMovingSquare;
+end;
+
+function TFreeSquare.BoundsRect : TRect;
+begin
+  Result := FMovingSquare.BoundsRect;
+end;
+
 procedure TFreeSquare.FitScreen;
 var
   R : integer;
 begin
+  if FFreezed then begin
+    FMovingSquare.Centralize;
+    Exit;
+  end;
+
   R := Random(3);
   case R of
    0: FMovingSquare.Centralize;

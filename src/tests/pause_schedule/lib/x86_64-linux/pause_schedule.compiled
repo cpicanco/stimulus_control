@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="/home/cpicanco/code/lazarus/trunk/fpc/bin/x86_64-linux/fpc.sh" Date="1621647103"/>
+  <Params Value=" -MObjFPC -Scghi -Cg -O1 -g -gl -l -vewnhibq -Fi/home/cpicanco/code/git/eduardo/src/tests/pause_schedule/lib/x86_64-linux -Fu/home/cpicanco/code/git/eduardo/src/schedules -Fu/home/cpicanco/code/git/eduardo/src/units -Fu/home/cpicanco/code/lazarus/trunk/lazarus/lcl/units/x86_64-linux/gtk2 -Fu/home/cpicanco/code/lazarus/trunk/lazarus/lcl/units/x86_64-linux -Fu/home/cpicanco/code/lazarus/trunk/lazarus/components/freetype/lib/x86_64-linux -Fu/home/cpicanco/code/lazarus/trunk/lazarus/components/lazutils/lib/x86_64-linux -Fu/home/cpicanco/code/lazarus/trunk/lazarus/packager/units/x86_64-linux -Fu/home/cpicanco/code/git/eduardo/src/tests/pause_schedule/ -FU/home/cpicanco/code/git/eduardo/src/tests/pause_schedule/lib/x86_64-linux/ -FE/home/cpicanco/code/git/eduardo/src/tests/pause_schedule/ -o/home/cpicanco/code/git/eduardo/src/tests/pause_schedule/pause_schedule -dLCL -dLCLgtk2 pause_schedule.lpr"/>
+</CONFIG>
