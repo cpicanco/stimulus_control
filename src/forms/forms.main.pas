@@ -15,9 +15,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  ExtCtrls, StdCtrls, IniPropStorage, ComCtrls, Spin
-  //, Stimuli.Image.Labeled
-  ;
+  ExtCtrls, StdCtrls, IniPropStorage, ComCtrls, Spin;
 
 type
 
@@ -79,7 +77,7 @@ uses
 { TBackground }
 
 var
-  LSession : TSession;
+  GSession : TSession;
   ConfigurationFilename : string;
 
 procedure TBackground.ButtonStartAllClick(Sender: TObject);
@@ -129,20 +127,14 @@ begin
     end;
   end;
   LName := 'Experimento '+(PageControl1.TabIndex+1).ToString;
-  LSession.Play(LName, EditParticipant.Text);
+  GSession.Play(LName, EditParticipant.Text);
 end;
-
 
 procedure TBackground.FormCreate(Sender: TObject);
 begin
-  LSession := TSession.Create(Self);
-  LSession.OnEndSession:=@EndSession;
-  LSession.OnBeforeStart:=@BeforeStartSession;
-
-  //FImage := TStimulusLabeledFigure.Create(Self);
-  //FImage.Parent := Self;
-  //FImage.LoadFromFile('acerto.png');
-  //FImage.Start;
+  GSession := TSession.Create(Self);
+  GSession.OnEndSession:=@EndSession;
+  GSession.OnBeforeStart:=@BeforeStartSession;
 end;
 
 procedure TBackground.EndSession(Sender: TObject);
@@ -153,7 +145,7 @@ end;
 
 procedure TBackground.BeforeStartSession(Sender: TObject);
 begin
-  CopyFile(ConfigurationFilename, LSession.BaseFilename+'.ini');
+  CopyFile(ConfigurationFilename, GSession.BaseFilename+'.ini');
 end;
 
 

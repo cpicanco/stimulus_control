@@ -26,6 +26,9 @@ type
     function GetParameter2: Cardinal; override;
     procedure SetParameter1(AValue: Cardinal); override;
     procedure SetParameter2(AValue: Cardinal); override;
+  public
+    procedure DoResponse; override;
+    procedure Reset; override;
   end;
 
   { TRatioSchedule }
@@ -143,6 +146,16 @@ begin
 end;
 
 procedure TUnknownSchedule.SetParameter2(AValue: Cardinal);
+begin
+  { do nothing }
+end;
+
+procedure TUnknownSchedule.DoResponse;
+begin
+  { do nothing }
+end;
+
+procedure TUnknownSchedule.Reset;
 begin
   { do nothing }
 end;

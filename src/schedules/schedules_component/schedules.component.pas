@@ -13,7 +13,7 @@ uses
 
 procedure Register;
 begin
-  RegisterComponents('Schedules',[TSchedule]);
+  RegisterComponents('Stimulus Control',[TSchedule]);
 end;
 
 end.

@@ -52,7 +52,7 @@ type
     procedure SetOnResponse(AValue: TNotifyEvent);
     procedure SetParameter(i : integer; AValue: Cardinal);
     procedure SetParameters(ASchedule: string); overload;
-    procedure SetParameters(AParameter1, AParameter2 : Cardinal); overload; inline;
+    procedure SetParameters(AParameter1, AParameter2 : Cardinal); overload;
   private
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
