@@ -137,7 +137,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="29">
+    <Units Count="30">
       <Unit0>
         <Filename Value="eduardo_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -284,6 +284,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli"/>
       </Unit28>
+      <Unit29>
+        <Filename Value="src/units/stimuli.nextbutton.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.NextButton"/>
+      </Unit29>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -312,7 +317,15 @@
       <TargetCPU Value="x86_64"/>
       <TargetOS Value="linux"/>
     </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <UseHeaptrc Value="True"/>
+      </Debugging>
+    </Linking>
     <Other>
+      <Verbosity>
+        <ShowDebugInfo Value="True"/>
+      </Verbosity>
       <CustomOptions Value="-dNO_LIBZMQ"/>
       <OtherDefines Count="1">
         <Define0 Value="NO_LIBZMQ"/>
