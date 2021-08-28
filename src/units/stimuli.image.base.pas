@@ -31,6 +31,7 @@ type
     FOnMouseDown: TMouseEvent;
     FOnResponse: TNotifyEvent;
     FPenWidth: integer;
+    function GetRandomPoint : TPoint;
     procedure SetKind(AValue: TImageKind);
     procedure SetOnMouseDown(AValue: TMouseEvent);
     procedure SetOnResponse(AValue: TNotifyEvent);
@@ -44,6 +45,7 @@ type
     destructor Destroy; override;
     function BoundsAsString : string;
     function ShortName : string;
+    procedure DoResponse; virtual;
     procedure LoadFromFile(AFilename : string);
     procedure SetOriginalSize;
     procedure Centralize;
@@ -76,6 +78,12 @@ procedure TLightImage.SetOnMouseDown(AValue: TMouseEvent);
 begin
   if FOnMouseDown=AValue then Exit;
   FOnMouseDown:=AValue;
+end;
+
+function TLightImage.GetRandomPoint : TPoint;
+begin
+  Result.X := BoundsRect.Left + 5 + Random(Width - 5);
+  Result.Y := BoundsRect.Top + 5 + Random(Height - 5);
 end;
 
 procedure TLightImage.SetKind(AValue: TImageKind);
@@ -266,11 +274,18 @@ begin
   SetOriginalSize;
 end;
 
+procedure TLightImage.DoResponse;
+begin
+  Mouse.CursorPos := GetRandomPoint;
+  MouseDown(mbLeft, [], Mouse.CursorPos.X, Mouse.CursorPos.Y);
+end;
+
 procedure TLightImage.SetOriginalSize;
 var
   AspectRatio : Double;
 begin
   case FImageKind of
+    ikLetter, ikSquare, ikCircle : { do nothing };
     ikBitmap:
       begin
         AspectRatio := FBitmap.Width / FBitmap.Height;

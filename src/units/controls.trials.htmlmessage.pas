@@ -13,8 +13,9 @@ unit Controls.Trials.HTMLMessage;
 
 interface
 
-uses LCLIntf, LCLType, Controls, Classes, SysUtils, StdCtrls, Graphics, IpHtml
+uses LCLIntf, LCLType, Controls, Classes, SysUtils, Graphics, IpHtml
 
+  , Stimuli.NextButton
   , Controls.Trials.Abstract
   , Controls.Trials.Helpers
   ;
@@ -26,7 +27,7 @@ type
   THTMLMessage = class(TTrial)
     procedure EndButtonClick(Sender : TObject);
   private
-    FEndButton : TButton;
+    FStimulus : TNextButton;
     FDataSupport : TDataSupport;
     FMessage : TIpHtmlPanel;
     procedure TrialBeforeEnd(Sender: TObject);
@@ -43,10 +44,7 @@ type
 
 implementation
 
-uses
-  Constants
-  , Timestamps
-  ;
+uses Constants, Timestamps, Cheats;
 
 constructor THTMLMessage.Create(AOwner: TCustomControl);
 begin
@@ -67,8 +65,6 @@ begin
     ShowHints := False;
     WantTabs := False;
 
-    //OnKeyUp:=@TrialKeyUp;
-    //OnMouseDown:=@TrialMouseDown;
     Height := (Self.Height div 3) * 2;
     Width := (Self.Width div 8) * 5;
     Left := (Self.Width - Width) div 2;
@@ -76,16 +72,10 @@ begin
     Parent := TCustomControl(AOwner);
   end;
 
-  FEndButton := TButton.Create(Self);
-  with FEndButton do begin
-    Caption := 'Continuar';
-    AutoSize := True;
-    Font.Name:='Times New Roman';
-    Font.Size := 15;
-    Top := FMessage.BoundsRect.Bottom + 10;
-    Left := FMessage.BoundsRect.Right - Width - 50;
-    OnClick := @EndButtonClick;
-    Parent := TCustomControl(AOwner);
+  FStimulus := TNextButton.Create(Self);
+  with FStimulus do begin
+     OnClick := @EndButtonClick;
+     Sibling := FMessage;
   end;
 
   Header := Header + #9 +
@@ -130,7 +120,7 @@ var
   LMessage : string;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   with FMessage do
     begin
        LMessage := LParameters.Values[_Msg];
@@ -153,9 +143,14 @@ end;
 
 procedure THTMLMessage.TrialStart(Sender: TObject);
 begin
+  FStimulus.Start;
   FMessage.Visible := True;
   Self.SetFocus;
   FDataSupport.StmBegin := TickCount;
+
+  if CheatsModeOn then begin
+    ParticipantBot.Start(FStimulus.AsInterface);
+  end;
 end;
 
 procedure THTMLMessage.WriteData(Sender: TObject);

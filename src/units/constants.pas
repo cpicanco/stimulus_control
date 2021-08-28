@@ -11,27 +11,65 @@ unit Constants;
 
 {$mode objfpc}{$H+}
 
+// {$DEFINE DEBUG}
+
 interface
 
 const
   DefaultAddress = '127.0.1.1:50020';
 
-const { Controls.Trials.TemporalBissection }
-  ConsequenceDuration : integer = 2000;
+const
+ {$IFDEF DEBUG}
+  ConsequenceDuration : integer = 200;
+  DurationLong  : integer = 400;
+  DurationShort : integer = 100;
+  TemporalBissectionITI : integer = 300;
+  ITISurvey : integer = 50;
+  Experiment3FIValue : integer = 150;
+  Experiment3FITestValue : integer = 300;
+  FreeSquareTrialDuration : integer = 2000;
+  FreeSquareOmissionDurationExp1 : integer = 5000;
+  FreeSquareOmissionDurationExp3Training : integer = 2000;
+  FreeSquareOmissionDurationExp3Testing : integer = 3000;
+  FreeSquareConsequenceDelay : integer = 1000;
+  FreeSquareConsequenceDurationExp1 : integer = 200;
+  FreeSquareConsequenceDurationExp3 : integer = 100;
+  ITIExperiment3 : integer = 50;
+{$ELSE}
+{ Controls.Trials.TemporalBissection }
+ ConsequenceDuration : integer = 2000;
 
-const { Stimuli.Sequence.TemporalBissection }
-  DurationLong  : integer = 4000;
-  DurationShort : integer = 1000;
+{ Stimuli.Sequence.TemporalBissection }
+ DurationLong  : integer = 4000;
+ DurationShort : integer = 1000;
 
-const  { Experiment 2 }
-  TemporalBissectionITI : integer = 3000;
+ { Experiment 2 }
+ TemporalBissectionITI : integer = 3000;
 
-const  { Experiment 1 and 2 }
-  SurveyITI : integer = 500;
+{ Experiment 1 and 2 }
+ ITISurvey : integer = 500;
 
-const  { Experiment3 }
-  Experiment3FIValue : integer = 15000;
-  Experiment3FITestValue : integer = 30000;
+ { Experiment3 }
+ Experiment3FIValue : integer = 15000;
+ Experiment3FITestValue : integer = 30000;
+
+{ Controls.Trials.FreeSquare }
+ FreeSquareTrialDuration : integer = 20000;
+
+ // Experiment 1
+ FreeSquareOmissionDurationExp1 : integer = 5000;
+
+ // Experiment 3
+ FreeSquareOmissionDurationExp3Training : integer = 15500;
+ FreeSquareOmissionDurationExp3Testing : integer = 30000;
+
+ FreeSquareConsequenceDelay : integer = 10000;
+ FreeSquareConsequenceDurationExp1 : integer = 2000;
+ FreeSquareConsequenceDurationExp3 : integer = 1000;
+
+ ITIExperiment3 : integer = 500;
+
+{$ENDIF}
 
 const
   // Posições

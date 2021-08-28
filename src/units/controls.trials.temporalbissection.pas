@@ -117,7 +117,7 @@ begin
   FStimulus.Cursor := -1;
   FShowCounter := True;
   FCounterType := ctSessionPoints;
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   FStimulus.LoadFromParameters(LParameters);
   FStimulus.SetScheduleConsequence(@Consequence);
   FStimulus.FitScreen;
@@ -138,21 +138,7 @@ begin
   FStimulus.Cursor := 0;
   Cursor := 0;
   FReportData.ComparisonBegin := TimestampToStr(LogEvent(rsReportStmCmpBeg));
-  if CheatsModeOn then begin
-    case FStimulus.ExpectedResponse of
-      tbLeft :
-        Mouse.CursorPos := FStimulus.ComparisonLeft.BoundsRect.CenterPoint;
-
-      tbRight:
-        Mouse.CursorPos := FStimulus.ComparisonRight.BoundsRect.CenterPoint;
-
-      tbNone:
-        Mouse.CursorPos := FStimulus.ComparisonRight.BoundsRect.CenterPoint;
-    end;
-
-  end else begin
-    Mouse.CursorPos := Point(Screen.Width div 2, Screen.Height div 2);
-  end;
+  Mouse.CursorPos := Point(Screen.Width div 2, Screen.Height div 2);
 end;
 
 procedure TTBMTS.TrialStart(Sender: TObject);
@@ -160,6 +146,10 @@ begin
   FResponseEnabled:=False;
   FStimulus.Start;
   FReportData.SampleBegin := TimestampToStr(LogEvent(rsReportStmModBeg));
+
+  if CheatsModeOn then begin
+    ParticipantBot.Start(FStimulus.AsInterface);
+  end;
 end;
 
 procedure TTBMTS.WriteData(Sender: TObject);

@@ -142,6 +142,8 @@ begin
               FAudioPlaying:=True;
               FAudio.Play;
             end;
+      {$ELSE}
+        msgAudio : { do nothing };
       {$ENDIF}
     end;
 end;
@@ -162,7 +164,7 @@ var
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   LFontColor :=  StrToIntDef(LParameters.Values[_MsgFontColor], $000000);
   FMessageStyle := TMessageStyle(Ord(StrToIntDef(LParameters.Values[_Style], 0)));
   {$IFDEF AUDIO}

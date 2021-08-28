@@ -15,6 +15,7 @@ interface
 
 uses LCLIntf, LCLType, Controls, Classes, SysUtils, StdCtrls, Graphics, IpHtml
 
+  , Stimuli.NextButton
   , Controls.Trials.Abstract
   , Controls.Trials.Helpers
   ;
@@ -27,7 +28,7 @@ type
     procedure EndButtonClick(Sender : TObject);
   private
     FResponse : string;
-    FEndButton : TButton;
+    FStimulus : TNextButton;
     FDataSupport : TDataSupport;
     FMessage : TLabel;
     FEdit : TEdit;
@@ -45,10 +46,7 @@ type
 
 implementation
 
-uses
-  constants
-  , Timestamps
-  ;
+uses Constants, Timestamps, Cheats;
 
 constructor TTextInput.Create(AOwner: TCustomControl);
 begin
@@ -67,6 +65,7 @@ begin
     Font.Name := 'Times New Roman';
     //OnMouseUp := @MessageMouseUp;
     Font.Size:=22;
+    Font.Color := 0;
     Width := 640;
     Parent := TCustomControl(AOwner);
   end;
@@ -82,16 +81,9 @@ begin
     NumbersOnly:=True;
   end;
 
-  FEndButton := TButton.Create(Self);
-  with FEndButton do begin
-    Visible := False;
-    Caption := 'Continuar';
-    AutoSize := True;
-    Font.Name:='Times New Roman';
-    Font.Size := 15;
-    OnClick := @EndButtonClick;
-    Parent := TCustomControl(AOwner);
-  end;
+  FStimulus := TNextButton.Create(Self);
+  FStimulus.Sibling := FEdit;
+  FStimulus.OnClick := @EndButtonClick;
 
   Header := Header + #9 +
             rsReportStmBeg + #9 +
@@ -139,7 +131,7 @@ var
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   FMessage.Caption := LParameters.Values[_Msg];
 
   if Self.ClassType = TTextInput then Config(Self);
@@ -156,13 +148,16 @@ begin
     Left := (Self.Width - Width) div 2;
     Show;
   end;
-  with FEndButton do begin
-    Top := FEdit.BoundsRect.Bottom + 20;
-    Left := (Self.Width - Width) div 2;
-  end;
+
+  FStimulus.Start;
 
   Self.SetFocus;
   FDataSupport.StmBegin := TickCount;
+
+  if CheatsModeOn then begin
+    FEdit.Text := Random(100).ToString;
+    ParticipantBot.Start(FStimulus.AsInterface);
+  end;
 end;
 
 procedure TTextInput.WriteData(Sender: TObject);

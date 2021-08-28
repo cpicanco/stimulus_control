@@ -18,7 +18,6 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, StdCtrls
   , Controls.Trials.Abstract
   , Stimuli.Choice
   , Consequences
-  , Schedules
   // , Dialogs
   ;
 
@@ -66,7 +65,7 @@ type
 
 implementation
 
-uses Forms, Graphics, Constants, Timestamps;
+uses Forms, Graphics, Constants, Timestamps, Cheats;
 
 constructor TBinaryChoiceTrial.Create(AOwner: TCustomControl);
 begin
@@ -127,7 +126,7 @@ var
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   FStimulus.LoadFromParameters(LParameters);
   FMessage := FStimulus.MessageFromParameters(LParameters);
   FMessage.CurrentTrial := CounterManager.BlcTrials;
@@ -149,6 +148,9 @@ begin
   FResponseEnabled:=True;
   FStimulus.Start;
   FReportData.ComparisonBegin:=TimestampToStr(LogEvent(rsReportStmCmpBeg));
+  if CheatsModeOn then begin
+    ParticipantBot.Start(FStimulus.AsInterface);
+  end;
 end;
 
 procedure TBinaryChoiceTrial.WriteData(Sender: TObject);
@@ -183,10 +185,10 @@ begin
 
   FStimulus.NextNow(FMessage);
   S := FloatToStrF(FMessage.Now, ffFixed, 0, 2);
-  Configurations.SList.Values[_Now] := S;
+  Configurations.Parameters.Values[_Now] := S;
 
   S := FloatToStrF(FMessage.LastNow, ffFixed, 0, 2);
-  Configurations.SList.Values[_LastNow] := S;
+  Configurations.Parameters.Values[_LastNow] := S;
 
   FStimulus.Stop;
   EndTrial(Sender);

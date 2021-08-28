@@ -14,7 +14,8 @@ unit Stimuli.Sequence.TemporalBissection;
 interface
 
 uses
-  Classes, SysUtils, Controls, Graphics, StdCtrls
+  Classes, SysUtils, Controls, Graphics
+  , Stimuli
   , Stimuli.Abstract
   , Stimuli.Image.Base
   , Schedules
@@ -28,7 +29,7 @@ type
 
   { TTBSequence }
 
-  TTBSequence = class(TStimulus)
+  TTBSequence = class(TStimulus, IStimuli)
   private
     FCursor : integer;
     FExpectedResponse : TTBExpectedResponse;
@@ -51,12 +52,13 @@ type
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: string); override;
+    function AsInterface : IStimuli;
+    procedure DoExpectedResponse;
+    procedure FitScreen;
     procedure LoadFromParameters(AParameters : TStringList);
     procedure SetScheduleConsequence(AConsequence : TNotifyEvent);
-    procedure Start; override;
-    procedure Stop; override;
-    procedure FitScreen;
+    procedure Start;
+    procedure Stop;
     property ExpectedResponse : TTBExpectedResponse read FExpectedResponse write SetExpectedResponse;
     property Parent : TWinControl read FParent write SetParent;
     property OnEndSerialTimer : TNotifyEvent read GetOnEndSerialTimer write SetOnEndSerialTimer;
@@ -175,14 +177,37 @@ begin
   inherited Destroy;
 end;
 
-procedure TTBSequence.LoadFromFile(AFilename: string);
+function TTBSequence.AsInterface : IStimuli;
 begin
-  { Implement me }
+  Result := Self;
+end;
+
+procedure TTBSequence.DoExpectedResponse;
+var
+  LComparison : TLightImage;
+begin
+  case ExpectedResponse of
+    tbLeft : begin
+      LComparison := ComparisonLeft;
+    end;
+
+    tbRight: begin
+      LComparison := ComparisonRight;
+    end;
+
+    tbNone: begin
+      case Random(2) of
+        0 : LComparison := ComparisonLeft;
+        1 : LComparison := ComparisonRight;
+      end;
+    end;
+  end;
+  LComparison.DoResponse;
 end;
 
 procedure TTBSequence.LoadFromParameters(AParameters: TStringList);
 var
-  LTimerItems : TTimerItems;
+  LTimerItems : TTimerItems = nil;
   LExpectedResponse : string;
 begin
   SetLength(LTimerItems, 1);

@@ -15,8 +15,8 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Controls,  ExtCtrls
+  , Stimuli
   , Stimuli.Image.Base
-  , Schedules
   ;
 
 type
@@ -26,8 +26,11 @@ type
 
   { TMovingSquare }
 
-  TMovingSquare = class sealed(TLightImage)
+  TMovingSquare = class sealed(TLightImage, IStimuli)
   private
+    //FGranularity : Cardinal;
+    //FScreenSize : real;
+    //FSize : real;
     FFreezed : Boolean;
     FDirection: TDirection;
     FMovementSize: integer;
@@ -42,9 +45,12 @@ type
     procedure Paint; override;
   public
     constructor Create(AOwner : TComponent); override;
+    function AsInterface : IStimuli;
+    procedure DoExpectedResponse;
+    procedure Freeze;
+    procedure LoadFromParameters(AParameters : TStringList);
     procedure Start;
     procedure Stop;
-    procedure Freeze;
     property Direction : TDirection read FDirection write SetDirection;
     property MovementSize : integer read FMovementSize write FMovementSize;
   end;
@@ -84,13 +90,14 @@ begin
   FTimerConsequence.OnTimer := @ChangeColor;
 end;
 
+function TMovingSquare.AsInterface : IStimuli;
+begin
+  Result := Self;
+end;
+
 procedure TMovingSquare.Move(Sender: TObject);
 var
   R : integer;
-  LLeft : integer;
-  LRight : integer;
-  LBottom : integer;
-  LTop : integer;
   procedure MoveLeft;
   begin
     Left := Left-MovementSize;
@@ -228,6 +235,19 @@ end;
 procedure TMovingSquare.Stop;
 begin
   FTimer.Enabled := False;
+end;
+
+procedure TMovingSquare.LoadFromParameters(AParameters : TStringList);
+begin
+  if Assigned(AParameters) then begin
+    // FFreezed := StrToBoolDef(AParameters.Values['Freezed'], False);
+    { TODO: load parameters as needed}
+  end;
+end;
+
+procedure TMovingSquare.DoExpectedResponse;
+begin
+  DoResponse;
 end;
 
 procedure TMovingSquare.Freeze;

@@ -139,10 +139,10 @@ begin
       Name:= ReadString(LTrialSection,_Name, '');
       Kind:= ReadString(LTrialSection, _Kind, '');
       NumComp := ReadInteger(LTrialSection, _NumComp, 0);
-      SList := TStringList.Create;
-      SList.CaseSensitive := False;
-      SList.Duplicates := dupIgnore;
-      ReadSectionValues(LTrialSection, SList);
+      Parameters := TStringList.Create;
+      Parameters.CaseSensitive := False;
+      Parameters.Duplicates := dupIgnore;
+      ReadSectionValues(LTrialSection, Parameters);
     end;
 end;
 

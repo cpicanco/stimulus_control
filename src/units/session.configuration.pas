@@ -27,7 +27,7 @@ type
     Name: string;
     Kind: string;
     NumComp: integer;
-    SList: TStringList;
+    Parameters: TStringList;
   end;
 
   TVetCfgTrial = array of TCfgTrial;
@@ -177,7 +177,7 @@ begin
     for i:= Low(FBlcs) to High(FBlcs) do
       if Length(FBlcs[i].Trials) > 0 then
         for j:= Low(FBlcs[i].Trials) to High(FBlcs[i].Trials) do
-           FBlcs[i].Trials[j].SList.Free;
+           FBlcs[i].Trials[j].Parameters.Free;
 
   inherited Destroy;
 end;
@@ -193,14 +193,14 @@ begin
   SetLength(FBlcs[Blc].Trials, FBlcs[Blc].NumTrials);
   for i := 0 to FBlcs[blc].NumTrials - 1 do
     begin
-      if not Assigned(FBlcs[blc].Trials[i].SList)then
+      if not Assigned(FBlcs[blc].Trials[i].Parameters)then
         begin
-          FBlcs[blc].Trials[i].SList:= TStringList.Create;
-          FBlcs[blc].Trials[i].SList.Sorted := False;
-          FBlcs[blc].Trials[i].SList.Duplicates := dupIgnore;
-          FBlcs[blc].Trials[i].SList.BeginUpdate;
-          FBlcs[blc].Trials[i].SList.Add('new=true');
-          FBlcs[blc].Trials[i].SList.EndUpdate;
+          FBlcs[blc].Trials[i].Parameters:= TStringList.Create;
+          FBlcs[blc].Trials[i].Parameters.Sorted := False;
+          FBlcs[blc].Trials[i].Parameters.Duplicates := dupIgnore;
+          FBlcs[blc].Trials[i].Parameters.BeginUpdate;
+          FBlcs[blc].Trials[i].Parameters.Add('new=true');
+          FBlcs[blc].Trials[i].Parameters.EndUpdate;
         end;
     end;
 end;

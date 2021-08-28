@@ -80,22 +80,6 @@ uses Constants, Timestamps, Graphics
   , Cheats
   ;
 
-const
-  TrialDuration : integer = 20000;
-
-  // Experiment 1
-  OmissionDurationExp1 : integer = 5000;
-
-  // Experiment 3
-  OmissionDurationExp3Training : integer = 15500;
-  OmissionDurationExp3Testing : integer = 30000;
-
-  ConsequenceDelay : integer = 10000;
-  ConsequenceDurationExp1 : integer = 2000;
-  ConsequenceDurationExp3 : integer = 1000;
-
-  ITIExperiment3 : integer = 500;
-
 constructor TFreeSquareTrial.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
@@ -105,13 +89,15 @@ begin
   if Self.ClassType = TFreeSquareTrial then
     Header := Header + #9 + GetHeader;
 
+  Configurations.Parameters.Values['VTConsequence'] := 'acerto.png';
   FConsequence := TStimulusFigure.Create(Self);
+  FConsequence.Key := 'VTConsequence';
   FConsequence.HideCursor;
-  FConsequence.LoadFromFile('acerto.png');
+  FConsequence.LoadFromParameters(Configurations.Parameters);
   FConsequence.Parent := AOwner;
 
   FConsequenceTimer := TTimer.Create(Self);
-  FConsequenceTimer.Interval := ConsequenceDurationExp3;
+  FConsequenceTimer.Interval := FreeSquareConsequenceDurationExp3;
   FConsequenceTimer.OnTimer := @VTConsequenceEnd;
 
   FTimer := TSchedule.Create(Self);
@@ -133,10 +119,10 @@ end;
 function TFreeSquareTrial.ConsequenceInterval: integer;
 begin
   case FTrialType of
-    ttE1B, ttE1C, ttE3B1, ttE3B2 : Result := ConsequenceDurationExp1;
+    ttE1B, ttE1C, ttE3B1, ttE3B2 : Result := FreeSquareConsequenceDurationExp1;
     ttE3C1, ttE3C2 : begin
       case Self.Result of
-        T_MISS, T_HIT : Result := ConsequenceDurationExp3;
+        T_MISS, T_HIT : Result := FreeSquareConsequenceDurationExp3;
         T_NONE : Result := 0;
       end;
     end;
@@ -148,7 +134,7 @@ var
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   case LParameters.Values['Type'] of
     'E1B' : begin
       FTrialType := ttE1B;
@@ -209,9 +195,9 @@ end;
 procedure TFreeSquareTrial.TrialStart(Sender: TObject);
 begin
   case FTrialType of
-    ttE1B,  ttE1C  : FTimer.Load(FT, OmissionDurationExp1);
-    ttE3B1, ttE3C1 : FTimer.Load(FT, OmissionDurationExp3Training);
-    ttE3B2, ttE3C2 : FTimer.Load(FT, OmissionDurationExp3Testing);
+    ttE1B,  ttE1C  : FTimer.Load(FT, FreeSquareOmissionDurationExp1);
+    ttE3B1, ttE3C1 : FTimer.Load(FT, FreeSquareOmissionDurationExp3Training);
+    ttE3B2, ttE3C2 : FTimer.Load(FT, FreeSquareOmissionDurationExp3Testing);
   end;
   FTimer.OnConsequence := @OmissionEnd;
   FTimer.Start;
@@ -227,8 +213,7 @@ begin
   Invalidate;
 
   if CheatsModeOn then begin
-    ParticipantBot.SetTargetControl(FStimulus.Target);
-    ParticipantBot.Start;
+    ParticipantBot.Start(FStimulus.AsInterface);
   end;
 end;
 
@@ -250,10 +235,6 @@ end;
 
 procedure TFreeSquareTrial.OmissionEnd(Sender: TObject);
 begin
-  if CheatsModeOn then begin
-    ParticipantBot.Stop;
-  end;
-
   FTimer.Stop;
   FStimulus.Stop;
   case FTrialType of
@@ -275,12 +256,12 @@ begin
 
   case FTrialType of
     ttE1B, ttE1C : begin
-      Configurations.SList.Values[_ITI] :=
-        (TrialDuration - OmissionDurationExp1).ToString;
+      Configurations.Parameters.Values[_ITI] :=
+        (FreeSquareTrialDuration - FreeSquareOmissionDurationExp1).ToString;
     end;
 
     ttE3B1, ttE3B2, ttE3C1, ttE3C2 : begin
-      Configurations.SList.Values[_ITI] := ITIExperiment3.ToString;
+      Configurations.Parameters.Values[_ITI] := ITIExperiment3.ToString;
     end;
   end;
   FReportData.ComparisonEnd := TimestampToStr(LogEvent(rsReportStmEndO));
@@ -350,10 +331,6 @@ procedure TFreeSquareTrial.Consequence(Sender: TObject);
 var
   ITI : Extended;
 begin
-  if CheatsModeOn then begin
-    ParticipantBot.Stop;
-  end;
-
   FTimer.Stop;
   FStimulus.Stop;
   case FTrialType of
@@ -366,25 +343,25 @@ begin
 
   case FTrialType of
     ttE1B : begin
-      ITI := TrialDuration
+      ITI := FreeSquareTrialDuration
         -ConsequenceInterval
         -(FReportData.CLatency - FReportData.CBegin);
 
-      Configurations.SList.Values[_ITI] := ITI.ToString;
+      Configurations.Parameters.Values[_ITI] := ITI.ToString;
       CounterManager.BlcPoints := CounterManager.BlcPoints +1;
       FReportData.ComparisonEnd:=TimestampToStr(LogEvent(rsReportStmEndR));
       EndTrial(Self);
     end;
 
     ttE1C : begin
-      ITI := TrialDuration
+      ITI := FreeSquareTrialDuration
         -ConsequenceInterval
-        -ConsequenceDelay
+        -FreeSquareConsequenceDelay
         -(FReportData.CLatency - FReportData.CBegin);
 
-      Configurations.SList.Values[_ITI] := ITI.ToString;
+      Configurations.Parameters.Values[_ITI] := ITI.ToString;
       Parent.Color := clPurple;
-      FTimer.Load(FT, ConsequenceDelay);
+      FTimer.Load(FT, FreeSquareConsequenceDelay);
       FTimer.OnConsequence := @DelayEnd;
       FTimer.Start;
       FReportData.ComparisonEnd := TimestampToStr(LogEvent(rsReportDelayBeg));
@@ -392,7 +369,7 @@ begin
 
     ttE3B1: begin
       ITI := ITIExperiment3;
-      Configurations.SList.Values[_ITI] := ITI.ToString;
+      Configurations.Parameters.Values[_ITI] := ITI.ToString;
       CounterManager.SessionPointsTopRight :=
         CounterManager.SessionPointsTopRight +1;
       FReportData.ComparisonEnd:=TimestampToStr(LogEvent(rsReportStmEndR));
@@ -401,7 +378,7 @@ begin
 
     ttE3B2 : begin
       ITI := ITIExperiment3;
-      Configurations.SList.Values[_ITI] := ITI.ToString;
+      Configurations.Parameters.Values[_ITI] := ITI.ToString;
       CounterManager.SessionPointsTopRight :=
         CounterManager.SessionPointsTopRight +1;
       FReportData.ComparisonEnd:=TimestampToStr(LogEvent(rsReportStmEndR));
@@ -410,7 +387,7 @@ begin
 
     ttE3C1, ttE3C2 : begin
       ITI := ITIExperiment3;
-      Configurations.SList.Values[_ITI] := ITI.ToString;
+      Configurations.Parameters.Values[_ITI] := ITI.ToString;
 
       if Sender = FStimulus.Schedule then begin
         CounterManager.SessionPointsTopRight :=

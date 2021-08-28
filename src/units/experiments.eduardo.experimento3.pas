@@ -20,7 +20,6 @@ implementation
 uses Classes, SysUtils
    , Constants
    , LazFileUtils
-   , StrUtils
    , Experiments.Eduardo.Comum
    , Session.Configuration.GlobalContainer
    , Session.ConfigurationFile
@@ -52,7 +51,7 @@ var
 begin
   for i := 0 to 19 do
     WriteOperantTask(ABlc,
-      'Treino Operante-FI'+#32+Experiment3FIValue.ToString+ABlc.ToString+'-'+(i+1).ToString,
+      'Treino Operante-FI'+#32+Experiment3FIValue.ToString+'-'+(i+1).ToString,
       'FI'+#32+Experiment3FIValue.ToString, AType);
 end;
 
@@ -63,7 +62,7 @@ var
 begin
   for i := 0 to 9 do
     WriteOperantTask(ABlc,
-      'Treino Operante-FI'+#32+Experiment3FIValue.ToString+ABlc.ToString+'-'+(i+1).ToString,
+      'Treino Operante-FI'+#32+Experiment3FIValue.ToString+'-'+(i+1).ToString,
       'FI'+#32+Experiment3FIValue.ToString, AType);
 end;
 
@@ -98,7 +97,7 @@ begin
           LStringlist[i]+'-'+(i+1).ToString,
           LStringlist[i], AType);
       Inc(j);
-     until j = 1;
+     until j = 2;
   finally
     LStringList.Free;
   end;
@@ -170,14 +169,14 @@ var
   end;
 
 begin
-  ITI := SurveyITI;
+  ITI := ITISurvey;
   SetupStimuli;
   if (ADesign = 'ABA') or (ADesign = 'ACA') then
   begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem A0');
     WriteMSG(LConditionI, 'M0', MessageA0);
-    LNextBlocOnCriteria := '5'; // zero based
+    LNextBlocOnCriteria := '13'; // zero based
   end else begin
     LNextBlocOnCriteria := '4';
   end;

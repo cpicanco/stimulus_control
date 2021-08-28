@@ -15,7 +15,6 @@ implementation
 uses Classes, SysUtils
    , Constants
    , LazFileUtils
-   , FileMethods
    , Experiments.Eduardo.Comum
    , Session.Configuration.GlobalContainer
    , Session.ConfigurationFile
@@ -85,7 +84,7 @@ var
   end;
 
 begin
-  ITI := SurveyITI;
+  ITI := ITISurvey;
   SetupStimuli;
   if (ADesign = 'ABA') or (ADesign = 'ACA') then
   begin

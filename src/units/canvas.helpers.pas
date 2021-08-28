@@ -111,6 +111,7 @@ function BresenhamLine(x0, x1, y0, y1: integer): TPoints;
 var
     dx, dy, sx, sy, err, err2 : integer;
 begin
+  Result := nil;
   SetLength(Result,0);
   dx := abs(x1-x0);
   dy := abs(y1-y0);

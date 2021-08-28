@@ -83,18 +83,18 @@ uses Constants
 
 procedure TBloc.PlayTrial(ABloc, ATrial: integer);
 var
-  ATrialConfig : TCfgTrial;
+  LTrialConfig : TCfgTrial;
   S : string;
 begin
-  ATrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
+  LTrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
 
   if (FTrial is TBinaryChoiceTrial) then begin
     if FCounterManager.BlcTrials > 0 then begin
-      S := FTrial.Configurations.SList.Values[_LastNow];
-      ATrialConfig.SList.Values[_LastNow] := S;
+      S := FTrial.Configurations.Parameters.Values[_LastNow];
+      LTrialConfig.Parameters.Values[_LastNow] := S;
 
-      S := FTrial.Configurations.SList.Values[_Now];
-      ATrialConfig.SList.Values[_Now] := S;
+      S := FTrial.Configurations.Parameters.Values[_Now];
+      LTrialConfig.Parameters.Values[_Now] := S;
     end;
   end;
 
@@ -102,7 +102,7 @@ begin
     FreeAndNil(FTrial);
 
   try
-    case ATrialConfig.Kind of
+    case LTrialConfig.Kind of
       T_MSG : FTrial := TMessageTrial.Create(Background);
       T_HTM : FTrial := THTMLMessage.Create(Background);
       T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
@@ -127,12 +127,12 @@ begin
       FTrial.SaveData(FTrial.HeaderTimestamps + LineEnding);
     end;
 
-    FTrial.Configurations := ATrialConfig;
+    FTrial.Configurations := LTrialConfig;
     FTrial.OnTrialEnd := @TrialEnd;
     FTrial.Play;
     Background.Cursor := FTrial.Cursor;
   finally
-    ATrialConfig.SList.Free;
+    LTrialConfig.Parameters.Free;
   end;
 end;
 
@@ -200,7 +200,7 @@ end;
 
 procedure TBloc.WriteTrialData(Sender: TObject);
 var
-  SaveData : TDataProcedure;
+  LSaveData : TDataProcedure;
   i, j : integer;
   LTrialNo, LBlocID, LBlocName,
   LTrialID, LTrialName, ITIData, NewData, LReportLn : string;
@@ -213,7 +213,7 @@ begin
     'HIT' : FCounterManager.OnHit(Sender);
     'MISS': FCounterManager.OnMiss(Sender);
   end;
-  SaveData := GetSaveDataProc(LGData);
+  LSaveData := GetSaveDataProc(LGData);
   if LTrial.Header <> FLastTrialHeader then
     LReportLn := rsReportTrialNO + #9 +
                  rsReportBlocID + #9 +
@@ -233,8 +233,7 @@ begin
   LTrialID := (i + 1).ToString;
 
   // FTrial Name
-
-  LTrialName := ConfigurationFile.Trial[j+1, i+1].Name;
+  LTrialName := LTrial.Configurations.Name;
   if LTrialName = '' then
     LTrialName := '--------';
 
@@ -256,7 +255,7 @@ begin
   // write data
   LReportLn :=
     LReportLn + NewData + #9 + ITIData + #9 + LTrial.Data + LineEnding;
-  SaveData(LReportLn);
+  LSaveData(LReportLn);
 end;
 
 procedure TBloc.PlayIntertrialInterval(Sender: TObject);
@@ -274,7 +273,7 @@ begin
   {$IFDEF DEBUG}
   FInterTrial.Interval := 100;
   {$ELSE}
-  FInterTrial.Interval := Round(StrToFloatDef(FTrial.Configurations.SList.Values[_ITI], 0));
+  FInterTrial.Interval := Round(StrToFloatDef(FTrial.Configurations.Parameters.Values[_ITI], 0));
   {$ENDIF}
   if FInterTrial.Interval > 0 then
     begin
@@ -289,6 +288,8 @@ begin
 end;
 
 constructor TBloc.Create(AOwner: TComponent);
+var
+  LParameters : TStringList;
 begin
   inherited Create(AOwner);
   FInterTrial := TTimer.Create(Self);
@@ -321,9 +322,13 @@ begin
     //OnMouseUp := @MessageMouseUp;
   end;
 
+  LParameters := TStringList.Create;
+  LParameters.Values['Consequence'] := 'acerto.png';
   FConsequence := TStimulusFigure.Create(Self);
+  FConsequence.Key := 'Consequence';
   FConsequence.HideCursor;
-  FConsequence.LoadFromFile('acerto.png');
+  FConsequence.LoadFromParameters(LParameters);
+  LParameters.Free;
 end;
 
 procedure TBloc.BeforePlay;

@@ -13,7 +13,7 @@ unit Cheats;
 
 interface
 
-uses Classes, Controls, ExtCtrls;
+uses Classes, Controls, ExtCtrls, Stimuli;
 
 type
 
@@ -23,15 +23,15 @@ type
   private
     FData  : PtrInt;
     FTimer : TTimer;
-    FTargetControl : TControl;
+    FTargetStimulus : IStimuli;
     procedure Click(Sender : TObject);
-    procedure Async(Data : PtrInt);
+    procedure Async(AData : PtrInt);
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure SetTargetControl(AControl : TControl);
-    procedure Start;
+    procedure Start(AStimulus : IStimuli);
     procedure Stop;
+    property Bias :
   end;
 
 var
@@ -40,6 +40,19 @@ var
 
 resourcestring
   RSErrorUnknownTarget = 'TParticipantBot.Async: target not assigned';
+
+{ Two Choice Porcentage Bias
+r := Random;
+if r < (TrackBarRandomBias.Position/100) then
+  repeat
+    ri := Random(10);
+  until not Odd(ri)
+else
+  repeat
+    ri := Random(10);
+  until Odd(ri);
+choice := choices[ri];
+}
 
 implementation
 
@@ -52,28 +65,18 @@ begin
   Application.QueueAsyncCall(@Async, FData);
 end;
 
-procedure TParticipantBot.Async(Data : PtrInt);
-var
-  LX : integer;
-  LY : integer;
+procedure TParticipantBot.Async(AData : PtrInt);
 begin
-  if Assigned(FTargetControl) then begin
-    LX := FTargetControl.BoundsRect.CenterPoint.X;
-    LY := FTargetControl.BoundsRect.CenterPoint.Y;
-    FTargetControl.OnClick(Self);
-  end else begin
-    raise Exception.Create(RSErrorUnknownTarget) at
-        get_caller_addr(get_frame),
-        get_caller_frame(get_frame);
-  end;
+  FTargetStimulus.DoExpectedResponse;
 end;
 
 constructor TParticipantBot.Create(AOwner : TComponent);
 begin
   inherited Create(AOwner);
+  FData := 0;
   FTimer := TTimer.Create(AOwner);
   FTimer.Enabled := False;
-  FTimer.Interval := Random(101) + 500;
+  FTimer.Interval := Random(100) + 70;
   FTimer.OnTimer := @Click;
 end;
 
@@ -82,26 +85,20 @@ begin
   inherited Destroy;
 end;
 
-procedure TParticipantBot.SetTargetControl(AControl : TControl);
+procedure TParticipantBot.Start(AStimulus : IStimuli);
 begin
-  FTargetControl := AControl;
-end;
-
-procedure TParticipantBot.Start;
-begin
+  FTargetStimulus := AStimulus;
   FTimer.Enabled := True;
 end;
 
 procedure TParticipantBot.Stop;
 begin
+  FData := 0;
   FTimer.Enabled := False;
 end;
 
 initialization
-  ParticipantBot := TParticipantBot.Create(nil);
-
-finalization
-  ParticipantBot.Free;
+  ParticipantBot := TParticipantBot.Create(Application);
 
 end.
 

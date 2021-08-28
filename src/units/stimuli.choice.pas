@@ -15,6 +15,7 @@ interface
 
 uses
   Classes, SysUtils, Controls, Graphics
+  , Stimuli
   , Stimuli.Abstract
   , Stimuli.Image.Base
   , Schedules
@@ -33,7 +34,7 @@ type
   end;
 
   { TBinaryChoice }
-  TBinaryChoice = class(TStimulus)
+  TBinaryChoice = class(TStimulus, IStimuli)
   private
     FParent : TWinControl;
     FImageLeft : TLightImage;
@@ -47,17 +48,18 @@ type
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: string); override;
-    procedure LoadFromParameters(AParameters: TStringList);
     function MessageFromParameters(
       AParameters : TStringList) : TBinaryChoiceMessage;
-    procedure LoadMessage(AMessage : TBinaryChoiceMessage);
-    procedure SetScheduleConsequence(AConsequence : TNotifyEvent);
     function NextTrial(AComponentName : string) : string;
-    procedure NextNow(var AMessage : TBinaryChoiceMessage);
-    procedure Start; override;
-    procedure Stop; override;
+    function AsInterface : IStimuli;
+    procedure DoExpectedResponse;
     procedure FitScreen;
+    procedure LoadFromParameters(AParameters: TStringList);
+    procedure LoadMessage(AMessage : TBinaryChoiceMessage);
+    procedure NextNow(var AMessage : TBinaryChoiceMessage);
+    procedure SetScheduleConsequence(AConsequence : TNotifyEvent);
+    procedure Start;
+    procedure Stop;
     property Parent : TWinControl read GetParent write SetParent;
   end;
 
@@ -116,6 +118,22 @@ begin
   end;
 end;
 
+function TBinaryChoice.AsInterface : IStimuli;
+begin
+  Result := Self;
+end;
+
+procedure TBinaryChoice.DoExpectedResponse;
+var
+  R : integer;
+begin
+  R := Random(2);
+  case R of
+    0 : FImageLeft.DoResponse;
+    1 : FImageRight.DoResponse;
+  end;
+end;
+
 procedure TBinaryChoice.NextNow(var AMessage : TBinaryChoiceMessage);
 const
   LFactor   : real = 0.5;
@@ -167,11 +185,6 @@ end;
 destructor TBinaryChoice.Destroy;
 begin
   inherited Destroy;
-end;
-
-procedure TBinaryChoice.LoadFromFile(AFilename: string);
-begin
-
 end;
 
 procedure TBinaryChoice.LoadFromParameters(AParameters: TStringList);

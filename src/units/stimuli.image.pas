@@ -15,6 +15,7 @@ interface
 
 uses
   Classes, SysUtils, Controls, Graphics
+  , Stimuli
   , Stimuli.Abstract
   , Stimuli.Image.Base
   , Schedules
@@ -24,8 +25,9 @@ type
 
   { TStimulusFigure }
 
-  TStimulusFigure = class(TStimulus)
+  TStimulusFigure = class(TStimulus, IStimuli)
   private
+    FKey : string;
     FImage : TLightImage;
     function GetLeft: integer;
     function GetParent: TWinControl;
@@ -42,15 +44,18 @@ type
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: string); override;
+    function AsInterface : IStimuli;
+    procedure DoExpectedResponse;
+    procedure HideCursor;
+    procedure LoadFromParameters(AParameters: TStringList);
     procedure Start;
     procedure Stop;
-    procedure HideCursor;
     property Parent : TWinControl read GetParent write SetParent;
     property Width : integer read GetWidth write SetWidth;
     property Height : integer read GetHeight write SetHeight;
     property Top : integer read GetTop write SetTop;
     property Left: integer read GetLeft write SetLeft;
+    property Key : string read FKey write FKey;
   end;
 
 implementation
@@ -130,14 +135,22 @@ begin
   inherited Destroy;
 end;
 
-procedure TStimulusFigure.LoadFromParameters(AParameters: string);
+function TStimulusFigure.AsInterface : IStimuli;
 begin
+  Result := IStimuli(Self);
+end;
+
+procedure TStimulusFigure.LoadFromParameters(AParameters : TStringList);
+var
+  LFilename : string;
+begin
+  LFilename := AParameters.Values[Key];
   try
-    FImage.LoadFromFile(AFilename);
+    FImage.LoadFromFile(LFilename);
   except
     on E : Exception do
     begin
-      Exception.Create(E.Message + #32 + AFilename);
+      Exception.Create(E.Message + #32 + LFilename);
     end;
   end;
 end;
@@ -151,6 +164,11 @@ end;
 procedure TStimulusFigure.Stop;
 begin
   FImage.Hide;
+end;
+
+procedure TStimulusFigure.DoExpectedResponse;
+begin
+  OnResponse(Self);
 end;
 
 procedure TStimulusFigure.HideCursor;

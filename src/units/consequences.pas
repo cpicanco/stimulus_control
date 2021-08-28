@@ -86,19 +86,28 @@ procedure LoadBuffers(ImagesHit, ImagesMiss,
   AudiosHit, AudiosMiss : TStringArray);
 var
   i : integer;
+  LParameters : TStringList;
+  LKey : string;
 begin
+  LParameters := TStringList.Create;
   SetLength(VisualsHit, Length(ImagesHit));
   for i := Low(ImagesHit) to High(ImagesHit) do
   begin
+    LKey := 'S';
+    LParameters.Values[LKey] := ImagesHit[i];
     VisualsHit[i] := TStimulusFigure.Create(nil);
-    VisualsHit[i].LoadFromFile(ImagesHit[i]);
+    VisualsHit[i].Key := LKey;
+    VisualsHit[i].LoadFromParameters(LParameters);
   end;
 
   SetLength(VisualsMiss, Length(ImagesMiss));
   for i := Low(ImagesMiss) to High(ImagesMiss) do
   begin
+    LKey := 'S';
+    LParameters.Values[LKey] := ImagesHit[i];
     VisualsMiss[i] := TStimulusFigure.Create(nil);
-    VisualsMiss[i].LoadFromFile(ImagesMiss[i]);
+    VisualsMiss[i].Key := LKey;
+    VisualsMiss[i].LoadFromParameters(LParameters);
   end;
 
   SetLength(AudiblesHit, Length(AudiosHit));
@@ -112,6 +121,8 @@ begin
   begin
     AudiblesMiss[i] := SoundEngine.LoadBuffer(AudiosMiss[i]);
   end;
+
+  LParameters.Free;
 end;
 
 procedure FreeBuffers;

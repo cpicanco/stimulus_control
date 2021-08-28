@@ -74,7 +74,7 @@ procedure WriteMSG(ABlc : integer; AName: string; AMessage : string);
 var
   i : integer;
 begin
-  ITI := SurveyITI;
+  ITI := ITISurvey;
   i := ConfigurationFile.TrialCount[ABlc]+1;
   with ConfigurationFile do
   begin
@@ -144,7 +144,7 @@ var
         'Quanto você consumiria se cada cigarro custasse R$'+LValues[i]+'?');
   end;
 begin
-  ITI := SurveyITI;
+  ITI := ITISurvey;
   Inc(ACondition);
   ConfigurationFile.WriteToBloc(ACondition, _Name, 'Mensagem A1');
   WriteMSG(ACondition, 'M1', MessageE1A1);

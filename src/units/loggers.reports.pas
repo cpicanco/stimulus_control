@@ -13,7 +13,7 @@ unit Loggers.Reports;
 
 interface
 
-uses Loggers.DataFile, Session.Configuration;
+uses Loggers.DataFile;
 
 type
 
@@ -41,6 +41,8 @@ resourcestring
   HTEST_MODE         = '(Modo de Teste)';
 
 implementation
+
+uses Forms;
 
 var
   GTimestampLogger,
@@ -86,7 +88,7 @@ var
 
   function RegData:TRegData;
   begin
-    Result := TRegData.Create(nil, AFilename + Ext(ADataLogger));
+    Result := TRegData.Create(Application, AFilename + Ext(ADataLogger));
     Result.SaveData(AHeader);
   end;
 begin

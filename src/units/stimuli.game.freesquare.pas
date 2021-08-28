@@ -14,7 +14,7 @@ unit Stimuli.Game.FreeSquare;
 interface
 
 uses
-  Classes, SysUtils, Controls, Graphics, StdCtrls
+  Classes, SysUtils, Controls, Graphics
   , Stimuli
   , Stimuli.Abstract
   , Stimuli.Image.MovingSquare
@@ -38,11 +38,11 @@ type
     constructor Create(AOwner : TComponent;
       ASchedule : TSchedule); override;
     destructor Destroy; override;
+    function AsInterface : IStimuli;
     procedure DoExpectedResponse;
     procedure FitScreen;
     procedure Freeze;
     procedure Hide;
-    procedure LoadFromFile(AFilename: string);
     procedure LoadFromParameters(AParameters : TStringList);
     procedure Start;
     procedure Stop;
@@ -51,7 +51,7 @@ type
 
 implementation
 
-uses Forms, Constants;
+uses Forms, Constants, Cheats;
 
 { TFreeSquare }
 
@@ -70,16 +70,13 @@ end;
 constructor TFreeSquare.Create(AOwner : TComponent);
 begin
   inherited Create(AOwner);
-  Schedule.OnConsequence:=@Consequence;
-  Schedule.OnResponse:=@Response;
   FMovingSquare := TMovingSquare.Create(Self);
 end;
 
 constructor TFreeSquare.Create(AOwner : TComponent; ASchedule : TSchedule);
 begin
   inherited Create(AOwner, ASchedule);
-  Schedule.OnConsequence:=@Consequence;
-  Schedule.OnResponse:=@Response;
+  Schedule := ASchedule;
   FMovingSquare := TMovingSquare.Create(Self);
 end;
 
@@ -88,9 +85,14 @@ begin
   inherited Destroy;
 end;
 
-procedure TFreeSquare.LoadFromFile(AFilename: string);
+function TFreeSquare.AsInterface : IStimuli;
 begin
+  Result := Self;
+end;
 
+procedure TFreeSquare.DoExpectedResponse;
+begin
+  FMovingSquare.DoExpectedResponse;
 end;
 
 procedure TFreeSquare.LoadFromParameters(AParameters: TStringList);
@@ -122,16 +124,6 @@ procedure TFreeSquare.Freeze;
 begin
   FMovingSquare.Freeze;
   FFreezed := True;
-end;
-
-function TFreeSquare.Target : TControl;
-begin
-  Result := FMovingSquare;
-end;
-
-function TFreeSquare.BoundsRect : TRect;
-begin
-  Result := FMovingSquare.BoundsRect;
 end;
 
 procedure TFreeSquare.FitScreen;

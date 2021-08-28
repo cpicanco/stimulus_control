@@ -167,9 +167,9 @@ resourcestring
 
 implementation
 
-
 uses Graphics, Constants, Timestamps, Canvas.Helpers
    , Session.Configuration.GlobalContainer
+   , Cheats
     {$ifdef DEBUG}
     , Loggers.Debug
     {$endif}
@@ -281,6 +281,10 @@ end;
 
 procedure TTrial.EndTrialThread(Sender: TObject);
 begin
+  if CheatsModeOn then begin
+    ParticipantBot.Stop;
+  end;
+
   if Assigned(FClock) then
     FClock.Enabled := False;
   {$ifdef DEBUG}
@@ -316,7 +320,7 @@ begin
   FConfigurations.Kind := AValue.Kind;
   FConfigurations.Name := AValue.Name;
   FConfigurations.NumComp := AValue.NumComp;
-  FConfigurations.SList.Assign(AValue.SList);
+  FConfigurations.Parameters.Assign(AValue.Parameters);
 end;
 
 procedure TTrial.SetLimitedHold(AValue: integer);
@@ -333,6 +337,7 @@ procedure TTrial.Paint;
     LPoints : integer;
   begin
     case FCounterType of
+      ctNone : LPoints := 0;
       ctBlocPoints : LPoints := CounterManager.BlcPoints;
       ctSessionPoints : LPoints := CounterManager.SessionPointsTopRight;
       ctCustom : LPoints := CounterManager.SessionPointsTopRight;
@@ -424,7 +429,7 @@ begin
   FConfigurations.NumComp := 0;
   FConfigurations.Name := T_NONE;
   FConfigurations.Kind := 'abstract';
-  FConfigurations.SList := TStringList.Create;
+  FConfigurations.Parameters := TStringList.Create;
   FResponseEnabled := False;
   FShowStarter := False;
   NextTrial := '0';
@@ -469,7 +474,7 @@ begin
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.Destroy:FNextTrial:' + FNextTrial);
   {$endif}
-  FConfigurations.SList.Free;
+  FConfigurations.Parameters.Free;
   inherited Destroy;
 end;
 
@@ -481,7 +486,7 @@ end;
 function TTrial.ConsequenceInterval: integer;
 begin
   // uses ITI by default, overrided as needed
-  Result := StrToIntDef(Configurations.SList.Values[_ITI], 0);
+  Result := StrToIntDef(Configurations.Parameters.Values[_ITI], 0);
 end;
 
 procedure TTrial.StopConsequence;
@@ -493,7 +498,7 @@ procedure TTrial.Play(ACorrection: Boolean);
 var
   LParameters : TStringList;
 begin
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
 
   // avoid responses while loading configurations
   FResponseEnabled := False;

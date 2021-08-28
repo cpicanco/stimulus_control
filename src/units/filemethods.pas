@@ -30,6 +30,7 @@ var
   Files : TStringList;
   i : integer;
 begin
+  AStimuliArray := nil;
   Files := TStringList.Create;
   try
     FindAllFiles(Files, AFolder, AExtensions, True);

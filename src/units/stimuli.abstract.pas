@@ -14,7 +14,7 @@ unit Stimuli.Abstract;
 interface
 
 uses
-  Classes, SysUtils, Controls, Stimuli, Schedules;
+  Classes, SysUtils, Controls, Schedules;
 
 type
 
@@ -102,6 +102,7 @@ function TStimulus.AsString: string;
 begin
   Result := 'Implement me';
 end;
+
 
 end.
 
