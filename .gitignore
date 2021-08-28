@@ -36,6 +36,7 @@ lib/*/*.lfm
 /src/*/backup/*
 src/tests/*/lib/*
 src/tests/lib/*
+src/tests/*/*.ini
 
 # self
 debug_log/*
@@ -57,3 +58,14 @@ src/tests/geometric_progression
 experiment.zip
 configuracoes
 *.zip
+
+languages/*win10*.po
+# link
+stimulus_control
+configuracoes
+
+# tests
+src/tests/bias/TrackBias1
+src/tests/bias/biases
+
+
