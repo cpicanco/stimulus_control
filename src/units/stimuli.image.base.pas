@@ -329,20 +329,20 @@ end;
 
 procedure TLightImage.Centralize;
 begin
-  Left := (Screen.Width  div 2) - (Width  div 2);
-  Top  := (Screen.Height div 2) - (Height div 2);
+  Left := (Parent.Width  div 2) - (Width  div 2);
+  Top  := (Parent.Height div 2) - (Height div 2);
 end;
 
 procedure TLightImage.CentralizeLeft;
 begin
-  Left := (Screen.Width  div 4) - (Width  div 2);
-  Top  := (Screen.Height div 2) - (Height div 2);
+  Left := (Parent.Width  div 4) - (Width  div 2);
+  Top  := (Parent.Height div 2) - (Height div 2);
 end;
 
 procedure TLightImage.CentralizeRight;
 begin
-  Left := Screen.Width - (Screen.Width  div 4) - (Width  div 2);
-  Top  := Screen.Height - (Screen.Height div 2) - (Height div 2);
+  Left := Parent.Width - (Parent.Width  div 4) - (Width  div 2);
+  Top  := Parent.Height - (Parent.Height div 2) - (Height div 2);
 end;
 
 end.

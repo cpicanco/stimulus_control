@@ -7,7 +7,7 @@
         <CompatibilityMode Value="True"/>
       </Flags>
       <SessionStorage Value="InProjectDir"/>
-      <Title Value="eduardo_experiment"/>
+      <Title Value="fabiane_experiment"/>
       <Scaled Value="True"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
@@ -23,7 +23,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="experiment_$(BuildMode)"/>
+            <Filename Value="fabiane_experiment"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
@@ -70,7 +70,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="experiment_$(BuildMode)"/>
+            <Filename Value="fabiane_experiment"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
@@ -137,9 +137,9 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="30">
+    <Units Count="35">
       <Unit0>
-        <Filename Value="eduardo_experiment.lpr"/>
+        <Filename Value="fabiane_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
       </Unit0>
       <Unit1>
@@ -195,9 +195,9 @@
         <UnitName Value="Stimuli.Image.Base"/>
       </Unit10>
       <Unit11>
-        <Filename Value="src/units/consequences.pas"/>
+        <Filename Value="src/units/consequences.custom.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Consequences"/>
+        <UnitName Value="Consequences.Custom"/>
       </Unit11>
       <Unit12>
         <Filename Value="src/units/filemethods.pas"/>
@@ -289,12 +289,37 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.NextButton"/>
       </Unit29>
+      <Unit30>
+        <Filename Value="src/units/experiments.fabiane.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Fabiane"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="src/units/experiments.fabiane.experiment1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Fabiane.Experiment1"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="src/units/controls.trials.freeoperantsquare.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.FreeOperantSquare"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="src/units/session.castleutils.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.CastleUtils"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="src/units/audio.castlesound.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Audio.CastleSound"/>
+      </Unit34>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
     <Target>
-      <Filename Value="experiment_$(BuildMode)"/>
+      <Filename Value="fabiane_experiment"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>

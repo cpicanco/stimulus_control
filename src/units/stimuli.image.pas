@@ -47,6 +47,7 @@ type
     function AsInterface : IStimuli;
     procedure DoExpectedResponse;
     procedure HideCursor;
+    procedure LoadFromFile(AFileName: string);
     procedure LoadFromParameters(AParameters: TStringList);
     procedure Start;
     procedure Stop;
@@ -174,6 +175,18 @@ end;
 procedure TStimulusFigure.HideCursor;
 begin
   FImage.Cursor := -1;
+end;
+
+procedure TStimulusFigure.LoadFromFile(AFileName: string);
+begin
+  try
+    FImage.LoadFromFile(AFileName);
+  except
+    on E : Exception do
+    begin
+      Exception.Create(E.Message + #32 + AFileName);
+    end;
+  end;
 end;
 
 end.

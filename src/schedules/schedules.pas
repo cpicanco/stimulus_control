@@ -56,12 +56,15 @@ type
   private
     FOnConsequence: TNotifyEvent;
     FOnResponse: TNotifyEvent;
+    FOnResponseReady: TNotifyEvent;
     function GetEnabled: Boolean;
     function GetParameter1: Cardinal;
     function GetParameter2: Cardinal;
     procedure Response(Sender : TObject);
     procedure Consequence(Sender : TObject);
+    procedure ResponseReady(Sender : TObject);
     procedure SetEnabled(AValue: Boolean);
+    procedure SetOnResponseReady(AValue: TNotifyEvent);
     procedure SetParameter1(AValue: Cardinal);
     procedure SetParameter2(AValue: Cardinal);
     procedure SetScheduleName(AValue: TScheduleName);
@@ -73,12 +76,15 @@ type
     destructor Destroy; override;
     procedure DoResponse;
     procedure Load(ASchedule : string); overload;
+    procedure Load(AScheduleName : TScheduleName); overload;
     procedure Load(AScheduleName : TScheduleName;
-      AParameter1: Cardinal = 0; AParameter2: Cardinal = 0); overload;
+      AParameter1: Cardinal; AParameter2: Cardinal = 0); overload;
+
     function Start : Extended;
     function Stop : Extended;
     function Pause : Extended;
     procedure UseFleshlerHoffmanIntervals;
+    procedure UseRegisNetoIntervals(UseProgression : Boolean);
     property AsString : string read GetScheduleString write Load;
     property Loaded : Boolean read GetLoaded;
     property ScheduleNameAsString : string read GetScheduleNameAsString;
@@ -88,6 +94,7 @@ type
     property ScheduleName : TScheduleName read GetScheduleName write SetScheduleName;
     property OnConsequence: TNotifyEvent read FOnConsequence write SetOnConsequence;
     property OnResponse: TNotifyEvent read FOnResponse write SetOnResponse;
+    property OnResponseReady: TNotifyEvent read FOnResponseReady write SetOnResponseReady;
     property Parameter1: Cardinal read GetParameter1 write SetParameter1;
     property Parameter2: Cardinal read GetParameter2 write SetParameter2;
     property Enabled : Boolean read GetEnabled write SetEnabled;
@@ -113,6 +120,7 @@ begin
   FName := AScheduleName;
   FSchedule.OnConsequence:=@Consequence;
   FSchedule.OnResponse:=@Response;
+  FSchedule.OnResponseReady:=@ResponseReady;
 end;
 
 procedure TSchedule.SetScheduleName(AName: string);
@@ -188,6 +196,11 @@ end;
 procedure TSchedule.Consequence(Sender: TObject);
 begin
   if Assigned(OnConsequence) then OnConsequence(Self);
+end;
+
+procedure TSchedule.ResponseReady(Sender: TObject);
+begin
+  if Assigned(OnResponseReady) then OnResponseReady(Self);
 end;
 
 procedure TSchedule.SetEnabled(AValue: Boolean);
@@ -384,6 +397,12 @@ begin
   FOnResponse:=AValue;
 end;
 
+procedure TSchedule.SetOnResponseReady(AValue: TNotifyEvent);
+begin
+  if FOnResponseReady = AValue then Exit;
+  FOnResponseReady := AValue;
+end;
+
 procedure TSchedule.DoResponse;
 begin
   if FName = UnknownSchedule then
@@ -398,6 +417,11 @@ procedure TSchedule.Load(ASchedule: string);
 begin
   SetScheduleName(GetScheduleName(ASchedule));
   SetParameters(ASchedule);
+end;
+
+procedure TSchedule.Load(AScheduleName: TScheduleName);
+begin
+  LoadScheduleName(AScheduleName);
 end;
 
 procedure TSchedule.Load(AScheduleName: TScheduleName; AParameter1: Cardinal;
@@ -443,6 +467,15 @@ end;
 procedure TSchedule.UseFleshlerHoffmanIntervals;
 begin
   FSchedule.RandomIntervalType := ritFleshlerHoffman;
+end;
+
+procedure TSchedule.UseRegisNetoIntervals(UseProgression: Boolean);
+begin
+  if UseProgression then begin
+    FSchedule.RandomIntervalType := ritRegisNetoProgression;
+  end else begin
+    FSchedule.RandomIntervalType := ritRegisNetoNoProgression;
+  end;
 end;
 
 end.

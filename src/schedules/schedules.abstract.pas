@@ -29,7 +29,12 @@ type
     Paused       : Extended;
   end;
 
-  TRandomIntervalType = (ritRandomAmplitude, ritFleshlerHoffman);
+  TRandomIntervalType = (
+    ritRandomAmplitude,
+    ritFleshlerHoffman,
+    ritRegisNetoProgression,
+    ritRegisNetoNoProgression
+  );
 
   TClockStartMethod = procedure of object;
 
@@ -38,6 +43,8 @@ type
   // Base class for all schedules. Do not create it directly, use TSchedule instead.
   TSchedules = class
   private
+    FRandomValuesList : TStringList;
+    FOnResponseReady: TNotifyEvent;
     FPausedState : TPausedState;
     FRandomIntervalType : TRandomIntervalType;
     FOnConsequence : TNotifyEvent;
@@ -50,11 +57,14 @@ type
     function GetStartMethod : TClockStartMethod;
     function RandomAmplitude(AValue, AAmplitude: Cardinal) : Cardinal;
     function FleshlerHoffman : Cardinal;
+    function RegisNeto(NoProgression: Boolean = False) : Cardinal;
     procedure Pass;
+    procedure UpdateRandomValuesList;
     procedure SetEnabled(AValue: Boolean);
     procedure SetMustUpdate(AValue : Boolean);
     procedure SetOnConsequence(AValue: TNotifyEvent);
     procedure SetOnResponse(AValue: TNotifyEvent);
+    procedure SetOnResponseReady(AValue: TNotifyEvent);
     procedure SetPaused(AValue : Boolean);
   protected
     function GetInterval : Cardinal;
@@ -71,6 +81,7 @@ type
     procedure UpdateRatio(out ATarget : Cardinal; ABase: Cardinal; AVariation: Cardinal = 0); inline;
     procedure Consequence; inline;
     procedure Response; inline;
+    procedure ResponseReady; inline;
   public
     constructor Create; virtual; overload;
     constructor Create(OnTimer : TNotifyEvent); overload;
@@ -83,6 +94,7 @@ type
     function Resume : Extended;
     property OnConsequence : TNotifyEvent read FOnConsequence write SetOnConsequence;
     property OnResponse : TNotifyEvent read FOnResponse write SetOnResponse;
+    property OnResponseReady : TNotifyEvent read FOnResponseReady write SetOnResponseReady;
     property Responses : Cardinal read FResponseCounter;
     property RandomIntervalType : TRandomIntervalType read FRandomIntervalType write FRandomIntervalType;
     property MustUpdate : Boolean read GetMustUpdate write SetMustUpdate;
@@ -104,20 +116,58 @@ resourcestring
 
 implementation
 
-uses Timestamps;
+uses Timestamps, Math;
+
+type
+  TArrayOfInteger = array of integer;
+  TRegisNetoIndex = 0..9;
+  TFleshlerHoffmanIndex = 0..9;
 
 var
-  FleshlerHoffmanList : TStringList;
-  FleshlerHoffmanValues : array [0..9] of integer =
+
+  RegisNetoIndex : TRegisNetoIndex = 0;
+  RegisNetoValues : array [TRegisNetoIndex] of integer =
+    (1000, 2000, 3000, 4000, 5000, 10000, 20000, 30000, 40000, 60000);
+
+  FleshlerHoffmanValues : array [TFleshlerHoffmanIndex] of integer =
     (207, 652, 1154, 1727, 2397, 3202, 4213, 5572, 7665, 13210);
 
-procedure UpdateFleshlerHoffmanList;
+procedure TSchedules.UpdateRandomValuesList;
 var
-  i : integer;
+  Value, R, i : integer;
+  RandomVIS : TArrayOfInteger;
+  function Append(AArray : TArrayOfInteger; AItem : integer) : TArrayOfInteger;
+  begin
+    SetLength(AArray, Length(AArray)+1);
+    AArray[High(AArray)] := AItem;
+    Result := AArray;
+  end;
 begin
-  FleshlerHoffmanList.Clear;
-  for i := Low(FleshlerHoffmanValues) to High(FleshlerHoffmanValues) do begin
-    FleshlerHoffmanList.Append(i.ToString);
+  FRandomValuesList.Clear;
+  case FRandomIntervalType of
+    ritRandomAmplitude: begin
+      { do nothing }
+    end;
+
+    ritFleshlerHoffman: begin
+      for Value := Low(TFleshlerHoffmanIndex) to High(TFleshlerHoffmanIndex) do begin
+        FRandomValuesList.Append(Value.ToString);
+      end;
+    end;
+
+    ritRegisNetoProgression, ritRegisNetoNoProgression: begin
+      Value := RegisNetoValues[RegisNetoIndex];
+      repeat
+        RandomVIS := Default(TArrayOfInteger);
+        for i in [0..4] do begin
+          R := RandomAmplitude(Value, (Value*30) div 100);
+          RandomVIS := Append(RandomVIS, R);
+        end;
+      until Mean(RandomVIS) = Value;
+      for Value in RandomVIS do begin
+        FRandomValuesList.Append(Value.ToString);
+      end;
+    end;
   end;
 end;
 
@@ -141,6 +191,12 @@ begin
   end;
 end;
 
+procedure TSchedules.ResponseReady;
+begin
+  if Assigned(OnResponseReady) then
+    OnResponseReady(Self);
+end;
+
 constructor TSchedules.Create;
 begin
   FTimer := nil;
@@ -152,6 +208,9 @@ begin
   FTimer := TTimer.Create(nil);
   FTimer.OnTimer := OnTimer;
   FRandomIntervalType := ritRandomAmplitude;
+  FRandomValuesList := TStringList.Create;
+  FRandomValuesList.Sorted := False;
+  UpdateRandomValuesList;
 end;
 
 procedure TSchedules.Pass;
@@ -191,6 +250,12 @@ procedure TSchedules.SetOnResponse(AValue: TNotifyEvent);
 begin
   if FOnResponse=AValue then Exit;
   FOnResponse:=AValue;
+end;
+
+procedure TSchedules.SetOnResponseReady(AValue: TNotifyEvent);
+begin
+  if FOnResponseReady=AValue then Exit;
+  FOnResponseReady:=AValue;
 end;
 
 procedure TSchedules.SetPaused(AValue : Boolean);
@@ -277,10 +342,24 @@ function TSchedules.FleshlerHoffman : Cardinal;
 var
   R : integer;
 begin
-  if FleshlerHoffmanList.Count = 0 then UpdateFleshlerHoffmanList;
-  R := Random(FleshlerHoffmanList.Count);
-  Result := FleshlerHoffmanValues[FleshlerHoffmanList[R].ToInteger];
-  FleshlerHoffmanList.Delete(R);
+  if FRandomValuesList.Count = 0 then UpdateRandomValuesList;
+  R := Random(FRandomValuesList.Count);
+  Result := FleshlerHoffmanValues[FRandomValuesList[R].ToInteger];
+  FRandomValuesList.Delete(R);
+end;
+
+function TSchedules.RegisNeto(NoProgression: Boolean): Cardinal;
+begin
+  if FRandomValuesList.Count = 0 then begin
+    if NoProgression then begin
+      RegisNetoIndex := High(TRegisNetoIndex);
+    end else begin
+      if RegisNetoIndex < High(TRegisNetoIndex) then
+        RegisNetoIndex := RegisNetoIndex + 1;
+    end;
+    UpdateRandomValuesList;
+  end;
+  Result := FRandomValuesList.Pop.ToInteger;
 end;
 
 procedure TSchedules.ResetResponses;
@@ -291,11 +370,21 @@ end;
 procedure TSchedules.UpdateInterval(ABase: Cardinal; AVariation: Cardinal);
 begin
   case FRandomIntervalType of
-    ritRandomAmplitude:
+    ritRandomAmplitude: begin
       FTimer.Interval := RandomAmplitude(ABase, AVariation);
+    end;
 
-    ritFleshlerHoffman:
+    ritFleshlerHoffman: begin
       FTimer.Interval := FleshlerHoffman;
+    end;
+
+    ritRegisNetoProgression: begin
+      FTimer.Interval := RegisNeto;
+    end;
+
+    ritRegisNetoNoProgression: begin
+      FTimer.Interval := RegisNeto(True);
+    end;
   end;
   FPausedState.Interval := FTimer.Interval;
   FPausedState.Elapsed  := 0;
@@ -309,6 +398,8 @@ end;
 
 destructor TSchedules.Destroy;
 begin
+  if Assigned(FRandomValuesList) then
+    FRandomValuesList.Free;
   OnConsequence := nil;
   OnResponse := nil;
   if Assigned(FTimer) then
@@ -366,14 +457,6 @@ begin
   FTimer.Enabled:=False;
   FTimer.Enabled:=True;
 end;
-
-initialization
-  FleshlerHoffmanList := TStringList.Create;
-  FleshlerHoffmanList.Sorted := False;
-  UpdateFleshlerHoffmanList;
-
-finalization
-  FleshlerHoffmanList.Free;
 
 end.
 

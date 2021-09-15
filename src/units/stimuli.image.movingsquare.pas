@@ -56,7 +56,7 @@ type
   end;
 
 var
-  Granularity : Cardinal = 100;
+  Granularity : Cardinal = 50;
   ScreenInCentimeters : real = 39.624;
   SquareSize : real = 0.8;
   SquareMovementSize : real = 0.53;
@@ -86,7 +86,7 @@ begin
   FTimer.OnTimer := @Move;
   FTimerConsequence := TTimer.Create(Self);
   FTimerConsequence.Enabled:=False;
-  FTimerConsequence.Interval := Granularity;
+  FTimerConsequence.Interval := 50;
   FTimerConsequence.OnTimer := @ChangeColor;
 end;
 

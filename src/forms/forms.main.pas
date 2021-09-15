@@ -27,25 +27,15 @@ type
     EditParticipant: TEdit;
     FloatSpinEditScreen: TFloatSpinEdit;
     FloatSpinEditSquare: TFloatSpinEdit;
-    FloatSpinEditSquareExp3 : TFloatSpinEdit;
     FloatSpinEditSquareMove: TFloatSpinEdit;
     IniPropStorage: TIniPropStorage;
     LabelScreenSize: TLabel;
     LabelSquareMove: TLabel;
     LabelSquareSize: TLabel;
-    LabelSquareSizeExp3 : TLabel;
     LabelTimeSize: TLabel;
-    PageControl1: TPageControl;
     PanelConfigurations: TPanel;
     RadioGroupDesign1: TRadioGroup;
-    RadioGroupDesign2: TRadioGroup;
-    RadioGroupDesign3: TRadioGroup;
-    RadioGroupDesign4: TRadioGroup;
     SpinEditTimeSize: TSpinEdit;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    TabSheet3: TTabSheet;
-    TabSheet4: TTabSheet;
     procedure ButtonStartAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure EndSession(Sender: TObject);
@@ -69,7 +59,7 @@ uses
    , Session.Backgrounds
    , Session.Configuration.GlobalContainer
    , SessionSimple
-   , Experiments.Eduardo
+   , Experiments.Fabiane
    , Stimuli.Image.MovingSquare
    , Cheats
    ;
@@ -83,50 +73,19 @@ var
 procedure TBackground.ButtonStartAllClick(Sender: TObject);
 var
   LName : string;
+  LDesign : string;
 begin
   CheatsModeOn := CheckBoxCheatsMode.Checked;
   PanelConfigurations.Hide;
   Session.Backgrounds.Background := Self;
   ScreenInCentimeters := FloatSpinEditScreen.Value;
-  case PageControl1.TabIndex of
-    0:begin
-      SquareSize := FloatSpinEditSquare.Value;
-      SquareMovementSize := FloatSpinEditSquareMove.Value;
-      Granularity := SpinEditTimeSize.Value;
-      ConfigurationFilename :=
-        Experiments.Eduardo.MakeConfigurationFile(
-          RadioGroupDesign1.Items[RadioGroupDesign1.ItemIndex],
-          PageControl1.TabIndex);
-    end;
 
-    1:begin
-      { code }
-      ConfigurationFilename :=
-        Experiments.Eduardo.MakeConfigurationFile(
-          RadioGroupDesign2.Items[RadioGroupDesign2.ItemIndex],
-          PageControl1.TabIndex);
-    end;
-
-    2:begin
-      { code }
-      SquareSize := FloatSpinEditSquareExp3.Value;
-      ConfigurationFilename :=
-        Experiments.Eduardo.MakeConfigurationFile(
-          RadioGroupDesign3.Items[RadioGroupDesign3.ItemIndex],
-          PageControl1.TabIndex);
-    end;
-
-    3:begin
-      { code }
-      ConfigurationFilename :=
-        Experiments.Eduardo.MakeConfigurationFile(
-          RadioGroupDesign4.Items[RadioGroupDesign4.ItemIndex],
-          PageControl1.TabIndex);
-
-      Exit;
-    end;
-  end;
-  LName := 'Experimento '+(PageControl1.TabIndex+1).ToString;
+  LDesign := RadioGroupDesign1.Items[RadioGroupDesign1.ItemIndex];
+  SquareSize := FloatSpinEditSquare.Value;
+  SquareMovementSize := FloatSpinEditSquareMove.Value;
+  Granularity := SpinEditTimeSize.Value;
+  ConfigurationFilename := Experiments.Fabiane.MakeConfigurationFile(LDesign, 0);
+  LName := 'Experimento 1'+ #32 + LDesign;
   GSession.Play(LName, EditParticipant.Text);
 end;
 

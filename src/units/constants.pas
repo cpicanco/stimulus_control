@@ -276,6 +276,7 @@ const
   T_MSG = 'MSG';
   T_HTM = 'HTMLM';
   T_EO1 = 'OP1';
+  T_EO2 = 'OP2';
   T_TMB = 'TMB';
   T_CHO = 'CHOICE';
   T_INP = 'TXTINP';

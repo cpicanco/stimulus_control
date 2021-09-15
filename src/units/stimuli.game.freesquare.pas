@@ -41,6 +41,7 @@ type
     function AsInterface : IStimuli;
     procedure DoExpectedResponse;
     procedure FitScreen;
+    procedure Centralize;
     procedure Freeze;
     procedure Hide;
     procedure LoadFromParameters(AParameters : TStringList);
@@ -97,7 +98,7 @@ end;
 
 procedure TFreeSquare.LoadFromParameters(AParameters: TStringList);
 begin
-  Schedule.Load(AParameters.Values[_Schedule]);
+  //Schedule.Load(AParameters.Values[_Schedule]);
   FMovingSquare.Schedule := Schedule;
 end;
 
@@ -141,6 +142,11 @@ begin
    1: FMovingSquare.CentralizeLeft;
    2: FMovingSquare.CentralizeRight;
   end;
+end;
+
+procedure TFreeSquare.Centralize;
+begin
+  FMovingSquare.Centralize;
 end;
 
 end.

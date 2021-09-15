@@ -70,10 +70,10 @@ uses Constants
    //, Controls.Trials.RelationalFrame
    , Controls.Trials.TextMessage
    , Controls.Trials.HTMLMessage
-   , Controls.Trials.BinaryChoice
-   , Controls.Trials.TextInput
-   , Controls.Trials.FreeSquare
-   , Controls.Trials.TemporalBissection
+   //, Controls.Trials.BinaryChoice
+   //, Controls.Trials.TextInput
+   , Controls.Trials.FreeOperantSquare
+   //, Controls.Trials.TemporalBissection
    , Graphics
    , Consequences
    , Dialogs
@@ -88,15 +88,15 @@ var
 begin
   LTrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
 
-  if (FTrial is TBinaryChoiceTrial) then begin
-    if FCounterManager.BlcTrials > 0 then begin
-      S := FTrial.Configurations.Parameters.Values[_LastNow];
-      LTrialConfig.Parameters.Values[_LastNow] := S;
-
-      S := FTrial.Configurations.Parameters.Values[_Now];
-      LTrialConfig.Parameters.Values[_Now] := S;
-    end;
-  end;
+  //if (FTrial is TBinaryChoiceTrial) then begin
+  //  if FCounterManager.BlcTrials > 0 then begin
+  //    S := FTrial.Configurations.Parameters.Values[_LastNow];
+  //    LTrialConfig.Parameters.Values[_LastNow] := S;
+  //
+  //    S := FTrial.Configurations.Parameters.Values[_Now];
+  //    LTrialConfig.Parameters.Values[_Now] := S;
+  //  end;
+  //end;
 
   if Assigned(FTrial) then
     FreeAndNil(FTrial);
@@ -105,10 +105,11 @@ begin
     case LTrialConfig.Kind of
       T_MSG : FTrial := TMessageTrial.Create(Background);
       T_HTM : FTrial := THTMLMessage.Create(Background);
-      T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
-      T_INP : FTrial := TTextInput.Create(Background);
-      T_EO1 : FTrial := TFreeSquareTrial.Create(Background);
-      T_TMB : FTrial := TTBMTS.Create(Background);
+      //T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
+      //T_INP : FTrial := TTextInput.Create(Background);
+      //T_EO1 : FTrial := TFreeSquareTrial.Create(Background);
+      T_EO2 : FTrial := TFreeOperantSquareTrial.Create(Background);
+      //T_TMB : FTrial := TTBMTS.Create(Background);
       //T_MTS : FTrial := TMTS.Create(Background);
       //T_LIK : FTrial := TLikert.Create(Background);
       //T_GNG : FTrial := TGNG.Create(Background);
@@ -277,9 +278,9 @@ begin
   {$ENDIF}
   if FInterTrial.Interval > 0 then
     begin
-      if (FTrial is TFreeSquareTrial) or (FTrial is TTBMTS) then begin
-        FWaitLabel.Show;
-      end;
+      //if (FTrial is TFreeSquareTrial) or (FTrial is TTBMTS) then begin
+      //  FWaitLabel.Show;
+      //end;
       FInterTrial.Enabled := True;
       FITIBegin := TickCount - GlobalContainer.TimeStart;
     end

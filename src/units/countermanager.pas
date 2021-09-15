@@ -45,6 +45,7 @@ type
     FSessionNones : integer;
     FSessionPoints : integer;
     FSessionPoints2 : integer;
+    FSessionPointsCenter: integer;
     FSessionStmResponses : integer;
     FSessionTrials : integer;
     FSessionVirtualHits : integer;
@@ -144,6 +145,7 @@ type
     property SessionTrials : integer read FSessionTrials;
     property SessionPointsTopRight : integer read FSessionPoints write FSessionPoints;
     property SessionPointsTopLeft : integer read FSessionPoints2 write FSessionPoints2;
+    property SessionPointsCenter : integer read FSessionPointsCenter write FSessionPointsCenter;
     property BlcTrials : integer read FBlcTrials;
     property SessionVirtualHits : integer read FSessionVirtualHits;
   {Current Blc}

@@ -217,6 +217,7 @@ procedure TIntervalSchedule.Clock(Sender : TObject);
 begin
   StopClock;
   FFlagClock := True;
+  ResponseReady;
 end;
 
 procedure TIntervalSchedule.DoResponse;

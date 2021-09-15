@@ -50,6 +50,7 @@ releases/*
 languages/*win10*.po
 experiment_deb64
 
+lib/x86_64-linux/
 lib/x86_64-win64/eduardo_experiment.compiled
 lib/x86_64-win64/augusto_experiment.compiled
 lib/x86_64-linux/augusto_experiment.compiled
@@ -67,5 +68,5 @@ configuracoes
 # tests
 src/tests/bias/TrackBias1
 src/tests/bias/biases
-
-
+src/tests/regisneto_vi/regis_neto_vi
+src/tests/serial_timer/serial_timer

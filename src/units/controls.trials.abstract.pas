@@ -26,7 +26,7 @@ uses Controls, ExtCtrls, Classes, SysUtils
 type
 
   { TCounterType }
-  TCounterType = (ctNone, ctBlocPoints, ctSessionPoints, ctCustom);
+  TCounterType = (ctNone, ctBlocPoints, ctSessionPoints, ctCustom, ctCenterTopRight);
 
   { TPaintEvent }
   TPaintEvent = procedure of object;
@@ -115,6 +115,7 @@ type
     FCounterType : TCounterType;
     FCounterRectTopRight : TRect;
     FCounterRectTopLeft : TRect;
+    FCounterRectTopCenter : TRect;
     FNextTrial : string;
     CounterManager : TCounterManager;
     procedure MouseDown(Button: TMouseButton;
@@ -356,6 +357,7 @@ procedure TTrial.Paint;
         Font.Color:= 0;
         Pen.Width := 2;
         Pen.Color := 0;
+        Brush.Color := clWhite;
         Rectangle(FCounterRectTopRight);
         TextRect(FCounterRectTopRight, FCounterRectTopRight.Left,
           FCounterRectTopRight.Top, 'Pontos: ' + LPoints.ToString);
@@ -385,9 +387,41 @@ procedure TTrial.Paint;
         Font.Color:= 0;
         Pen.Width := 2;
         Pen.Color := 0;
+        Brush.Color := clWhite;
         Rectangle(FCounterRectTopLeft);
         TextRect(FCounterRectTopLeft, FCounterRectTopLeft.Left,
           FCounterRectTopLeft.Top, 'Pontos: ' + LPoints.ToString);
+      end;
+  end;
+
+  procedure DrawCounterCenterTopRight;
+  var
+    LTextStyle : TTextStyle;
+    LPoints : integer;
+  begin
+    LTextStyle := Canvas.TextStyle;
+    LTextStyle.SingleLine:=False;
+    LTextStyle.Wordbreak:=True;
+    LTextStyle.Clipping:=False;
+    LTextStyle.Alignment:=taCenter;
+    LTextStyle.Layout:=tlCenter;
+    Canvas.TextStyle := LTextStyle;
+    with Canvas do
+      begin
+        Font.Size := 22;
+        Font.Color:= 0;
+        Pen.Width := 2;
+        Pen.Color := 0;
+        Brush.Color := clWhite;
+        LPoints := CounterManager.SessionPointsCenter;
+        Rectangle(FCounterRectTopCenter);
+        TextRect(FCounterRectTopCenter, FCounterRectTopCenter.Left,
+          FCounterRectTopCenter.Top, 'Pontos: ' + LPoints.ToString);
+
+        LPoints := CounterManager.SessionPointsTopRight;
+        Rectangle(FCounterRectTopRight);
+        TextRect(FCounterRectTopRight, FCounterRectTopRight.Left,
+          FCounterRectTopRight.Top, 'Pontos: ' + LPoints.ToString);
       end;
   end;
 begin
@@ -406,6 +440,7 @@ begin
           DrawCounterTopRight;
           DrawCounterTopLeft;
         end;
+      ctCenterTopRight : DrawCounterCenterTopRight;
     end;
   end;
 
@@ -497,6 +532,7 @@ end;
 procedure TTrial.Play(ACorrection: Boolean);
 var
   LParameters : TStringList;
+  LWidth : integer;
 begin
   LParameters := Configurations.Parameters;
 
@@ -538,17 +574,22 @@ begin
   FShowCounter := False;
 
   // set counter reacts
+  LWidth := (ClientRect.Right div 7);
   FCounterRectTopRight :=
-    Rect((ClientRect.Right div 7)*6, 10, ClientRect.Right-10, 70);
+    Rect(LWidth*6, 10, ClientRect.Right-10, 70);
 
   FCounterRectTopLeft :=
     Rect(10, 10, (ClientRect.Right div 7)-10, 70);
+
+  FCounterRectTopCenter :=
+    Rect((ClientRect.Right div 2)- (LWidth div 2), 10,(ClientRect.Right div 2)+(LWidth div 2), 70);
 
   // how counters/points are presented
   case StrToIntDef(LParameters.Values[_CounterType], -1) of
     0 :  FCounterType := ctBlocPoints;
     1 :  FCounterType := ctSessionPoints;
     2 :  FCounterType := ctCustom;
+    3 :  FCounterType := ctCenterTopRight;
     else FCounterType := ctNone;
   end;
 
