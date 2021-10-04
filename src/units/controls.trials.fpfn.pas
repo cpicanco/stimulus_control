@@ -18,7 +18,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls, Graphics
   , Controls.Trials.Abstract
   , Controls.Trials.Helpers
   , Schedules
-  , Audio.Bass_nonfree
+  //, Audio.Bass_nonfree
   ;
 
 type
@@ -44,7 +44,7 @@ type
     FForeground : TBitmap;
     FFeaturesToDraw : TFPFNDrawing;
     FSchedule : TSchedule;
-    FSound : TBassStream;
+    //FSound : TBassStream;
     FShouldPlaySound : Boolean;
     FCenterStyle : string;
 
@@ -63,7 +63,7 @@ type
   protected { TTrial }
     procedure WriteData(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
     destructor Destroy; override;
     procedure Hide;override;
     procedure Play(ACorrection : Boolean); override;
@@ -72,12 +72,13 @@ type
 
 implementation
 
-uses background, strutils, constants, Timestamps, Canvas.Helpers;
+uses background, strutils, constants, Timestamps, Canvas.Helpers
+  , Session.Configuration.GlobalContainer;
 
 { TFPFN }
 
 
-constructor TFPFN.Create(AOwner: TComponent);
+constructor TFPFN.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -100,8 +101,8 @@ end;
 destructor TFPFN.Destroy;
 begin
   FForeGround.Free;
-  if Assigned(FSound) then
-    FSound.Free;
+  //if Assigned(FSound) then
+  //  FSound.Free;
   inherited Destroy;
 end;
 
@@ -130,7 +131,7 @@ begin
         T_CRT:NextTrial := T_CRT;
         'IF_HIT_JUMP_NEXT_TRIAL':
             if Result = T_HIT then
-              NextTrial := IntToStr(CounterManager.CurrentTrial+3);
+              NextTrial := IntToStr(Counters.CurrentTrial+3);
       end;
     end;
 end;
@@ -166,7 +167,7 @@ begin
     if gngPlayGo in FStyle then
       PlaySound;
 
-  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+  if Assigned(Counters.OnConsequence) then Counters.OnConsequence(Self);
 end;
 
 procedure TFPFN.TrialKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -195,14 +196,14 @@ begin
   if FileExists(LSoundFile) and FShouldPlaySound then
     begin
       LogEvent('C');
-      if Assigned(FSound) then
-        begin
-          FSound.Free;
-          FSound := TBassStream.Create(LSoundFile);
-        end
-      else
-        FSound := TBassStream.Create(LSoundFile);
-      FSound.Play;
+      //if Assigned(FSound) then
+      //  begin
+      //    FSound.Free;
+      //    FSound := TBassStream.Create(LSoundFile);
+      //  end
+      //else
+      //  FSound := TBassStream.Create(LSoundFile);
+      //FSound.Play;
     end;
 end;
 
@@ -269,13 +270,14 @@ var
   LOuterR : TRect;
   i, LWidth, LHeight, LNumComp : Integer;
   LCircles : array of TCircle;
-
+  Parameters : TStringList;
 begin
   inherited Play(ACorrection);
-  FFeaturesToDraw := TFPFNDrawing(StrToIntDef(CfgTrial.SList.Values[_DrawingType], 0));
+  Parameters := Configurations.Parameters;
+  FFeaturesToDraw := TFPFNDrawing(StrToIntDef(Parameters.Values[_DrawingType], 0));
 
   FStyle := [];
-  s1 := CfgTrial.SList.Values[_Style];
+  s1 := Parameters.Values[_Style];
   for i := 1 to WordCount(s1,[#32]) do
     FStyle += [StringToStyle(ExtractDelimited(i,s1,[#32]))];
 
@@ -287,19 +289,19 @@ begin
     begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
-      Load(CfgTrial.SList.Values[_Schedule]);
+      Load(Parameters.Values[_Schedule]);
       Enabled := False;
     end;
-  AddToClockList(FSchedule);
-  FContingency := CfgTrial.SList.Values[_Contingency];
-  FCenterStyle := CfgTrial.SList.Values[_Comp+_Style];
+  //AddToClockList(FSchedule);
+  FContingency := Parameters.Values[_Contingency];
+  FCenterStyle := Parameters.Values[_Comp+_Style];
 
-  FShouldPlaySound := StrToBoolDef(CfgTrial.SList.Values[_ShouldPlaySound], True);
-  LNumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 1);
+  FShouldPlaySound := StrToBoolDef(Parameters.Values[_ShouldPlaySound], True);
+  LNumComp := StrToIntDef(Parameters.Values[_NumComp], 1);
   SetLength(LCircles, LNumComp);
   for i := 0 to LNumComp -1 do
     begin
-        s1:= CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd];
+        s1:= Parameters.Values[_Comp + IntToStr(i + 1) + _cBnd];
         LOuterR.Top:= StrToInt(ExtractDelimited(1,s1,[#32]));
         LOuterR.Left:= StrToInt(ExtractDelimited(2,s1,[#32]));
         LWidth := StrToInt(ExtractDelimited(3,s1,[#32]));
@@ -314,9 +316,9 @@ begin
               fpfnClearCircles: {do nothing};
               fpfnFullOuterInnerCircles.:InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
             end;
-            gap := StrToBoolDef(CfgTrial.SList.Values[_Comp + IntToStr(i+1) + _cGap], False );
-            gap_degree := 16 * StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], Random(361));
-            gap_length := 16 * (360-StrToIntDef(CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 ));
+            gap := StrToBoolDef(Parameters.Values[_Comp + IntToStr(i+1) + _cGap], False );
+            gap_degree := 16 * StrToIntDef(Parameters.Values[_Comp + IntToStr(i + 1) + _cGap_Degree], Random(361));
+            gap_length := 16 * (360-StrToIntDef(Parameters.Values[_Comp + IntToStr(i + 1) + _cGap_Length], 5 ));
           end;
       end;
 
@@ -351,7 +353,7 @@ begin
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
            FContingency + #32 + FCenterStyle;
 
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+  //if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
 procedure TFPFN.Response(Sender: TObject);
@@ -360,7 +362,7 @@ begin
   if FDataSupport.Latency = TimeStart then
     FDataSupport.Latency := TickCount;
 
-  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
+  if Assigned(Counters.OnStmResponse) then Counters.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
 

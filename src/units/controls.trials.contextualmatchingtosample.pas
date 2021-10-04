@@ -49,7 +49,7 @@ type
   public
     constructor Create(AOwner: TCustomControl); override;
     function AsString : string; override;
-    function HasConsequence: Boolean; override;
+    function HasConsequence: Boolean;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -115,7 +115,7 @@ var
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   FStimulus.LoadFromParameters(LParameters);
   FStimulus.FitScreen;
   FStimulus.OnEndSerialTimer:=@EnableResponses;

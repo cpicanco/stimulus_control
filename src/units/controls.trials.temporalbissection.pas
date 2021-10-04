@@ -63,7 +63,10 @@ type
 
 implementation
 
-uses Forms, Graphics, StrUtils, Constants, Timestamps, Cheats;
+uses Forms, Graphics, StrUtils
+  , Constants, Timestamps, Cheats
+  , Session.Configuration.GlobalContainer
+  , Experiments.Eduardo.Experimento2.Tables;
 
 constructor TTBMTS.Create(AOwner: TCustomControl);
 begin
@@ -153,15 +156,31 @@ begin
 end;
 
 procedure TTBMTS.WriteData(Sender: TObject);
+  function GetResult : integer;
+  begin
+    case FReportData.ComparisonChosen of
+      'Left' : Result := 0;
+      'Right': Result := 1;
+    end;
+  end;
+
+  function IsTestTrial : Boolean;
+  begin
+    Result := Configurations.Parameters.Values['IsTestTrial'].ToBoolean;
+  end;
+
 begin
   inherited WriteData(Sender);
+  if Assigned(FTable) then begin
+    TExperiment2Table(FTable).AddRow(
+      FStimulus.SampleDuration.ToString, GetResult, IsTestTrial);
+  end;
   Data := Data +
     FStimulus.SampleDuration.ToString + HeaderTabs +
     FReportData.SampleBegin + HeaderTabs +
     FReportData.ComparisonBegin + HeaderTabs +
     FReportData.ComparisonLatency + HeaderTabs +
-    FReportData.ComparisonChosen
-    ;
+    FReportData.ComparisonChosen;
 end;
 
 function TTBMTS.GetHeader: string;
@@ -171,8 +190,7 @@ begin
     rsReportStmModBeg + HeaderTabs +
     rsReportStmCmpBeg + HeaderTabs +
     rsReportRspCmpLat + HeaderTabs +
-    rsReportRspCmp
-    ;
+    rsReportRspCmp;
 end;
 
 procedure TTBMTS.WhiteScreen(Sender: TObject);
@@ -239,8 +257,8 @@ begin
         Parent.Cursor := -1;
         Cursor := -1;
         Parent.Invalidate;
-        CounterManager.SessionPointsTopRight :=
-          CounterManager.SessionPointsTopRight + 1;
+        Counters.SessionPointsTopRight :=
+          Counters.SessionPointsTopRight + 1;
         EndTrial(Sender);
       end else begin
         Parent.Cursor := -1;

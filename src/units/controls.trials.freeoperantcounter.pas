@@ -45,7 +45,7 @@ type
   protected
     procedure WriteData(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -54,11 +54,12 @@ implementation
 uses
   constants
   , Timestamps
-  , Audio.Bass_nonfree
-  , Audio.BassCallbacks
+  , Session.Configuration.GlobalContainer
+  //, Audio.Bass_nonfree
+  //, Audio.BassCallbacks
   ;
 
-constructor TFreeOperantCounter.Create(AOwner: TComponent);
+constructor TFreeOperantCounter.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -94,7 +95,7 @@ begin
   FConsequences := 0;
   FPoints := 0;
   FEndCriterium := 0;
-  GMessageTrialAudioWasPlayed := True;
+  //GMessageTrialAudioWasPlayed := True;
 end;
 
 procedure TFreeOperantCounter.TrialKeyUp(Sender: TObject;
@@ -114,17 +115,19 @@ end;
 procedure TFreeOperantCounter.Play(ACorrection : Boolean);
 var
   LSchedule : string;
+  Parameters : TStringList;
 begin
   inherited Play(ACorrection);
-  FEndCriterium := StrToIntDef(CfgTrial.SList.Values[_Consequence], 1000);
+  Parameters := Configurations.Parameters;
+  FEndCriterium := StrToIntDef(Parameters.Values[_Consequence], 1000);
 
-  LSchedule := CfgTrial.SList.Values[_Schedule];
+  LSchedule := Parameters.Values[_Schedule];
   if LSchedule = '' then
     LSchedule := 'CRF';
   FSchedule.Load(LSchedule);
 
   with FLabelPoints do
-    Font.Size := StrToIntDef(CfgTrial.SList.Values[_MsgFontSize], 22);
+    Font.Size := StrToIntDef(Parameters.Values[_MsgFontSize], 22);
 
   if Self.ClassType = TFreeOperantCounter then Config(Self);
 end;
@@ -138,33 +141,33 @@ end;
 procedure TFreeOperantCounter.Consequence(Sender: TObject);
 var
   LSoundFile : string;
-  LSound : TBassStream;
+  //LSound : TBassStream;
 begin
-  if GMessageTrialAudioWasPlayed then
-  begin
-    GMessageTrialAudioWasPlayed := False;
-    LSoundFile := RootMedia+'CSQ1.wav';
-
-    // increment consequences
-    Inc(FConsequences);
-
-    // increment points
-    Inc(FPoints);
-    FLabelPoints.Caption:= rsReportPoints + ':' + LineEnding + IntToStr(FPoints);
-
-    // play sound
-    if FileExists(LSoundFile) then
-    begin
-      LSound := TBassStream.Create(LSoundFile);
-      LSound.SyncProcedure := @EndOfMessageTrialAudio;
-      LSound.Play;
-      LSound.Free;
-    end;
-    LogEvent('C');
-
-    WriteData(Self); // must be self, see TBlc.WriteTrialData
-    if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
-  end;
+  //if GMessageTrialAudioWasPlayed then
+  //begin
+  //  GMessageTrialAudioWasPlayed := False;
+  //  LSoundFile := RootMedia+'CSQ1.wav';
+  //
+  //  // increment consequences
+  //  Inc(FConsequences);
+  //
+  //  // increment points
+  //  Inc(FPoints);
+  //  FLabelPoints.Caption:= rsReportPoints + ':' + LineEnding + IntToStr(FPoints);
+  //
+  //  // play sound
+  //  if FileExists(LSoundFile) then
+  //  begin
+  //    LSound := TBassStream.Create(LSoundFile);
+  //    LSound.SyncProcedure := @EndOfMessageTrialAudio;
+  //    LSound.Play;
+  //    LSound.Free;
+  //  end;
+  //  LogEvent('C');
+  //
+  //  WriteData(Self); // must be self, see TBlc.WriteTrialData
+  //  if Assigned(Counters.OnConsequence) then Counters.OnConsequence(Self);
+  //end;
 end;
 
 procedure TFreeOperantCounter.Response(Sender: TObject);
@@ -172,7 +175,7 @@ begin
   LogEvent('R');
   Inc(FDataSupport.Responses);
 
-  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
+  if Assigned(Counters.OnStmResponse) then Counters.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse(Self);
 end;
 
@@ -189,7 +192,7 @@ begin
     Format('%-*.*d', [4, 8, FDataSupport.Responses]) + #9 +
     Format('%-*.*d', [4, 8, FPoints]);
 
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
+  //if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
 end;
 
 end.

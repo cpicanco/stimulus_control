@@ -107,6 +107,7 @@ procedure WriteToConfigurationFile(ADesign : string);
 var
   LCondition : char;
   LConditionI : integer = 0;
+  LTable : integer = 0;
   LNextBlocOnCriteria : string;
 
   procedure WriteBCondition;
@@ -115,6 +116,8 @@ var
   begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem B');
+    ConfigurationFile.WriteToBloc(
+      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE3B);
 
     // 20 tentativas
@@ -123,6 +126,7 @@ var
     WriteB1(LConditionI, 'E3B1');
 
     // 40 no máximo, critério de 90% de acerto
+    LNextBlocOnCriteria := (LConditionI+2).ToString;
     for i := 0 to 1 do
     begin
       Inc(LConditionI);
@@ -145,6 +149,8 @@ var
   begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem C');
+    ConfigurationFile.WriteToBloc(
+      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE3B);
 
     // 20 tentativas
@@ -153,6 +159,7 @@ var
     WriteB1(LConditionI, 'E3C1');
 
     // 40 no máximo, critério de 90% de acerto
+    LNextBlocOnCriteria := (LConditionI+2).ToString;
     for i := 0 to 1 do
     begin
       Inc(LConditionI);
@@ -176,14 +183,11 @@ begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem A0');
     WriteMSG(LConditionI, 'M0', MessageA0);
-    LNextBlocOnCriteria := '13'; // zero based
-  end else begin
-    LNextBlocOnCriteria := '4';
   end;
 
   for LCondition in ADesign do
   case LCondition of
-    'A': WriteACondition(LConditionI);
+    'A': WriteACondition(LConditionI, LTable, '3');
     'B': WriteBCondition;
     'C': WriteCCondition;
   end;

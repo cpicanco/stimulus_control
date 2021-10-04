@@ -23,7 +23,6 @@ type
 
   TLightImage = class(TGraphicControl)
   private
-    FSchedule : TSchedule;
     FFileName: string;
     FBitmap: TBitmap;
     FEdge: TColor;
@@ -37,6 +36,7 @@ type
     procedure SetOnResponse(AValue: TNotifyEvent);
     procedure SetSchedule(AValue: TSchedule);
   protected
+    FSchedule : TSchedule;
     procedure MouseDown(Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;

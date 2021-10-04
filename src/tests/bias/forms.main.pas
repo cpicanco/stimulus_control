@@ -16,7 +16,6 @@ type
     Button1 : TButton;
     Button2 : TButton;
     IniPropStorage1 : TIniPropStorage;
-    ListBox1 : TListBox;
     procedure Button1Click(Sender : TObject);
     procedure Button2Click(Sender : TObject);
     procedure FormCreate(Sender : TObject);

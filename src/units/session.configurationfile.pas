@@ -28,6 +28,7 @@ type
     FBlocCount : integer;
     class function TrialSection(BlocIndex, TrialIndex : integer) : string;
     class function BlocSection(BlocIndex : integer) : string;
+    function CurrentBlocSection : string;
     function GetBlocCount : integer;
     function GetTrialCount(BlocIndex : integer): integer;
     function GetBloc(BlocIndex : integer): TCfgBlc;
@@ -36,12 +37,17 @@ type
     //procedure SetTrial(BlocIndex, TrialIndex : integer; AValue: TCfgTrial);
     procedure CopySection(AFrom, ATo : string; AConfigurationFile : TConfigurationFile);
     procedure WriteSection(ASectionName:string; ASection : TStrings);
+
   public
     constructor Create(const AConfigurationFile: string; AEscapeLineFeeds:Boolean=False); override;
     destructor Destroy; override;
     class function FullTrialSection(ABloc, ATrial : integer) : string;
     function ReadTrialString(ABloc : integer; ATrial : integer; AName:string):string;
     function ReadTrialInteger(ABloc : integer; ATrial : integer; AName:string):LongInt;
+    function CurrentBloc: TCfgBlc;
+    function CurrentTrial: TCfgTrial;
+    function BeginTableName : string;
+    function EndTableName : string;
     procedure Invalidate;
     procedure ReadPositionsInBloc(ABloc:integer; APositionsList : TStrings);
     procedure WriteToBloc(ABloc : integer;AName, AValue: string);
@@ -66,7 +72,7 @@ var
 
 implementation
 
-uses constants, strutils;
+uses Constants, StrUtils, Session.Configuration.GlobalContainer;
 
 { TConfigurationFile }
 
@@ -96,6 +102,33 @@ begin
   Result := BlocSection(BlocIndex) + ' - ' + _Trial + IntToStr(TrialIndex);
 end;
 
+function TConfigurationFile.CurrentBloc: TCfgBlc;
+begin
+  Result := Bloc[Counters.CurrentBlc+1];
+end;
+
+function TConfigurationFile.CurrentTrial: TCfgTrial;
+begin
+  Result := Trial[
+    Counters.CurrentBlc+1,
+    Counters.CurrentTrial+1];
+end;
+
+function TConfigurationFile.BeginTableName: string;
+begin
+  Result := ReadString(CurrentBlocSection, 'BeginTable', '');
+end;
+
+function TConfigurationFile.EndTableName: string;
+begin
+  Result := ReadString(CurrentBlocSection, 'EndTable', '');
+end;
+
+function TConfigurationFile.CurrentBlocSection: string;
+begin
+  Result := BlocSection(Counters.CurrentBlc+1);
+end;
+
 function TConfigurationFile.GetBloc(BlocIndex: integer): TCfgBlc;
 var
   LBlcSection , s1: string;
@@ -105,7 +138,7 @@ begin
     begin
       ID := BlocIndex;
       s1 := ReadString(LBlcSection, _NumTrials, '0 0');
-      NumTrials:=StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
+      TotalTrials:=StrToIntDef(ExtractDelimited(1,s1,[#32]),0);
       VirtualTrialValue:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
 
       Name:= ReadString(LBlcSection, _Name, '');
@@ -115,6 +148,7 @@ begin
       CrtHitPorcentage := ReadInteger(LBlcSection, _CrtHitPorcentage, -1);
       CrtConsecutiveHit := ReadInteger(LBlcSection, _CrtConsecutiveHit, -1);
       CrtConsecutiveMiss := ReadInteger(LBlcSection, _CrtConsecutiveMiss, -1);
+      CrtConsecutiveHitPerType := ReadInteger(LBlcSection, _CrtConsecutiveHitPerType, -1);
       CrtHitValue := ReadInteger(LBlcSection, _CrtHitValue, -1);
       CrtMaxTrials:= ReadInteger(LBlcSection, _CrtMaxTrials, -1);
       CrtKCsqHit := ReadInteger(LBlcSection, _CsqCriterion, -1);

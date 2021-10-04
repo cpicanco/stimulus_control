@@ -47,7 +47,7 @@ resourcestring
 
 implementation
 
-uses Constants, Timestamps;
+uses Constants, Timestamps, Session.Configuration.GlobalContainer;
 
 constructor TPerformanceReview.Create(AOwner: TCustomControl);
 begin
@@ -94,12 +94,12 @@ begin
   inherited Play(ACorrection);
   FHitsCounter := TCounterPR.Create(Owner);
   FHitsCounter.Cursor := Cursor;
-  FHitsCounter.Caption := RSLabelHits+#32+IntToStr(CounterManager.BlcHits);
+  FHitsCounter.Caption := RSLabelHits+#32+IntToStr(Counters.BlcHits);
   FHitsCounter.CentralizeLeft;
 
   FMissCounter := TCounterPR.Create(Owner);
   FHitsCounter.Cursor := Cursor;
-  FMissCounter.Caption := RSLabelMiss+#32+IntToStr(CounterManager.BlcMisses);
+  FMissCounter.Caption := RSLabelMiss+#32+IntToStr(Counters.BlcMisses);
   FMissCounter.CentralizeRight;
   if Self.ClassType = TPerformanceReview then Config(Self);
 end;
@@ -123,8 +123,8 @@ begin
   Data :=  Data +
            TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
            LLatency + #9 +
-           IntToStr(CounterManager.BlcHits) + #9 +
-           IntToStr(CounterManager.BlcMisses);
+           IntToStr(Counters.BlcHits) + #9 +
+           IntToStr(Counters.BlcMisses);
 end;
 
 end.

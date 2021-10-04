@@ -71,7 +71,9 @@ type
 
 implementation
 
-uses strutils, constants, timestamps, Session.ConfigurationFile;
+uses strutils, constants, timestamps
+  , Session.ConfigurationFile
+  , Session.Configuration.GlobalContainer;
 
 constructor TSimpl.Create(AOwner: TCustomControl);
 begin
@@ -97,7 +99,7 @@ begin
   if Self.ClassType = TSimpl then
   begin
     LTrial.Append(TConfigurationFile.FullTrialSection(
-      CounterManager.CurrentBlc, CounterManager.CurrentTrial));
+      Counters.CurrentBlc, Counters.CurrentTrial));
     LTrial.Values[_Kind] := T_Simple;
     LTrial.Values[_Cursor] := IntToStr(Cursor);
     LTrial.Values[_LimitedHold] := IntToStr(LimitedHold);
@@ -128,7 +130,7 @@ var
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   FNumComp := StrToIntDef(LParameters.Values[_NumComp], 0);
   SetLength(FComparisons, FNumComp);
   for i := Low(FComparisons) to High(FComparisons) do

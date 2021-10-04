@@ -35,6 +35,8 @@ type
     LabelSquareSize: TLabel;
     LabelSquareSizeExp3 : TLabel;
     LabelTimeSize: TLabel;
+    LabelColorTime1: TLabel;
+    LabelColorTime3: TLabel;
     PageControl1: TPageControl;
     PanelConfigurations: TPanel;
     RadioGroupDesign1: TRadioGroup;
@@ -42,6 +44,8 @@ type
     RadioGroupDesign3: TRadioGroup;
     RadioGroupDesign4: TRadioGroup;
     SpinEditTimeSize: TSpinEdit;
+    SpinEditColorTime1: TSpinEdit;
+    SpinEditColorTime3: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -84,12 +88,16 @@ procedure TBackground.ButtonStartAllClick(Sender: TObject);
 var
   LName : string;
 begin
+  GlobalContainer.RootData :=
+    GlobalContainer.RootData + EditParticipant.Text + DirectorySeparator;
+  ForceDirectories(GlobalContainer.RootData);
   CheatsModeOn := CheckBoxCheatsMode.Checked;
   PanelConfigurations.Hide;
   Session.Backgrounds.Background := Self;
   ScreenInCentimeters := FloatSpinEditScreen.Value;
   case PageControl1.TabIndex of
     0:begin
+      ConsequenceTime := SpinEditColorTime1.Value;
       SquareSize := FloatSpinEditSquare.Value;
       SquareMovementSize := FloatSpinEditSquareMove.Value;
       Granularity := SpinEditTimeSize.Value;
@@ -109,6 +117,7 @@ begin
 
     2:begin
       { code }
+      ConsequenceTime := SpinEditColorTime3.Value;
       SquareSize := FloatSpinEditSquareExp3.Value;
       ConfigurationFilename :=
         Experiments.Eduardo.MakeConfigurationFile(

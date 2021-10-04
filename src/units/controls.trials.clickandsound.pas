@@ -39,7 +39,8 @@ type
 
 implementation
 
-uses Constants, Timestamps, Session.ConfigurationFile;
+uses Constants, Timestamps, Session.ConfigurationFile
+  , Session.Configuration.GlobalContainer;
 
 { TClickSound }
 
@@ -87,7 +88,7 @@ begin
     LDuration + #9 +
     LLatency + #9 +
     FStimulus.ShortName;
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
+  //if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
 end;
 
 constructor TClickSound.Create(AOwner: TCustomControl);
@@ -130,7 +131,7 @@ var
 begin
   LTrial := TStringList.Create;
   LTrial.Append(TConfigurationFile.FullTrialSection(
-    CounterManager.CurrentBlc, CounterManager.CurrentTrial));
+    Counters.CurrentBlc, Counters.CurrentTrial));
   LTrial.Values[_Kind] := T_LIK;
   LTrial.Values[_Cursor] := IntToStr(Cursor);
   LTrial.Values[_cStm] := ExtractFileName(FStimulus.Filename);
@@ -143,7 +144,7 @@ var
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   FSoundBuffer := SoundEngine.LoadBuffer(RootMedia+'tone.wav');
 
   FStimulus := TKey.Create(Self.Parent);

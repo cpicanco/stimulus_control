@@ -26,6 +26,8 @@ type
   }
   TCounterManager = class(TComponent)
   private
+    FBlcCscHitsType1: integer;
+    FBlcCscHitsType2: integer;
     FBlcPoints: integer;
     FOnRepeatBlc: TNotifyEvent;
   {Current Session}
@@ -191,6 +193,7 @@ type
     property OnCsqCriterion : TNotifyEvent read FOnCsqCriterion write FOnCsqCriterion;
     //property OnBlcRepetition : TNotifyEvent read FOnBlcRepetition write SetOnBlcRepetition;
   end;
+
 implementation
 
 { TCounterManager }
@@ -231,6 +234,8 @@ begin
   FBlcCsqHits := 0;
   FBlcHits := 0;
   FBlcCscHits := 0;
+  FBlcCscHitsType1 := 0;
+  FBlcCscHitsType2 := 0;
   FBlcHighCscHits := 0;
   FBlcMisses := 0;
   FBlcCscMisses := 0;
@@ -349,6 +354,8 @@ begin
   FBlcCsqHits := 0;
   FBlcHits := 0;
   FBlcCscHits := 0;
+  FBlcCscHitsType1 := 0;
+  FBlcCscHitsType2 := 0;
   FBlcHighCscHits := 0;
   FBlcMisses := 0;
   FBlcCscMisses := 0;
@@ -377,6 +384,8 @@ begin
   FBlcCsqHits := 0;
   FBlcHits := 0;
   FBlcCscHits := 0;
+  FBlcCscHitsType1 := 0;
+  FBlcCscHitsType2 := 0;
   FBlcHighCscHits := 0;
   FBlcMisses := 0;
   FBlcCscMisses := 0;
@@ -425,6 +434,8 @@ begin
           Inc(FSessionCscHits);           //Contador de corretas consecutivas na sessão
           Inc(FBlcHits);           //Contador de corretas no bloco
           Inc(FBlcCscHits);        //Contador de corretas consecutivas do bloco
+          Inc(FBlcCscHitsType1);        //Contador de corretas consecutivas t1
+          Inc(FBlcCscHitsType2);        //Contador de corretas consecutivas t2
           Inc(FBlcCsqHits);        //Contador de corretas consecutivas para liberação de consequências
         end else FBlcVirtualHitLoop := 0;
        ///
@@ -451,6 +462,8 @@ begin
 
   if FBlcCscHits > FBlcHighCscHits then FBlcHighCscHits := FBlcCscHits;
   FBlcCscHits := 0;
+  FBlcCscHitsType1 := 0;
+  FBlcCscHitsType2 := 0;
   if FBlcCscMisses > FBlcHighCscMisses then FBlcHighCscMisses := FBlcCscMisses;
 
   if FSessionCscHits > FSessionHighCscHits then FSessionHighCscHits := FSessionCscHits;

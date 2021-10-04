@@ -13,7 +13,7 @@ unit Cheats;
 
 interface
 
-uses Classes, Controls, ExtCtrls, Stimuli;
+uses Classes, SysUtils, Controls, ExtCtrls, Stimuli;
 
 type
 
@@ -21,17 +21,19 @@ type
 
   TParticipantBot = class(TComponent)
   private
+    FBias: TBytes;
     FData  : PtrInt;
     FTimer : TTimer;
     FTargetStimulus : IStimuli;
     procedure Click(Sender : TObject);
     procedure Async(AData : PtrInt);
+    procedure SetBias(AValue: TBytes);
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
     procedure Start(AStimulus : IStimuli);
     procedure Stop;
-    property Bias :
+    property Bias : TBytes read FBias write SetBias;
   end;
 
 var
@@ -56,7 +58,7 @@ choice := choices[ri];
 
 implementation
 
-uses Forms, SysUtils;
+uses Forms;
 
 { TBot }
 
@@ -68,6 +70,12 @@ end;
 procedure TParticipantBot.Async(AData : PtrInt);
 begin
   FTargetStimulus.DoExpectedResponse;
+end;
+
+procedure TParticipantBot.SetBias(AValue: TBytes);
+begin
+  if FBias=AValue then Exit;
+  FBias:=AValue;
 end;
 
 constructor TParticipantBot.Create(AOwner : TComponent);

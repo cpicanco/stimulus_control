@@ -128,7 +128,7 @@ end;
 
 procedure TRS232.Dispenser(Data: String);
 begin
-  if Assigned (FBlockSerial) then
+  if Assigned(FBlockSerial) then
     FBlockSerial.SendString(Data);
 end;
 

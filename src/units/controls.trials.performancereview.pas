@@ -123,12 +123,12 @@ begin
 
   FHitsCounter := TCounterPR.Create(Self);
   FHitsCounter.Cursor := Cursor;
-  FHitsCounter.Caption := RSLabelHits+#32+IntToStr(CounterManager.BlcHits);
+  FHitsCounter.Caption := RSLabelHits+#32+IntToStr(Counters.BlcHits);
   FHitsCounter.CentralizeLeft;
 
   FMissCounter := TCounterPR.Create(Self);
   FHitsCounter.Cursor := Cursor;
-  FMissCounter.Caption := RSLabelMiss+#32+IntToStr(CounterManager.BlcMisses);
+  FMissCounter.Caption := RSLabelMiss+#32+IntToStr(Counters.BlcMisses);
   FMissCounter.CentralizeRight;
 
   if Self.ClassType = TPerformanceReview then Config(Self);

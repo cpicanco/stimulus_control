@@ -25,9 +25,9 @@ type
     PupilClient: TPupilClient;
     {$ENDIF}
     PupilEnabled : Boolean;
-    CounterManager : TCounterManager;
-    RootData: string;
-    RootMedia: string;
+    RootData : string;
+    RootMedia : string;
+    BaseFileName : string;
     ExeName : string;
     TimeStart : Extended;
     TestMode : Boolean;
@@ -35,21 +35,23 @@ type
   end;
 var
   GlobalContainer : TGlobalContainer;
+  Counters : TCounterManager;
 
 implementation
 
 uses SysUtils, Forms, Timestamps;
 
 initialization
+  Counters := TCounterManager.Create(nil);
   GlobalContainer := TGlobalContainer.Create;
   with GlobalContainer do
   begin
+    BaseFileName := '';
     ExeName := Application.ExeName;
     RootData := ExtractFilePath(ExeName) + 'data' + DirectorySeparator;
     RootMedia := ExtractFilePath(ExeName) +  'media' + DirectorySeparator;
     ForceDirectories(RootData);
     ForceDirectories(RootMedia);
-    CounterManager := TCounterManager.Create(nil);
     MonitorToShow := 0;
     TimeStart := TickCount;
     PupilEnabled := False;
@@ -57,8 +59,8 @@ initialization
   end
 
 finalization
-  GlobalContainer.CounterManager.Free;
   GlobalContainer.Free;
+  Counters.Free;
 
 end.
 

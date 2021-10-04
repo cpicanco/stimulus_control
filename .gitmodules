@@ -1,3 +1,6 @@
 [submodule "src/trackbias"]
 	path = src/trackbias
 	url = git@github.com:cpicanco/trackbias.git
+[submodule "dependency/richmemo"]
+	path = dependency/richmemo
+	url = https://github.com/skalogryz/richmemo.git

@@ -39,7 +39,9 @@ uses
 , LazFileUtils
 , Loggers.Reports
 , Session.ConfigurationFile
-, Session.Configuration.GlobalContainer;
+, Session.Configuration.GlobalContainer
+, Session.EndCriteria
+  ;
 
 { TSession }
 
@@ -51,14 +53,16 @@ var
 
 procedure TSession.PlayBloc;
 begin
-  with GlobalContainer.CounterManager do
-  if CurrentBlc < ConfigurationFile.BlocCount then
-    begin
-      FBloc.BeforePlay;
-      SetVirtualTrialValue(ConfigurationFile.Bloc[CurrentBlc+1].VirtualTrialValue);
-      FBloc.Play;
-    end
-  else EndSession;
+  EndCriteria.Invalidate;
+  if EndCriteria.OfSession then begin
+    EndSession;
+  end else begin
+    Counters.OnEndBlc(Self);
+    FBloc.BeforePlay;
+    Counters.SetVirtualTrialValue(
+      ConfigurationFile.Bloc[Counters.CurrentBlc+1].VirtualTrialValue);
+    FBloc.Play;
+  end;
 end;
 
 function TSession.GetBaseFilename: string;
@@ -71,7 +75,6 @@ end;
 
 procedure TSession.EndBloc(Sender: TObject);
 begin
-  GlobalContainer.CounterManager.OnEndBlc(Sender);
   PlayBloc;
 end;
 
@@ -101,7 +104,7 @@ constructor TSession.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   //MakeConfigurationFile(0, SessionBlocs);
-  FirstFilename := GlobalContainer.RootData + FirstFilename;
+  EndCriteria := TEndCriteria.Create(Self);
   FBloc := TBloc.Create(Self);
   FBloc.OnEndBloc := @EndBloc;
   //FBloc.OnInterTrialStop := @InterTrialStop;
@@ -115,13 +118,16 @@ end;
 
 procedure TSession.Play(ASessionName: string; AParticipantName: string);
 begin
+  FirstFilename := GlobalContainer.RootData + FirstFilename;
   Header := HSUBJECT_NAME + #9 + AParticipantName + LineEnding +
             HSESSION_NAME + #9 + ASessionName + LineEnding +
             HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
   DataFilename := CreateLogger(LGData, FirstFilename, Header);
   TimestampsFilename := CreateLogger(LGTimestamps, FirstFilename, Header);
   if Assigned(OnBeforeStart) then OnBeforeStart(Self);
+
   GlobalContainer.TimeStart := TickCount;
+  GlobalContainer.BaseFilename := BaseFilename;
   PlayBloc;
 end;
 

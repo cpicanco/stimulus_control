@@ -60,7 +60,7 @@ begin
     AllowTextSelect := False;
     FixedTypeface := 'Times New Roman';
     DefaultTypeFace := 'default';
-    DefaultFontSize := 20;
+    DefaultFontSize := 25;
     FlagErrors := False;
     ShowHints := False;
     WantTabs := False;

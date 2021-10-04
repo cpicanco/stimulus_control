@@ -56,6 +56,7 @@ type
   end;
 
 var
+  ConsequenceTime : Cardinal = 250;
   Granularity : Cardinal = 100;
   ScreenInCentimeters : real = 39.624;
   SquareSize : real = 0.8;
@@ -86,7 +87,7 @@ begin
   FTimer.OnTimer := @Move;
   FTimerConsequence := TTimer.Create(Self);
   FTimerConsequence.Enabled:=False;
-  FTimerConsequence.Interval := Granularity;
+  FTimerConsequence.Interval := ConsequenceTime;
   FTimerConsequence.OnTimer := @ChangeColor;
 end;
 
@@ -206,14 +207,16 @@ procedure TMovingSquare.ChangeColor(Sender: TObject);
 begin
   FTimerConsequence.Enabled := False;
   Color := clGray;
+  if Assigned(FSchedule) then FSchedule.DoResponse;
 end;
 
 procedure TMovingSquare.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
-  inherited MouseDown(Button, Shift, X, Y);
+  //inherited MouseDown(Button, Shift, X, Y);
   Color := clYellow;
   FTimerConsequence.Enabled := True;
+  if Assigned(OnMouseDown) then OnMouseDown(Self, Button, Shift, X, Y);
 end;
 
 procedure TMovingSquare.Paint;

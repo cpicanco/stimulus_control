@@ -15,8 +15,10 @@ interface
 
 procedure SetupStimuli;
 procedure WriteMSG(ABlc : integer; AName: string; AMessage : string);
-procedure WriteTXTInput(ABlc : integer; AName: string; AMessage : string);
-procedure WriteACondition(var ACondition : integer);
+procedure WriteTXTInput(ABlc : integer; AName: string;
+  AMessage : string; APrice : string);
+procedure WriteACondition(var ACondition : integer;
+  var ATable : integer; Experiment:string);
 
 const
   FolderMessages =
@@ -55,7 +57,8 @@ begin
   LoadMessageFromFile(MessageE3B,  GlobalContainer.RootMedia+FolderMessages+'3-MensagemB.html');
 end;
 
-procedure WriteTXTInput(ABlc : integer; AName: string; AMessage : string);
+procedure WriteTXTInput(ABlc : integer; AName: string;
+  AMessage: string; APrice : string);
 var
   i : integer;
 begin
@@ -67,6 +70,7 @@ begin
     WriteToTrial(i, ABlc, _Kind, T_INP);
     WriteToTrial(i, ABlc, _ITI, ITI.ToString);
     WriteToTrial(i, ABlc, _Msg, AMessage);
+    WriteToTrial(i, ABlc, 'Price', APrice);
   end;
 end;
 
@@ -106,10 +110,10 @@ begin
   end;
 end;
 
-procedure WriteACondition(var ACondition : integer);
+procedure WriteACondition(var ACondition: integer; var ATable: integer;
+  Experiment: string);
 var
   i : integer;
-
   procedure WriteDiscountBloc(ABlc : integer);
   var
     LDelay : string;
@@ -117,9 +121,9 @@ var
     if DelaysIndex > High(Delays) then DelaysIndex := 0;
     LDelay := Delays[DelaysIndex];
 
-    WriteChoice(ABlc,FloatToStrF(50.0,ffFixed,0,2)+#32+LDelay,
-      FloatToStrF(50.0, ffFixed, 0,2),
-      FloatToStrF(100.0, ffFixed, 0,2),
+    WriteChoice(ABlc,'50.0'+#32+LDelay,
+      '50.0',
+      '100.0',
       LDelay,
       '0','0');
 
@@ -131,22 +135,28 @@ var
   var
     i : integer;
   const
-    LValues : array [0..20] of string =
-      ('0,50','1,00','1,50','2,00',
-      '3,00','4,00','5,00','6,00','7,00',
-      '8,00','9,00','10,00','12,00',
-      '15,00','20,00','25,00','30,00',
-      '50,00','100,00','200,00','400,00');
+    LPrices : array [0..20] of string =
+      ('0.50','1.00','1.50','2.00',
+      '3.00','4.00','5.00','6.00','7.00',
+      '8.00','9.00','10.00','12.00',
+      '15.00','20.00','25.00','30.00',
+      '50.00','100.00','200.00','400.00');
   begin
-    WriteTXTInput(ABlc, 'Demanda 1', 'Quanto você consumiria se o cigarro fosse gratuito?');
-    for i := Low(LValues) to High(LValues) do
-      WriteTXTInput(ABlc, 'Demanda '+(i+2).ToString,
-        'Quanto você consumiria se cada cigarro custasse R$'+LValues[i]+'?');
+    WriteTXTInput(ABlc, 'Demanda 0',
+      'Quanto você consumiria se o cigarro fosse gratuito?', '0');
+    for i := Low(LPrices) to High(LPrices) do
+      WriteTXTInput(ABlc, 'Demanda '+LPrices[i],
+      'Quantos cigarros você consumiria se cada um custasse R$'+LPrices[i]+'?',
+      LPrices[i]);
   end;
 begin
   ITI := ITISurvey;
   Inc(ACondition);
   ConfigurationFile.WriteToBloc(ACondition, _Name, 'Mensagem A1');
+  ConfigurationFile.WriteToBloc(
+    ACondition,
+    'EndTable',
+    'Experiment'+Experiment+'Table'+ATable.ToString);
   WriteMSG(ACondition, 'M1', MessageE1A1);
 
   for i := Low(Delays) to High(Delays)do
@@ -154,15 +164,25 @@ begin
     Inc(ACondition);
     ConfigurationFile.WriteToBloc(ACondition, _Name, Delays[i]);
     ConfigurationFile.WriteToBloc(ACondition, _CrtMaxTrials, '10');
+    if i = Low(Delays) then begin
+      ATable := ACondition;
+      ConfigurationFile.WriteToBloc(
+        ACondition, 'BeginTable', 'DiscountTable'+ATable.ToString);
+    end;
     WriteDiscountBloc(ACondition);
   end;
 
   Inc(ACondition);
   ConfigurationFile.WriteToBloc(ACondition, _Name, 'Mensagem A2');
+  ConfigurationFile.WriteToBloc(
+    ACondition, 'EndTable', 'DiscountTable'+ATable.ToString);
   WriteMSG(ACondition, 'M1', MessageE1A2);
 
   Inc(ACondition);
+  ATable := ACondition;
   ConfigurationFile.WriteToBloc(ACondition, _Name, 'Demanda');
+  ConfigurationFile.WriteToBloc(
+    ACondition, 'BeginTable', 'DemandTable'+ATable.ToString);
   WriteDemandBloc(ACondition);
 end;
 

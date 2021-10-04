@@ -27,6 +27,8 @@ type
     ComparisonBegin   : string;
     ComparisonEnd     : string;
     ComparisonChosen  : string;
+    ComparisonLeft    : string;
+    ComparisonRight   : string;
     ComparisonLatency : string;
   end;
 
@@ -65,7 +67,11 @@ type
 
 implementation
 
-uses Forms, Graphics, Constants, Timestamps, Cheats;
+uses
+  Forms, Graphics,
+  Constants, Timestamps, Cheats
+  , Session.Configuration.GlobalContainer
+  , Experiments.Eduardo.Comum.DelayDiscountTable;
 
 constructor TBinaryChoiceTrial.Create(AOwner: TCustomControl);
 begin
@@ -129,7 +135,7 @@ begin
   LParameters := Configurations.Parameters;
   FStimulus.LoadFromParameters(LParameters);
   FMessage := FStimulus.MessageFromParameters(LParameters);
-  FMessage.CurrentTrial := CounterManager.BlcTrials;
+  FMessage.CurrentTrial := Counters.BlcTrials;
   FStimulus.LoadMessage(FMessage);
   FStimulus.SetScheduleConsequence(@Consequence);
   FStimulus.FitScreen;
@@ -157,32 +163,45 @@ procedure TBinaryChoiceTrial.WriteData(Sender: TObject);
 begin
   inherited WriteData(Sender);
   Data := Data +
-          FReportData.ComparisonChosen + HeaderTabs +
-          FReportData.ComparisonBegin + HeaderTabs +
-          FReportData.ComparisonLatency
-          ;
+    FReportData.ComparisonBegin + HeaderTabs +
+    FReportData.ComparisonLatency + HeaderTabs +
+    FReportData.ComparisonLeft + HeaderTabs +
+    FReportData.ComparisonRight + HeaderTabs +
+    FReportData.ComparisonChosen;
 end;
 
 function TBinaryChoiceTrial.GetHeader: string;
 begin
   Result :=
-    rsReportRspCmp + HeaderTabs +
     rsReportStmCmpBeg + HeaderTabs +
-    rsReportRspCmpLat
-    ;
+    rsReportRspCmpLat + HeaderTabs +
+    rsReportStmLeft + HeaderTabs +
+    rsReportStmRight + HeaderTabs +
+    rsReportRspCmp;
 end;
 
 procedure TBinaryChoiceTrial.Consequence(Sender: TObject);
 var
   S : string;
+  LTable : TDelayDiscountTable;
 begin
+  if Assigned(FTable) then begin
+    LTable := FTable as TDelayDiscountTable;
+    if Counters.BlcTrials =
+      Configurations.Parameters.Values[_CrtMaxTrials].ToInteger-1 then begin
+      LTable.AddIndiferencePoint(FMessage.Now);
+    end;
+  end;
+
   FResponseEnabled := False;
   S := TComponent(Sender).Name;
-  FMessage.AComponentName := S;
-  NextTrial := FStimulus.NextTrial(S);
-  FReportData.ComparisonLatency:=TimestampToStr(LogEvent(S +'.Latency'));
-  FReportData.ComparisonChosen:=S;
+  FReportData.ComparisonLatency := TimestampToStr(LogEvent(S +'.Latency'));
+  FReportData.ComparisonChosen := S;
+  FReportData.ComparisonLeft := FloatToStrF(FMessage.Now, ffFixed, 0, 2);
+  FReportData.ComparisonRight := FloatToStrF(FMessage.Later, ffFixed, 0, 2);
 
+  FMessage.Sender := Sender;
+  NextTrial := FStimulus.NextTrial(Sender);
   FStimulus.NextNow(FMessage);
   S := FloatToStrF(FMessage.Now, ffFixed, 0, 2);
   Configurations.Parameters.Values[_Now] := S;

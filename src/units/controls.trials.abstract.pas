@@ -16,7 +16,6 @@ interface
 uses Controls, ExtCtrls, Classes, SysUtils
   , Session.Configuration
   , Loggers.Reports
-  , CounterManager
   {$IFDEF RS232}
   , Devices.RS232i
   {$ENDIF}
@@ -111,12 +110,12 @@ type
     property OnTrialStart: TNotifyEvent read FOnTrialStart write SetOnTrialStart;
     property OnTrialMouseDown: TMouseEvent read FOnTrialMouseDown write SetOnTrialMouseDown;
   protected
+    FTable : TComponent;
     FShowCounter : Boolean;
     FCounterType : TCounterType;
     FCounterRectTopRight : TRect;
     FCounterRectTopLeft : TRect;
     FNextTrial : string;
-    CounterManager : TCounterManager;
     procedure MouseDown(Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer); override;
     procedure Paint; override;
@@ -129,7 +128,9 @@ type
     function AsString : string; virtual; abstract;
     function HasVisualConsequence : Boolean; virtual;
     function ConsequenceInterval : integer; virtual;
+    function ResultAsInteger : integer;
     procedure StopConsequence; virtual;
+    procedure AssignTable(ATable : TComponent);
     procedure Play(ACorrection: Boolean=False); virtual;
     procedure Hide; virtual;
     procedure Show; virtual;
@@ -338,9 +339,9 @@ procedure TTrial.Paint;
   begin
     case FCounterType of
       ctNone : LPoints := 0;
-      ctBlocPoints : LPoints := CounterManager.BlcPoints;
-      ctSessionPoints : LPoints := CounterManager.SessionPointsTopRight;
-      ctCustom : LPoints := CounterManager.SessionPointsTopRight;
+      ctBlocPoints : LPoints := Counters.BlcPoints;
+      ctSessionPoints : LPoints := Counters.SessionPointsTopRight;
+      ctCustom : LPoints := Counters.SessionPointsTopRight;
     end;
 
     LTextStyle := Canvas.TextStyle;
@@ -368,7 +369,7 @@ procedure TTrial.Paint;
     LPoints : integer;
   begin
     case FCounterType of
-      ctCustom : LPoints := CounterManager.SessionPointsTopLeft;
+      ctCustom : LPoints := Counters.SessionPointsTopLeft;
       else { do nothing };
     end;
 
@@ -424,7 +425,6 @@ end;
 constructor TTrial.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
-  CounterManager := GlobalContainer.CounterManager;
   FConfigurations.Id := -1;
   FConfigurations.NumComp := 0;
   FConfigurations.Name := T_NONE;
@@ -489,9 +489,24 @@ begin
   Result := StrToIntDef(Configurations.Parameters.Values[_ITI], 0);
 end;
 
+function TTrial.ResultAsInteger: integer;
+begin
+  case Self.Result of
+    T_HIT : ResultAsInteger := 1;
+    T_MISS: ResultAsInteger := 0;
+    T_NONE: ResultAsInteger := -1;
+    else    ResultAsInteger := -1;
+  end;
+end;
+
 procedure TTrial.StopConsequence;
 begin
 
+end;
+
+procedure TTrial.AssignTable(ATable: TComponent);
+begin
+  FTable := ATable;
 end;
 
 procedure TTrial.Play(ACorrection: Boolean);
@@ -612,9 +627,9 @@ function TTrial.LogEvent(ACode: string): Extended;
 begin
   Result := TickCount - TimeStart;
   SaveData(TimestampToStr(Result) + #9 +
-           IntToStr(CounterManager.CurrentBlc+1) + #9 +
-           IntToStr(CounterManager.CurrentTrial+1) + #9 +
-           IntToStr(CounterManager.SessionTrials+1) + #9 + // Current trial cycle
+           IntToStr(Counters.CurrentBlc+1) + #9 +
+           IntToStr(Counters.CurrentTrial+1) + #9 +
+           IntToStr(Counters.SessionTrials+1) + #9 + // Current trial cycle
            Configurations.Name + #9 +
            ACode + LineEnding);
 end;
@@ -623,9 +638,9 @@ function TTrial.LogEvent(ACode : string; ATimestamp : Extended) : Extended;
 begin
   Result := ATimestamp - TimeStart;
   SaveData(TimestampToStr(Result) + #9 +
-           IntToStr(CounterManager.CurrentBlc+1) + #9 +
-           IntToStr(CounterManager.CurrentTrial+1) + #9 +
-           IntToStr(CounterManager.SessionTrials+1) + #9 + // Current trial cycle
+           IntToStr(Counters.CurrentBlc+1) + #9 +
+           IntToStr(Counters.CurrentTrial+1) + #9 +
+           IntToStr(Counters.SessionTrials+1) + #9 + // Current trial cycle
            Configurations.Name + #9 +
            ACode + LineEnding);
 end;

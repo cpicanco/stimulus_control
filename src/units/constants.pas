@@ -11,7 +11,7 @@ unit Constants;
 
 {$mode objfpc}{$H+}
 
-// {$DEFINE DEBUG}
+{$DEFINE DEBUG}
 
 interface
 
@@ -72,6 +72,9 @@ const
 {$ENDIF}
 
 const
+  clDarkGreen = $006400;
+
+const
   // Posições
   _Positions = 'Positions';
   _Cols = 'Cols';
@@ -95,6 +98,7 @@ const
   _CrtHitPorcentage = 'Criteria.HitPorcentage';
   _CrtHitValue = 'Criteria.HitValue';
   _CrtConsecutiveHit  = 'ConsecutiveHitCriterion';
+  _CrtConsecutiveHitPerType = 'ConsecutiveHitCriterionPerType';
   _CrtConsecutiveMiss = 'ConsecutiveMissCriterion';
   _CrtMaxTrials = 'MaxTrialCriterion';
   _NextBlocOnCriteria = 'NextBloc.OnCriteria';
@@ -275,6 +279,7 @@ const
   T_MRD = 'MRD';
   T_MSG = 'MSG';
   T_HTM = 'HTMLM';
+  T_RTF = 'RTFM';
   T_EO1 = 'OP1';
   T_TMB = 'TMB';
   T_CHO = 'CHOICE';
@@ -333,6 +338,8 @@ resourcestring
   rsReportStmEnd = 'S.Fim';
   rsReportStmEndR = 'S.Fim.Reforco';
   rsReportStmEndO = 'S.Fim.Omissao';
+  rsReportStmLeft = 'S.Comparacao.Esquerda';
+  rsReportStmRight = 'S.Comparacao.Direita';
 
   rsReportRspLat = 'R.Latencia';
   rsReportRspFrq = 'R.Frequencia';
@@ -345,6 +352,7 @@ resourcestring
   rsReportStmCmpBeg = 'S.Comparacoes.Inicio';
   rsReportStmCmpEnd = 'S.Comparacoes.Fim';
   rsReportRspCmp = 'R.Comparacao.Escolhida';
+  rsReportRspCmpAlt = 'R.Comparacao.NaoEscolhida';
   rsReportRspCmpLat = 'R.Comparacao.Escolhida.Latencia';
   rsReportStmCmpDur = 'S.Comparacoes.Duracao';
 

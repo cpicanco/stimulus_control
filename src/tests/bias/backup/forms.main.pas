@@ -64,7 +64,7 @@ end;
 
 procedure TForm1.Button2Click(Sender : TObject);
 begin
-  //TrackBias1.RemoveSpot;
+  TrackBias1.RemoveSpot;
 end;
 
 end.

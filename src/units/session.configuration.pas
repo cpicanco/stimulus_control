@@ -38,7 +38,7 @@ type
     ITI: Integer;
     BkGnd: Integer;
     Counter : string;
-    NumTrials: Integer;
+    TotalTrials: Integer;
     VirtualTrialValue: Integer;
 
     MaxCorrection: Integer;
@@ -49,6 +49,7 @@ type
     CrtHitValue:Integer;
     CrtConsecutiveHit: Integer;
     CrtHitPorcentage : Integer;
+    CrtConsecutiveHitPerType : Integer;
     CrtConsecutiveMiss : Integer;
     CrtMaxTrials : Integer;
     CrtKCsqHit : Integer;
@@ -150,7 +151,7 @@ end;
 
 function TCfgSes.GetCurrentBlc: TCfgBlc;
 begin
-  Result := GetCfgBlc(GlobalContainer.CounterManager.CurrentBlc);
+  Result := GetCfgBlc(Counters.CurrentBlc);
 end;
 
 function TCfgSes.GetPupilEnabled: Boolean;
@@ -190,8 +191,8 @@ end;
 procedure TCfgSes.SetLengthVetTrial(Blc: Integer);
 var i : integer;
 begin
-  SetLength(FBlcs[Blc].Trials, FBlcs[Blc].NumTrials);
-  for i := 0 to FBlcs[blc].NumTrials - 1 do
+  SetLength(FBlcs[Blc].Trials, FBlcs[Blc].TotalTrials);
+  for i := 0 to FBlcs[blc].TotalTrials - 1 do
     begin
       if not Assigned(FBlcs[blc].Trials[i].Parameters)then
         begin
@@ -254,7 +255,7 @@ begin
               for i:= Low(FBlcs) to High(FBlcs) do
                 begin
                   FBlcs[i] := Bloc[i+1];
-                  SetLength(FBlcs[i].Trials, FBlcs[i].NumTrials);
+                  SetLength(FBlcs[i].Trials, FBlcs[i].TotalTrials);
                   for j:= Low(FBlcs[i].Trials) to High(FBlcs[i].Trials) do
                     FBlcs[i].Trials[j] := Trial[i+1,j+1];
                 end;

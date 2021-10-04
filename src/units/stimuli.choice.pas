@@ -14,7 +14,7 @@ unit Stimuli.Choice;
 interface
 
 uses
-  Classes, SysUtils, Controls, Graphics
+  Classes, SysUtils, Controls, Graphics, StdCtrls
   , Stimuli
   , Stimuli.Abstract
   , Stimuli.Image.Base
@@ -26,10 +26,10 @@ type
   { TBinaryChoiceMessage }
   TBinaryChoiceMessage = record
     CurrentTrial: integer;
-    LastNow : real;
-    Now : real;
-    Later : real;
-    AComponentName : string;
+    LastNow : Extended;
+    Now : Extended;
+    Later : Extended;
+    Sender : TObject;
     Delay: string;
   end;
 
@@ -37,6 +37,8 @@ type
   TBinaryChoice = class(TStimulus, IStimuli)
   private
     FParent : TWinControl;
+    FLabelLeft : TLabel;
+    FLabelRight: TLabel;
     FImageLeft : TLightImage;
     FImageRight : TLightImage;
     FNextTrialLeft : string;
@@ -50,7 +52,7 @@ type
     destructor Destroy; override;
     function MessageFromParameters(
       AParameters : TStringList) : TBinaryChoiceMessage;
-    function NextTrial(AComponentName : string) : string;
+    function NextTrial(Sender: TObject) : string;
     function AsInterface : IStimuli;
     procedure DoExpectedResponse;
     procedure FitScreen;
@@ -73,22 +75,43 @@ procedure TBinaryChoice.SetParent(AValue: TWinControl);
 begin
   if FParent=AValue then Exit;
   FParent := AValue;
+  FLabelLeft.Parent := FParent;
+  FLabelRight.Parent := FParent;
   FImageLeft.Parent := FParent;
   FImageRight.Parent := FParent;
 end;
 
 procedure TBinaryChoice.LoadMessage(AMessage : TBinaryChoiceMessage);
+var
+  OldDecimalSeparator : char;
 begin
+  OldDecimalSeparator := DefaultFormatSettings.DecimalSeparator;
+  DefaultFormatSettings.DecimalSeparator := '.';
+
+  FLabelLeft.Caption := 'Agora';
   FImageLeft.Caption :=
   'Ganhar '+#13+'R$' +
   FloatToStrF(AMessage.Now, ffFixed, 0, 2) +
-  ' reais' + #13 + 'agora';
+  ' reais';
 
+  case AMessage.CurrentTrial of
+    0 : begin
+      FLabelRight.Font.Bold := True;
+      FLabelLeft.Font.Bold := True;
+    end
+
+    else begin
+      FLabelRight.Font.Bold := False;
+      FLabelLeft.Font.Bold := False;
+    end;
+  end;
+  FLabelRight.Caption := 'Daqui ' + AMessage.Delay;
   FImageRight.Caption :=
   'Ganhar '+#13+'R$' +
   FloatToStrF(AMessage.Later, ffFixed, 0, 2) +
-  ' reais' + #13 + 'daqui ' +
-  AMessage.Delay;
+  ' reais';
+
+  DefaultFormatSettings.DecimalSeparator := OldDecimalSeparator;
 end;
 
 
@@ -110,12 +133,13 @@ begin
   FImageRight.Schedule.OnConsequence := AConsequence;
 end;
 
-function TBinaryChoice.NextTrial(AComponentName: string): string;
+function TBinaryChoice.NextTrial(Sender: TObject): string;
+var
+  LSchedule : TSchedule;
 begin
-  case AComponentName of
-    'Left' : Result := FNextTrialLeft;
-    'Right': Result := FNextTrialRight;
-  end;
+  LSchedule :=  TSchedule(Sender);
+  if LSchedule = FImageLeft.Schedule then Result := FNextTrialLeft;
+  if LSchedule = FImageRight.Schedule then Result := FNextTrialRight;
 end;
 
 function TBinaryChoice.AsInterface : IStimuli;
@@ -136,31 +160,42 @@ end;
 
 procedure TBinaryChoice.NextNow(var AMessage : TBinaryChoiceMessage);
 const
-  LFactor   : real = 0.5;
+  LFactor : real = 0.5;
 var
   LNow : real;
   LDelta : real;
+  LSchedule : TSchedule;
 begin
-  case AMessage.CurrentTrial of
-    0 : begin
-      case AMessage.AComponentName of
-        'Left' : LNow := AMessage.Now * 0.50;
-        'Right': LNow := AMessage.Now * 1.50
+  if AMessage.Sender is TSchedule then begin
+    LSchedule :=  TSchedule(AMessage.Sender);
+    case AMessage.CurrentTrial of
+      0 : begin
+        if LSchedule = FImageLeft.Schedule then begin
+          LNow := AMessage.Now * 0.50;
+        end;
+
+        if LSchedule = FImageRight.Schedule then begin
+          LNow := AMessage.Now * 1.50
+        end;
+
+        AMessage.LastNow := AMessage.Now;
+        AMessage.Now     := LNow;
       end;
-      AMessage.LastNow := AMessage.Now;
-      AMessage.Now     := LNow;
+
+      // recursive logic for geometric progression
+      else
+        LDelta := Abs(AMessage.Now - AMessage.LastNow) * LFactor;
+        AMessage.LastNow := AMessage.Now;
+
+        if LSchedule = FImageLeft.Schedule then begin
+          LNow := AMessage.LastNow - LDelta;
+        end;
+        if LSchedule = FImageRight.Schedule then begin
+          LNow := AMessage.LastNow + LDelta;
+        end;
+
+        AMessage.Now := LNow;
     end;
-
-    // recursive logic for geometric progression
-    else
-      LDelta := Abs(AMessage.Now - AMessage.LastNow) * LFactor;
-      AMessage.LastNow := AMessage.Now;
-
-      case AMessage.AComponentName of
-        'Left' : LNow := AMessage.LastNow - LDelta;
-        'Right': LNow := AMessage.LastNow + LDelta;
-      end;
-      AMessage.Now     := LNow;
   end;
 end;
 
@@ -180,6 +215,36 @@ begin
   FImageRight.Schedule.Name := 'Right';
   FImageRight.Schedule.Load(CRF);
   FImageRight.EdgeColor:=clBlack;
+
+  FLabelLeft := TLabel.Create(Self);
+  FLabelLeft.Visible := False;
+  FLabelLeft.Alignment := taCenter;
+  FLabelLeft.Layout := tlCenter;
+  FLabelLeft.Font.Size := 20;
+  FLabelLeft.Font.Color := clBlack;
+  FLabelLeft.BorderSpacing.Around := 10;
+  with FLabelLeft do begin
+    Anchors := [akBottom, akLeft];
+    AnchorSideBottom.Control := FImageLeft;
+    AnchorSideBottom.Side := asrTop;
+    AnchorSideLeft.Control := FImageLeft;
+    AnchorSideLeft.Side := asrCenter;
+  end;
+
+  FLabelRight := TLabel.Create(Self);
+  FLabelRight.Visible := False;
+  FLabelRight.Alignment := taCenter;
+  FLabelRight.Layout := tlCenter;
+  FLabelRight.Font.Size := 20;
+  FLabelRight.Font.Color := clBlack;
+  FLabelRight.BorderSpacing.Around := 10;
+  with FLabelRight do begin
+    Anchors := [akBottom, akLeft];
+    AnchorSideBottom.Control := FImageRight;
+    AnchorSideBottom.Side := asrTop;
+    AnchorSideLeft.Control := FImageRight;
+    AnchorSideLeft.Side := asrCenter;
+  end;
 end;
 
 destructor TBinaryChoice.Destroy;
@@ -208,15 +273,20 @@ end;
 
 procedure TBinaryChoice.Start;
 begin
+  FLabelLeft.Show;
   FImageLeft.Show;
   FImageLeft.Schedule.Start;
 
+  FLabelRight.Show;
   FImageRight.Show;
   FImageRight.Schedule.Start;
 end;
 
 procedure TBinaryChoice.Stop;
 begin
+  FLabelLeft.Hide;
+  FLabelRight.Hide;
+
   FImageLeft.Hide;
   FImageRight.Hide;
 end;

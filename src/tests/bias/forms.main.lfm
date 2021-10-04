@@ -1,41 +1,31 @@
 object Form1: TForm1
   Left = 365
-  Height = 666
+  Height = 207
   Top = 161
   Width = 730
   Caption = 'Form1'
-  ClientHeight = 666
+  ClientHeight = 207
   ClientWidth = 730
   OnCreate = FormCreate
   SessionProperties = 'TrackBias1.Spots;TrackBias1.Name'
   LCLVersion = '2.1.0.0'
-  object ListBox1: TListBox
-    Left = 18
-    Height = 234
-    Top = 408
-    Width = 282
-    ItemHeight = 0
-    ScrollWidth = 280
-    TabOrder = 0
-    TopIndex = -1
-  end
   object Button1: TButton
-    Left = 328
+    Left = 40
     Height = 28
-    Top = 431
+    Top = 136
     Width = 117
-    Caption = 'Button1'
+    Caption = 'ButtonAdd'
     OnClick = Button1Click
-    TabOrder = 1
+    TabOrder = 0
   end
   object Button2: TButton
-    Left = 328
+    Left = 192
     Height = 28
-    Top = 472
+    Top = 136
     Width = 117
-    Caption = 'Button2'
+    Caption = 'ButtonRemove'
     OnClick = Button2Click
-    TabOrder = 2
+    TabOrder = 1
   end
   object IniPropStorage1: TIniPropStorage
     StoredValues = <>

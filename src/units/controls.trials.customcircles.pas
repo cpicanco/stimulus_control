@@ -51,20 +51,21 @@ type
   protected
     procedure WriteData(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner : TCustomControl); override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
 implementation
 
 uses strutils, constants, Timestamps, Canvas.Helpers
+  , Session.Configuration.GlobalContainer
 {$ifdef DEBUG}
   , Loggers.Debug
   , Dialogs
 {$endif}
   ;
 
-constructor TMRD.Create(AOwner: TComponent);
+constructor TMRD.Create(AOwner: TCustomControl);
 begin
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialKeyUp := @TrialKeyUp;
@@ -91,7 +92,7 @@ end;
 procedure TMRD.Consequence(Sender: TObject);
 begin
   LogEvent('C');
-  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+  if Assigned(Counters.OnConsequence) then Counters.OnConsequence(Self);
 
   TrialResult(Sender);
 end;
@@ -139,15 +140,15 @@ begin
     begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
-      Load(CfgTrial.SList.Values[_Schedule]);
+      Load(Configurations.Parameters.Values[_Schedule]);
     end;
-  AddToClockList(FSchedule);
-  FCircles.angle := StrToFloatDef(CfgTrial.SList.Values[_Angle], 0.0);
-  FCircles.response := CfgTrial.SList.Values[_Comp + '1' + _cGap];
+  //AddToClockList(FSchedule);
+  FCircles.angle := StrToFloatDef(Configurations.Parameters.Values[_Angle], 0.0);
+  FCircles.response := Configurations.Parameters.Values[_Comp + '1' + _cGap];
 
   for a1 := 0 to 1 do
     begin
-      s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd];
+      s1:= Configurations.Parameters.Values[_Comp + IntToStr(a1+1) + _cBnd];
 
       LOuterR.Left:= StrToIntDef(ExtractDelimited(1,s1,[#32]), 0);
       LOuterR.Top:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
@@ -160,9 +161,9 @@ begin
         begin
           OuterRect := LOuterR;
           InnerRect := GetInnerRect(LOuterR, LWidth, LHeight);
-          gap := StrToBoolDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap], False );
-          gap_degree := 16 * StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
-          gap_length := 16 * StrToIntDef( CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
+          gap := StrToBoolDef(Configurations.Parameters.Values[_Comp + IntToStr(a1+1) + _cGap], False );
+          gap_degree := 16 * StrToIntDef(Configurations.Parameters.Values[_Comp + IntToStr(a1+1) + _cGap_Degree], Round(Random(360)));
+          gap_length := 16 * StrToIntDef(Configurations.Parameters.Values[_Comp + IntToStr(a1+1) + _cGap_Length], 5 );
         end;
   end;
 
@@ -189,7 +190,7 @@ begin
           Format('%-*.*d', [4,8,FCircles.C[1].OuterRect.Top]) + #9 +
           #32#32#32#32#32#32#32 + FCircles.response + #9 +
           Format('%-*.*d', [4,8,FDataSupport.Responses]);
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+  //if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
 procedure TMRD.TrialBeforeEnd(Sender: TObject);
@@ -211,7 +212,7 @@ begin
       FDataSupport.Latency := LTickCount;
     end;
 
-  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse (Sender);
+  if Assigned(Counters.OnStmResponse) then Counters.OnStmResponse (Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
 

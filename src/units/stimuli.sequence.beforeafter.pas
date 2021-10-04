@@ -67,10 +67,10 @@ type
   public
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
-    procedure LoadFromFile(AFilename: string); override;
+    procedure LoadFromFile(AFilename: string);
     procedure LoadFromParameters(AParameters : TStringList);
-    procedure Start; override;
-    procedure Stop; override;
+    procedure Start;
+    procedure Stop;
     procedure FitScreen;
     property ExpectedResponse : TExpectedResponse read FExpectedResponse write SetExpectedResponse;
     property TrialType : TTrialType read FTrialType write SetTrialType;

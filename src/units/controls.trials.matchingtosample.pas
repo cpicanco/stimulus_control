@@ -103,6 +103,7 @@ implementation
 
 uses StrUtils, Constants, Timestamps
   , Session.ConfigurationFile
+  , Session.Configuration.GlobalContainer
   ;
 
 constructor TMTS.Create(AOwner: TCustomControl);
@@ -124,7 +125,7 @@ var
   LParameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  LParameters := Configurations.Parameters;
   with FSample do
   begin
     // Owner is TGraphicControl
@@ -222,7 +223,7 @@ begin
   if Self.ClassType = TMTS then
   begin
     LTrial.Append(TConfigurationFile.FullTrialSection(
-      CounterManager.CurrentBlc, CounterManager.CurrentTrial));
+      Counters.CurrentBlc, Counters.CurrentTrial));
     LTrial.Values[_Kind] := T_Simple;
     LTrial.Values[_Cursor] := IntToStr(Cursor);
     LTrial.Values[_LimitedHold] := IntToStr(LimitedHold);
@@ -344,7 +345,7 @@ begin
         if FSDataSupport.SampLatency = TimeStart then
             FSDataSupport.SampLatency := LTickCount;
 
-        if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
+        if Assigned(Counters.OnStmResponse) then Counters.OnStmResponse(Sender);
         if Assigned(OnStmResponse) then OnStmResponse(Self);
       end;
 end;
@@ -422,7 +423,7 @@ begin
     end;
   LogEvent(aStimulus + #9 + IntToStr(X) + #9 + IntToStr(Y));
 
-  CounterManager.OnBkgndResponse(Self);
+  Counters.OnBkgndResponse(Self);
   if Assigned(OnBkGndResponse) then OnBkGndResponse(Self);
 end;
 

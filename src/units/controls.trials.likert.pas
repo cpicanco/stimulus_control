@@ -51,7 +51,9 @@ type
 
 implementation
 
-uses Constants, Timestamps, Session.ConfigurationFile;
+uses Constants, Timestamps,
+  Session.ConfigurationFile,
+  Session.Configuration.GlobalContainer;
 
 { TLikert }
 
@@ -75,7 +77,7 @@ begin
 end;
 
 procedure TLikert.WriteData(Sender: TObject);
-var LStart, LDuration : string;
+var LStart : string;
 begin
   inherited WriteData(Sender);
   LStart := TimestampToStr(FDataLine.StmBegin - TimeStart);
@@ -125,7 +127,7 @@ var
 begin
   LTrial := TStringList.Create;
   LTrial.Append(TConfigurationFile.FullTrialSection(
-    CounterManager.CurrentBlc, CounterManager.CurrentTrial));
+    Counters.CurrentBlc, Counters.CurrentTrial));
   LTrial.Values[_Kind] := T_LIK;
   LTrial.Values[_Cursor] := IntToStr(Cursor);
   LTrial.Values[_Left] := FLikertScale.FilenameLeft;
@@ -136,14 +138,14 @@ end;
 
 procedure TLikert.Play(ACorrection: Boolean);
 var
-  LParameters : TStringList;
+  Parameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LParameters := Configurations.SList;
+  Parameters := Configurations.Parameters;
 
   FLikertScale.LoadImagePair(
-    RootMedia + LParameters.Values[_Left],
-    RootMedia + LParameters.Values[_Right]);
+    RootMedia + Parameters.Values[_Left],
+    RootMedia + Parameters.Values[_Right]);
   FLikertScale.Hide;
 
   if Self.ClassType = TLikert then Config(Self);

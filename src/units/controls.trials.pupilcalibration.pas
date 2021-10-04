@@ -13,7 +13,7 @@ unit Controls.Trials.PupilCalibration;
 
 interface
 
-uses LCLIntf, LCLType, Classes, SysUtils, Graphics, ExtCtrls
+uses LCLIntf, LCLType, Classes, SysUtils, Graphics, ExtCtrls, Controls
 
   , Controls.Trials.Abstract
   , Controls.Trials.Helpers
@@ -59,7 +59,7 @@ type
     procedure WriteData(Sender: TObject); override;
     procedure Paint; override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
@@ -67,7 +67,7 @@ type
 
 implementation
 
-uses strutils, constants, timestamps
+uses strutils, constants, timestamps, Session.Configuration.GlobalContainer
     {$IFNDEF NO_LIBZMQ}
     , background
     {$ENDIF}
@@ -190,7 +190,7 @@ begin
           TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
           TimestampToStr(FDataSupport.StmEnd - TimeStart) + #9 +
           IntToStr(Length(FDots));
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+  //if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
 procedure TCLB.Paint;
@@ -199,7 +199,7 @@ begin
 
 end;
 
-constructor TCLB.Create(AOwner: TComponent);
+constructor TCLB.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -233,21 +233,21 @@ end;
 procedure TCLB.Play(ACorrection: Boolean);
 var
   s1 : string;
-
   NumComp,
   i : integer;
+  Parameters : TStringList;
 begin
   inherited Play(ACorrection);
-
-  NumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
-  FShowDots := StrToBoolDef(CfgTrial.SList.Values[_ShowDots], False);
-  FBlocking := StrToBoolDef(CfgTrial.SList.Values[_Blocking], False);
+  Parameters := Configurations.Parameters;
+  NumComp := StrToIntDef(Parameters.Values[_NumComp], 0);
+  FShowDots := StrToBoolDef(Parameters.Values[_ShowDots], False);
+  FBlocking := StrToBoolDef(Parameters.Values[_Blocking], False);
   if NumComp > 0 then
     begin
       SetLength(FDots, NumComp);
       for i := Low(FDots) to High(FDots) do
         begin
-          s1 := CfgTrial.SList.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
+          s1 := Parameters.Values[_Comp + IntToStr(i + 1) + _cBnd] + #32;
           FDots[i].Y := StrToIntDef(ExtractDelimited(1,s1,[#32]), 0); // top, left, width, height
           FDots[i].X := StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
           FDots[i].Size := StrToIntDef(ExtractDelimited(3,s1,[#32]), 0);

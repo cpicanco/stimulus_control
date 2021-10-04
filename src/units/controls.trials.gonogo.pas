@@ -19,7 +19,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, LazFileUtils
   , Controls.Trials.Helpers
   , Schedules
   , Controls.Stimuli.Key
-  , Audio.Bass_nonfree
+  //, Audio.Bass_nonfree
   ;
 
 type
@@ -33,7 +33,7 @@ type
     FConsequenceFired : Boolean;
     FDataSupport : TDataSupport;
     FStimulus : TKey;
-    FSound : TBassStream;
+    //FSound : TBassStream;
     FPopUpTime : integer;
     FSchedule : TSchedule;
     FContingency : string;
@@ -49,7 +49,7 @@ type
     { TTrial }
     procedure WriteData(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
     destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
     //procedure DispenserPlusCall; override;
@@ -58,11 +58,11 @@ type
 
 implementation
 
-uses strutils, constants, Timestamps;
+uses strutils, constants, Timestamps, Session.Configuration.GlobalContainer;
 
 { TGNG }
 
-constructor TGNG.Create(AOwner: TComponent);
+constructor TGNG.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
@@ -83,8 +83,8 @@ end;
 
 destructor TGNG.Destroy;
 begin
-  if Assigned(FSound) then
-    FSound.Free;
+  //if Assigned(FSound) then
+  //  FSound.Free;
   inherited Destroy;
 end;
 
@@ -107,7 +107,7 @@ begin
         T_CRT:NextTrial := T_CRT;
         'IF_HIT_JUMP_NEXT_TRIAL':
             if Result = T_HIT then
-              NextTrial := IntToStr(CounterManager.CurrentTrial+3);
+              NextTrial := IntToStr(Counters.CurrentTrial+3);
       end;
     end;
 end;
@@ -140,14 +140,14 @@ begin
   if FileExists(LSoundFile) then
     begin
       LogEvent('CS');
-      if Assigned(FSound) then
-        begin
-          FSound.Free;
-          FSound := TBassStream.Create(LSoundFile);
-        end
-      else
-        FSound := TBassStream.Create(LSoundFile);
-      FSound.Play;
+      //if Assigned(FSound) then
+      //  begin
+      //    FSound.Free;
+      //    FSound := TBassStream.Create(LSoundFile);
+      //  end
+      //else
+      //  FSound := TBassStream.Create(LSoundFile);
+      //FSound.Play;
     end;
 
   if FileExists(LPopUpFile) then
@@ -200,7 +200,7 @@ procedure TGNG.Consequence(Sender: TObject);
       if gngPlayGo in FGoNoGoStyle then
         PlayConsequence;
 
-    if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+    if Assigned(Counters.OnConsequence) then Counters.OnConsequence(Self);
   end;
 
 begin
@@ -236,6 +236,7 @@ var
   , LName, LWidth, LHeight
   , LPopUpTime : string;
   i : integer;
+  Parameters : TStringList;
 begin
   inherited Play(ACorrection);
   {
@@ -254,26 +255,26 @@ begin
 
     C1Stm=A1.png
   }
-
-  FPresentConsequenceJustOnce := StrToBoolDef(CfgTrial.SList.Values[_PresentConsequenceJustOnce],True);
+  Parameters := Configurations.Parameters;
+  FPresentConsequenceJustOnce := StrToBoolDef(Parameters.Values[_PresentConsequenceJustOnce],True);
   FGoNoGoStyle := [];
-  s1 := CfgTrial.SList.Values[_Style];
+  s1 := Parameters.Values[_Style];
   for i := 1 to WordCount(s1,[#32]) do
     FGoNoGoStyle += [StringToStyle(ExtractDelimited(i,s1,[#32]))];
 
   if FGoNoGoStyle = [] then
     FGoNoGoStyle := [gngPlayGo,gngPlayNoGo];
 
-  s1 := CfgTrial.SList.Values[_PopUpTime] + #32;
+  s1 := Parameters.Values[_PopUpTime] + #32;
   LPopUpTime := ExtractDelimited(1,s1,[#32]);
   FPopUpTime := StrToIntDef(LPopUpTime,1000);
 
-  s1:= CfgTrial.SList.Values[_Comp + IntToStr(1) +_cStm] + #32;
+  s1:= Parameters.Values[_Comp + IntToStr(1) +_cStm] + #32;
   LName := RootMedia + ExtractDelimited(1,s1,[#32]);
   LColor := ExtractDelimited(2,s1,[#32]);
   LLoop := s1;
 
-  s1:= CfgTrial.SList.Values[_Comp + IntToStr(1) +_cBnd] + #32;
+  s1:= Parameters.Values[_Comp + IntToStr(1) +_cBnd] + #32;
   LWidth := ExtractDelimited(1,s1,[#32]);
   LHeight := ExtractDelimited(2,s1,[#32]);
 
@@ -294,12 +295,12 @@ begin
     begin
       OnConsequence := @Consequence;
       OnResponse:= @Response;
-      Load(CfgTrial.SList.Values[_Schedule]);
+      Load(Parameters.Values[_Schedule]);
       Enabled := False;
     end;
-  AddToClockList(FSchedule);
+  //AddToClockList(FSchedule);
 
-  FContingency := CfgTrial.SList.Values[_Consequence];
+  FContingency := Parameters.Values[_Consequence];
   if Self.ClassType = TGNG then Config(Self);
 end;
 
@@ -328,7 +329,7 @@ begin
            Format('%-*.*d', [4,8, FDataSupport.Responses]) + #9 +
            FContingency;
 
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+  //if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
 procedure TGNG.Response(Sender: TObject);
@@ -337,7 +338,7 @@ begin
   if FDataSupport.Latency = TimeStart then
     FDataSupport.Latency := TickCount;
 
-  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
+  if Assigned(Counters.OnStmResponse) then Counters.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
 

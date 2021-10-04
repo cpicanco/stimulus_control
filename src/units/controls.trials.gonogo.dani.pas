@@ -57,14 +57,15 @@ type
     destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
     procedure StopConsequence; override;
-    function StartConsequence : integer; override;
+    function StartConsequence : integer;
     function AsString : string; override;
-    function HasConsequence: Boolean; override;
+    function HasConsequence: Boolean;
   end;
 
 implementation
 
-uses StdCtrls, strutils, constants, Timestamps;
+uses StdCtrls, strutils, constants, Timestamps
+  , Session.Configuration.GlobalContainer;
 
 { TGNG }
 
@@ -117,7 +118,7 @@ end;
 
 procedure TGNG.Consequence(Sender: TObject);
 begin
-  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+  if Assigned(Counters.OnConsequence) then Counters.OnConsequence(Self);
   EndTrial(Sender);
 end;
 
@@ -175,12 +176,12 @@ end;
 procedure TGNG.Play(ACorrection: Boolean);
 var
   s1, LName : string;
-  LConfiguration : TStringList;
+  Parameters : TStringList;
 begin
   inherited Play(ACorrection);
-  LConfiguration := Configurations.SList;
+  Parameters := Configurations.Parameters;
 
-  s1:= LConfiguration.Values[_Samp +_cStm] + #32;
+  s1:= Parameters.Values[_Samp +_cStm] + #32;
   LName := RootMedia + ExtractDelimited(1,s1,[#32]);
   FSample := TLabelStimulus.Create(Self, Self.Parent);
   with FSample do
@@ -189,7 +190,7 @@ begin
       CentralizeTopMiddle;
     end;
 
-  s1:= LConfiguration.Values[_Comp + IntToStr(1) +_cStm] + #32;
+  s1:= Parameters.Values[_Comp + IntToStr(1) +_cStm] + #32;
   LName := RootMedia + ExtractDelimited(1,s1,[#32]);
 
   FComparison := TLabelStimulus.Create(Self, Self.Parent);
@@ -218,7 +219,7 @@ begin
       Load(CRF);
     end;
 
-  case UpperCase(LConfiguration.Values[_ResponseStyle]) of
+  case UpperCase(Parameters.Values[_ResponseStyle]) of
     'GO'   : FButtonSide := ssLeft;
     'NOGO' : FButtonSide := ssRight;
   end;
@@ -283,7 +284,7 @@ begin
   if FDataSupport.Latency = TimeStart then
     FDataSupport.Latency := TickCount;
 
-  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
+  if Assigned(Counters.OnStmResponse) then Counters.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
 

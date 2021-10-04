@@ -70,7 +70,7 @@ type
   protected { TTrial }
     procedure WriteData(Sender: TObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
     destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
     property Cycles : integer read GetCycles;
@@ -79,13 +79,13 @@ type
 
 implementation
 
-uses strutils, constants, timestamps
+uses strutils, constants, timestamps, Session.Configuration.GlobalContainer
      {$ifdef DEBUG}
      , Loggers.Debug
      , dialogs
      {$endif}
      ;
-constructor TDZT.Create(AOwner: TComponent);
+constructor TDZT.Create(AOwner: TCustomControl);
 begin
   inherited Create(AOwner);
   OnTrialKeyUp := @TrialKeyUp;
@@ -158,7 +158,7 @@ begin
     end;
   LogEvent('C');
 
-  if Assigned(CounterManager.OnConsequence) then CounterManager.OnConsequence(Self);
+  if Assigned(Counters.OnConsequence) then Counters.OnConsequence(Self);
 end;
 
 procedure TDZT.TrialResult(Sender: TObject);
@@ -290,7 +290,7 @@ begin
   FResponseEnabled := False;
 
   // self
-  FDizzyTimer.Schedule := CfgTrial.SList.Values[_Schedule];
+  FDizzyTimer.Schedule := Configurations.Parameters.Values[_Schedule];
   FSchedule := TSchedule.Create(self);
   with FSchedule do
     begin
@@ -300,11 +300,11 @@ begin
     end;
 
   if FSchedule.Loaded then
-    AddToClockList(FSchedule)
+    //AddToClockList(FSchedule)
   else
     raise Exception.Create(ExceptionNoScheduleFound);
 
-  s1 := CfgTrial.SList.Values[_Trial + _cRes] + #32;
+  s1 := Configurations.Parameters.Values[_Trial + _cRes] + #32;
 
   with FDizzyTimer do
     begin
@@ -339,25 +339,25 @@ begin
           Timer2.OnTimer := @UpdateTimer1;
         end;
 
-      AddToClockList(@Timer1.Start);
-      AddToClockList(@Timer2.Start);
+      //AddToClockList(@Timer1.Start);
+      //AddToClockList(@Timer2.Start);
 
       {$ifdef DEBUG}
         DebugLn(mt_Debug + 'FDizzyTimer:' + IntToStr(Main) +','+ IntToStr(Host) );
       {$endif}
     end;
 
-  FConsequence := CfgTrial.SList.Values[_Trial + _cCsq];
+  FConsequence := Configurations.Parameters.Values[_Trial + _cCsq];
 
   if FConsequence = T_HIT then FConsequence := 'CSQ1.wav';
   if FConsequence = T_MISS then FConsequence := 'CSQ2.wav';
 
-  NumComp := StrToIntDef(CfgTrial.SList.Values[_NumComp], 0);
+  NumComp := StrToIntDef(Configurations.Parameters.Values[_NumComp], 0);
   SetLength(FStimuli, NumComp);
 
   for a1 := 0 to NumComp -1 do
     begin
-        s1:= CfgTrial.SList.Values[_Comp + IntToStr(a1+1) + _cBnd] + #32;
+        s1:= Configurations.Parameters.Values[_Comp + IntToStr(a1+1) + _cBnd] + #32;
 
         R.Top:= StrToIntDef(ExtractDelimited(1,s1,[#32]), 0);
         R.Left:= StrToIntDef(ExtractDelimited(2,s1,[#32]), 0);
@@ -430,14 +430,14 @@ begin
           FDizzyTimer.Mode + #9 +
           Format('%-*.*d', [4, 8, FDataSupport.Responses]);
 
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
+  //if Assigned(OnTrialWriteData) then OnTrialWriteData(Sender);
 end;
 
 procedure TDZT.Response(Sender: TObject);
 begin
   Inc(FDataSupport.Responses);
 
-  if Assigned(CounterManager.OnStmResponse) then CounterManager.OnStmResponse(Sender);
+  if Assigned(Counters.OnStmResponse) then Counters.OnStmResponse(Sender);
   if Assigned(OnStmResponse) then OnStmResponse (Self);
 end;
 

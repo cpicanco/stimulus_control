@@ -120,24 +120,27 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="5">
+    <RequiredPackages Count="6">
       <Item1>
-        <PackageName Value="TurboPowerIPro"/>
+        <PackageName Value="richmemopackage"/>
       </Item1>
       <Item2>
-        <PackageName Value="SynEdit"/>
+        <PackageName Value="TurboPowerIPro"/>
       </Item2>
       <Item3>
-        <PackageName Value="JvCtrlsLazR"/>
+        <PackageName Value="SynEdit"/>
       </Item3>
       <Item4>
-        <PackageName Value="castle_base"/>
+        <PackageName Value="JvCtrlsLazR"/>
       </Item4>
       <Item5>
-        <PackageName Value="LCL"/>
+        <PackageName Value="castle_base"/>
       </Item5>
+      <Item6>
+        <PackageName Value="LCL"/>
+      </Item6>
     </RequiredPackages>
-    <Units Count="30">
+    <Units Count="67">
       <Unit0>
         <Filename Value="eduardo_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -235,60 +238,246 @@
         <UnitName Value="Controls.Trials.TemporalBissection"/>
       </Unit18>
       <Unit19>
-        <Filename Value="src/units/controls.trials.relationalframe.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Controls.Trials.RelationalFrame"/>
-      </Unit19>
-      <Unit20>
         <Filename Value="src/units/stimuli.sequence.relationalframe.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Sequence.RelationalFrame"/>
-      </Unit20>
-      <Unit21>
+      </Unit19>
+      <Unit20>
         <Filename Value="src/units/testingmethods.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="TestingMethods"/>
-      </Unit21>
-      <Unit22>
+      </Unit20>
+      <Unit21>
         <Filename Value="src/units/controls.trials.textinput.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.TextInput"/>
-      </Unit22>
-      <Unit23>
+      </Unit21>
+      <Unit22>
         <Filename Value="src/units/stimuli.image.movingsquare.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Image.MovingSquare"/>
-      </Unit23>
-      <Unit24>
+      </Unit22>
+      <Unit23>
         <Filename Value="src/units/experiments.eduardo.comum.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Experiments.Eduardo.Comum"/>
-      </Unit24>
-      <Unit25>
+      </Unit23>
+      <Unit24>
         <Filename Value="src/units/stimuli.image.labeled.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.Image.Labeled"/>
-      </Unit25>
-      <Unit26>
+      </Unit24>
+      <Unit25>
         <Filename Value="src/units/cheats.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Cheats"/>
-      </Unit26>
-      <Unit27>
+      </Unit25>
+      <Unit26>
         <Filename Value="src/units/experiments.eduardo.experimento3.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Experiments.Eduardo.Experimento3"/>
-      </Unit27>
-      <Unit28>
+      </Unit26>
+      <Unit27>
         <Filename Value="src/units/stimuli.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli"/>
-      </Unit28>
-      <Unit29>
+      </Unit27>
+      <Unit28>
         <Filename Value="src/units/stimuli.nextbutton.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="Stimuli.NextButton"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="src/units/controls.customrichmemo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.CustomRichMemo"/>
       </Unit29>
+      <Unit30>
+        <Filename Value="src/units/session.endcriteria.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.EndCriteria"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="src/units/session.configurationfile.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.ConfigurationFile"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="src/units/experiments.eduardo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="src/units/controls.trials.htmlmessage.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.HTMLMessage"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="src/units/constants.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Constants"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="src/units/session.configuration.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.Configuration"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="src/units/controls.trials.abstract.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.Abstract"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="src/units/countermanager.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="CounterManager"/>
+      </Unit37>
+      <Unit38>
+        <Filename Value="src/units/controls.trials.textmessage.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.TextMessage"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="src/units/controls.trials.binarychoice.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.BinaryChoice"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="src/units/stimuli.image.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Image"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="src/units/experiments.eduardo.experimento1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo.Experimento1"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="src/units/timestamps.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Timestamps"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="src/units/timestamps.helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Timestamps.Helpers"/>
+      </Unit43>
+      <Unit44>
+        <Filename Value="src/units/stimuli.sequence.beforeafter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Sequence.BeforeAfter"/>
+      </Unit44>
+      <Unit45>
+        <Filename Value="src/units/loggers.reports.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.Reports"/>
+      </Unit45>
+      <Unit46>
+        <Filename Value="src/units/loggers.datafile.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.DataFile"/>
+      </Unit46>
+      <Unit47>
+        <Filename Value="src/units/canvas.helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Canvas.Helpers"/>
+      </Unit47>
+      <Unit48>
+        <Filename Value="src/units/reinforcementprobability.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ReinforcementProbability"/>
+      </Unit48>
+      <Unit49>
+        <Filename Value="src/units/session.configuration.globalcontainer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.Configuration.GlobalContainer"/>
+      </Unit49>
+      <Unit50>
+        <Filename Value="src/units/controls.stimuli.key.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Stimuli.Key"/>
+      </Unit50>
+      <Unit51>
+        <Filename Value="src/units/controls.trials.helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.Helpers"/>
+      </Unit51>
+      <Unit52>
+        <Filename Value="src/units/loggers.debug.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.Debug"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="src/units/loggers.debugutils.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.DebugUtils"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="src/units/stimuli.sequence.contextualmatchingtosample.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Sequence.ContextualMatchingToSample"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="src/forms/background.lfm"/>
+        <IsPartOfProject Value="True"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="src/forms/background.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Background"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit56>
+      <Unit57>
+        <Filename Value="src/forms/forms.checkstimuli.lfm"/>
+        <IsPartOfProject Value="True"/>
+      </Unit57>
+      <Unit58>
+        <Filename Value="src/forms/forms.checkstimuli.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormCheckStimuli"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Forms.CheckStimuli"/>
+      </Unit58>
+      <Unit59>
+        <Filename Value="src/units/loggers.tables.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.Tables"/>
+      </Unit59>
+      <Unit60>
+        <Filename Value="src/units/experiments.eduardo.experimento1.tables.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo.Experimento1.Tables"/>
+      </Unit60>
+      <Unit61>
+        <Filename Value="src/units/experiments.eduardo.comum.delaydiscounttable.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo.Comum.DelayDiscountTable"/>
+      </Unit61>
+      <Unit62>
+        <Filename Value="src/units/experiments.eduardo.experimento2.tables.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo.Experimento2.Tables"/>
+      </Unit62>
+      <Unit63>
+        <Filename Value="src/units/experiments.eduardo.experimento3.tables.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo.Experimento3.Tables"/>
+      </Unit63>
+      <Unit64>
+        <Filename Value="src/units/session.tables.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Session.Tables"/>
+      </Unit64>
+      <Unit65>
+        <Filename Value="src/units/experiments.eduardo.comum.demandtable.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Eduardo.Comum.DemandTable"/>
+      </Unit65>
+      <Unit66>
+        <Filename Value="src/units/loggers.helpers.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Loggers.Helpers"/>
+      </Unit66>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

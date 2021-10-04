@@ -59,16 +59,22 @@ procedure WriteToConfigurationFile(ADesign : string);
 var
   LCondition : char;
   LConditionI : integer = 0;
-
+  LTable : integer = 0;
   procedure WriteBCondition;
   begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem B/C');
+    ConfigurationFile.WriteToBloc(
+      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE1B);
 
 
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B');
+    LTable := LConditionI;
+    ConfigurationFile.WriteToBloc(
+      LConditionI, 'BeginTable', 'Experiment1Table'+LTable.ToString);
+
     WriteB(LConditionI);
   end;
 
@@ -76,10 +82,16 @@ var
   begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem C/B');
+    ConfigurationFile.WriteToBloc(
+      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE1B);
 
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C');
+    LTable := LConditionI;
+    ConfigurationFile.WriteToBloc(
+      LConditionI, 'BeginTable', 'Experiment1Table'+LTable.ToString);
+
     WriteC(LConditionI);
   end;
 
@@ -95,7 +107,7 @@ begin
 
   for LCondition in ADesign do
   case LCondition of
-    'A': WriteACondition(LConditionI);
+    'A': WriteACondition(LConditionI, LTable, '1');
     'B': WriteBCondition;
     'C': WriteCCondition;
   end;

@@ -13,7 +13,7 @@ unit Controls.Trials.MoveSquare;
 
 interface
 
-uses LCLIntf, Classes, SysUtils, Forms, Graphics
+uses LCLIntf, Classes, SysUtils, Forms, Graphics, Controls
 
   , Controls.Trials.Abstract
   , Controls.Trials.Helpers
@@ -47,14 +47,14 @@ type
     procedure WriteData(Sender: TObject); override;
     procedure Paint; override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(AOwner: TCustomControl); override;
     destructor Destroy; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
 implementation
 
-uses Timestamps, constants;
+uses Timestamps, constants, Session.Configuration.GlobalContainer;
 
 { TMSQ }
 
@@ -136,7 +136,7 @@ begin
           TimestampToStr(FDataSupport.StmBegin - TimeStart) + #9 +
           TimestampToStr(FDataSupport.StmEnd - TimeStart);
 
-  if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
+  //if Assigned(OnTrialWriteData) then OnTrialWriteData(Self);
 end;
 
 procedure TMSQ.Paint;
@@ -158,7 +158,7 @@ begin
     end;
 end;
 
-constructor TMSQ.Create(AOwner: TComponent);
+constructor TMSQ.Create(AOwner: TCustomControl);
 const
   LSize : integer = 100;
 var

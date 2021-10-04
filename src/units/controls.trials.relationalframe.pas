@@ -84,7 +84,7 @@ begin
   //if Self.ClassType = TBeforeAfter then
   //begin
   //  LTrial.Append(TConfigurationFile.FullTrialSection(
-  //    CounterManager.CurrentBlc, CounterManager.CurrentTrial));
+  //    Counters.CurrentBlc, Counters.CurrentTrial));
   //  LTrial.Values[_Kind] := T_Simple;
   //  LTrial.Values[_Cursor] := IntToStr(Cursor);
   //  LTrial.Values[_LimitedHold] := IntToStr(LimitedHold);

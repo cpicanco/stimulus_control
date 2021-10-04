@@ -15,7 +15,6 @@ interface
 
 uses
   Classes, SysUtils, ExtCtrls, StdCtrls, Controls
-  , CounterManager
   , Controls.Trials.Abstract
   , Stimuli.Image
   ;
@@ -26,9 +25,9 @@ type
 
   TBloc = class(TComponent)
   private
+    FTable : TComponent;
     FWaitLabel : TLabel;
     FConsequence : TStimulusFigure;
-    FCounterManager : TCounterManager;
     FInterTrial : TTimer;
     FTrialConsequence : TTimer;
     FITIBegin, FITIEnd : Extended;
@@ -38,6 +37,7 @@ type
     procedure TrialEnd(Sender: TObject);
     procedure WriteTrialData(Sender: TObject);
   private
+    FBaseFilename: string;
     FOnEndBloc: TNotifyEvent;
     FOnInterTrialStop: TNotifyEvent;
     procedure PlayIntertrialInterval(Sender: TObject);
@@ -62,13 +62,14 @@ uses Constants
    , Session.Configuration
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
+   , Session.EndCriteria
    //, Controls.Trials.Likert
    //, Controls.Trials.MatchingToSample
    //, Controls.Trials.PerformanceReview
    //, Controls.Trials.BeforeAfter
    //, Controls.Trials.ContextualMatchingToSample
    //, Controls.Trials.RelationalFrame
-   , Controls.Trials.TextMessage
+   //, Controls.Trials.TextMessage
    , Controls.Trials.HTMLMessage
    , Controls.Trials.BinaryChoice
    , Controls.Trials.TextInput
@@ -77,6 +78,11 @@ uses Constants
    , Graphics
    , Consequences
    , Dialogs
+   , Experiments.Eduardo.Comum.DelayDiscountTable
+   , Experiments.Eduardo.Comum.DemandTable
+   , Experiments.Eduardo.Experimento1.Tables
+   , Experiments.Eduardo.Experimento2.Tables
+   , Experiments.Eduardo.Experimento3.Tables
    ;
 
 { TBloc }
@@ -89,7 +95,7 @@ begin
   LTrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
 
   if (FTrial is TBinaryChoiceTrial) then begin
-    if FCounterManager.BlcTrials > 0 then begin
+    if Counters.BlcTrials > 0 then begin
       S := FTrial.Configurations.Parameters.Values[_LastNow];
       LTrialConfig.Parameters.Values[_LastNow] := S;
 
@@ -103,7 +109,7 @@ begin
 
   try
     case LTrialConfig.Kind of
-      T_MSG : FTrial := TMessageTrial.Create(Background);
+      //T_MSG : FTrial := TMessageTrial.Create(Background);
       T_HTM : FTrial := THTMLMessage.Create(Background);
       T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
       T_INP : FTrial := TTextInput.Create(Background);
@@ -117,16 +123,18 @@ begin
       //T_CTX : FTrial := TCMTS.Create(Background);
       //T_RFT : FTrial := TFrame.Create(Background);
     end;
+    LTrialConfig.Parameters.Values[_CrtMaxTrials] :=
+      ConfigurationFile.CurrentBloc.CrtMaxTrials.ToString;
 
     FTrial.SaveData := GetSaveDataProc(LGTimestamps);
-    if FCounterManager.SessionTrials = 0 then
+    if Counters.SessionTrials = 0 then
     begin
       FTrial.SaveData(
         HFIRST_TIMESTAMP + #9 +
         TimestampToStr(GlobalContainer.TimeStart) + LineEnding + LineEnding);
       FTrial.SaveData(FTrial.HeaderTimestamps + LineEnding);
     end;
-
+    FTrial.AssignTable(FTable);
     FTrial.Configurations := LTrialConfig;
     FTrial.OnTrialEnd := @TrialEnd;
     FTrial.Play;
@@ -146,8 +154,8 @@ begin
   WriteTrialData(FTrial);
 
   LNextTrial := StrToIntDef(FTrial.NextTrial, 1);
-  FCounterManager.CurrentTrial := FCounterManager.CurrentTrial+LNextTrial;
-  if FCounterManager.CurrentTrial < 0 then
+  Counters.CurrentTrial := Counters.CurrentTrial+LNextTrial;
+  if Counters.CurrentTrial < 0 then
     Exception.Create('Exception. CurrentTrial cannot be less than zero.');
   Play;
 end;
@@ -184,7 +192,7 @@ begin
         case LTrial.Result of
           'HIT' :
             begin
-              Background.Color := clPurple;
+              Background.Color := clDarkGreen;
               FConsequence.Start;
             end;
 
@@ -210,8 +218,8 @@ const
 begin
   LTrial := TTrial(Sender);
   case LTrial.Result of
-    'HIT' : FCounterManager.OnHit(Sender);
-    'MISS': FCounterManager.OnMiss(Sender);
+    'HIT' : Counters.OnHit(Sender);
+    'MISS': Counters.OnMiss(Sender);
   end;
   LSaveData := GetSaveDataProc(LGData);
   if LTrial.Header <> FLastTrialHeader then
@@ -224,10 +232,10 @@ begin
                  rsReportITIEnd + #9 +
                  LTrial.Header + LineEnding;
 
-  i := FCounterManager.CurrentTrial;
-  j := FCounterManager.CurrentBlc;
+  i := Counters.CurrentTrial;
+  j := Counters.CurrentBlc;
   FLastTrialHeader := LTrial.Header;
-  LTrialNo := (FCounterManager.SessionTrials + 1).ToString;
+  LTrialNo := (Counters.SessionTrials + 1).ToString;
   LBlocID := (j + 1).ToString;
   LBlocName := ConfigurationFile.Bloc[j+1].Name;
   LTrialID := (i + 1).ToString;
@@ -245,7 +253,7 @@ begin
     LTrialID + #9 + LTrialName;
 
   // iti
-  if FCounterManager.SessionTrials = 0 then
+  if Counters.SessionTrials = 0 then
     ITIData := DoNotApply + #9 + TimestampToStr(0)
   else
     ITIData :=
@@ -292,6 +300,7 @@ var
   LParameters : TStringList;
 begin
   inherited Create(AOwner);
+  FTable := nil;
   FInterTrial := TTimer.Create(Self);
   FInterTrial.Enabled := False;
   FInterTrial.OnTimer := @InterTrialTimer;
@@ -300,8 +309,6 @@ begin
   FTrialConsequence := TTimer.Create(Self);
   FTrialConsequence.Enabled := False;
   FTrialConsequence.OnTimer := @PlayIntertrialInterval;
-
-  FCounterManager := GlobalContainer.CounterManager;
   FLastTrialHeader := '';
   FITIBegin := 0;
   FITIEnd := 0;
@@ -332,95 +339,60 @@ begin
 end;
 
 procedure TBloc.BeforePlay;
+var
+  LBeginTable : string;
+  LEndTable: string;
 begin
   FWaitLabel.Parent := Background;
   FConsequence.Parent := Background;
   Background.Cursor := -1;
+
+  if Assigned(FTable) then begin
+    LEndTable := ConfigurationFile.EndTableName;
+    if LEndTable.IsEmpty then begin
+      { do nothing }
+    end else begin
+      if LEndTable = FTable.Name then begin
+        FreeAndNil(FTable);
+      end;
+    end;
+  end;
+
+  LBeginTable := ConfigurationFile.BeginTableName;
+  if LBeginTable.IsEmpty then begin
+    { do nothing }
+  end else begin
+    if LBeginTable.Contains('DiscountTable') then begin
+      FTable := TDelayDiscountTable.Create(Self);
+      FTable.Name := LBeginTable;
+    end else
+    if LBeginTable.Contains('DemandTable') then begin
+      FTable := TDemandTable.Create(Self);
+      FTable.Name := LBeginTable;
+    end else
+    if LBeginTable.Contains('Experiment1Table') then begin
+      FTable := TExperiment1Table.Create(Self);
+      FTable.Name := LBeginTable;
+    end else
+    if LBeginTable.Contains('Experiment2Table') then begin
+      FTable := TExperiment2Table.Create(Self);
+      FTable.Name := LBeginTable;
+    end else
+    if LBeginTable.Contains('Experiment3Table') then begin
+      //FTable := TExperiment3Table.Create(Self);
+      FTable.Name := LBeginTable;
+    end;
+  end;
 end;
 
 procedure TBloc.Play;
-var
-  LCurrentBloc, LCurrentTrial, LTotalTrials : integer;
-  LBlc : TCfgBlc;
-  function EndCriteriaAchieved(ABlc : TCfgBlc) : Boolean;
-  begin
-    Result := False;
-    if ABlc.CrtConsecutiveHit > 0 then
-      if FCounterManager.BlcCscHits = ABlc.CrtConsecutiveHit then
-      begin
-
-        Exit;
-      end;
-    if ABlc.CrtMaxTrials > 0 then
-      if ABlc.CrtMaxTrials <= FCounterManager.BlcTrials  then
-      begin
-        Result := True;
-        Exit;
-      end;
-  end;
-
 begin
-  LCurrentBloc := FCounterManager.CurrentBlc;
-  LBlc := ConfigurationFile.Bloc[LCurrentBloc+1];
-  LTotalTrials := LBlc.NumTrials;
-  LCurrentTrial := FCounterManager.CurrentTrial;
-
-  // will check every trial
-  if EndCriteriaAchieved(LBlc) then
-  begin
+  EndCriteria.Invalidate;
+  if EndCriteria.OfBloc then begin
     if Assigned(OnEndBloc) then OnEndBloc(Self);
-    Exit;
+  end else begin
+    PlayTrial(Counters.CurrentBlc, Counters.CurrentTrial)
   end;
-
-  if (LCurrentTrial <= LTotalTrials -1) then
-    PlayTrial(LCurrentBloc, LCurrentTrial)
-  else
-    begin // will check once per bloc
-      if LBlc.CrtHitValue > 0 then
-        if (FCounterManager.BlcHits < LBlc.CrtHitValue) then
-        begin
-          if LBlc.MaxBlcRepetition > 0 then
-          begin
-            if (FCounterManager.BlcRepetitions < LBlc.MaxBlcRepetition) then
-            begin
-              FCounterManager.OnRepeatBlc(Self);
-              PlayTrial(LCurrentBloc, FCounterManager.CurrentTrial);
-              Exit;
-            end else begin
-              FCounterManager.CurrentBlc := ConfigurationFile.BlocCount;
-              //FCounterManager.OnEndSess(Self);
-            end;
-          end else begin
-            FCounterManager.OnRepeatBlc(Self);
-            PlayTrial(LCurrentBloc, FCounterManager.CurrentTrial);
-            Exit;
-          end;
-        end;
-
-      if (LBlc.CrtHitPorcentage > 0) and (LBlc.CrtHitPorcentage <= 100) then
-      begin
-        if (Round((FCounterManager.BlcHits * 100)/LBlc.NumTrials) >= LBlc.CrtHitPorcentage) then
-        begin
-          if LBlc.NextBlocOnCriteria > 0 then begin
-            FCounterManager.CurrentBlc := LBlc.NextBlocOnCriteria-1;
-          end else begin
-            FCounterManager.CurrentBlc := ConfigurationFile.BlocCount;
-          end;
-        end;
-      end;
-
-      //if LBlc.CrtConsecutiveHit > 0 then
-      //  if FCounterManager.BlcHighCscHits < LBlc.CrtConsecutiveHit then
-      //  begin
-      //    FCounterManager.OnRepeatBlc(Self);
-      //    PlayTrial(LCurrentBloc, FCounterManager.CurrentTrial);
-      //    if Assigned(OnEndBloc) then OnEndBloc(Self);
-      //    Exit;
-      //  end;
-
-
-      if Assigned(OnEndBloc) then OnEndBloc(Self);
-    end;
 end;
 
 end.

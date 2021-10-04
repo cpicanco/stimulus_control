@@ -28,10 +28,8 @@ type
   TReportData = record
     CBegin : Extended;
     CLatency : Extended;
-    CTimeLatency : Extended;
-    ComparisonBegin   : string;
-    ComparisonEnd     : string;
-    ComparisonLatency : string;
+    //CTimeLatency : Extended;
+    CEnd     : Extended;
     DelayEnd  : string;
   end;
 
@@ -77,8 +75,9 @@ type
 implementation
 
 uses Constants, Timestamps, Graphics
-  , Cheats
-  ;
+  , Cheats, Session.Configuration.GlobalContainer
+  , Experiments.Eduardo.Experimento1.Tables
+  , Experiments.Eduardo.Experimento3.Tables;
 
 constructor TFreeSquareTrial.Create(AOwner: TCustomControl);
 begin
@@ -207,8 +206,7 @@ begin
     else { do nothing };
   end;
 
-  FReportData.CBegin:=LogEvent(rsReportStmBeg);
-  FReportData.ComparisonBegin:=TimestampToStr(FReportData.CBegin);
+  FReportData.CBegin:=LogEvent('Quadrado.Inicio');
   FResponseEnabled:=True;
   Invalidate;
 
@@ -220,10 +218,21 @@ end;
 procedure TFreeSquareTrial.WriteData(Sender: TObject);
 begin
   inherited WriteData(Sender);
+  case FTrialType of
+    ttE1B, ttE1C : begin
+      TExperiment1Table(FTable).AddRow(
+        FReportData.CLatency-FReportData.CBegin, ResultAsInteger);
+    end;
+
+    ttE3C1, ttE3C2 : begin
+
+    end
+    else { do nothing };
+  end;
   Data := Data +
-          FReportData.ComparisonLatency + HeaderTabs +
-          FReportData.ComparisonBegin + HeaderTabs +
-          FReportData.ComparisonEnd;
+          TimestampToStr(FReportData.CLatency) + HeaderTabs +
+          TimestampToStr(FReportData.CBegin) + HeaderTabs +
+          TimestampToStr(FReportData.CEnd);
 end;
 
 function TFreeSquareTrial.GetHeader: string;
@@ -264,7 +273,7 @@ begin
       Configurations.Parameters.Values[_ITI] := ITIExperiment3.ToString;
     end;
   end;
-  FReportData.ComparisonEnd := TimestampToStr(LogEvent(rsReportStmEndO));
+  FReportData.CEnd := LogEvent('Omissao.Fim');
   EndTrial(Self);
 end;
 
@@ -272,8 +281,8 @@ procedure TFreeSquareTrial.DelayEnd(Sender: TObject);
 begin
   FTimer.Stop;
   Parent.Color := clWhite;
-  CounterManager.BlcPoints := CounterManager.BlcPoints +1;
-  LogEvent(rsReportDelayEnd);
+  Counters.BlcPoints := Counters.BlcPoints +1;
+  LogEvent('Atraso.Fim');
   EndTrial(Self);
 end;
 
@@ -288,13 +297,13 @@ begin
       FShowCounter := False;
       FStimulus.Hide;
       FConsequence.Start;
-      Parent.Color := clPurple;
+      Parent.Color := clDarkGreen;
       if Sender = FSchedule then begin
-        CounterManager.SessionPointsTopLeft :=
-          CounterManager.SessionPointsTopLeft +1;
+        Counters.SessionPointsTopLeft :=
+          Counters.SessionPointsTopLeft +1;
       end;
       FConsequenceTimer.Enabled := True;
-      LogEvent('VT.+.Start');
+      LogEvent('VT.Inicio');
       Invalidate;
     end
 
@@ -316,11 +325,11 @@ begin
       FStimulus.Start; // FSquareSchedule.Start;
       Parent.Color := clWhite;
       if Sender = FSchedule then begin
-        CounterManager.SessionPointsTopLeft :=
-          CounterManager.SessionPointsTopLeft +1;
+        Counters.SessionPointsTopLeft :=
+          Counters.SessionPointsTopLeft +1;
       end;
       Invalidate;
-      LogEvent('VT.+.Stop');
+      LogEvent('VT.Fim');
     end
 
     else { do nothing };
@@ -348,8 +357,8 @@ begin
         -(FReportData.CLatency - FReportData.CBegin);
 
       Configurations.Parameters.Values[_ITI] := ITI.ToString;
-      CounterManager.BlcPoints := CounterManager.BlcPoints +1;
-      FReportData.ComparisonEnd:=TimestampToStr(LogEvent(rsReportStmEndR));
+      Counters.BlcPoints := Counters.BlcPoints +1;
+      FReportData.CEnd:=LogEvent('Reforco');
       EndTrial(Self);
     end;
 
@@ -360,28 +369,28 @@ begin
         -(FReportData.CLatency - FReportData.CBegin);
 
       Configurations.Parameters.Values[_ITI] := ITI.ToString;
-      Parent.Color := clPurple;
+      Parent.Color := clDarkGreen;
       FTimer.Load(FT, FreeSquareConsequenceDelay);
       FTimer.OnConsequence := @DelayEnd;
       FTimer.Start;
-      FReportData.ComparisonEnd := TimestampToStr(LogEvent(rsReportDelayBeg));
+      FReportData.CEnd := LogEvent('Atraso.Inicio');
     end;
 
     ttE3B1: begin
       ITI := ITIExperiment3;
       Configurations.Parameters.Values[_ITI] := ITI.ToString;
-      CounterManager.SessionPointsTopRight :=
-        CounterManager.SessionPointsTopRight +1;
-      FReportData.ComparisonEnd:=TimestampToStr(LogEvent(rsReportStmEndR));
+      Counters.SessionPointsTopRight :=
+        Counters.SessionPointsTopRight +1;
+      FReportData.CEnd:=LogEvent('Reforco');
       EndTrial(Self);
     end;
 
     ttE3B2 : begin
       ITI := ITIExperiment3;
       Configurations.Parameters.Values[_ITI] := ITI.ToString;
-      CounterManager.SessionPointsTopRight :=
-        CounterManager.SessionPointsTopRight +1;
-      FReportData.ComparisonEnd:=TimestampToStr(LogEvent(rsReportStmEndR));
+      Counters.SessionPointsTopRight :=
+        Counters.SessionPointsTopRight +1;
+      FReportData.CEnd:=LogEvent('Reforco');
       EndTrial(Self);
     end;
 
@@ -390,11 +399,11 @@ begin
       Configurations.Parameters.Values[_ITI] := ITI.ToString;
 
       if Sender = FStimulus.Schedule then begin
-        CounterManager.SessionPointsTopRight :=
-          CounterManager.SessionPointsTopRight +1;
+        Counters.SessionPointsTopRight :=
+          Counters.SessionPointsTopRight +1;
       end;
 
-      FReportData.ComparisonEnd:=TimestampToStr(LogEvent(rsReportStmEndR));
+      FReportData.CEnd:=LogEvent('Reforco');
       EndTrial(Self);
     end;
   end;
@@ -405,8 +414,9 @@ begin
   if FFirstResponse then
   begin
     FFirstResponse := False;
-    FReportData.CLatency := LogEvent(rsReportRspLat);
-    FReportData.ComparisonLatency:=TimestampToStr(FReportData.CLatency);
+    FReportData.CLatency := LogEvent('Resposta.Latencia');
+  end else begin
+    LogEvent('Resposta');
   end;
 end;
 

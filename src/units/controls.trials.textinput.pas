@@ -46,7 +46,8 @@ type
 
 implementation
 
-uses Constants, Timestamps, Cheats;
+uses Constants, Timestamps, Cheats,
+  Experiments.Eduardo.Comum.DemandTable;
 
 constructor TTextInput.Create(AOwner: TCustomControl);
 begin
@@ -113,6 +114,7 @@ end;
 
 procedure TTextInput.EndButtonClick(Sender: TObject);
 begin
+  LogEvent(rsReportRspLat);
   FResponse := FEdit.Text;
   if StrToIntDef(FResponse, -1) = 0 then
     NextTrial :=  '100';
@@ -161,13 +163,14 @@ begin
 end;
 
 procedure TTextInput.WriteData(Sender: TObject);
-var aStart, aDuration : string;
+var LStart, LDuration, LPrice : string;
 begin
   inherited WriteData(Sender);
-  aStart := TimestampToStr(FDataSupport.StmBegin - TimeStart);
-  aDuration := TimestampToStr(FDataSupport.StmEnd - TimeStart);
-
-  Data := Data + aStart + #9 + aDuration + #9 + FResponse;
+  LPrice := Configurations.Parameters.Values['Price'];
+  LStart := TimestampToStr(FDataSupport.StmBegin - TimeStart);
+  LDuration := TimestampToStr(FDataSupport.StmEnd - TimeStart);
+  TDemandTable(FTable).AddRow(LPrice.ToExtended, FResponse.ToExtended);
+  Data := Data + LStart + #9 + LDuration + #9 + FResponse;
 end;
 
 end.
