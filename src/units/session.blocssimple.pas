@@ -379,7 +379,7 @@ begin
       FTable.Name := LBeginTable;
     end else
     if LBeginTable.Contains('Experiment3Table') then begin
-      //FTable := TExperiment3Table.Create(Self);
+      FTable := TExperiment3Table.Create(Self);
       FTable.Name := LBeginTable;
     end;
   end;

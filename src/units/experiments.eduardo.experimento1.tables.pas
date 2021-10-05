@@ -22,6 +22,7 @@ type
     destructor Destroy; override;
   public
     procedure AddRow(ALatency : Extended; ACategory: integer);
+
   end;
 
 implementation
@@ -46,8 +47,6 @@ begin
 end;
 
 procedure TExperiment1Table.AddRow(ALatency: Extended; ACategory: integer);
-var
-  Datum : TDemandDatum;
 begin
   FCategories.Add(ACategory);
   FLatencies.Add(ALatency);

@@ -28,7 +28,8 @@ type
   TReportData = record
     CBegin : Extended;
     CLatency : Extended;
-    //CTimeLatency : Extended;
+    CVTDelayBegin : Extended;
+    CVTDelayEnd : Extended;
     CEnd     : Extended;
     DelayEnd  : string;
   end;
@@ -216,19 +217,31 @@ begin
 end;
 
 procedure TFreeSquareTrial.WriteData(Sender: TObject);
+var
+  LLatency : Extended = -1;
+  LResponsesTime : Extended;
+  function IsTestTrial : Boolean;
+  begin
+    Result := Configurations.Parameters.Values['IsTestTrial'].ToBoolean;
+  end;
 begin
   inherited WriteData(Sender);
+  LResponsesTime := FReportData.CEnd-FReportData.CBegin;
+  if not FFirstResponse then begin
+    LLatency := FReportData.CLatency-FReportData.CBegin;
+  end;
   case FTrialType of
     ttE1B, ttE1C : begin
       TExperiment1Table(FTable).AddRow(
-        FReportData.CLatency-FReportData.CBegin, ResultAsInteger);
+        LLatency, ResultAsInteger);
     end;
-
-    ttE3C1, ttE3C2 : begin
-
-    end
-    else { do nothing };
+    ttE3B1, ttE3B2, ttE3C1, ttE3C2 : begin
+      TExperiment3Table(FTable).AddRow(
+        Counters.CurrentTrial,
+        LLatency, LResponsesTime, ResultAsInteger, IsTestTrial);
+    end;
   end;
+
   Data := Data +
           TimestampToStr(FReportData.CLatency) + HeaderTabs +
           TimestampToStr(FReportData.CBegin) + HeaderTabs +
@@ -303,7 +316,7 @@ begin
           Counters.SessionPointsTopLeft +1;
       end;
       FConsequenceTimer.Enabled := True;
-      LogEvent('VT.Inicio');
+      FReportData.CVTDelayBegin := LogEvent('VT.Inicio');
       Invalidate;
     end
 
@@ -312,6 +325,8 @@ begin
 end;
 
 procedure TFreeSquareTrial.VTConsequenceEnd(Sender : TObject);
+var
+  LDelay: Extended;
 begin
   case FTrialType of
     ttE3C1, ttE3C2 : begin
@@ -329,7 +344,10 @@ begin
           Counters.SessionPointsTopLeft +1;
       end;
       Invalidate;
-      LogEvent('VT.Fim');
+      FReportData.CVTDelayEnd := LogEvent('VT.Fim');
+      LDelay := FReportData.CVTDelayEnd - FReportData.CVTDelayBegin;
+      TExperiment3Table(FTable).AddDelay(
+        Counters.CurrentTrial, LDelay);
     end
 
     else { do nothing };
@@ -376,16 +394,7 @@ begin
       FReportData.CEnd := LogEvent('Atraso.Inicio');
     end;
 
-    ttE3B1: begin
-      ITI := ITIExperiment3;
-      Configurations.Parameters.Values[_ITI] := ITI.ToString;
-      Counters.SessionPointsTopRight :=
-        Counters.SessionPointsTopRight +1;
-      FReportData.CEnd:=LogEvent('Reforco');
-      EndTrial(Self);
-    end;
-
-    ttE3B2 : begin
+    ttE3B1, ttE3B2 : begin
       ITI := ITIExperiment3;
       Configurations.Parameters.Values[_ITI] := ITI.ToString;
       Counters.SessionPointsTopRight :=
@@ -398,7 +407,7 @@ begin
       ITI := ITIExperiment3;
       Configurations.Parameters.Values[_ITI] := ITI.ToString;
 
-      if Sender = FStimulus.Schedule then begin
+      if Sender = FStimulus then begin
         Counters.SessionPointsTopRight :=
           Counters.SessionPointsTopRight +1;
       end;
@@ -410,13 +419,26 @@ begin
 end;
 
 procedure TFreeSquareTrial.Response(Sender: TObject);
+var
+  LResponse : Extended;
+  function IsTestTrial : Boolean;
+  begin
+    Result := Configurations.Parameters.Values['IsTestTrial'].ToBoolean;
+  end;
+
 begin
+  LResponse := LogEvent('Resposta.Latencia');
   if FFirstResponse then
   begin
     FFirstResponse := False;
-    FReportData.CLatency := LogEvent('Resposta.Latencia');
-  end else begin
-    LogEvent('Resposta');
+    FReportData.CLatency := LResponse
+  end;
+  case FTrialType of
+    ttE3B1, ttE3C1, ttE3B2, ttE3C2 : begin
+      TExperiment3Table(FTable).AddResponse(
+        Counters.CurrentTrial, LResponse);
+    end;
+    else { do nothing };
   end;
 end;
 

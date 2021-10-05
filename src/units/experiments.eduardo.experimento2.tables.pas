@@ -148,7 +148,6 @@ begin
     SP1000C := 0;
     SP1000T := 0;
     for i := 0 to FResultsTest.Count -1 do begin
-      WriteLn(FSampleDurationsTest[i]);
       case FSampleDurationsTest[i] of
         SP4000, '40' : begin
           Inc(SP4000T);

@@ -5,16 +5,17 @@ unit Loggers.Tables;
 interface
 
 uses
-  Classes, fgl, Loggers.Helpers;
+  Classes, Loggers.Helpers;
 
 type
 
-  TStringColumn = specialize TFPGList<string>;
-  TFloatColumn = specialize TFPGList<Extended>;
-  TIntegerColumn = specialize TFPGList<Integer>;
-  TDemandDataColumn = specialize TFPGList<TDemandDatum>;
+  TStringColumn = specialize TGenericList<string>;
+  TFloatColumn = specialize TGenericList<Extended>;
+  TIntegerColumn = specialize TGenericList<Integer>;
+  TDemandDataColumn = specialize TGenericList<TDemandDatum>;
 
   { TTabDelimitedReport }
+
 
   TTabDelimitedReport = class
     private

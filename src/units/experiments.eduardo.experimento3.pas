@@ -30,6 +30,7 @@ procedure WriteOperantTask(ABlc : integer; AName: string;
   ASchedule: string; AType : string);
 var
   i : integer;
+  IsTestTrial : Boolean;
 begin
   i := ConfigurationFile.TrialCount[ABlc]+1;
   with ConfigurationFile do
@@ -41,6 +42,8 @@ begin
     WriteToTrial(i, ABlc, _CounterType, '2');
     WriteToTrial(i, ABlc, _ITI, ITI.ToString);
     WriteToTrial(i, ABlc, 'Type', AType);
+    IsTestTrial := ASchedule = T_EXT;
+    WriteToTrial(i, ABlc, 'IsTestTrial', IsTestTrial.ToString);
   end;
 end;
 
@@ -123,6 +126,9 @@ var
     // 20 tentativas
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B1-MIN 20');
+    LTable := LConditionI;
+    ConfigurationFile.WriteToBloc(
+      LConditionI, 'BeginTable', 'Experiment3Table'+LTable.ToString);
     WriteB1(LConditionI, 'E3B1');
 
     // 40 no máximo, critério de 90% de acerto
@@ -156,6 +162,9 @@ var
     // 20 tentativas
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1-MIN 20');
+    LTable := LConditionI;
+    ConfigurationFile.WriteToBloc(
+      LConditionI, 'BeginTable', 'Experiment3Table'+LTable.ToString);
     WriteB1(LConditionI, 'E3C1');
 
     // 40 no máximo, critério de 90% de acerto
