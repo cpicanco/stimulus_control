@@ -24,16 +24,17 @@ type
 
   TConsequence = class(TComponent)
   private
-    FAuditive: TSound;
+    //FAuditive: TSound;
     FVisual: TStimulusFigure;
-    procedure SoundStopped(Sender : TObject);
+    //procedure SoundStopped(Sender : TObject);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Load(AImage, ASound : string);
-    procedure Play;
+    procedure Load(AImage : string);
+    procedure Start;
+    procedure Stop;
     property Visual : TStimulusFigure read FVisual write FVisual;
-    property Auditive : TSound read FAuditive write FAuditive;
+    //property Auditive : TSound read FAuditive write FAuditive;
   end;
 
 var
@@ -46,18 +47,18 @@ uses
 
 { TConsequence }
 
-procedure TConsequence.SoundStopped(Sender: TObject);
-begin
-  FVisual.Stop;
-  FAuditive.Play;
-end;
+//procedure TConsequence.SoundStopped(Sender: TObject);
+//begin
+//  FVisual.Stop;
+//  FAuditive.Play;
+//end;
 
 constructor TConsequence.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FVisual := TStimulusFigure.Create(Self);
-  FAuditive := TSound.Create(Self);
-  FAuditive.OnStop := @SoundStopped;
+  //FAuditive := TSound.Create(Self);
+  //FAuditive.OnStop := @SoundStopped;
 end;
 
 destructor TConsequence.Destroy;
@@ -66,22 +67,27 @@ begin
   inherited Destroy;
 end;
 
-procedure TConsequence.Load(AImage, ASound: string);
+procedure TConsequence.Load(AImage: string);
 begin
   FVisual.LoadFromFile(AImage);
-  FAuditive.LoadFromFile(ASound);
+  //FAuditive.LoadFromFile(ASound);
 end;
 
-procedure TConsequence.Play;
+procedure TConsequence.Start;
 begin
   FVisual.Start;
-  FAuditive.Play;
+  //FAuditive.Play;
+end;
+
+procedure TConsequence.Stop;
+begin
+  FVisual.Stop;
 end;
 
 initialization
   CustomConsequence := TConsequence.Create(nil);
   CustomConsequence.Name := 'CustomConsequence';
-  CustomConsequence.Load('imagem-jocosa.png', 'risada-jocosa.wav');
+  CustomConsequence.Load('imagem-jocosa.png');
 
 finalization
   CustomConsequence.Free;

@@ -24,15 +24,16 @@ type
   private
     FOnStartPlaying: TNotifyEvent;
     FOnStop : TNotifyEvent;
-    FPlayingSound : TCastlePlayingSound;
-    procedure Stop(Sender : TObject);
+    FAudio : TCastlePlayingSound;
     procedure SetOnStartPlaying(AValue: TNotifyEvent);
     procedure SetOnStop(AValue: TNotifyEvent);
   public
     constructor Create(AOwner : TComponent); override;
+    function Duration : Single;
     function Playing : Boolean;
     procedure LoadFromFile(AFilename : string);
     procedure Play;
+    procedure Stop;
     property OnStartPlaying : TNotifyEvent read FOnStartPlaying write SetOnStartPlaying;
     property OnStop : TNotifyEvent read FOnStop write SetOnStop;
   end;
@@ -42,11 +43,6 @@ implementation
 uses Session.Configuration.GlobalContainer;
 
 { TSound }
-
-procedure TSound.Stop(Sender: TObject);
-begin
-  if Assigned(OnStop) then OnStop(Self);
-end;
 
 procedure TSound.SetOnStartPlaying(AValue: TNotifyEvent);
 begin
@@ -65,26 +61,36 @@ begin
   inherited Create(AOwner);
   FOnStartPlaying := nil;
   FOnStop := nil;
-  FPlayingSound := TCastlePlayingSound.Create(Self);
-  FPlayingSound.Sound := TCastleSound.Create(Self);
-  FPlayingSound.OnStop := @Stop;
+  FAudio := TCastlePlayingSound.Create(Self);
+  FAudio.Sound := TCastleSound.Create(Self);
+end;
+
+function TSound.Duration: Single;
+begin
+  Result := FAudio.Sound.Duration;
 end;
 
 function TSound.Playing: Boolean;
 begin
-  Result := FPlayingSound.Playing;
+  Result := FAudio.Playing;
 end;
 
 procedure TSound.LoadFromFile(AFilename: string);
 begin
-  FPlayingSound.Sound.URL := GlobalContainer.RootMedia+AFilename;
+  FAudio.Sound.URL := GlobalContainer.RootMedia+AFilename;
 end;
 
 procedure TSound.Play;
 begin
   if Assigned(OnStartPlaying) then OnStartPlaying(Self);
-  if FPlayingSound.Playing then FPlayingSound.Stop;
-  SoundEngine.Play(FPlayingSound);
+  if FAudio.Playing then FAudio.Stop;
+  SoundEngine.Play(FAudio);
+end;
+
+procedure TSound.Stop;
+begin
+  FAudio.Stop;
+  if Assigned(OnStop) then OnStop(Self);
 end;
 
 end.

@@ -50,12 +50,12 @@ type
     FTrialType : TTrialType;
     FResponseReady : Boolean;
     FFirstResponse : Boolean;
-    //FHasConsequence : Boolean;
     FReportData : TReportData;
     FContainer : TPanel;
     FStimulus : TFreeSquare;
     procedure ConditionalStimulusStarted(Sender: TObject);
     procedure ConditionalStimulusStopped(Sender: TObject);
+    procedure CustomConsequenceStop(Sender: TObject);
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
     procedure ResponseReady(Sender: TObject);
@@ -149,9 +149,10 @@ begin
     ttB1, ttB2, ttB3, ttC1 :  begin
       FStimulus.Schedule.Load(VI);
       FStimulus.Schedule.UseRegisNetoIntervals(False);
-      SerialSound.LoadFromFile('tom.wav');
-      SerialSound.OnStop := @ConditionalStimulusStopped;
-      SerialSound.OnStartPlaying := @ConditionalStimulusStarted;
+      SerialSound.Tone.OnStartPlaying := @ConditionalStimulusStarted;
+      SerialSound.Tone.OnStop := @ConditionalStimulusStopped;
+      SerialSound.Laught.OnStop := @CustomConsequenceStop;
+
     end;
   end;
 
@@ -196,14 +197,18 @@ begin
   inherited WriteData(Sender);
   Data := Data + FReportData.ComparisonLatency + HeaderTabs +
     FReportData.ComparisonBegin + HeaderTabs +
-    FReportData.ComparisonEnd;
+    FReportData.ComparisonEnd + HeaderTabs +
+    CounterManager.SessionPointsCenter.ToString + HeaderTabs +
+    CounterManager.SessionPointsTopRight.ToString;
 end;
 
 function TFreeOperantSquareTrial.GetHeader: string;
 begin
   Result := rsReportRspLat + HeaderTabs +
             rsReportStmBeg + HeaderTabs +
-            rsReportStmEnd;
+            rsReportStmEnd + HeaderTabs +
+            'Contador.Centro' + HeaderTabs +
+            'Contador.Direita';
 end;
 
 procedure TFreeOperantSquareTrial.Paint;
@@ -245,13 +250,26 @@ begin
     end;
 
     ttB2 : begin
-      CustomConsequence.Play;
+      CustomConsequence.Start;
+      SerialSound.Laught.Play;
     end;
 
     ttB3 : begin
-      CustomConsequence.Play;
+      CustomConsequence.Start;
+      SerialSound.Laught.Play;
       LoosePoints;
     end;
+  end;
+end;
+
+procedure TFreeOperantSquareTrial.CustomConsequenceStop(Sender: TObject);
+begin
+  case FTrialType of
+    ttB2, ttB3 : begin
+      CustomConsequence.Stop;
+      LogEvent('Consequencia.Fim');
+    end;
+    else { do nothing };
   end;
 end;
 
