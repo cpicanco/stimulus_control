@@ -61,6 +61,7 @@ type
     FOnConsequence: TNotifyEvent;
     FOnEndCorrection: TNotifyEvent;
     FOnHit: TNotifyEvent;
+    FOnLimitedHold: TNotifyEvent;
     FOnMiss: TNotifyEvent;
     FOnNone: TNotifyEvent;
     FOnStmResponse: TNotifyEvent;
@@ -77,6 +78,7 @@ type
     procedure EndTrialThread(Sender: TObject);
     procedure SetConfigurations(AValue: TCfgTrial);
     procedure SetLimitedHold(AValue: integer);
+    procedure SetOnLimitedHold(AValue: TNotifyEvent);
     procedure SetOnTrialBeforeEnd(AValue: TNotifyEvent);
     procedure SetOnBeginCorrection(AValue: TNotifyEvent);
     procedure SetOnBkGndResponse(AValue: TNotifyEvent);
@@ -127,9 +129,9 @@ type
     destructor Destroy; override;
     function AsString : string; virtual; abstract;
     function HasVisualConsequence : Boolean; virtual;
+    function ConsequenceDelay : Cardinal; virtual;
     function ConsequenceInterval : integer; virtual;
     function ResultAsInteger : integer;
-    procedure StopConsequence; virtual;
     procedure AssignTable(ATable : TComponent);
     procedure Play(ACorrection: Boolean=False); virtual;
     procedure Hide; virtual;
@@ -151,6 +153,7 @@ type
     property TimeOut : Integer read FTimeOut write FTimeOut;
     property TimeStart : Extended read GetTimeStart;
   public
+    property OnLimitedHold : TNotifyEvent read FOnLimitedHold write SetOnLimitedHold;
     property OnTrialBeforeEnd: TNotifyEvent read FOnTrialBeforeEnd write SetOnTrialBeforeEnd;
     property OnBeginCorrection : TNotifyEvent read FOnBeginCorrection write SetOnBeginCorrection;
     property OnBkGndResponse: TNotifyEvent read FOnBkGndResponse write SetOnBkGndResponse;
@@ -282,8 +285,10 @@ end;
 
 procedure TTrial.EndTrialThread(Sender: TObject);
 begin
+  if Assigned(OnLimitedHold) then OnLimitedHold(Sender);
   if CheatsModeOn then begin
-    ParticipantBot.Stop;
+    if Assigned(ParticipantBot) then
+      ParticipantBot.Stop;
   end;
 
   if Assigned(FClock) then
@@ -327,8 +332,16 @@ end;
 procedure TTrial.SetLimitedHold(AValue: integer);
 begin
   if FLimitedHold=AValue then Exit;
+  if FLimitedHold = 0 then
+      FClock.Enabled := False;
   FLimitedHold := AValue;
   FClock.Interval := FLimitedHold;
+end;
+
+procedure TTrial.SetOnLimitedHold(AValue: TNotifyEvent);
+begin
+  if FOnLimitedHold = AValue then Exit;
+  FOnLimitedHold := AValue;
 end;
 
 procedure TTrial.Paint;
@@ -483,6 +496,11 @@ begin
   Result := IETConsequence <> T_NONE;
 end;
 
+function TTrial.ConsequenceDelay: Cardinal;
+begin
+  Result := 0;
+end;
+
 function TTrial.ConsequenceInterval: integer;
 begin
   // uses ITI by default, overrided as needed
@@ -497,11 +515,6 @@ begin
     T_NONE: ResultAsInteger := -1;
     else    ResultAsInteger := -1;
   end;
-end;
-
-procedure TTrial.StopConsequence;
-begin
-
 end;
 
 procedure TTrial.AssignTable(ATable: TComponent);

@@ -23,7 +23,7 @@ type
   private
     FBias: TBytes;
     FData  : PtrInt;
-    FTimer : TTimer;
+    FFakeExpectedResponseTimer : TTimer;
     FTargetStimulus : IStimuli;
     procedure Click(Sender : TObject);
     procedure Async(AData : PtrInt);
@@ -64,12 +64,14 @@ uses Forms;
 
 procedure TParticipantBot.Click(Sender : TObject);
 begin
-  Application.QueueAsyncCall(@Async, FData);
+  if FFakeExpectedResponseTimer.Enabled then
+    Application.QueueAsyncCall(@Async, FData);
 end;
 
 procedure TParticipantBot.Async(AData : PtrInt);
 begin
-  FTargetStimulus.DoExpectedResponse;
+
+    FTargetStimulus.DoExpectedResponse;
 end;
 
 procedure TParticipantBot.SetBias(AValue: TBytes);
@@ -82,10 +84,10 @@ constructor TParticipantBot.Create(AOwner : TComponent);
 begin
   inherited Create(AOwner);
   FData := 0;
-  FTimer := TTimer.Create(AOwner);
-  FTimer.Enabled := False;
-  FTimer.Interval := Random(100) + 70;
-  FTimer.OnTimer := @Click;
+  FFakeExpectedResponseTimer := TTimer.Create(AOwner);
+  FFakeExpectedResponseTimer.Enabled := False;
+  FFakeExpectedResponseTimer.Interval := 100;
+  FFakeExpectedResponseTimer.OnTimer := @Click;
 end;
 
 destructor TParticipantBot.Destroy;
@@ -96,13 +98,13 @@ end;
 procedure TParticipantBot.Start(AStimulus : IStimuli);
 begin
   FTargetStimulus := AStimulus;
-  FTimer.Enabled := True;
+  FFakeExpectedResponseTimer.Enabled := True;
 end;
 
 procedure TParticipantBot.Stop;
 begin
   FData := 0;
-  FTimer.Enabled := False;
+  FFakeExpectedResponseTimer.Enabled := False;
 end;
 
 initialization

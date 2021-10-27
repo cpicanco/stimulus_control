@@ -81,6 +81,8 @@ type
     function Stop : Extended;
     function Pause : Extended;
     function Resume : Extended;
+    function NextInterval : Cardinal;
+    procedure PostponeLastInterval;
     property OnConsequence : TNotifyEvent read FOnConsequence write SetOnConsequence;
     property OnResponse : TNotifyEvent read FOnResponse write SetOnResponse;
     property Responses : Cardinal read FResponseCounter;
@@ -104,11 +106,15 @@ resourcestring
 
 implementation
 
-uses Timestamps;
+uses Cheats, Timestamps, fgl;
+
+type
+  TIntegerList = specialize TFPGList<integer>;
 
 var
-  FleshlerHoffmanList : TStringList;
-  FleshlerHoffmanValues : array [0..9] of integer =
+  FleshlerHoffmanLastIndex : integer = -1;
+  FleshlerHoffmanList : TIntegerList;
+  FleshlerHoffmanValues : array [0..9] of Cardinal =
     (207, 652, 1154, 1727, 2397, 3202, 4213, 5572, 7665, 13210);
 
 procedure UpdateFleshlerHoffmanList;
@@ -117,7 +123,7 @@ var
 begin
   FleshlerHoffmanList.Clear;
   for i := Low(FleshlerHoffmanValues) to High(FleshlerHoffmanValues) do begin
-    FleshlerHoffmanList.Append(i.ToString);
+    FleshlerHoffmanList.Add(i);
   end;
 end;
 
@@ -194,6 +200,8 @@ begin
 end;
 
 procedure TSchedules.SetPaused(AValue : Boolean);
+var
+  LElapsed      : Extended;
 begin
   FPausedState.Enabled := AValue;
   if Assigned(FTimer) then begin
@@ -213,8 +221,12 @@ begin
         if FPausedState.TimerEnabled then begin
           FPausedState.Elapsed := FPausedState.Elapsed +
             (FPausedState.Paused - FPausedState.Started);
-          FTimer.Interval :=
-            Round(FPausedState.Interval - (FPausedState.Elapsed*1000));
+          LElapsed := FPausedState.Interval - (FPausedState.Elapsed*1000);
+          if LElapsed > 0 then begin
+            FTimer.Interval := Round(LElapsed);
+          end else begin
+            FTimer.Interval := 1;
+          end;
           FPausedState.MustUpdate := True;
           StartClock;
         end else begin
@@ -279,8 +291,12 @@ var
 begin
   if FleshlerHoffmanList.Count = 0 then UpdateFleshlerHoffmanList;
   R := Random(FleshlerHoffmanList.Count);
-  Result := FleshlerHoffmanValues[FleshlerHoffmanList[R].ToInteger];
+  Result := FleshlerHoffmanValues[FleshlerHoffmanList[R]];
   FleshlerHoffmanList.Delete(R);
+  FleshlerHoffmanLastIndex := R;
+  if CheatsModeOn then begin
+    Result := Result div 10;
+  end;
 end;
 
 procedure TSchedules.ResetResponses;
@@ -361,6 +377,25 @@ begin
   end;
 end;
 
+function TSchedules.NextInterval: Cardinal;
+begin
+  case FRandomIntervalType of
+    ritRandomAmplitude:
+      Result := RandomAmplitude(Parameter1, Parameter2);
+
+    ritFleshlerHoffman:
+      Result := FleshlerHoffman;
+  end;
+end;
+
+procedure TSchedules.PostponeLastInterval;
+begin
+  if FleshlerHoffmanLastIndex > -1 then begin
+    FleshlerHoffmanList.Add(FleshlerHoffmanLastIndex);
+    FleshlerHoffmanLastIndex := -1;
+  end;
+end;
+
 procedure TSchedules.ResetClock;
 begin
   FTimer.Enabled:=False;
@@ -368,8 +403,7 @@ begin
 end;
 
 initialization
-  FleshlerHoffmanList := TStringList.Create;
-  FleshlerHoffmanList.Sorted := False;
+  FleshlerHoffmanList := TIntegerList.Create;
   UpdateFleshlerHoffmanList;
 
 finalization

@@ -37,8 +37,13 @@ begin
   begin
     WriteToTrial(i, ABlc, _Name, AName);
     WriteToTrial(i, ABlc, _Cursor, '0');
-    WriteToTrial(i, ABlc, _Kind, T_EO1);
-    WriteToTrial(i, ABlc, _Schedule, ASchedule);
+    if (AType = 'E3C1') or (AType = 'E3C2') then begin
+      WriteToTrial(i, ABlc, _Kind, T_VTFI);
+      WriteToTrial(i, ABlc, _Schedule, 'EXT');
+    end else begin
+      WriteToTrial(i, ABlc, _Kind, T_EO1);
+      WriteToTrial(i, ABlc, _Schedule, ASchedule);
+    end;
     WriteToTrial(i, ABlc, _CounterType, '2');
     WriteToTrial(i, ABlc, _ITI, ITI.ToString);
     WriteToTrial(i, ABlc, 'Type', AType);
@@ -120,7 +125,8 @@ var
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem B');
     ConfigurationFile.WriteToBloc(
-      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
+      LConditionI, 'EndTable',
+      'DemandTable_A_Bloco'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE3B);
 
     // 20 tentativas
@@ -128,7 +134,8 @@ var
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B1-MIN 20');
     LTable := LConditionI;
     ConfigurationFile.WriteToBloc(
-      LConditionI, 'BeginTable', 'Experiment3Table'+LTable.ToString);
+      LConditionI, 'BeginTable',
+      'Experiment3Table_'+LCondition+'_Bloco'+LTable.ToString);
     WriteB1(LConditionI, 'E3B1');
 
     // 40 no máximo, critério de 90% de acerto
@@ -156,7 +163,8 @@ var
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem C');
     ConfigurationFile.WriteToBloc(
-      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
+      LConditionI, 'EndTable',
+      'DemandTable_A_Bloco'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE3B);
 
     // 20 tentativas
@@ -164,7 +172,8 @@ var
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1-MIN 20');
     LTable := LConditionI;
     ConfigurationFile.WriteToBloc(
-      LConditionI, 'BeginTable', 'Experiment3Table'+LTable.ToString);
+      LConditionI, 'BeginTable',
+      'Experiment3Table_'+LCondition+'_Bloco'+LTable.ToString);
     WriteB1(LConditionI, 'E3C1');
 
     // 40 no máximo, critério de 90% de acerto
@@ -187,7 +196,7 @@ var
 begin
   ITI := ITISurvey;
   SetupStimuli;
-  if (ADesign = 'ABA') or (ADesign = 'ACA') then
+  if (ADesign = 'ABA') or (ADesign = 'ACA')  or (ADesign = 'A') then
   begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem A0');
@@ -196,7 +205,7 @@ begin
 
   for LCondition in ADesign do
   case LCondition of
-    'A': WriteACondition(LConditionI, LTable, '3');
+    'A': WriteACondition(LConditionI, LTable, '3', ADesign);
     'B': WriteBCondition;
     'C': WriteCCondition;
   end;

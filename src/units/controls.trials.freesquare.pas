@@ -1,6 +1,6 @@
 {
   Stimulus Control
-  Copyright (C) 2014-2020 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
+  Copyright (C) 2014-2021 Carlos Rafael Fernandes Picanço, Universidade Federal do Pará.
 
   The present file is distributed under the terms of the GNU General Public License (GPL v3.0).
 
@@ -17,19 +17,15 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls
 
   , Controls.Trials.Abstract
   , Stimuli.Game.FreeSquare
-  , Stimuli.Image
-  , Schedules
   ;
 
 type
 
-  TTrialType = (ttE1B, ttE1C, ttE3B1, ttE3B2, ttE3C1, ttE3C2);
+  TTrialType = (ttE1B, ttE1C, ttE3B1, ttE3B2);
 
   TReportData = record
     CBegin : Extended;
     CLatency : Extended;
-    CVTDelayBegin : Extended;
-    CVTDelayEnd : Extended;
     CEnd     : Extended;
     DelayEnd  : string;
   end;
@@ -37,31 +33,25 @@ type
   { TFreeSquareTrial }
 
   {
-    Implements Free Operant Square
-    Square moves around
+    Square moves around or fixed
     Clicks produces consequences
-    LimitedHold produces diferential consequences
   }
   TFreeSquareTrial = class(TTrial)
   private
-    FConsequence : TStimulusFigure;
-    FSchedule : TSchedule;
-    FSquareSchedule : TSchedule;
+    FHasDelay : Boolean;
+    FCustomResult : integer;
     FTrialType : TTrialType;
     FFirstResponse : Boolean;
-    //FHasConsequence : Boolean;
     FReportData : TReportData;
     FStimulus : TFreeSquare;
-    FTimer : TSchedule;
-    FConsequenceTimer : TTimer;
-    procedure VTConsequenceEnd(Sender: TObject);
+    //FOmissionTimer : TTimer;
     procedure OmissionEnd(Sender: TObject);
-    procedure DelayEnd(Sender: TObject);
-    procedure VTConsequence(Sender: TObject);
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
     procedure TrialBeforeEnd(Sender: TObject);
+    procedure SetCustomResult;
     function GetHeader: string;
+    function IsTestTrial : Boolean;
   protected
     procedure TrialStart(Sender: TObject); virtual;
     procedure WriteData(Sender: TObject); override;
@@ -69,13 +59,14 @@ type
     constructor Create(AOwner: TCustomControl); override;
     function AsString : string; override;
     function HasVisualConsequence: Boolean; override;
+    function ConsequenceDelay : Cardinal; override;
     function ConsequenceInterval: integer; override;
     procedure Play(ACorrection : Boolean); override;
   end;
 
 implementation
 
-uses Constants, Timestamps, Graphics
+uses Constants, Timestamps, Forms, Graphics
   , Cheats, Session.Configuration.GlobalContainer
   , Experiments.Eduardo.Experimento1.Tables
   , Experiments.Eduardo.Experimento3.Tables;
@@ -85,22 +76,14 @@ begin
   inherited Create(AOwner);
   OnTrialBeforeEnd := @TrialBeforeEnd;
   OnTrialStart := @TrialStart;
+  OnLimitedHold := @OmissionEnd;
 
   if Self.ClassType = TFreeSquareTrial then
     Header := Header + #9 + GetHeader;
 
-  Configurations.Parameters.Values['VTConsequence'] := 'acerto.png';
-  FConsequence := TStimulusFigure.Create(Self);
-  FConsequence.Key := 'VTConsequence';
-  FConsequence.HideCursor;
-  FConsequence.LoadFromParameters(Configurations.Parameters);
-  FConsequence.Parent := AOwner;
-
-  FConsequenceTimer := TTimer.Create(Self);
-  FConsequenceTimer.Interval := FreeSquareConsequenceDurationExp3;
-  FConsequenceTimer.OnTimer := @VTConsequenceEnd;
-
-  FTimer := TSchedule.Create(Self);
+  //FOmissionTimer := TTimer.Create(Self);
+  //FOmissionTimer.Enabled := False;
+  FHasDelay := False;
   FFirstResponse := True;
   FResponseEnabled := False;
 end;
@@ -116,16 +99,19 @@ begin
   Result := (Self.Result <> T_NONE);
 end;
 
+function TFreeSquareTrial.ConsequenceDelay: Cardinal;
+begin
+  if FHasDelay then begin
+    Result := FreeSquareConsequenceDelay;
+  end else begin
+    Result := 0;
+  end;
+end;
+
 function TFreeSquareTrial.ConsequenceInterval: integer;
 begin
   case FTrialType of
     ttE1B, ttE1C, ttE3B1, ttE3B2 : Result := FreeSquareConsequenceDurationExp1;
-    ttE3C1, ttE3C2 : begin
-      case Self.Result of
-        T_MISS, T_HIT : Result := FreeSquareConsequenceDurationExp3;
-        T_NONE : Result := 0;
-      end;
-    end;
   end;
 end;
 
@@ -151,68 +137,55 @@ begin
     'E3B2': begin
       FTrialType := ttE3B2;
     end;
-
-    'E3C1': begin
-      FTrialType := ttE3C1;
-    end;
-
-    'E3C2': begin
-      FTrialType := ttE3C2;
-    end;
-  end;
-
-  case FTrialType of
-    ttE3C1, ttE3C2 : begin
-      FSchedule := TSchedule.Create(Self);
-      FSchedule.Load(VT, 1000, 500);
-      FSchedule.UseFleshlerHoffmanIntervals;
-      FSchedule.OnConsequence := @VTConsequence;
-    end
-    else { do nothing };
   end;
 
   case FTrialType of
     ttE1B, ttE1C   : FCounterType := ctBlocPoints;
     ttE3B1, ttE3B2 : FCounterType := ctSessionPoints;
-    ttE3C1, ttE3C2 : FCounterType := ctCustom;
   end;
 
   FStimulus := TFreeSquare.Create(Self);
   case FTrialType of
     ttE1B, ttE1C : { do nothing };
-    ttE3B1, ttE3B2, ttE3C1, ttE3C2 : FStimulus.Freeze;
+    ttE3B1, ttE3B2 : begin
+      FStimulus.Freeze;
+      TExperiment3Table(FTable).CreateTrial(Counters.SessionTrials);
+    end;
   end;
-  FSquareSchedule := FStimulus.Schedule;
+
   FStimulus.Parent := Self.Parent;
   FStimulus.LoadFromParameters(LParameters);
   FStimulus.OnConsequence := @Consequence;
   FStimulus.OnResponse := @Response;
   FStimulus.FitScreen;
   FShowCounter := True;
+
+  case FTrialType of
+    ttE1B,  ttE1C  : LimitedHold := FreeSquareOmissionDurationExp1;
+    ttE3B1 : LimitedHold := FreeSquareOmissionDurationExp3Training;
+    ttE3B2 : begin
+      if IsTestTrial then begin
+        LimitedHold := FreeSquareOmissionDurationExp3Testing;
+      end else begin
+        LimitedHold := FreeSquareOmissionDurationExp3Training;
+      end;
+    end;
+  end;
+
   if Self.ClassType = TFreeSquareTrial then Config(Self);
 end;
 
 procedure TFreeSquareTrial.TrialStart(Sender: TObject);
 begin
-  case FTrialType of
-    ttE1B,  ttE1C  : FTimer.Load(FT, FreeSquareOmissionDurationExp1);
-    ttE3B1, ttE3C1 : FTimer.Load(FT, FreeSquareOmissionDurationExp3Training);
-    ttE3B2, ttE3C2 : FTimer.Load(FT, FreeSquareOmissionDurationExp3Testing);
-  end;
-  FTimer.OnConsequence := @OmissionEnd;
-  FTimer.Start;
   FStimulus.Start;
-  case FTrialType of
-    ttE3C1, ttE3C2 : FSchedule.Start;
-    else { do nothing };
-  end;
-
   FReportData.CBegin:=LogEvent('Quadrado.Inicio');
+
   FResponseEnabled:=True;
   Invalidate;
 
   if CheatsModeOn then begin
-    ParticipantBot.Start(FStimulus.AsInterface);
+    if Random <= 0.9 then
+      ParticipantBot.Start(FStimulus.AsInterface);
   end;
 end;
 
@@ -220,10 +193,6 @@ procedure TFreeSquareTrial.WriteData(Sender: TObject);
 var
   LLatency : Extended = -1;
   LResponsesTime : Extended;
-  function IsTestTrial : Boolean;
-  begin
-    Result := Configurations.Parameters.Values['IsTestTrial'].ToBoolean;
-  end;
 begin
   inherited WriteData(Sender);
   LResponsesTime := FReportData.CEnd-FReportData.CBegin;
@@ -235,10 +204,10 @@ begin
       TExperiment1Table(FTable).AddRow(
         LLatency, ResultAsInteger);
     end;
-    ttE3B1, ttE3B2, ttE3C1, ttE3C2 : begin
+    ttE3B1, ttE3B2 : begin
       TExperiment3Table(FTable).AddRow(
-        Counters.CurrentTrial,
-        LLatency, LResponsesTime, ResultAsInteger, IsTestTrial);
+        Counters.SessionTrials,
+        LLatency, LResponsesTime, FCustomResult, IsTestTrial);
     end;
   end;
 
@@ -255,102 +224,49 @@ begin
              rsReportStmEnd;
 end;
 
+procedure TFreeSquareTrial.SetCustomResult;
+begin
+  if IsTestTrial then begin
+    FCustomResult := -1;
+  end else begin
+    if Self.Result = T_HIT then begin
+      FCustomResult := 1;
+    end else
+    if (Self.Result = T_MISS) or (Self.Result = T_NONE) then begin
+      FCustomResult := 0;
+    end;
+  end;
+end;
+
+function TFreeSquareTrial.IsTestTrial: Boolean;
+begin
+  Result := Configurations.Parameters.Values['IsTestTrial'].ToBoolean;
+end;
+
 procedure TFreeSquareTrial.OmissionEnd(Sender: TObject);
 begin
-  FTimer.Stop;
-  FStimulus.Stop;
-  case FTrialType of
-    ttE3C1, ttE3C2 : FSchedule.Stop;
-    else { do nothing };
-  end;
-  FResponseEnabled := False;
-  Invalidate;
+  if FResponseEnabled then begin
+    Invalidate;
+    FReportData.CEnd := LogEvent('Omissao.Fim');
+    FStimulus.Stop;
 
-  case FTrialType of
-    ttE1B, ttE1C, ttE3B1, ttE3B2: begin
-      Result := T_MISS;
-    end;
-
-    ttE3C1, ttE3C2 : begin
-      Result := T_NONE;
-    end;
-  end;
-
-  case FTrialType of
-    ttE1B, ttE1C : begin
-      Configurations.Parameters.Values[_ITI] :=
-        (FreeSquareTrialDuration - FreeSquareOmissionDurationExp1).ToString;
-    end;
-
-    ttE3B1, ttE3B2, ttE3C1, ttE3C2 : begin
-      Configurations.Parameters.Values[_ITI] := ITIExperiment3.ToString;
-    end;
-  end;
-  FReportData.CEnd := LogEvent('Omissao.Fim');
-  EndTrial(Self);
-end;
-
-procedure TFreeSquareTrial.DelayEnd(Sender: TObject);
-begin
-  FTimer.Stop;
-  Parent.Color := clWhite;
-  Counters.BlcPoints := Counters.BlcPoints +1;
-  LogEvent('Atraso.Fim');
-  EndTrial(Self);
-end;
-
-procedure TFreeSquareTrial.VTConsequence(Sender : TObject);
-begin
-  case FTrialType of
-    ttE3C1, ttE3C2 : begin
-      FResponseEnabled := False;
-      FTimer.Pause;
-      FSchedule.Stop;
-      FSquareSchedule.Pause;
-      FShowCounter := False;
-      FStimulus.Hide;
-      FConsequence.Start;
-      Parent.Color := clDarkGreen;
-      if Sender = FSchedule then begin
-        Counters.SessionPointsTopLeft :=
-          Counters.SessionPointsTopLeft +1;
+    case FTrialType of
+      ttE1B, ttE1C, ttE3B1, ttE3B2: begin
+        Result := T_MISS;
       end;
-      FConsequenceTimer.Enabled := True;
-      FReportData.CVTDelayBegin := LogEvent('VT.Inicio');
-      Invalidate;
-    end
+    end;
 
-    else { do nothing };
-  end;
-end;
-
-procedure TFreeSquareTrial.VTConsequenceEnd(Sender : TObject);
-var
-  LDelay: Extended;
-begin
-  case FTrialType of
-    ttE3C1, ttE3C2 : begin
-      FConsequenceTimer.Enabled := False;
-      FResponseEnabled := False;
-      FConsequence.Stop;
-
-      FShowCounter := True;
-      FTimer.Start;
-      FSchedule.Start;
-      FStimulus.Start; // FSquareSchedule.Start;
-      Parent.Color := clWhite;
-      if Sender = FSchedule then begin
-        Counters.SessionPointsTopLeft :=
-          Counters.SessionPointsTopLeft +1;
+    case FTrialType of
+      ttE1B, ttE1C : begin
+        Configurations.Parameters.Values[_ITI] :=
+          (FreeSquareTrialDuration - FreeSquareOmissionDurationExp1).ToString;
       end;
-      Invalidate;
-      FReportData.CVTDelayEnd := LogEvent('VT.Fim');
-      LDelay := FReportData.CVTDelayEnd - FReportData.CVTDelayBegin;
-      TExperiment3Table(FTable).AddDelay(
-        Counters.CurrentTrial, LDelay);
-    end
 
-    else { do nothing };
+      ttE3B1, ttE3B2 : begin
+        Configurations.Parameters.Values[_ITI] := ITIExperiment3.ToString;
+      end;
+    end;
+    SetCustomResult;
   end;
 end;
 
@@ -358,16 +274,17 @@ procedure TFreeSquareTrial.Consequence(Sender: TObject);
 var
   ITI : Extended;
 begin
-  FTimer.Stop;
+  LimitedHold := 0;
   FStimulus.Stop;
-  case FTrialType of
-    ttE3C1, ttE3C2 : FSchedule.Stop;
-    else { do nothing };
-  end;
   FResponseEnabled := False;
   Invalidate;
-  Result := T_HIT;
 
+  if CheatsModeOn then begin
+    ParticipantBot.Stop;
+  end;
+
+  Result := T_HIT;
+  SetCustomResult;
   case FTrialType of
     ttE1B : begin
       ITI := FreeSquareTrialDuration
@@ -388,10 +305,10 @@ begin
 
       Configurations.Parameters.Values[_ITI] := ITI.ToString;
       Parent.Color := clDarkGreen;
-      FTimer.Load(FT, FreeSquareConsequenceDelay);
-      FTimer.OnConsequence := @DelayEnd;
-      FTimer.Start;
+      Counters.BlcPoints := Counters.BlcPoints +1;
       FReportData.CEnd := LogEvent('Atraso.Inicio');
+      FHasDelay := True;
+      EndTrial(Self);
     end;
 
     ttE3B1, ttE3B2 : begin
@@ -402,41 +319,25 @@ begin
       FReportData.CEnd:=LogEvent('Reforco');
       EndTrial(Self);
     end;
-
-    ttE3C1, ttE3C2 : begin
-      ITI := ITIExperiment3;
-      Configurations.Parameters.Values[_ITI] := ITI.ToString;
-
-      if Sender = FStimulus then begin
-        Counters.SessionPointsTopRight :=
-          Counters.SessionPointsTopRight +1;
-      end;
-
-      FReportData.CEnd:=LogEvent('Reforco');
-      EndTrial(Self);
-    end;
   end;
 end;
 
 procedure TFreeSquareTrial.Response(Sender: TObject);
 var
   LResponse : Extended;
-  function IsTestTrial : Boolean;
-  begin
-    Result := Configurations.Parameters.Values['IsTestTrial'].ToBoolean;
-  end;
-
 begin
-  LResponse := LogEvent('Resposta.Latencia');
   if FFirstResponse then
   begin
     FFirstResponse := False;
+    LResponse := LogEvent('Resposta.Latencia');
     FReportData.CLatency := LResponse
+  end else begin
+    LResponse := LogEvent('Resposta');
   end;
   case FTrialType of
-    ttE3B1, ttE3C1, ttE3B2, ttE3C2 : begin
+    ttE3B1, ttE3B2 : begin
       TExperiment3Table(FTable).AddResponse(
-        Counters.CurrentTrial, LResponse);
+        Counters.SessionTrials, LResponse);
     end;
     else { do nothing };
   end;

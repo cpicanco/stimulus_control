@@ -32,6 +32,7 @@ type
     function GetLeft: integer;
     function GetParent: TWinControl;
     function GetTop: integer;
+    function GetVisible: Boolean;
     function GetWidth: integer;
     function GetHeight: integer;
     procedure SetHeight(AValue: integer);
@@ -56,6 +57,7 @@ type
     property Top : integer read GetTop write SetTop;
     property Left: integer read GetLeft write SetLeft;
     property Key : string read FKey write FKey;
+    property Visible : Boolean read GetVisible;
   end;
 
 implementation
@@ -97,6 +99,11 @@ end;
 function TStimulusFigure.GetTop: integer;
 begin
   Result := FImage.Top;
+end;
+
+function TStimulusFigure.GetVisible: Boolean;
+begin
+  Result := FImage.Visible;
 end;
 
 procedure TStimulusFigure.SetLeft(AValue: integer);
@@ -159,6 +166,7 @@ procedure TStimulusFigure.Start;
 begin
   FImage.Centralize;
   FImage.Show;
+  FImage.BringToFront;
 end;
 
 procedure TStimulusFigure.Stop;

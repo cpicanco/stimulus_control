@@ -64,7 +64,7 @@ var
 
 implementation
 
-uses Forms;
+uses Forms, Cheats, Constants;
 
 procedure TMovingSquare.SetDirection(AValue: TDirection);
 begin
@@ -75,6 +75,10 @@ end;
 constructor TMovingSquare.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  if CheatsModeOn then begin
+    ConsequenceTime := ConsequenceTime div VelocityFactor;
+    //Granularity := Granularity div VelocityFactor;
+  end;
   FFreezed := False;
   Width := Round(SquareSize*(Screen.Width/ScreenInCentimeters));
   Height:= Width;
@@ -205,18 +209,22 @@ end;
 
 procedure TMovingSquare.ChangeColor(Sender: TObject);
 begin
-  FTimerConsequence.Enabled := False;
-  Color := clGray;
-  if Assigned(FSchedule) then FSchedule.DoResponse;
+  if FTimerConsequence.Enabled then begin
+    FTimerConsequence.Enabled := False;
+    Color := clGray;
+    if Assigned(FSchedule) then FSchedule.DoResponse;
+  end;
 end;
 
 procedure TMovingSquare.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
-  //inherited MouseDown(Button, Shift, X, Y);
-  Color := clYellow;
-  FTimerConsequence.Enabled := True;
-  if Assigned(OnMouseDown) then OnMouseDown(Self, Button, Shift, X, Y);
+  if not FTimerConsequence.Enabled then begin
+    //inherited MouseDown(Button, Shift, X, Y);
+    Color := clYellow;
+    FTimerConsequence.Enabled := True;
+    if Assigned(OnMouseDown) then OnMouseDown(Self, Button, Shift, X, Y);
+  end;
 end;
 
 procedure TMovingSquare.Paint;
@@ -243,7 +251,6 @@ end;
 procedure TMovingSquare.LoadFromParameters(AParameters : TStringList);
 begin
   if Assigned(AParameters) then begin
-    // FFreezed := StrToBoolDef(AParameters.Values['Freezed'], False);
     { TODO: load parameters as needed}
   end;
 end;

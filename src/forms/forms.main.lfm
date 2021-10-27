@@ -10,7 +10,7 @@ object Background: TBackground
   Color = clWhite
   OnCreate = FormCreate
   Position = poScreenCenter
-  SessionProperties = 'CheckBoxCheatsMode.Checked;EditParticipant.Text;FloatSpinEditScreen.Value;FloatSpinEditSquare.Value;FloatSpinEditSquareMove.Value;PageControl1.ActivePage;RadioGroupBehaviour.ItemIndex;RadioGroupCondition.ItemIndex;RadioGroupDesign1.ItemIndex;RadioGroupDesign2.ItemIndex;RadioGroupDesign3.ItemIndex;RadioGroupDesign4.ItemIndex;SpinEditOperandumDelay.Value;SpinEditSessionBlocs.Value;SpinEditTimeSize.Value;FloatSpinEditSquareExp3.Value'
+  SessionProperties = 'CheckBoxCheatsMode.Checked;EditParticipant.Text;FloatSpinEditScreen.Value;FloatSpinEditSquare.Value;FloatSpinEditSquareExp3.Value;FloatSpinEditSquareMove.Value;PageControl1.ActivePage;RadioGroupBehaviour.ItemIndex;RadioGroupCondition.ItemIndex;RadioGroupDesign1.ItemIndex;RadioGroupDesign2.ItemIndex;RadioGroupDesign3.ItemIndex;RadioGroupDesign4.ItemIndex;SpinEditOperandumDelay.Value;SpinEditSessionBlocs.Value;SpinEditTimeSize.Value;SpinEditColorTime1.Value;SpinEditColorTime3.Value'
   LCLVersion = '2.3.0.0'
   WindowState = wsFullScreen
   object PanelConfigurations: TPanel
@@ -33,11 +33,11 @@ object Background: TBackground
       Height = 449
       Top = 166
       Width = 288
-      ActivePage = TabSheet3
+      ActivePage = TabSheet1
       Align = alClient
       BorderSpacing.Top = 165
       ParentFont = False
-      TabIndex = 2
+      TabIndex = 0
       TabOrder = 0
       object TabSheet1: TTabSheet
         Caption = '1'
@@ -61,6 +61,7 @@ object Background: TBackground
           ClientWidth = 244
           ItemIndex = 0
           Items.Strings = (
+            'A'
             'ABA'
             'ACA'
             'CA'
@@ -182,6 +183,7 @@ object Background: TBackground
           ClientWidth = 244
           ItemIndex = 0
           Items.Strings = (
+            'A'
             'ABA'
             'CA'
             'BA'
@@ -212,6 +214,7 @@ object Background: TBackground
           ClientWidth = 244
           ItemIndex = 0
           Items.Strings = (
+            'A'
             'ABA'
             'ACA'
             'CA'
@@ -259,7 +262,7 @@ object Background: TBackground
           MaxValue = 500
           MinValue = 10
           TabOrder = 2
-          Value = 250
+          Value = 50
         end
       end
       object TabSheet4: TTabSheet

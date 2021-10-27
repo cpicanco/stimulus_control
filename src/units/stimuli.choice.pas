@@ -91,8 +91,7 @@ begin
   FLabelLeft.Caption := 'Agora';
   FImageLeft.Caption :=
   'Ganhar '+#13+'R$' +
-  FloatToStrF(AMessage.Now, ffFixed, 0, 2) +
-  ' reais';
+  FloatToStrF(AMessage.Now, ffFixed, 0, 2);
 
   case AMessage.CurrentTrial of
     0 : begin
@@ -108,8 +107,7 @@ begin
   FLabelRight.Caption := 'Daqui ' + AMessage.Delay;
   FImageRight.Caption :=
   'Ganhar '+#13+'R$' +
-  FloatToStrF(AMessage.Later, ffFixed, 0, 2) +
-  ' reais';
+  FloatToStrF(AMessage.Later, ffFixed, 0, 2);
 
   DefaultFormatSettings.DecimalSeparator := OldDecimalSeparator;
 end;

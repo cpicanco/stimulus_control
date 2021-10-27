@@ -122,25 +122,25 @@
     </RunParams>
     <RequiredPackages Count="6">
       <Item1>
-        <PackageName Value="richmemopackage"/>
+        <PackageName Value="castle_base"/>
       </Item1>
       <Item2>
-        <PackageName Value="TurboPowerIPro"/>
+        <PackageName Value="richmemopackage"/>
       </Item2>
       <Item3>
-        <PackageName Value="SynEdit"/>
+        <PackageName Value="TurboPowerIPro"/>
       </Item3>
       <Item4>
-        <PackageName Value="JvCtrlsLazR"/>
+        <PackageName Value="SynEdit"/>
       </Item4>
       <Item5>
-        <PackageName Value="castle_base"/>
+        <PackageName Value="JvCtrlsLazR"/>
       </Item5>
       <Item6>
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="67">
+    <Units Count="68">
       <Unit0>
         <Filename Value="eduardo_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -478,6 +478,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Loggers.Helpers"/>
       </Unit66>
+      <Unit67>
+        <Filename Value="src/units/controls.trials.freesquare.mixvtfi.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.Freesquare.MixVTFI"/>
+      </Unit67>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

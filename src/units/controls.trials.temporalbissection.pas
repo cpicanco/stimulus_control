@@ -156,11 +156,11 @@ begin
 end;
 
 procedure TTBMTS.WriteData(Sender: TObject);
-  function GetResult : integer;
+  function CustomResult : integer;
   begin
     case FReportData.ComparisonChosen of
-      'Left' : Result := 0;
-      'Right': Result := 1;
+      'Left' : CustomResult := 0;
+      'Right': CustomResult := 1;
     end;
   end;
 
@@ -169,14 +169,18 @@ procedure TTBMTS.WriteData(Sender: TObject);
     Result := Configurations.Parameters.Values['IsTestTrial'].ToBoolean;
   end;
 
+var
+  LSampleDuration: String;
 begin
   inherited WriteData(Sender);
+  LSampleDuration := FStimulus.SampleDuration.ToString;
+
   if Assigned(FTable) then begin
     TExperiment2Table(FTable).AddRow(
-      FStimulus.SampleDuration.ToString, GetResult, IsTestTrial);
+      LSampleDuration, CustomResult, IsTestTrial);
   end;
   Data := Data +
-    FStimulus.SampleDuration.ToString + HeaderTabs +
+    LSampleDuration + HeaderTabs +
     FReportData.SampleBegin + HeaderTabs +
     FReportData.ComparisonBegin + HeaderTabs +
     FReportData.ComparisonLatency + HeaderTabs +

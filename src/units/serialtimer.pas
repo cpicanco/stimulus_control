@@ -69,18 +69,20 @@ begin
 end;
 
 procedure TSerialTimer.TimerOnTimer(Sender: TObject);
+var
+  LTimer : TTimer;
 begin
-  FTimer.Enabled := False;
-  if Assigned(FTimerItems[FCurrentItem].OnTimerEvent) then
-    FTimerItems[FCurrentItem].OnTimerEvent(Sender);
-  if FCurrentItem < High(FTimerItems) then
-    begin
-      Inc(FCurrentItem);
-      FTimer.Interval := FTimerItems[FCurrentItem].Interval;
-      FTimer.Enabled := True;
-    end
-  else
-    if Assigned(OnEndTimeSerie) then OnEndTimeSerie(Sender);
+  LTimer := TTimer(Sender);
+  LTimer.Enabled := False;
+  if Assigned(FTimerItems[FCurrentItem].OnTimerEvent) then begin
+    FTimerItems[FCurrentItem].OnTimerEvent(Self);
+  end;
+  if FCurrentItem < High(FTimerItems) then begin
+    Inc(FCurrentItem);
+    LTimer.Interval := FTimerItems[FCurrentItem].Interval;
+    LTimer.Enabled := True;
+  end else
+    if Assigned(OnEndTimeSerie) then OnEndTimeSerie(Self);
 end;
 
 constructor TSerialTimer.Create(AOwner: TComponent);

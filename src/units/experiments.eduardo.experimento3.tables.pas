@@ -8,15 +8,18 @@ uses
   Classes, SysUtils, Loggers.Tables;
 
 type
+  TDelays = array of Extended;
 
   TTableTrial = record
-    Tag       : integer;
-    Result    : integer;
-    IsTest    : Boolean;
-    Latency   : Extended;
-    VTDelays  : TFloatColumn;
-    ResponsesTime : Extended;
-    Responses : TFloatColumn;
+    Tag            : integer;
+    Result         : integer;
+    IsTest         : Boolean;
+    Latency        : Extended;
+    ResponsesTime  : Extended;
+    Responses      : TFloatColumn;
+    VTDelaysBegin  : TFloatColumn;
+    VTDelaysEnd    : TFloatColumn;
+    Delays         : TDelays;
   end;
 
   { TExperiment3Table }
@@ -33,12 +36,15 @@ type
     constructor Create(AOwner : TComponent); override;
     destructor Destroy; override;
   public
+    procedure CreateTrial(ATrial: integer);
     procedure AddRow(ATrial: integer; ALatency : Extended;
       AResponsesTime : Extended;
       AResult: integer; IsTestTrial: Boolean);
     procedure AddResponse(ATrial : integer;
       AResponse : Extended);
-    procedure AddDelay(ATrial : integer;
+    procedure AddDelayBegin(ATrial : integer;
+      ADelay : Extended);
+    procedure AddDelayEnd(ATrial : integer;
       ADelay : Extended);
   end;
 
@@ -62,9 +68,26 @@ begin
   WriteTable;
   for i := Low(FTrials) to High(FTrials) do begin
     FTrials[i].Responses.Free;
-    FTrials[i].VTDelays.Free;
+    FTrials[i].VTDelaysBegin.Free;
+    FTrials[i].VTDelaysEnd.Free;
+    FTrials[i].Delays := nil;
   end;
   inherited Destroy;
+end;
+
+procedure TExperiment3Table.CreateTrial(ATrial: integer);
+begin
+  if FIsFirstTrial then begin
+    FTrials := nil;
+    SetLength(FTrials, 0);
+    FIsFirstTrial := False;
+    FFirstTrial := ATrial;
+  end;
+  SetLength(FTrials, Length(FTrials)+1);
+  FTrials[High(FTrials)].Tag := High(FTrials)+1;
+  FTrials[High(FTrials)].Responses := TFloatColumn.Create;
+  FTrials[High(FTrials)].VTDelaysBegin := TFloatColumn.Create;
+  FTrials[High(FTrials)].VTDelaysEnd := TFloatColumn.Create;
 end;
 
 procedure TExperiment3Table.AddRow(ATrial: integer; ALatency: Extended;
@@ -73,10 +96,16 @@ var
   i: Integer;
 begin
   i := GetTrial(ATrial);
-  FTrials[i].IsTest := IsTestTrial;
-  FTrials[i].Latency := ALatency;
-  FTrials[i].ResponsesTime := AResponsesTime;
-  FTrials[i].Result := AResult;
+  try
+    FTrials[i].IsTest := IsTestTrial;
+    FTrials[i].Latency := ALatency;
+    FTrials[i].ResponsesTime := AResponsesTime;
+    FTrials[i].Result := AResult;
+  except
+    on E : Exception do begin
+      i := 0;
+    end;
+  end;
 end;
 
 procedure TExperiment3Table.AddResponse(ATrial: integer; AResponse: Extended);
@@ -84,15 +113,41 @@ var
   i : integer;
 begin
   i := GetTrial(ATrial);
-  FTrials[i].Responses.Add(AResponse);
+  try
+    FTrials[i].Responses.Add(AResponse);
+  except
+    on E : Exception do begin
+      i := 0;
+    end;
+  end;
 end;
 
-procedure TExperiment3Table.AddDelay(ATrial: integer; ADelay: Extended);
+procedure TExperiment3Table.AddDelayBegin(ATrial: integer; ADelay: Extended);
 var
   i : integer;
 begin
   i := GetTrial(ATrial);
-  FTrials[i].VTDelays.Add(ADelay);
+  try
+    FTrials[i].VTDelaysBegin.Add(ADelay);
+  except
+    on E : Exception do begin
+      i := 0;
+    end;
+  end;
+end;
+
+procedure TExperiment3Table.AddDelayEnd(ATrial: integer; ADelay: Extended);
+var
+  i : integer;
+begin
+  i := GetTrial(ATrial);
+  try
+    FTrials[i].VTDelaysEnd.Add(ADelay);
+  except
+    on E : Exception do begin
+      i := 0;
+    end;
+  end;
 end;
 
 function TExperiment3Table.GetFilename: string;
@@ -102,17 +157,7 @@ end;
 
 function TExperiment3Table.GetTrial(ATrial: integer): integer;
 begin
-  if FIsFirstTrial then begin
-    FIsFirstTrial := False;
-    FFirstTrial := ATrial;
-  end;
   Result := ATrial - FFirstTrial;
-  if (Result > High(FTrials)) or (Length(FTrials) = 0) then begin
-    SetLength(FTrials, Length(FTrials)+1);
-    FTrials[Result].Tag := Result+1;
-    FTrials[Result].Responses := TFloatColumn.Create;
-    FTrials[Result].VTDelays  := TFloatColumn.Create;
-  end;
 end;
 
 procedure TExperiment3Table.WriteTable;
@@ -122,11 +167,51 @@ const
   HIT  = 1;
 var
   Table : TTabDelimitedReport;
-  i: Integer;
+  i, j : Integer;
   Result : string;
-  function CalculatePorcentage(A, B : integer):string;
+  DelaysCount  : integer;
+  DelaysTime   : Extended;
+  Rate         : Extended;
+  RunningRate  : Extended;
+  FirstQuartil : Extended;
+  TrialsWithReinforcement : integer = 0;
+  QuarterLife : Extended;
+  Quarters : array of Extended = nil;
+
+  function GetFirstQuartil(ATrial: TTableTrial) : Extended;
+  var
+    Q1 : Integer;
+    i : integer;
   begin
-    Result := ((A*100)/B).ToString;
+    if ATrial.Responses.Count > 0 then begin
+      Q1 := Round(ATrial.Responses.Count*0.25);
+      Result := ATrial.Responses[Q1];
+      for i := Low(ATrial.Delays) to High(ATrial.Delays) do begin
+        if ATrial.VTDelaysBegin[i] < ATrial.Responses[Q1] then begin
+          Result := Result - ATrial.Delays[i];
+        end;
+      end;
+    end else begin
+      Result := 0
+    end;
+  end;
+
+  function GetDelays(ATrial : TTableTrial):  TDelays;
+  var i : integer;
+  begin
+    Result := nil;
+    if ATrial.VTDelaysBegin.Count > 0 then begin
+      SetLength(Result, ATrial.VTDelaysBegin.Count);
+      if ATrial.VTDelaysBegin.Count = ATrial.VTDelaysEnd.Count then begin
+        for i := 0 to ATrial.VTDelaysBegin.Count-1 do begin
+          Result[i] := ATrial.VTDelaysEnd[i] - ATrial.VTDelaysBegin[i];
+        end;
+      end else begin
+        Exception.Create('VTDelay error');
+      end;
+    end else begin
+      SetLength(Result, 0);
+    end;
   end;
 begin
   Table := TTabDelimitedReport.Create;
@@ -135,31 +220,81 @@ begin
     Table.WriteRow([
       'Tentativa',
       'Latência',
-      'Respostas (n)',
-      'Respostas (s)',
-      'Pausa Pós Reforço (n)',
-      'Pausa Pós Reforço (s)',
+      'Frequência de Respostas- n',
+      'Tempo das Respostas- s',
+      'Taxa de Respostas- n/s',
+      'Taxa de Respostas- n/(s-s2)',
+      'Q1',
+      'Q1/(s-s2)',
+      'Pausa Pós Reforço- n2',
+      'Pausa Pós Reforço- s2',
       'Resultado']);
     for i := Low(FTrials) to High(FTrials) do begin
       case FTrials[i].Result of
-         NONE : Result := 'TESTE';
-         MISS : Result := '0';
-         HIT  : Result := '1';
+        NONE : Result := 'TESTE';
+        MISS : Result := '0';
+        HIT  : Result := '1';
       end;
+      FTrials[i].Delays := GetDelays(FTrials[i]);
+      DelaysCount := Length(FTrials[i].Delays);
+      if DelaysCount > 0 then begin
+        DelaysTime := Sum(FTrials[i].Delays);
+      end else begin
+        DelaysTime := 0;
+      end;
+
+      if FTrials[i].Responses.Count > 0 then begin
+        Rate := FTrials[i].Responses.Count/FTrials[i].ResponsesTime;
+        RunningRate :=
+          FTrials[i].Responses.Count/(FTrials[i].ResponsesTime-DelaysTime);
+      end else begin
+        Rate := 0;
+        RunningRate := 0;
+      end;
+      FirstQuartil := GetFirstQuartil(FTrials[i]);
+      QuarterLife := FirstQuartil/(FTrials[i].ResponsesTime-DelaysTime);
       Table.WriteRow([
         FTrials[i].Tag.ToString,
         FTrials[i].Latency.ToString,
         FTrials[i].Responses.Count.ToString,
         FTrials[i].ResponsesTime.ToString,
-        FTrials[i].VTDelays.Count.ToString,
-        FTrials[i].VTDelays.Sum.ToString,
+        Rate.ToString,
+        RunningRate.ToString,
+        FirstQuartil.ToString,
+        QuarterLife.ToString,
+        DelaysCount.ToString,
+        DelaysTime.ToString,
         Result
       ]);
+      if FTrials[i].IsTest then begin
+        { do nothing }
+      end else begin
+        Inc(TrialsWithReinforcement);
+        SetLength(Quarters, Length(Quarters)+1);
+        Quarters[High(Quarters)] := QuarterLife;
+      end;
     end;
+    QuarterLife := Mean(Quarters);
+    Table.WriteRow(['']);
+    Table.WriteRow([
+      'Tentativas com reforço',
+      'Média de Q1/(s-s2)']);
+    Table.WriteRow([
+      TrialsWithReinforcement.ToString,
+      QuarterLife.ToString]);
 
-    //Table.WriteRow(['']);
-    //Table.WriteRow(['Média da Latência', 'Porcentagem de Acertos']);
-    //
+    for i := Low(FTrials) to High(FTrials) do begin
+      if FTrials[i].IsTest then begin
+        Table.WriteRow(['']);
+        Table.WriteRow(['Tentativa de Teste '+FTrials[i].Tag.ToString]);
+        Table.WriteRow(['Tempo', 'Frequência Acumulada']);
+        for j := 0 to FTrials[i].Responses.Count-1 do begin
+          Table.WriteRow([FTrials[i].Responses[j].ToString, (j+1).ToString]);
+        end;
+      end else begin
+        { do nothing }
+      end;
+    end;
   finally
     Table.Free;
   end;

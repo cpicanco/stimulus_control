@@ -78,8 +78,8 @@ begin
 
     for i := 0 to 2 do
     begin
-      LStringList.Append('Left');
-      LStringList.Append('Right');
+      LStringList.Append(SP1000.ToString);
+      LStringList.Append(SP4000.ToString);
     end;
 
     for i := 0 to LStringlist.Count-1 do
@@ -90,7 +90,7 @@ begin
 
     for i := 0 to LStringlist.Count-1 do
       WriteTemporalBissection(ABlc, 'Temporal Bissection '+(i+1).ToString,
-        LStringlist[i], '100.0 100.0', False);
+        LStringlist[i], '1.0 1.0', False);
 
   finally
     LStringList.Free;
@@ -108,8 +108,8 @@ begin
     LStringList.Clear;
     for i := 0 to 4 do
     begin
-      LStringList.Append('Left');
-      LStringList.Append('Right');
+      LStringList.Append(SP1000.ToString);
+      LStringList.Append(SP4000.ToString);
     end;
 
     for i := 0 to LStringlist.Count-1 do
@@ -126,96 +126,68 @@ begin
   end;
 end;
 
-// teste 10 blocos de 6 (2 treino, 4 de teste), total 20 treino, 40 teste
-procedure WriteTrainingTest(ABlc : integer; AConsequence : string);
+// teste 8 blocos de 7 (2 treino, 5 de teste), total 16 treino, 40 teste
+procedure WriteTrainingTest(ABlc : integer);
 var
-  j, i, r, LTrainingI, LTestingI : integer;
+  j, i, r : integer;
   LConsequence : string;
-  LTraining : TStringList;
-  LTesting  : TStringList;
   LStringList     : TStringList;
+  S4000 : string;
+  S3170 : string;
+  S2520 : string;
+  S2000 : string;
+  S1590 : string;
+  S1260 : string;
+  S1000 : string;
 begin
-  LStringList     := TStringList.Create;
-  LTraining := TStringList.Create;
-  LTesting  := TStringList.Create;
+  LStringList := TStringList.Create;
   try
-    LTesting.Clear;
-    LTraining.Clear;
     LStringList.Clear;
 
-    LStringList.Append('3170');
-    LStringList.Append('2520');
-    LStringList.Append('2000');
-    LStringList.Append('1590');
-    LStringList.Append('1260');
+    S4000 := SP4000.ToString;
+    S3170 := SP3170.ToString;
+    S2520 := SP2520.ToString;
+    S2000 := SP2000.ToString;
+    S1590 := SP1590.ToString;
+    S1260 := SP1260.ToString;
+    S1000 := SP1000.ToString;
 
-    for i := 0 to 9 do
-    begin
-      LTraining.Append('Left');
-      LTraining.Append('Right');
-    end;
+    LStringList.Append(S4000);
+    LStringList.Append(S3170);
+    LStringList.Append(S2520);
+    LStringList.Append(S2000);
+    LStringList.Append(S1590);
+    LStringList.Append(S1260);
+    LStringList.Append(S1000);
 
-    for i := 0 to 19 do
-    begin
-      r := Random(20);
-      LTraining.Exchange(i, r);
-    end;
-
-    for i := 0 to 7 do
-    begin
-      for j := 0 to 4 do
+    for j := 0 to 7 do begin
+      for i := 0 to LStringList.Count-1 do
       begin
-        r := Random(5);
-        LStringList.Exchange(j, r);
-      end;
-
-      for j := 0 to 4 do
-        LTesting.Append(LStringList[j]);
-    end;
-
-    LTrainingI := 0;
-    LTestingI := 0;
-    j := 0;
-    repeat
-      LStringlist.Clear;
-      for i := 0 to 5 do
-      begin
-        case i of
-          0, 1 :
-            begin
-              LStringlist.Append(LTraining[LTrainingI]);
-              Inc(LTrainingI);
-            end;
-          else
-            begin
-              LStringlist.Append(LTesting[LTestingI]);
-              Inc(LTestingI);
-            end;
-          end;
-      end;
-
-      for i := 0 to 5 do
-      begin
-        r := Random(6);
+        r := Random(LStringList.Count);
         LStringList.Exchange(i, r);
       end;
 
       for i := 0 to LStringList.Count -1 do
       begin
-        case LStringList[i] of
-          'Left', 'Right' : LConsequence := AConsequence;
-          '3170', '2520', '2000', '1590', '1260': LConsequence := '0.0 0.0';
+        if (LStringList[i] = S4000) or
+           (LStringList[i] = S1000) then begin
+           LConsequence := '1.0 1.0';
         end;
-        Inc(j);
+
+        if (LStringList[i] = S3170) or
+           (LStringList[i] = S2520) or
+           (LStringList[i] = S2000) or
+           (LStringList[i] = S1590) or
+           (LStringList[i] = S1260) then begin
+          LConsequence := '0.0 0.0';
+        end;
         WriteTemporalBissection(ABlc,
-        'Temporal Bissection Test '+(j).ToString + #32 + LStringList[i],
+        'Temporal Bissection Test '+(j+1).ToString,
           LStringList[i], LConsequence, True);
       end;
-    until (LTrainingI = 20) and (LTestingI = 40);
+    end;
   finally
     LStringList.Free;
-    LTraining.Free;
-    LTesting.Free;
   end;
 end;
 
@@ -228,11 +200,7 @@ var
 
   procedure SetITIForBCD;
   begin
-    if CheatsModeOn then begin
-      ITI := TemporalBissectionITI div 10;
-    end else begin
-      ITI := TemporalBissectionITI;
-    end;
+    ITI := TemporalBissectionITI;
   end;
 
   procedure WriteBCondition; // sem viés
@@ -241,9 +209,10 @@ var
   begin
     SetITIForBCD;
     Inc(LConditionI);
-    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem B sem viés');
+    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem B|sem viés');
     ConfigurationFile.WriteToBloc(
-      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
+      LConditionI, 'EndTable',
+      'DemandTable_A_Bloco'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE2B);
 
     // 24, critério misto, 6 corretas consecutivas sendo 3 de cada tipo
@@ -251,31 +220,32 @@ var
     for i := 0 to 3 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B1-100% reforço sem viés');
-      ConfigurationFile.WriteToBloc(LConditionI, _CrtConsecutiveHit, '6');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B1|6 a 24 tentativas|100% reforço|sem viés');
+      ConfigurationFile.WriteToBloc(LConditionI, _CrtHitPorcentage, '100');
       ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, LNextBlocOnCriteria);
       WriteTraining1(LConditionI);
     end;
 
-    // 60 no mínimo
-    for i := 0 to 5 do
+    // 50 no mínimo
+    for i := 0 to 4 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B2-MIN 60-50% reforço sem viés');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B2|50 tentativas|50% reforço|sem viés');
       if i = 0 then begin
         LTable := LConditionI;
         ConfigurationFile.WriteToBloc(
-          LConditionI, 'BeginTable', 'Experiment2Table'+LTable.ToString);
+          LConditionI, 'BeginTable',
+          'Experiment2Table_'+LCondition+'_Bloco'+LTable.ToString);
       end;
       WriteTraining2(LConditionI, '0.5 0.5');
     end;
 
     // 100 no máximo, critério de 90% de acerto
-    LNextBlocOnCriteria := (LConditionI+4).ToString;
-    for i := 0 to 3 do
+    LNextBlocOnCriteria := (LConditionI+5).ToString;
+    for i := 0 to 4 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B2-MAX 100-50% reforço-90% de acerto sem viés');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B2|10 a 50 tentativas|50% reforço|90% de acerto|sem viés');
       ConfigurationFile.WriteToBloc(LConditionI, _CrtHitPorcentage, '90');
       ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, LNextBlocOnCriteria);
       WriteTraining2(LConditionI, '0.5 0.5');
@@ -283,8 +253,8 @@ var
 
     // testing
     Inc(LConditionI);
-    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B teste sem viés');
-    WriteTrainingTest(LConditionI, '0.5 0.5');
+    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'B|teste|sem viés');
+    WriteTrainingTest(LConditionI);
   end;
 
 
@@ -294,30 +264,32 @@ var
   begin
     SetITIForBCD;
     Inc(LConditionI);
-    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem C viés longo');
+    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem C|viés longo');
     ConfigurationFile.WriteToBloc(
-      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
+      LConditionI, 'EndTable',
+      'DemandTable_A_Bloco'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE2B);
 
-    // 60 no mínimo
-    for i := 0 to 5 do
+    // 50 no mínimo
+    for i := 0 to 4 do
     begin
       Inc(LConditionI);
       if i = 0 then begin
         LTable := LConditionI;
         ConfigurationFile.WriteToBloc(
-          LConditionI, 'BeginTable', 'Experiment2Table'+LTable.ToString);
+          LConditionI, 'BeginTable',
+          'Experiment2Table_'+LCondition+'_Bloco'+LTable.ToString);
       end;
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1-MIN 60-80%/20% reforço viés longo');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1|50 tentativas|80%/20% reforço|viés longo');
       WriteTraining2(LConditionI, '0.8 0.2');
     end;
 
     // 100 no máximo, critério de 90% de acerto
-    LNextBlocOnCriteria := (LConditionI+4).ToString;
-    for i := 0 to 3 do
+    LNextBlocOnCriteria := (LConditionI+5).ToString;
+    for i := 0 to 4 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1-MAX 100-80%/20% reforço-90% de acerto viés longo');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C1|10 a 50 tentativas|80%/20% reforço|90% de acerto|viés longo');
       ConfigurationFile.WriteToBloc(LConditionI, _CrtHitPorcentage, '90');
       ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, LNextBlocOnCriteria);
       WriteTraining2(LConditionI, '0.8 0.2');
@@ -325,8 +297,8 @@ var
 
     // testing
     Inc(LConditionI);
-    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C teste viés longo');
-    WriteTrainingTest(LConditionI, '0.8 0.2');
+    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'C|teste|viés longo');
+    WriteTrainingTest(LConditionI);
   end;
 
   procedure WriteDCondition; //viés curto
@@ -335,25 +307,26 @@ var
   begin
     SetITIForBCD;
     Inc(LConditionI);
-    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem D - viés curto');
+    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem D|viés curto');
     ConfigurationFile.WriteToBloc(
-      LConditionI, 'EndTable', 'DemandTable'+LTable.ToString);
+      LConditionI, 'EndTable',
+      'DemandTable_A_Bloco'+LTable.ToString);
     WriteMSG(LConditionI, 'M1', MessageE2B);
 
     // 60 no mínimo
-    for i := 0 to 5 do
+    for i := 0 to 4 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D1-MIN 60-20%/80% reforço viés curto');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D1|50 tentativas|20%/80% reforço|viés curto');
       WriteTraining2(LConditionI, '0.2 0.8');
     end;
 
     // 100 no máximo, critério de 90% de acerto
-    LNextBlocOnCriteria := (LConditionI+4).ToString;
-    for i := 0 to 3 do
+    LNextBlocOnCriteria := (LConditionI+5).ToString;
+    for i := 0 to 4 do
     begin
       Inc(LConditionI);
-      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D1-MAX 100-20%/80% reforço-90% de acerto  - viés curto');
+      ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D1|10 a 50 tentativas|20%/80% reforço|90% de acerto|viés curto');
       ConfigurationFile.WriteToBloc(LConditionI, _CrtHitPorcentage, '90');
       ConfigurationFile.WriteToBloc(LConditionI, _NextBlocOnCriteria, LNextBlocOnCriteria);
       WriteTraining2(LConditionI, '0.2 0.8');
@@ -361,13 +334,13 @@ var
 
     // testing
     Inc(LConditionI);
-    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D teste viés curto');
-    WriteTrainingTest(LConditionI, '0.2 0.8');
+    ConfigurationFile.WriteToBloc(LConditionI, _Name, 'D|teste|viés curto');
+    WriteTrainingTest(LConditionI);
   end;
 
 begin
   SetupStimuli;
-  if (ADesign = 'ABA') then
+  if (ADesign = 'ABA')  or (ADesign = 'A') then
   begin
     Inc(LConditionI);
     ConfigurationFile.WriteToBloc(LConditionI, _Name, 'Mensagem A0');
@@ -376,7 +349,7 @@ begin
 
   for LCondition in ADesign do
   case LCondition of
-    'A': WriteACondition(LConditionI, LTable, '2');
+    'A': WriteACondition(LConditionI, LTable, '2', ADesign);
     'B': WriteBCondition;
     'C': WriteCCondition;
     'D': WriteDCondition;

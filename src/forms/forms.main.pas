@@ -135,7 +135,8 @@ begin
       Exit;
     end;
   end;
-  LName := 'Experimento '+(PageControl1.TabIndex+1).ToString;
+  LName := 'Experimento '+(PageControl1.TabIndex+1).ToString + ' Delineamento:'+
+  RadioGroupDesign4.Items[RadioGroupDesign4.ItemIndex];
   GSession.Play(LName, EditParticipant.Text);
 end;
 

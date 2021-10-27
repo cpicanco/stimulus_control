@@ -11,65 +11,69 @@ unit Constants;
 
 {$mode objfpc}{$H+}
 
-{$DEFINE DEBUG}
+//{$DEFINE DEBUG}
 
 interface
+
+uses Cheats;
+
+var VelocityFactor : integer = 10;
 
 const
   DefaultAddress = '127.0.1.1:50020';
 
-const
- {$IFDEF DEBUG}
-  ConsequenceDuration : integer = 200;
-  DurationLong  : integer = 400;
-  DurationShort : integer = 100;
-  TemporalBissectionITI : integer = 300;
-  ITISurvey : integer = 50;
-  Experiment3FIValue : integer = 150;
-  Experiment3FITestValue : integer = 300;
-  FreeSquareTrialDuration : integer = 2000;
-  FreeSquareOmissionDurationExp1 : integer = 5000;
-  FreeSquareOmissionDurationExp3Training : integer = 2000;
-  FreeSquareOmissionDurationExp3Testing : integer = 3000;
-  FreeSquareConsequenceDelay : integer = 1000;
-  FreeSquareConsequenceDurationExp1 : integer = 200;
-  FreeSquareConsequenceDurationExp3 : integer = 100;
-  ITIExperiment3 : integer = 50;
-{$ELSE}
-{ Controls.Trials.TemporalBissection }
- ConsequenceDuration : integer = 2000;
+ // Default = 2000
+ function ConsequenceDuration : integer;
 
-{ Stimuli.Sequence.TemporalBissection }
- DurationLong  : integer = 4000;
- DurationShort : integer = 1000;
+ // Default = 4000
+ function DurationLong  : integer;
 
- { Experiment 2 }
- TemporalBissectionITI : integer = 3000;
+ // Default = 1000
+ function DurationShort : integer;
 
-{ Experiment 1 and 2 }
- ITISurvey : integer = 500;
+ // Default = 3000
+ function TemporalBissectionITI : integer;
 
- { Experiment3 }
- Experiment3FIValue : integer = 15000;
- Experiment3FITestValue : integer = 30000;
+ // Default = 500
+ function ITISurvey : integer;
 
-{ Controls.Trials.FreeSquare }
- FreeSquareTrialDuration : integer = 20000;
+ // Default = 20000
+ function FreeSquareTrialDuration : integer;
 
- // Experiment 1
- FreeSquareOmissionDurationExp1 : integer = 5000;
+ // Default = 5000
+ function FreeSquareOmissionDurationExp1 : integer;
 
- // Experiment 3
- FreeSquareOmissionDurationExp3Training : integer = 15500;
- FreeSquareOmissionDurationExp3Testing : integer = 30000;
+ // Default = 2000
+ function FreeSquareConsequenceDurationExp1 : integer;
 
- FreeSquareConsequenceDelay : integer = 10000;
- FreeSquareConsequenceDurationExp1 : integer = 2000;
- FreeSquareConsequenceDurationExp3 : integer = 1000;
+ // Default = 15000
+ function Experiment3FIValue : integer;
 
- ITIExperiment3 : integer = 500;
+ // Default = 30000
+ function Experiment3FITestValue : integer;
 
-{$ENDIF}
+ // Default = 15500
+ function FreeSquareOmissionDurationExp3Training : integer;
+
+ // Default = 30000
+ function FreeSquareOmissionDurationExp3Testing : integer;
+
+ // Default = 10000
+ function FreeSquareConsequenceDelay : integer;
+
+ // Default = 1000
+ function FreeSquareConsequenceDurationExp3 : integer;
+
+ // Default = 500
+ function ITIExperiment3 : integer;
+
+ function SP4000 : integer;
+ function SP3170 : integer;
+ function SP2520 : integer;
+ function SP2000 : integer;
+ function SP1590 : integer;
+ function SP1260 : integer;
+ function SP1000 : integer;
 
 const
   clDarkGreen = $006400;
@@ -281,6 +285,7 @@ const
   T_HTM = 'HTMLM';
   T_RTF = 'RTFM';
   T_EO1 = 'OP1';
+  T_VTFI = 'VTFI';
   T_TMB = 'TMB';
   T_CHO = 'CHOICE';
   T_INP = 'TXTINP';
@@ -385,6 +390,229 @@ resourcestring
 
   rsNA = 'NA';
 implementation
+
+{ Controls.Trials.TemporalBissection }
+function ConsequenceDuration: integer;
+const R : integer = 2000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+{ Stimuli.Sequence.TemporalBissection }
+function DurationLong: integer;
+const R  : integer = 4000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+{ Stimuli.Sequence.TemporalBissection }
+function DurationShort: integer;
+const R : integer = 1000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function TemporalBissectionITI: integer;
+const R : integer = 3000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function ITISurvey: integer;
+const R : integer = 500;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function FreeSquareTrialDuration: integer;
+const R : integer = 20000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function FreeSquareOmissionDurationExp1: integer;
+const R : integer = 5000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function FreeSquareConsequenceDurationExp1: integer;
+const R : integer = 2000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function Experiment3FIValue: integer;
+const R : integer = 15000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function Experiment3FITestValue: integer;
+const R : integer = 30000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function FreeSquareOmissionDurationExp3Training: integer;
+const R : integer = 15500;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function FreeSquareOmissionDurationExp3Testing: integer;
+const R : integer = 30000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function FreeSquareConsequenceDelay: integer;
+const R : integer = 10000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function FreeSquareConsequenceDurationExp3: integer;
+const R : integer = 1000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function ITIExperiment3: integer;
+const R : integer = 500;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function SP4000: integer;
+const R : integer = 4000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function SP3170: integer;
+const R : integer = 3170;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function SP2520: integer;
+const R : integer = 2520;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function SP2000: integer;
+const R : integer = 2000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function SP1590: integer;
+const R : integer = 1590;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function SP1260: integer;
+const R : integer = 1260;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
+
+function SP1000: integer;
+const R : integer = 1000;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
 
 
 end.

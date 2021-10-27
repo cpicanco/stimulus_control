@@ -29,7 +29,7 @@ type
 
 implementation
 
-uses Session.Configuration.GlobalContainer;
+uses Session.Configuration.GlobalContainer, Constants;
 
 { TExperiment1Table }
 
@@ -71,16 +71,18 @@ end;
 
 procedure TExperiment2Table.WriteTable;
 const
-  SP4000 = '4000';
-  SP3170 = '3170';
-  SP2520 = '2520';
-  SP2000 = '2000';
-  SP1590 = '1590';
-  SP1260 = '1260';
-  SP1000 = '1000';
   LeftLong = 0;
   RightShort = 1;
 var
+  S : string;
+  S4000 : string;
+  S3170 : string;
+  S2520 : string;
+  S2000 : string;
+  S1590 : string;
+  S1260 : string;
+  S1000 : string;
+
   SP4000C : integer = 0;
   SP3170C : integer = 0;
   SP2520C : integer = 0;
@@ -103,6 +105,13 @@ var
     Result := ((A*100)/B).ToString;
   end;
 begin
+  S4000 := SP4000.ToString;
+  S3170 := SP3170.ToString;
+  S2520 := SP2520.ToString;
+  S2000 := SP2000.ToString;
+  S1590 := SP1590.ToString;
+  S1260 := SP1260.ToString;
+  S1000 := SP1000.ToString;
   Table := TTabDelimitedReport.Create;
   Table.Filename := GetFilename;
   try
@@ -110,27 +119,26 @@ begin
     Table.WriteRow(
       ['Duração do Modelo', 'Número de Tentativas', 'Número de Acertos', 'Porcentagem de Acertos']);
     for i := 0 to FResults.Count -1 do begin
-      case FSampleDurations[i] of
-        SP4000, '40' : begin
-          Inc(SP4000T);
-          case FResults[i] of
-            LeftLong : Inc(SP4000C);
-            RightShort : { do nothing };
-          end
-        end;
+      S := FSampleDurations[i];
+      if S = S4000 then begin
+        Inc(SP4000T);
+        case FResults[i] of
+          LeftLong : Inc(SP4000C);
+          RightShort : { do nothing };
+        end
+      end;
 
-        SP1000, '10' : begin
-          Inc(SP1000T);
-          case FResults[i] of
-            LeftLong : { do nothing};
-            RightShort : Inc(SP1000C);
-          end
-        end;
+      if S = S1000 then begin
+        Inc(SP1000T);
+        case FResults[i] of
+          LeftLong : { do nothing};
+          RightShort : Inc(SP1000C);
+        end
       end;
     end;
     with Table do begin
-      WriteRow([SP4000, SP4000T.ToString, SP4000C.ToString, CalculatePorcentage(SP4000C, SP4000T)]);
-      WriteRow([SP1000, SP1000T.ToString, SP1000C.ToString, CalculatePorcentage(SP1000C, SP1000T)]);
+      WriteRow([S4000, SP4000T.ToString, SP4000C.ToString, CalculatePorcentage(SP4000C, SP4000T)]);
+      WriteRow([S1000, SP1000T.ToString, SP1000C.ToString, CalculatePorcentage(SP1000C, SP1000T)]);
     end;
 
     SP4000C := 0;
@@ -148,62 +156,61 @@ begin
     SP1000C := 0;
     SP1000T := 0;
     for i := 0 to FResultsTest.Count -1 do begin
-      case FSampleDurationsTest[i] of
-        SP4000, '40' : begin
-          Inc(SP4000T);
-          case FResultsTest[i] of
-            LeftLong : Inc(SP4000C);
-            RightShort : { do nothing };
-          end
-        end;
+      S := FSampleDurationsTest[i];
+      if S = S4000 then begin
+        Inc(SP4000T);
+        case FResultsTest[i] of
+          LeftLong : Inc(SP4000C);
+          RightShort : { do nothing };
+        end
+      end;
 
-        SP3170, '317' : begin
-          Inc(SP3170T);
-          case FResultsTest[i] of
-            LeftLong : Inc(SP3170C);
-            RightShort : { do nothing };
-          end
-        end;
+      if S = S3170 then begin
+        Inc(SP3170T);
+        case FResultsTest[i] of
+          LeftLong : Inc(SP3170C);
+          RightShort : { do nothing };
+        end
+      end;
 
-        SP2520, '252' : begin
-          Inc(SP2520T);
-          case FResultsTest[i] of
-            LeftLong : Inc(SP2520C);
-            RightShort : { do nothing };
-          end
-        end;
+      if S = S2520 then begin
+        Inc(SP2520T);
+        case FResultsTest[i] of
+          LeftLong : Inc(SP2520C);
+          RightShort : { do nothing };
+        end
+      end;
 
-        SP2000, '200' : begin
-          Inc(SP2000T);
-          case FResultsTest[i] of
-            LeftLong : Inc(SP2000C);
-            RightShort : { do nothing };
-          end
-        end;
+      if S = S2000 then begin
+        Inc(SP2000T);
+        case FResultsTest[i] of
+          LeftLong : Inc(SP2000C);
+          RightShort : { do nothing };
+        end
+      end;
 
-        SP1590, '159' : begin
-          Inc(SP1590T);
-          case FResultsTest[i] of
-            LeftLong : Inc(SP1590C);
-            RightShort : { do nothing };
-          end
-        end;
+      if S = S1590 then begin
+        Inc(SP1590T);
+        case FResultsTest[i] of
+          LeftLong : Inc(SP1590C);
+          RightShort : { do nothing };
+        end
+      end;
 
-        SP1260, '126' : begin
-          Inc(SP1260T);
-          case FResultsTest[i] of
-            LeftLong : Inc(SP1260C);
-            RightShort : { do nothing };
-          end
-        end;
+      if S = S1260 then begin
+        Inc(SP1260T);
+        case FResultsTest[i] of
+          LeftLong : Inc(SP1260C);
+          RightShort : { do nothing };
+        end
+      end;
 
-        SP1000, '10' : begin
-          Inc(SP1000T);
-          case FResultsTest[i] of
-            LeftLong : Inc(SP1000C);
-            RightShort : { do nothing };
-          end
-        end;
+      if S = S1000 then begin
+        Inc(SP1000T);
+        case FResultsTest[i] of
+          LeftLong : Inc(SP1000C);
+          RightShort : { do nothing };
+        end
       end;
     end;
     Table.WriteRow(['']);
@@ -211,13 +218,13 @@ begin
     Table.WriteRow(
       ['Duração do Modelo', 'Número de Tentativas', 'Número de R (Longo)', 'Porcentagem (Longo)']);
     with Table do begin
-      WriteRow([SP4000, SP4000T.ToString, SP4000C.ToString, CalculatePorcentage(SP4000C, SP4000T)]);
-      WriteRow([SP3170, SP3170T.ToString, SP3170C.ToString, CalculatePorcentage(SP3170C, SP3170T)]);
-      WriteRow([SP2520, SP2520T.ToString, SP2520C.ToString, CalculatePorcentage(SP2520C, SP2520T)]);
-      WriteRow([SP2000, SP2000T.ToString, SP2000C.ToString, CalculatePorcentage(SP2000C, SP2000T)]);
-      WriteRow([SP1590, SP1590T.ToString, SP1590C.ToString, CalculatePorcentage(SP1590C, SP1590T)]);
-      WriteRow([SP1260, SP1260T.ToString, SP1260C.ToString, CalculatePorcentage(SP1260C, SP1260T)]);
-      WriteRow([SP1000, SP1000T.ToString, SP1000C.ToString, CalculatePorcentage(SP1000C, SP1000T)]);
+      WriteRow([S4000, SP4000T.ToString, SP4000C.ToString, CalculatePorcentage(SP4000C, SP4000T)]);
+      WriteRow([S3170, SP3170T.ToString, SP3170C.ToString, CalculatePorcentage(SP3170C, SP3170T)]);
+      WriteRow([S2520, SP2520T.ToString, SP2520C.ToString, CalculatePorcentage(SP2520C, SP2520T)]);
+      WriteRow([S2000, SP2000T.ToString, SP2000C.ToString, CalculatePorcentage(SP2000C, SP2000T)]);
+      WriteRow([S1590, SP1590T.ToString, SP1590C.ToString, CalculatePorcentage(SP1590C, SP1590T)]);
+      WriteRow([S1260, SP1260T.ToString, SP1260C.ToString, CalculatePorcentage(SP1260C, SP1260T)]);
+      WriteRow([S1000, SP1000T.ToString, SP1000C.ToString, CalculatePorcentage(SP1000C, SP1000T)]);
     end;
   finally
     Table.Free;

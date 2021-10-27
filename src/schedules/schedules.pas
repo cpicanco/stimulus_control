@@ -78,6 +78,8 @@ type
     function Start : Extended;
     function Stop : Extended;
     function Pause : Extended;
+    function GetInterval : Cardinal;
+    procedure Postpone;
     procedure UseFleshlerHoffmanIntervals;
     property AsString : string read GetScheduleString write Load;
     property Loaded : Boolean read GetLoaded;
@@ -438,6 +440,16 @@ begin
   end else begin
     Result := FSchedule.Pause;
   end;
+end;
+
+function TSchedule.GetInterval: Cardinal;
+begin
+  Result := FSchedule.NextInterval;
+end;
+
+procedure TSchedule.Postpone;
+begin
+  FSchedule.PostponeLastInterval;
 end;
 
 procedure TSchedule.UseFleshlerHoffmanIntervals;

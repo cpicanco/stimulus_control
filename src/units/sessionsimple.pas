@@ -107,7 +107,7 @@ begin
   EndCriteria := TEndCriteria.Create(Self);
   FBloc := TBloc.Create(Self);
   FBloc.OnEndBloc := @EndBloc;
-  //FBloc.OnInterTrialStop := @InterTrialStop;
+  //FBloc.OnInterTrialEnd := @InterTrialStop;
 end;
 
 destructor TSession.Destroy;

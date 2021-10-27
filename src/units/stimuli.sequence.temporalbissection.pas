@@ -215,39 +215,17 @@ begin
   FSerialTimer.Clear;
 
   LExpectedResponse := AParameters.Values[_ExpectedResponse];
-  case LExpectedResponse of
-    'Left' :
-      begin
-        { long }
-        ExpectedResponse := tbLeft;
-        if CheatsModeOn then begin
-          LTimerItems[0].Interval := DurationLong div 10;
-        end else begin
-          LTimerItems[0].Interval := DurationLong;
-        end;
-      end;
-    'Right' :
-      begin
-        { short }
-        ExpectedResponse := tbRight;
-        if CheatsModeOn then begin
-          LTimerItems[0].Interval := DurationShort div 10;
-        end else begin
-          LTimerItems[0].Interval := DurationShort;
-        end;
-      end;
-    else
-      begin
-        { generalization }
-        ExpectedResponse := tbNone;
-        if CheatsModeOn then begin
-          LTimerItems[0].Interval := LExpectedResponse.ToInteger div 10;
-        end else begin
-          LTimerItems[0].Interval := LExpectedResponse.ToInteger;
-        end;
-      end;
-
+  if LExpectedResponse = SP4000.ToString then begin
+    ExpectedResponse := tbLeft;
+  end else begin
+    if LExpectedResponse = SP1000.ToString then begin
+      ExpectedResponse := tbRight;
+    end else begin
+      ExpectedResponse := tbNone;
+    end;
   end;
+
+  LTimerItems[0].Interval := LExpectedResponse.ToInteger;
   FSerialTimer.Append(LTimerItems);
 end;
 

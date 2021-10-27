@@ -18,7 +18,7 @@ procedure WriteMSG(ABlc : integer; AName: string; AMessage : string);
 procedure WriteTXTInput(ABlc : integer; AName: string;
   AMessage : string; APrice : string);
 procedure WriteACondition(var ACondition : integer;
-  var ATable : integer; Experiment:string);
+  var ATable : integer; Experiment:string; ADesign: string);
 
 const
   FolderMessages =
@@ -111,9 +111,10 @@ begin
 end;
 
 procedure WriteACondition(var ACondition: integer; var ATable: integer;
-  Experiment: string);
+  Experiment: string; ADesign: string);
 var
   i : integer;
+  LLetter: Char;
   procedure WriteDiscountBloc(ABlc : integer);
   var
     LDelay : string;
@@ -150,13 +151,27 @@ var
       LPrices[i]);
   end;
 begin
+  if ADesign.Contains('B') then
+  begin
+    LLetter := 'B';
+  end;
+
+  if ADesign.Contains('C') then
+  begin
+    LLetter := 'C';
+  end;
+
+  if ADesign.Contains('D') then
+  begin
+    LLetter := 'D';
+  end;
   ITI := ITISurvey;
   Inc(ACondition);
   ConfigurationFile.WriteToBloc(ACondition, _Name, 'Mensagem A1');
   ConfigurationFile.WriteToBloc(
     ACondition,
     'EndTable',
-    'Experiment'+Experiment+'Table'+ATable.ToString);
+    'Experiment'+Experiment+'Table'+'_'+LLetter+'_Bloco'+ATable.ToString);
   WriteMSG(ACondition, 'M1', MessageE1A1);
 
   for i := Low(Delays) to High(Delays)do
@@ -167,7 +182,7 @@ begin
     if i = Low(Delays) then begin
       ATable := ACondition;
       ConfigurationFile.WriteToBloc(
-        ACondition, 'BeginTable', 'DiscountTable'+ATable.ToString);
+        ACondition, 'BeginTable', 'DiscountTable_A_Bloco'+ATable.ToString);
     end;
     WriteDiscountBloc(ACondition);
   end;
@@ -175,14 +190,14 @@ begin
   Inc(ACondition);
   ConfigurationFile.WriteToBloc(ACondition, _Name, 'Mensagem A2');
   ConfigurationFile.WriteToBloc(
-    ACondition, 'EndTable', 'DiscountTable'+ATable.ToString);
+    ACondition, 'EndTable', 'DiscountTable_A_Bloco'+ATable.ToString);
   WriteMSG(ACondition, 'M1', MessageE1A2);
 
   Inc(ACondition);
   ATable := ACondition;
   ConfigurationFile.WriteToBloc(ACondition, _Name, 'Demanda');
   ConfigurationFile.WriteToBloc(
-    ACondition, 'BeginTable', 'DemandTable'+ATable.ToString);
+    ACondition, 'BeginTable', 'DemandTable_A_Bloco'+ATable.ToString);
   WriteDemandBloc(ACondition);
 end;
 

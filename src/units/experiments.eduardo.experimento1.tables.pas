@@ -65,18 +65,26 @@ var
   Latencies : array of Extended;
   Porcentage : Extended;
   i: Integer;
+
+  procedure Append(ALatency : Extended);
+  begin
+    if ALatency > 0 then begin
+      SetLength(Latencies, Length(Latencies)+1);
+      Latencies[High(Latencies)] := ALatency;
+    end;
+  end;
+
 begin
   Results := nil;
   Latencies := nil;
   SetLength(Results, FCategories.Count);
-  SetLength(Latencies, FCategories.Count);
 
   Table := TTabDelimitedReport.Create;
   Table.Filename := GetFilename;
   try
     Table.WriteRow(['Latência', 'Resultado']);
     for i := 0 to FCategories.Count -1 do begin
-      Latencies[i] := FLatencies[i];
+      Append(FLatencies[i]);
       case FCategories[i] of
         -1 : begin
           Result := 'NA';
@@ -84,12 +92,12 @@ begin
         end;
 
         0 : begin
-          Result := 'Erro';
+          Result := '0';
           Results[i] := 0;
         end;
 
         1 : begin
-          Result := 'Acerto';
+          Result := '1';
           Results[i] := 1;
         end;
       end;

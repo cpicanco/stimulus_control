@@ -17,6 +17,7 @@ uses
   Classes, SysUtils, ExtCtrls, StdCtrls, Controls
   , Controls.Trials.Abstract
   , Stimuli.Image
+  , SerialTimer
   ;
 
 type
@@ -26,23 +27,30 @@ type
   TBloc = class(TComponent)
   private
     FTable : TComponent;
+    FSerialTimer : TSerialTimer;
+    FInterTrial : TTimerItem;
+    FDelay : TTimerItem;
+    FConsequenceDuration : TTimerItem;
     FWaitLabel : TLabel;
     FConsequence : TStimulusFigure;
-    FInterTrial : TTimer;
-    FTrialConsequence : TTimer;
     FITIBegin, FITIEnd : Extended;
     FLastTrialHeader : string;
     FTrial : TTrial;
+    procedure DelayBegin;
+    procedure ConsequenceBegin;
+    procedure InterTrialIntervalBegin;
+    function HasDelay : Boolean;
+    function HasConsequenceDuration : Boolean;
+    function HasInterTrialTime : Boolean;
     procedure PlayTrial(ABloc, ATrial : integer);
     procedure TrialEnd(Sender: TObject);
     procedure WriteTrialData(Sender: TObject);
   private
-    FBaseFilename: string;
     FOnEndBloc: TNotifyEvent;
     FOnInterTrialStop: TNotifyEvent;
-    procedure PlayIntertrialInterval(Sender: TObject);
-    procedure InterTrialStopTimer(Sender: TObject);
-    procedure InterTrialTimer(Sender: TObject);
+    procedure ConsequenceEnd(Sender: TObject);
+    procedure DelayEnd(Sender: TObject);
+    procedure InterTrialEnd(Sender: TObject);
     procedure SetOnEndBloc(AValue: TNotifyEvent);
     procedure SetOnInterTrialStop(AValue: TNotifyEvent);
   public
@@ -50,7 +58,7 @@ type
     procedure BeforePlay;
     procedure Play;
     property OnEndBloc : TNotifyEvent read FOnEndBloc write SetOnEndBloc;
-    property OnInterTrialStop : TNotifyEvent read FOnInterTrialStop write SetOnInterTrialStop;
+    property OnInterTrialEnd : TNotifyEvent read FOnInterTrialStop write SetOnInterTrialStop;
   end;
 
 implementation
@@ -74,6 +82,7 @@ uses Constants
    , Controls.Trials.BinaryChoice
    , Controls.Trials.TextInput
    , Controls.Trials.FreeSquare
+   , Controls.Trials.FreeSquare.MixVTFI
    , Controls.Trials.TemporalBissection
    , Graphics
    , Consequences
@@ -114,6 +123,7 @@ begin
       T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
       T_INP : FTrial := TTextInput.Create(Background);
       T_EO1 : FTrial := TFreeSquareTrial.Create(Background);
+      T_VTFI : FTrial := TFreeSquareMixVTFI.Create(Background);
       T_TMB : FTrial := TTBMTS.Create(Background);
       //T_MTS : FTrial := TMTS.Create(Background);
       //T_LIK : FTrial := TLikert.Create(Background);
@@ -144,27 +154,6 @@ begin
   end;
 end;
 
-procedure TBloc.InterTrialStopTimer(Sender: TObject);
-var
-  LNextTrial : integer;
-begin
-  FWaitLabel.Hide;
-  if Assigned(OnIntertrialStop) then OnIntertrialStop(Sender);
-  FITIEnd := TickCount - GlobalContainer.TimeStart;
-  WriteTrialData(FTrial);
-
-  LNextTrial := StrToIntDef(FTrial.NextTrial, 1);
-  Counters.CurrentTrial := Counters.CurrentTrial+LNextTrial;
-  if Counters.CurrentTrial < 0 then
-    Exception.Create('Exception. CurrentTrial cannot be less than zero.');
-  Play;
-end;
-
-procedure TBloc.InterTrialTimer(Sender: TObject);
-begin
-  FInterTrial.Enabled := False;
-end;
-
 procedure TBloc.SetOnEndBloc(AValue: TNotifyEvent);
 begin
   if FOnEndBloc=AValue then Exit;
@@ -178,32 +167,55 @@ begin
 end;
 
 procedure TBloc.TrialEnd(Sender: TObject);
-var
-  LTrial : TTrial;
 begin
-  LTrial := TTrial(Sender);
-  LTrial.Hide;
+  FTrial.Hide;
   Background.Cursor := -1;
-  FTrialConsequence.Interval := LTrial.ConsequenceInterval;
-  if FTrialConsequence.Interval > 0 then
-    begin
-      FTrialConsequence.Enabled := True;
-      if LTrial.HasVisualConsequence then
-        case LTrial.Result of
-          'HIT' :
-            begin
-              Background.Color := clDarkGreen;
-              FConsequence.Start;
-            end;
+  FDelay.Interval := FTrial.ConsequenceDelay;
+  FConsequenceDuration.Interval := FTrial.ConsequenceInterval;
+  {$IFDEF DEBUG}
+  FInterTrial.Interval := 100;
+  {$ELSE}
+  FInterTrial.Interval := Round(StrToFloatDef(FTrial.Configurations.Parameters.Values[_ITI], 0));
+  {$ENDIF}
 
-          'MISS':
-            begin
-              Background.Color := clBlack;
-            end;
-        end;
-    end
-  else
-    PlayInterTrialInterval(Sender);
+  if HasDelay then begin
+    FSerialTimer.Append(FDelay);
+  end;
+
+  if HasConsequenceDuration then begin
+    FSerialTimer.Append(FConsequenceDuration);
+  end;
+
+  if HasInterTrialTime then begin
+    FSerialTimer.Append(FInterTrial);
+  end;
+
+  if HasDelay then begin
+    DelayBegin;
+    FSerialTimer.Start;
+    Exit;
+  end;
+
+  if HasConsequenceDuration then begin
+    ConsequenceBegin;
+    FSerialTimer.Start;
+    Exit;
+  end;
+
+  if HasInterTrialTime then begin
+    InterTrialIntervalBegin;
+    FSerialTimer.Start;
+    Exit;
+  end;
+
+  InterTrialEnd(Sender);
+  //if (not HasDelay) and
+  //   (not HasConsequenceDuration) and
+  //   (not HasInterTrialTime) then begin
+  //  FInterTrial.Interval := 1;
+  //  FSerialTimer.Append(FInterTrial);
+  //  FSerialTimer.Start;
+  //end;
 end;
 
 procedure TBloc.WriteTrialData(Sender: TObject);
@@ -266,33 +278,103 @@ begin
   LSaveData(LReportLn);
 end;
 
-procedure TBloc.PlayIntertrialInterval(Sender: TObject);
+function TBloc.HasDelay: Boolean;
 begin
-  if Assigned(FTrialConsequence) then
-  begin
-    FTrialConsequence.Enabled:=False;
-    FTrial.StopConsequence;
-    //FConsequence.Caption:='';
-    //FConsequence.Hide;
-    FConsequence.Stop;
-    Background.Color := clWhite;
+  Result := FDelay.Interval > 0;
+end;
+
+function TBloc.HasConsequenceDuration: Boolean;
+begin
+  Result := FConsequenceDuration.Interval > 0;
+end;
+
+function TBloc.HasInterTrialTime: Boolean;
+begin
+  Result := FInterTrial.Interval > 0;
+end;
+
+procedure TBloc.DelayBegin;
+begin
+  { do nothing }
+end;
+
+procedure TBloc.DelayEnd(Sender: TObject);
+begin
+  if HasConsequenceDuration then begin
+    ConsequenceBegin;
+    Exit;
   end;
 
-  {$IFDEF DEBUG}
-  FInterTrial.Interval := 100;
-  {$ELSE}
-  FInterTrial.Interval := Round(StrToFloatDef(FTrial.Configurations.Parameters.Values[_ITI], 0));
-  {$ENDIF}
-  if FInterTrial.Interval > 0 then
-    begin
-      if (FTrial is TFreeSquareTrial) or (FTrial is TTBMTS) then begin
-        FWaitLabel.Show;
-      end;
-      FInterTrial.Enabled := True;
-      FITIBegin := TickCount - GlobalContainer.TimeStart;
-    end
-  else
-    InterTrialStopTimer(Sender);
+  if HasInterTrialTime then begin
+    InterTrialIntervalBegin;
+  end;
+end;
+
+procedure TBloc.ConsequenceBegin;
+begin
+  if FTrial.HasVisualConsequence then
+    case FTrial.Result of
+      'HIT' :
+        begin
+          Background.Color := clDarkGreen;
+          FConsequence.Start;
+        end;
+
+      'MISS':
+        begin
+          Background.Color := clBlack;
+        end;
+    end;
+end;
+
+procedure TBloc.ConsequenceEnd(Sender: TObject);
+begin
+  Background.Color := clWhite;
+
+  if FConsequence.Visible then
+    FConsequence.Stop;
+
+  if HasInterTrialTime then begin
+    InterTrialIntervalBegin;
+  end;
+end;
+procedure TBloc.InterTrialIntervalBegin;
+begin
+  if (FTrial is TFreeSquareTrial) or (FTrial is TTBMTS) then begin
+    FWaitLabel.Show;
+  end;
+  //FInterTrial.Enabled := True;
+  FITIBegin := TickCount - GlobalContainer.TimeStart;
+end;
+
+procedure TBloc.InterTrialEnd(Sender: TObject);
+var
+  LNextTrial : integer;
+begin
+  if Sender is TSerialTimer then begin
+    FSerialTimer.Stop;
+    FSerialTimer.Clear;
+  end;
+
+  FDelay.Interval := 0;
+  FConsequenceDuration.Interval := 0;
+  FInterTrial.Interval := 0;
+
+  if FConsequence.Visible then
+    FConsequence.Stop;
+
+  if FWaitLabel.Visible then
+    FWaitLabel.Hide;
+
+  if Assigned(OnInterTrialEnd) then OnInterTrialEnd(Self);
+  FITIEnd := TickCount - GlobalContainer.TimeStart;
+  WriteTrialData(FTrial);
+
+  LNextTrial := StrToIntDef(FTrial.NextTrial, 1);
+  Counters.CurrentTrial := Counters.CurrentTrial+LNextTrial;
+  if Counters.CurrentTrial < 0 then
+    Exception.Create('Exception. CurrentTrial cannot be less than zero.');
+  Play;
 end;
 
 constructor TBloc.Create(AOwner: TComponent);
@@ -301,14 +383,12 @@ var
 begin
   inherited Create(AOwner);
   FTable := nil;
-  FInterTrial := TTimer.Create(Self);
-  FInterTrial.Enabled := False;
-  FInterTrial.OnTimer := @InterTrialTimer;
-  FInterTrial.OnStopTimer := @InterTrialStopTimer;
+  FSerialTimer := TSerialTimer.Create(Self);
 
-  FTrialConsequence := TTimer.Create(Self);
-  FTrialConsequence.Enabled := False;
-  FTrialConsequence.OnTimer := @PlayIntertrialInterval;
+  FDelay.OnTimerEvent := @DelayEnd;
+  FConsequenceDuration.OnTimerEvent := @ConsequenceEnd;
+  FSerialTimer.OnEndTimeSerie := @InterTrialEnd;
+
   FLastTrialHeader := '';
   FITIBegin := 0;
   FITIEnd := 0;
@@ -353,7 +433,8 @@ begin
       { do nothing }
     end else begin
       if LEndTable = FTable.Name then begin
-        FreeAndNil(FTable);
+        FTable.Free;
+        FTable := nil;
       end;
     end;
   end;

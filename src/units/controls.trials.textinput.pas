@@ -94,7 +94,7 @@ begin
   Result := T_NONE;
   IETConsequence := T_NONE;
   Result := T_NONE;
-  FResponse := 'Sem Resposta';
+  FResponse := '';
 end;
 
 destructor TTextInput.Destroy;
@@ -114,11 +114,15 @@ end;
 
 procedure TTextInput.EndButtonClick(Sender: TObject);
 begin
-  LogEvent(rsReportRspLat);
   FResponse := FEdit.Text;
-  if StrToIntDef(FResponse, -1) = 0 then
-    NextTrial :=  '100';
-  EndTrial(Sender);
+  if FResponse.IsEmpty then begin
+    { do nothing }
+  end else begin
+    LogEvent(rsReportRspLat);
+    if StrToIntDef(FResponse, -1) = 0 then
+      NextTrial :=  '100';
+    EndTrial(Sender);
+  end;
 end;
 
 procedure TTextInput.TrialBeforeEnd(Sender: TObject);
