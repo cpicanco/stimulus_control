@@ -1,4 +1,4 @@
-program eduardo_experiment;
+program vinicius_experiment;
 
 {$mode objfpc}{$H+}
 
