@@ -99,6 +99,7 @@ const
 
   // Blc
   _NumTrials = 'NumTrials';
+  _AutoEndSession = 'AutoEndSession';
   _CrtHitPorcentage = 'Criteria.HitPorcentage';
   _CrtHitValue = 'Criteria.HitValue';
   _CrtConsecutiveHit  = 'ConsecutiveHitCriterion';
@@ -404,7 +405,7 @@ end;
 
 { Stimuli.Sequence.TemporalBissection }
 function DurationLong: integer;
-const R  : integer = 4000;
+const R  : integer = 1600;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -415,7 +416,7 @@ end;
 
 { Stimuli.Sequence.TemporalBissection }
 function DurationShort: integer;
-const R : integer = 1000;
+const R : integer = 400;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -545,7 +546,7 @@ begin
 end;
 
 function SP4000: integer;
-const R : integer = 4000;
+const R : integer = 1600;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -555,7 +556,7 @@ begin
 end;
 
 function SP3170: integer;
-const R : integer = 3170;
+const R : integer = 1400;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -565,7 +566,7 @@ begin
 end;
 
 function SP2520: integer;
-const R : integer = 2520;
+const R : integer = 1200;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -575,7 +576,7 @@ begin
 end;
 
 function SP2000: integer;
-const R : integer = 2000;
+const R : integer = 1000;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -585,7 +586,7 @@ begin
 end;
 
 function SP1590: integer;
-const R : integer = 1590;
+const R : integer = 800;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -595,7 +596,7 @@ begin
 end;
 
 function SP1260: integer;
-const R : integer = 1260;
+const R : integer = 600;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -605,7 +606,7 @@ begin
 end;
 
 function SP1000: integer;
-const R : integer = 1000;
+const R : integer = 400;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;

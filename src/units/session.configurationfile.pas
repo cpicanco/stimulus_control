@@ -145,6 +145,7 @@ begin
       BkGnd:= ReadInteger(LBlcSection, _BkGnd, 0);
       ITI:= ReadInteger(LBlcSection, _ITI, 0);
 
+      AutoEndSession := ReadBool(LBlcSection, _AutoEndSession, True);
       CrtHitPorcentage := ReadInteger(LBlcSection, _CrtHitPorcentage, -1);
       CrtConsecutiveHit := ReadInteger(LBlcSection, _CrtConsecutiveHit, -1);
       CrtConsecutiveMiss := ReadInteger(LBlcSection, _CrtConsecutiveMiss, -1);

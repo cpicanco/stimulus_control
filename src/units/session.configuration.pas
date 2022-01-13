@@ -40,7 +40,7 @@ type
     Counter : string;
     TotalTrials: Integer;
     VirtualTrialValue: Integer;
-
+    AutoEndSession : Boolean;
     MaxCorrection: Integer;
     MaxBlcRepetition: Integer;
 
