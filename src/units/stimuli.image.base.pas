@@ -17,7 +17,7 @@ uses SysUtils, Classes, Graphics, Controls, Schedules;
 
 type
 
-  TImageKind = (ikLetter, ikSquare, ikCircle, ikBitmap);
+  TImageKind = (ikLetter, ikSquare, ikCircle, ikLetterRect, ikBitmap);
 
   { TLightImage }
 
@@ -53,7 +53,7 @@ type
     procedure CentralizeRight;
     property Schedule : TSchedule read FSchedule write SetSchedule;
     property EdgeColor : TColor read FEdge write FEdge;
-    property Kind: TImageKind read FImageKind write SetKind ;
+    property Kind: TImageKind read FImageKind write SetKind;
     property OnMouseDown : TMouseEvent read FOnMouseDown write SetOnMouseDown;
     property Color;
     property Caption;
@@ -89,12 +89,7 @@ end;
 procedure TLightImage.SetKind(AValue: TImageKind);
 begin
   if FImageKind=AValue then Exit;
-  case AValue of
-    ikLetter, ikSquare, ikCircle:
-     if Assigned(FBitmap) then FBitmap.Free;
-    ikBitmap: Exit { use LoadFromFile or implement me } ;
-  end;
-  FImageKind:=AValue;
+  FImageKind:=AValue
 end;
 
 procedure TLightImage.SetOnResponse(AValue: TNotifyEvent);
@@ -126,8 +121,8 @@ var
       begin
         Font.Color:= clWhite xor Color;
         Pen.Width := FPenWidth;
-        Pen.Color := EdgeColor;
-        Brush.Color:= Color;//FBorderColor;
+        Pen.Color := clGray;
+        Brush.Color:= clGray;//FBorderColor;
         //FillRect(Rect(0, 0, Width, Height));
         if Caption = '' then Rectangle(ClientRect);
         Rectangle(ClientRect);
@@ -159,17 +154,50 @@ var
   end;
 
   procedure PaintSquare(Color : TColor);
-    begin
-      with Canvas do
-        begin
-          Pen.Width := FPenWidth;
-          Pen.Color := Color;
-          Brush.Color:= Color;
-          Rectangle(ClientRect);
-        end;
-    end;
+  begin
+    with Canvas do
+      begin
+        Pen.Width := FPenWidth;
+        Pen.Color := Color;
+        Brush.Color:= Color;
+        Rectangle(ClientRect);
+      end;
+  end;
+
+  procedure PaintLetterRect(Color : TColor);
+  var
+    R : TRect;
+  begin
+    R := Rect(ClientRect.Left,
+          ClientRect.Top,
+          ClientRect.Right,
+          (ClientRect.Bottom - ClientRect.Top) div 2);
+    LTextStyle := Canvas.TextStyle;
+    LTextStyle.SingleLine:=False;
+    LTextStyle.Wordbreak:=True;
+    LTextStyle.Clipping:=False;
+    LTextStyle.Alignment:=taCenter;
+    LTextStyle.Layout:=tlCenter;
+    Canvas.TextStyle := LTextStyle;
+    Canvas.Font.Size := 15;
+    with Canvas do
+      begin
+        Font.Color:= clWhite xor Color;
+        Pen.Width := FPenWidth;
+        Pen.Color := EdgeColor;
+        Brush.Color := Color; //FBorderColor;
+
+        Rectangle(R);
+        TextRect(R,
+          (((R.Right-R.Left) div 2) - (TextWidth(Caption)div 2)),
+          (((R.Bottom-R.Top) div 2) - (TextHeight(Caption)div 2)),
+          Caption);
+      end;
+  end;
+
 begin
   case FImageKind of
+    ikLetterRect : PaintLetterRect(Color);
     ikLetter: PaintText(Color);
     ikSquare: PaintSquare(Color);
     ikCircle: PaintCircle(Color);
@@ -270,8 +298,8 @@ begin
     '.PNG' : Load_PNG;
   end;
   Invalidate;
-  FImageKind:=ikBitmap;
-  SetOriginalSize;
+  //FImageKind:=ikBitmap;
+  //SetOriginalSize;
 end;
 
 procedure TLightImage.DoResponse;

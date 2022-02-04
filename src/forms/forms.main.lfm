@@ -1,16 +1,16 @@
 object Background: TBackground
-  Left = 341
-  Height = 729
-  Top = 166
-  Width = 1055
+  Left = 262
+  Height = 509
+  Top = 116
+  Width = 814
   BorderStyle = bsNone
   Caption = 'Configurar sessão'
-  ClientHeight = 729
-  ClientWidth = 1055
+  ClientHeight = 509
+  ClientWidth = 814
   Color = clWhite
   OnCreate = FormCreate
   Position = poScreenCenter
-  SessionProperties = 'CheckBoxCheatsMode.Checked;EditParticipant.Text;FloatSpinEditScreen.Value;FloatSpinEditSquare.Value;FloatSpinEditSquareExp3.Value;FloatSpinEditSquareMove.Value;PageControl1.ActivePage;RadioGroupBehaviour.ItemIndex;RadioGroupCondition.ItemIndex;RadioGroupDesign1.ItemIndex;RadioGroupDesign2.ItemIndex;RadioGroupDesign3.ItemIndex;RadioGroupDesign4.ItemIndex;SpinEditOperandumDelay.Value;SpinEditSessionBlocs.Value;SpinEditTimeSize.Value;SpinEditColorTime1.Value;SpinEditColorTime3.Value'
+  SessionProperties = 'CheckBoxCheatsMode.Checked;EditParticipant.Text;PageControl1.ActivePage;RadioGroupCondition.ItemIndex;RadioGroupDesign1.ItemIndex;RadioGroupDesign2.ItemIndex;SpinEditParticipant.Value;FloatSpinEditScreenWidth.Value'
   LCLVersion = '2.3.0.0'
   WindowState = wsFullScreen
   object PanelConfigurations: TPanel
@@ -18,30 +18,29 @@ object Background: TBackground
     AnchorSideLeft.Side = asrCenter
     AnchorSideTop.Control = Owner
     AnchorSideTop.Side = asrCenter
-    Left = 382
-    Height = 616
-    Top = 56
+    Left = 262
+    Height = 484
+    Top = 12
     Width = 290
-    ClientHeight = 616
+    ClientHeight = 484
     ClientWidth = 290
-    Font.Color = clBlack
     ParentColor = False
-    ParentFont = False
     TabOrder = 0
     object PageControl1: TPageControl
       Left = 1
-      Height = 449
-      Top = 166
+      Height = 182
+      Top = 251
       Width = 288
-      ActivePage = TabSheet1
+      ActivePage = TabSheet2
       Align = alClient
-      BorderSpacing.Top = 165
+      BorderSpacing.Top = 250
+      BorderSpacing.Bottom = 50
       ParentFont = False
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 0
       object TabSheet1: TTabSheet
         Caption = '1'
-        ClientHeight = 412
+        ClientHeight = 145
         ClientWidth = 282
         object RadioGroupDesign1: TRadioGroup
           Left = 16
@@ -61,109 +60,19 @@ object Background: TBackground
           ClientWidth = 244
           ItemIndex = 0
           Items.Strings = (
-            'A'
-            'ABA'
-            'ACA'
-            'CA'
-            'BA'
+            'A1 B1 A2 C1'
+            'A1'
+            'B1'
+            'A2'
+            'C1'
           )
           ParentFont = False
           TabOrder = 0
         end
-        object LabelSquareSize: TLabel
-          Left = 16
-          Height = 19
-          Top = 144
-          Width = 175
-          Caption = 'Tamanho do Quadrado (cm)'
-          ParentFont = False
-        end
-        object FloatSpinEditSquare: TFloatSpinEdit
-          AnchorSideLeft.Control = LabelSquareSize
-          AnchorSideTop.Control = LabelSquareSize
-          AnchorSideTop.Side = asrBottom
-          Left = 16
-          Height = 29
-          Top = 168
-          Width = 248
-          BorderSpacing.Top = 5
-          Increment = 0.1
-          ParentFont = False
-          TabOrder = 1
-          Value = 0.8
-        end
-        object LabelSquareMove: TLabel
-          Left = 16
-          Height = 19
-          Top = 208
-          Width = 188
-          Caption = 'Movimento do Quadrado (cm)'
-          ParentFont = False
-        end
-        object FloatSpinEditSquareMove: TFloatSpinEdit
-          AnchorSideLeft.Control = LabelSquareMove
-          AnchorSideTop.Control = LabelSquareMove
-          AnchorSideTop.Side = asrBottom
-          Left = 16
-          Height = 29
-          Top = 232
-          Width = 248
-          BorderSpacing.Top = 5
-          Increment = 0.1
-          ParentFont = False
-          TabOrder = 2
-          Value = 0.53
-        end
-        object LabelTimeSize: TLabel
-          Left = 16
-          Height = 19
-          Top = 272
-          Width = 185
-          Caption = 'Granularidade Temporal (ms)'
-          ParentFont = False
-        end
-        object SpinEditTimeSize: TSpinEdit
-          AnchorSideLeft.Control = LabelTimeSize
-          AnchorSideTop.Control = LabelTimeSize
-          AnchorSideTop.Side = asrBottom
-          Left = 16
-          Height = 29
-          Top = 296
-          Width = 248
-          BorderSpacing.Top = 5
-          Increment = 50
-          ParentFont = False
-          TabOrder = 3
-          Value = 100
-        end
-        object LabelColorTime1: TLabel
-          Left = 16
-          Height = 19
-          Top = 336
-          Width = 214
-          Caption = 'Duração da Cor do Quadrado (ms)'
-          ParentFont = False
-        end
-        object SpinEditColorTime1: TSpinEdit
-          AnchorSideLeft.Control = LabelColorTime1
-          AnchorSideTop.Control = LabelColorTime1
-          AnchorSideTop.Side = asrBottom
-          Left = 16
-          Height = 29
-          Top = 360
-          Width = 248
-          BorderSpacing.Top = 5
-          Increment = 10
-          MaxValue = 500
-          MinValue = 10
-          ParentFont = False
-          TabOrder = 4
-          Value = 250
-        end
       end
       object TabSheet2: TTabSheet
         Caption = '2'
-        ClientHeight = 412
+        ClientHeight = 145
         ClientWidth = 282
         object RadioGroupDesign2: TRadioGroup
           Left = 16
@@ -183,114 +92,11 @@ object Background: TBackground
           ClientWidth = 244
           ItemIndex = 0
           Items.Strings = (
-            'A'
-            'ABA'
-            'CA'
-            'BA'
-            'DA'
-          )
-          TabOrder = 0
-        end
-      end
-      object TabSheet3: TTabSheet
-        Caption = '3'
-        ClientHeight = 412
-        ClientWidth = 282
-        object RadioGroupDesign3: TRadioGroup
-          Left = 16
-          Height = 117
-          Top = 8
-          Width = 248
-          AutoFill = True
-          Caption = 'Delineamento'
-          ChildSizing.LeftRightSpacing = 6
-          ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-          ChildSizing.EnlargeVertical = crsHomogenousChildResize
-          ChildSizing.ShrinkHorizontal = crsScaleChilds
-          ChildSizing.ShrinkVertical = crsScaleChilds
-          ChildSizing.Layout = cclLeftToRightThenTopToBottom
-          ChildSizing.ControlsPerLine = 1
-          ClientHeight = 96
-          ClientWidth = 244
-          ItemIndex = 0
-          Items.Strings = (
-            'A'
-            'ABA'
-            'ACA'
-            'CA'
-            'BA'
-          )
-          TabOrder = 0
-        end
-        object LabelSquareSizeExp3: TLabel
-          Left = 16
-          Height = 19
-          Top = 144
-          Width = 175
-          Caption = 'Tamanho do Quadrado (cm)'
-        end
-        object FloatSpinEditSquareExp3: TFloatSpinEdit
-          AnchorSideLeft.Control = LabelSquareSizeExp3
-          AnchorSideTop.Control = LabelSquareSizeExp3
-          AnchorSideTop.Side = asrBottom
-          Left = 16
-          Height = 29
-          Top = 168
-          Width = 248
-          BorderSpacing.Top = 5
-          Increment = 0.1
-          TabOrder = 1
-          Value = 0.8
-        end
-        object LabelColorTime3: TLabel
-          Left = 16
-          Height = 19
-          Top = 208
-          Width = 214
-          Caption = 'Duração da Cor do Quadrado (ms)'
-        end
-        object SpinEditColorTime3: TSpinEdit
-          AnchorSideLeft.Control = LabelColorTime3
-          AnchorSideTop.Control = LabelColorTime3
-          AnchorSideTop.Side = asrBottom
-          Left = 16
-          Height = 29
-          Top = 232
-          Width = 248
-          BorderSpacing.Top = 5
-          Increment = 10
-          MaxValue = 500
-          MinValue = 10
-          TabOrder = 2
-          Value = 50
-        end
-      end
-      object TabSheet4: TTabSheet
-        Caption = '4'
-        ClientHeight = 412
-        ClientWidth = 282
-        TabVisible = False
-        object RadioGroupDesign4: TRadioGroup
-          Left = 16
-          Height = 117
-          Top = 8
-          Width = 248
-          AutoFill = True
-          Caption = 'Delineamento'
-          ChildSizing.LeftRightSpacing = 6
-          ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-          ChildSizing.EnlargeVertical = crsHomogenousChildResize
-          ChildSizing.ShrinkHorizontal = crsScaleChilds
-          ChildSizing.ShrinkVertical = crsScaleChilds
-          ChildSizing.Layout = cclLeftToRightThenTopToBottom
-          ChildSizing.ControlsPerLine = 1
-          ClientHeight = 96
-          ClientWidth = 244
-          ItemIndex = 0
-          Items.Strings = (
-            'ABC'
-            'BD'
-            'BC'
+            'A1 B1 A2 C1'
+            'A1'
+            'B1'
+            'A2'
+            'C1'
           )
           TabOrder = 0
         end
@@ -299,52 +105,80 @@ object Background: TBackground
     object EditParticipant: TEdit
       Left = 8
       Height = 29
-      Top = 8
-      Width = 168
+      Top = 9
+      Width = 198
       ParentFont = False
       TabOrder = 1
       Text = 'Participante'
     end
     object ButtonStartAll: TButton
-      Left = 184
+      Left = 8
       Height = 29
-      Top = 8
-      Width = 99
+      Top = 443
+      Width = 270
       Caption = 'Começar'
       OnClick = ButtonStartAllClick
       ParentFont = False
       TabOrder = 2
     end
-    object LabelScreenSize: TLabel
-      AnchorSideTop.Side = asrBottom
-      Left = 8
-      Height = 19
-      Top = 56
-      Width = 237
-      Caption = 'Comprimento da Tela do Monitor (cm)'
-      ParentFont = False
-    end
-    object FloatSpinEditScreen: TFloatSpinEdit
-      AnchorSideLeft.Control = LabelScreenSize
-      AnchorSideTop.Control = LabelScreenSize
-      AnchorSideTop.Side = asrBottom
-      Left = 8
-      Height = 29
-      Top = 75
-      Width = 275
-      DecimalPlaces = 3
-      ParentFont = False
-      TabOrder = 3
-      Value = 39.624
-    end
     object CheckBoxCheatsMode: TCheckBox
       Left = 8
       Height = 21
-      Top = 128
+      Top = 224
       Width = 113
       Caption = 'Modo de teste'
       ParentFont = False
+      TabOrder = 3
+    end
+    object RadioGroupCondition: TRadioGroup
+      Left = 8
+      Height = 48
+      Top = 48
+      Width = 275
+      AutoFill = True
+      Caption = 'Condição'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 27
+      ClientWidth = 271
+      Columns = 2
+      ItemIndex = 0
+      Items.Strings = (
+        'Primeira'
+        'Segunda'
+      )
       TabOrder = 4
+    end
+    object SpinEditParticipant: TSpinEdit
+      Left = 217
+      Height = 29
+      Top = 9
+      Width = 61
+      MaxValue = 16
+      MinValue = 1
+      TabOrder = 5
+      Value = 1
+    end
+    object FloatSpinEditScreenWidth: TFloatSpinEdit
+      Left = 8
+      Height = 29
+      Top = 121
+      Width = 270
+      DecimalPlaces = 3
+      TabOrder = 6
+      Value = 39.624
+    end
+    object LabelScreenWidth: TLabel
+      Left = 13
+      Height = 19
+      Top = 97
+      Width = 232
+      Caption = 'Comprimento da Tela do Monitor (cm)'
     end
   end
   object IniPropStorage: TIniPropStorage

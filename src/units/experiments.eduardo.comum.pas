@@ -24,6 +24,7 @@ const
   FolderMessages =
     'mensagens'+DirectorySeparator;
 
+
 var
   ITI : integer = 1000;
   MessageA0 : string;

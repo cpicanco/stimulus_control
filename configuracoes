@@ -1,5 +1,5 @@
 [TApplication.Background]
-RadioGroupCondition_ItemIndex=1
+RadioGroupCondition_ItemIndex=0
 SpinEditOperandumHold_Value=20000
 SpinEditSessionBlocs_Value=1
 SpinEditOperandumDelay_Value=5000
@@ -10,12 +10,14 @@ FloatSpinEditScreen_Value=39.624
 FloatSpinEditSquare_Value=1.8
 FloatSpinEditSquareMove_Value=0.53
 SpinEditTimeSize_Value=100
-PageControl1_ActivePage=TabSheet2
+PageControl1_ActivePage=TabSheet1
 RadioGroupDesign1_ItemIndex=1
 RadioGroupDesign2_ItemIndex=1
 RadioGroupDesign3_ItemIndex=3
 RadioGroupDesign4_ItemIndex=0
-CheckBoxCheatsMode_Checked=1
+CheckBoxCheatsMode_Checked=0
 FloatSpinEditSquareExp3_Value=2
 SpinEditColorTime1_Value=200
 SpinEditColorTime3_Value=200
+SpinEditParticipant_Value=3
+FloatSpinEditScreenWidth_Value=39.624

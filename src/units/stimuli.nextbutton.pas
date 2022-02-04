@@ -67,7 +67,7 @@ begin
   inherited Create(AOwner);
   FButton := TButton.Create(AOwner);
   with FButton do begin
-    Caption := 'Continuar';
+    Caption := 'Entendi';
     AutoSize := True;
     Font.Name:='Times New Roman';
     Font.Size := 15;

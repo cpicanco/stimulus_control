@@ -25,31 +25,17 @@ type
     ButtonStartAll: TButton;
     CheckBoxCheatsMode : TCheckBox;
     EditParticipant: TEdit;
-    FloatSpinEditScreen: TFloatSpinEdit;
-    FloatSpinEditSquare: TFloatSpinEdit;
-    FloatSpinEditSquareExp3 : TFloatSpinEdit;
-    FloatSpinEditSquareMove: TFloatSpinEdit;
+    FloatSpinEditScreenWidth: TFloatSpinEdit;
     IniPropStorage: TIniPropStorage;
-    LabelScreenSize: TLabel;
-    LabelSquareMove: TLabel;
-    LabelSquareSize: TLabel;
-    LabelSquareSizeExp3 : TLabel;
-    LabelTimeSize: TLabel;
-    LabelColorTime1: TLabel;
-    LabelColorTime3: TLabel;
+    LabelScreenWidth: TLabel;
     PageControl1: TPageControl;
     PanelConfigurations: TPanel;
+    RadioGroupCondition: TRadioGroup;
     RadioGroupDesign1: TRadioGroup;
     RadioGroupDesign2: TRadioGroup;
-    RadioGroupDesign3: TRadioGroup;
-    RadioGroupDesign4: TRadioGroup;
-    SpinEditTimeSize: TSpinEdit;
-    SpinEditColorTime1: TSpinEdit;
-    SpinEditColorTime3: TSpinEdit;
+    SpinEditParticipant: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
-    TabSheet3: TTabSheet;
-    TabSheet4: TTabSheet;
     procedure ButtonStartAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure EndSession(Sender: TObject);
@@ -73,8 +59,9 @@ uses
    , Session.Backgrounds
    , Session.Configuration.GlobalContainer
    , SessionSimple
-   , Experiments.Eduardo
-   , Stimuli.Image.MovingSquare
+   , Experiments.Grids
+   , Experiments.Vinicius.Comum
+   , Experiments.Vinicius
    , Cheats
    ;
 
@@ -87,58 +74,62 @@ var
 procedure TBackground.ButtonStartAllClick(Sender: TObject);
 var
   LName : string;
+  LDesign : string;
+  LVisual : Boolean;
+  LFirstCondition  : Boolean;
 begin
   GlobalContainer.RootData :=
-    GlobalContainer.RootData + EditParticipant.Text + DirectorySeparator;
+    GlobalContainer.RootData +
+    SpinEditParticipant.Value.ToString + '_' +
+    EditParticipant.Text +
+    DirectorySeparator;
   ForceDirectories(GlobalContainer.RootData);
   CheatsModeOn := CheckBoxCheatsMode.Checked;
   PanelConfigurations.Hide;
   Session.Backgrounds.Background := Self;
-  ScreenInCentimeters := FloatSpinEditScreen.Value;
+
   case PageControl1.TabIndex of
     0:begin
-      ConsequenceTime := SpinEditColorTime1.Value;
-      SquareSize := FloatSpinEditSquare.Value;
-      SquareMovementSize := FloatSpinEditSquareMove.Value;
-      Granularity := SpinEditTimeSize.Value;
-      ConfigurationFilename :=
-        Experiments.Eduardo.MakeConfigurationFile(
-          RadioGroupDesign1.Items[RadioGroupDesign1.ItemIndex],
-          PageControl1.TabIndex);
+      LDesign := RadioGroupDesign1.Items[RadioGroupDesign1.ItemIndex];
     end;
 
     1:begin
-      { code }
-      ConfigurationFilename :=
-        Experiments.Eduardo.MakeConfigurationFile(
-          RadioGroupDesign2.Items[RadioGroupDesign2.ItemIndex],
-          PageControl1.TabIndex);
-    end;
-
-    2:begin
-      { code }
-      ConsequenceTime := SpinEditColorTime3.Value;
-      SquareSize := FloatSpinEditSquareExp3.Value;
-      ConfigurationFilename :=
-        Experiments.Eduardo.MakeConfigurationFile(
-          RadioGroupDesign3.Items[RadioGroupDesign3.ItemIndex],
-          PageControl1.TabIndex);
-    end;
-
-    3:begin
-      { code }
-      ConfigurationFilename :=
-        Experiments.Eduardo.MakeConfigurationFile(
-          RadioGroupDesign4.Items[RadioGroupDesign4.ItemIndex],
-          PageControl1.TabIndex);
-
-      Exit;
+      LDesign := RadioGroupDesign2.Items[RadioGroupDesign2.ItemIndex];
     end;
   end;
-  LName := 'Experimento '+(PageControl1.TabIndex+1).ToString + ' Delineamento:'+
-  RadioGroupDesign4.Items[RadioGroupDesign4.ItemIndex];
+
+  case SpinEditParticipant.Value of
+    1, 2, 5, 6, 9, 10, 13, 14 :
+      LVisual := False;
+    3, 4, 7, 8, 11, 12, 15, 16 :
+      LVisual := True;
+  end;
+
+  case RadioGroupCondition.ItemIndex of
+    0 : begin
+      LFirstCondition := True;
+    end;
+    1 : begin
+      LFirstCondition := False;
+      LVisual := not LVisual;
+    end;
+  end;
+  ConfigurationFilename :=
+    Experiments.Vinicius.MakeConfigurationFile(LDesign, PageControl1.TabIndex,
+      LVisual, LFirstCondition, SpinEditParticipant.Value);
+
+  LName := 'Experimento ' + (PageControl1.TabIndex+1).ToString +
+           ' Delineamento:' + LDesign;
+
   GSession.Play(LName, EditParticipant.Text);
 end;
+
+//procedure TBackground.Button1Click(Sender: TObject);
+//begin
+//  PanelConfigurations.Hide;
+//  Grid := GetCentralGrid(3, 3.0, False);
+//  DoDraw := True;
+//end;
 
 procedure TBackground.FormCreate(Sender: TObject);
 begin
@@ -157,6 +148,26 @@ procedure TBackground.BeforeStartSession(Sender: TObject);
 begin
   CopyFile(ConfigurationFilename, GSession.BaseFilename+'.ini');
 end;
+
+//procedure TBackground.FormPaint(Sender: TObject);
+//var
+//  j, i: Integer;
+//  R : TRect;
+//begin
+//  Canvas.Pen.Color := clBlack;
+//  if DoDraw then
+//  for j := Low(Grid) to High(Grid) do begin
+//    for i := Low(Grid[j]) to High(Grid[j]) do begin
+//      R := Rect(
+//        Grid[j][i].Left,
+//        Grid[j][i].Top,
+//        Grid[j][i].Left+Grid[j][i].SquareSide,
+//        Grid[j][i].Top +Grid[j][i].SquareSide);
+//      Canvas.Rectangle(R);
+//      Canvas.TextOut(R.Left, R.Top, Grid[j][i].Index.ToString);
+//    end;
+//  end;
+//end;
 
 
 end.

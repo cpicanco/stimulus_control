@@ -15,6 +15,9 @@ interface
 
 uses  SysUtils;
 
+type
+  TLogEvent = function (ACode: string): Extended of object;
+
 procedure StartTimestamp(ATimestamp:Extended);
 
 function GetTimeStampF : string; overload;

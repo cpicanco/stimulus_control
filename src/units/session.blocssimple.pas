@@ -26,7 +26,7 @@ type
 
   TBloc = class(TComponent)
   private
-    FTable : TComponent;
+    //FTable : TComponent;
     FSerialTimer : TSerialTimer;
     FInterTrial : TTimerItem;
     FDelay : TTimerItem;
@@ -71,27 +71,11 @@ uses Constants
    , Session.ConfigurationFile
    , Session.Configuration.GlobalContainer
    , Session.EndCriteria
-   //, Controls.Trials.Likert
-   //, Controls.Trials.MatchingToSample
-   //, Controls.Trials.PerformanceReview
-   //, Controls.Trials.BeforeAfter
-   //, Controls.Trials.ContextualMatchingToSample
-   //, Controls.Trials.RelationalFrame
-   //, Controls.Trials.TextMessage
    , Controls.Trials.HTMLMessage
-   , Controls.Trials.BinaryChoice
-   , Controls.Trials.TextInput
-   , Controls.Trials.FreeSquare
-   , Controls.Trials.FreeSquare.MixVTFI
-   , Controls.Trials.TemporalBissection
+   , Controls.Trials.DMTS
    , Graphics
    , Consequences
    , Dialogs
-   , Experiments.Eduardo.Comum.DelayDiscountTable
-   , Experiments.Eduardo.Comum.DemandTable
-   , Experiments.Eduardo.Experimento1.Tables
-   , Experiments.Eduardo.Experimento2.Tables
-   , Experiments.Eduardo.Experimento3.Tables
    ;
 
 { TBloc }
@@ -103,35 +87,13 @@ var
 begin
   LTrialConfig := ConfigurationFile.Trial[ABloc+1, ATrial+1];
 
-  if (FTrial is TBinaryChoiceTrial) then begin
-    if Counters.BlcTrials > 0 then begin
-      S := FTrial.Configurations.Parameters.Values[_LastNow];
-      LTrialConfig.Parameters.Values[_LastNow] := S;
-
-      S := FTrial.Configurations.Parameters.Values[_Now];
-      LTrialConfig.Parameters.Values[_Now] := S;
-    end;
-  end;
-
   if Assigned(FTrial) then
     FreeAndNil(FTrial);
 
   try
     case LTrialConfig.Kind of
-      //T_MSG : FTrial := TMessageTrial.Create(Background);
       T_HTM : FTrial := THTMLMessage.Create(Background);
-      T_CHO : FTrial := TBinaryChoiceTrial.Create(Background);
-      T_INP : FTrial := TTextInput.Create(Background);
-      T_EO1 : FTrial := TFreeSquareTrial.Create(Background);
-      T_VTFI : FTrial := TFreeSquareMixVTFI.Create(Background);
-      T_TMB : FTrial := TTBMTS.Create(Background);
-      //T_MTS : FTrial := TMTS.Create(Background);
-      //T_LIK : FTrial := TLikert.Create(Background);
-      //T_GNG : FTrial := TGNG.Create(Background);
-      //T_PFR : FTrial := TPerformanceReview.Create(Background);
-      //T_BAT : FTrial := TBeforeAfter.Create(Background);
-      //T_CTX : FTrial := TCMTS.Create(Background);
-      //T_RFT : FTrial := TFrame.Create(Background);
+      T_DMTS : FTrial := TDMTS.Create(Background);
     end;
     LTrialConfig.Parameters.Values[_CrtMaxTrials] :=
       ConfigurationFile.CurrentBloc.CrtMaxTrials.ToString;
@@ -144,7 +106,6 @@ begin
         TimestampToStr(GlobalContainer.TimeStart) + LineEnding + LineEnding);
       FTrial.SaveData(FTrial.HeaderTimestamps + LineEnding);
     end;
-    FTrial.AssignTable(FTable);
     FTrial.Configurations := LTrialConfig;
     FTrial.OnTrialEnd := @TrialEnd;
     FTrial.Play;
@@ -172,11 +133,12 @@ begin
   Background.Cursor := -1;
   FDelay.Interval := FTrial.ConsequenceDelay;
   FConsequenceDuration.Interval := FTrial.ConsequenceInterval;
-  {$IFDEF DEBUG}
-  FInterTrial.Interval := 100;
-  {$ELSE}
-  FInterTrial.Interval := Round(StrToFloatDef(FTrial.Configurations.Parameters.Values[_ITI], 0));
-  {$ENDIF}
+  if Counters.CurrentTrial > 0 then begin
+    FInterTrial.Interval :=
+      StrToInt(FTrial.Configurations.Parameters.Values[_ITI]);
+  end else begin
+    FInterTrial.Interval := 1;
+  end;
 
   if HasDelay then begin
     FSerialTimer.Append(FDelay);
@@ -314,9 +276,13 @@ procedure TBloc.ConsequenceBegin;
 begin
   if FTrial.HasVisualConsequence then
     case FTrial.Result of
+      'HIT+BLACKOUT':
+        begin
+          Background.Color := clBlack;
+        end;
       'HIT' :
         begin
-          Background.Color := clDarkGreen;
+          Background.Color := clWhite;
           FConsequence.Start;
         end;
 
@@ -338,10 +304,11 @@ begin
     InterTrialIntervalBegin;
   end;
 end;
+
 procedure TBloc.InterTrialIntervalBegin;
 begin
-  if (FTrial is TFreeSquareTrial) or (FTrial is TTBMTS) then begin
-    FWaitLabel.Show;
+  if (FTrial is TDMTS) then begin
+    //FWaitLabel.Show;
   end;
   //FInterTrial.Enabled := True;
   FITIBegin := TickCount - GlobalContainer.TimeStart;
@@ -382,7 +349,7 @@ var
   LParameters : TStringList;
 begin
   inherited Create(AOwner);
-  FTable := nil;
+  //FTable := nil;
   FSerialTimer := TSerialTimer.Create(Self);
 
   FDelay.OnTimerEvent := @DelayEnd;
@@ -419,51 +386,51 @@ begin
 end;
 
 procedure TBloc.BeforePlay;
-var
-  LBeginTable : string;
-  LEndTable: string;
+//var
+//  LBeginTable : string;
+//  LEndTable: string;
 begin
   FWaitLabel.Parent := Background;
   FConsequence.Parent := Background;
   Background.Cursor := -1;
 
-  if Assigned(FTable) then begin
-    LEndTable := ConfigurationFile.EndTableName;
-    if LEndTable.IsEmpty then begin
-      { do nothing }
-    end else begin
-      if LEndTable = FTable.Name then begin
-        FTable.Free;
-        FTable := nil;
-      end;
-    end;
-  end;
-
-  LBeginTable := ConfigurationFile.BeginTableName;
-  if LBeginTable.IsEmpty then begin
-    { do nothing }
-  end else begin
-    if LBeginTable.Contains('DiscountTable') then begin
-      FTable := TDelayDiscountTable.Create(Self);
-      FTable.Name := LBeginTable;
-    end else
-    if LBeginTable.Contains('DemandTable') then begin
-      FTable := TDemandTable.Create(Self);
-      FTable.Name := LBeginTable;
-    end else
-    if LBeginTable.Contains('Experiment1Table') then begin
-      FTable := TExperiment1Table.Create(Self);
-      FTable.Name := LBeginTable;
-    end else
-    if LBeginTable.Contains('Experiment2Table') then begin
-      FTable := TExperiment2Table.Create(Self);
-      FTable.Name := LBeginTable;
-    end else
-    if LBeginTable.Contains('Experiment3Table') then begin
-      FTable := TExperiment3Table.Create(Self);
-      FTable.Name := LBeginTable;
-    end;
-  end;
+  //if Assigned(FTable) then begin
+  //  LEndTable := ConfigurationFile.EndTableName;
+  //  if LEndTable.IsEmpty then begin
+  //    { do nothing }
+  //  end else begin
+  //    if LEndTable = FTable.Name then begin
+  //      FTable.Free;
+  //      FTable := nil;
+  //    end;
+  //  end;
+  //end;
+  //
+  //LBeginTable := ConfigurationFile.BeginTableName;
+  //if LBeginTable.IsEmpty then begin
+  //  { do nothing }
+  //end else begin
+  //  if LBeginTable.Contains('DiscountTable') then begin
+  //    FTable := TDelayDiscountTable.Create(Self);
+  //    FTable.Name := LBeginTable;
+  //  end else
+  //  if LBeginTable.Contains('DemandTable') then begin
+  //    FTable := TDemandTable.Create(Self);
+  //    FTable.Name := LBeginTable;
+  //  end else
+  //  if LBeginTable.Contains('Experiment1Table') then begin
+  //    FTable := TExperiment1Table.Create(Self);
+  //    FTable.Name := LBeginTable;
+  //  end else
+  //  if LBeginTable.Contains('Experiment2Table') then begin
+  //    FTable := TExperiment2Table.Create(Self);
+  //    FTable.Name := LBeginTable;
+  //  end else
+  //  if LBeginTable.Contains('Experiment3Table') then begin
+  //    FTable := TExperiment3Table.Create(Self);
+  //    FTable.Name := LBeginTable;
+  //  end;
+  //end;
 end;
 
 procedure TBloc.Play;

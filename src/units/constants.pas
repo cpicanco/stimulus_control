@@ -35,7 +35,7 @@ const
  function TemporalBissectionITI : integer;
 
  // Default = 500
- function ITISurvey : integer;
+ function ITIBase : integer;
 
  // Default = 20000
  function FreeSquareTrialDuration : integer;
@@ -67,13 +67,12 @@ const
  // Default = 500
  function ITIExperiment3 : integer;
 
- function SP4000 : integer;
- function SP3170 : integer;
- function SP2520 : integer;
- function SP2000 : integer;
- function SP1590 : integer;
- function SP1260 : integer;
- function SP1000 : integer;
+ function SP00000 : integer;
+ function SP02000 : integer;
+ function SP04000 : integer;
+ function SP06000 : integer;
+ function SP08000 : integer;
+ function SP10000 : integer;
 
 const
   clDarkGreen = $006400;
@@ -291,6 +290,8 @@ const
   T_CHO = 'CHOICE';
   T_INP = 'TXTINP';
   T_MTS = 'MTS';
+  T_DMTS = 'DMTS';
+  T_DMTSA = 'DMTSA';
   T_Simple = 'SIMPLE';
   T_LIK = 'LIKERT';
   T_PFR = 'PERFORMANCE';
@@ -435,8 +436,8 @@ begin
   end;
 end;
 
-function ITISurvey: integer;
-const R : integer = 500;
+function ITIBase: integer;
+const R : integer = 5000;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -545,8 +546,14 @@ begin
   end;
 end;
 
-function SP4000: integer;
-const R : integer = 1600;
+function SP00000: integer;
+const R : integer = 0;
+begin
+  Result := R;
+end;
+
+function SP02000: integer;
+const R : integer = 2000;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -555,8 +562,8 @@ begin
   end;
 end;
 
-function SP3170: integer;
-const R : integer = 1400;
+function SP04000: integer;
+const R : integer = 4000;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -565,8 +572,8 @@ begin
   end;
 end;
 
-function SP2520: integer;
-const R : integer = 1200;
+function SP06000: integer;
+const R : integer = 6000;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -575,8 +582,8 @@ begin
   end;
 end;
 
-function SP2000: integer;
-const R : integer = 1000;
+function SP08000: integer;
+const R : integer = 8000;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;
@@ -585,28 +592,8 @@ begin
   end;
 end;
 
-function SP1590: integer;
-const R : integer = 800;
-begin
-  if CheatsModeOn then begin
-    Result := R div VelocityFactor;
-  end else begin
-    Result := R;
-  end;
-end;
-
-function SP1260: integer;
-const R : integer = 600;
-begin
-  if CheatsModeOn then begin
-    Result := R div VelocityFactor;
-  end else begin
-    Result := R;
-  end;
-end;
-
-function SP1000: integer;
-const R : integer = 400;
+function SP10000: integer;
+const R : integer = 10000;
 begin
   if CheatsModeOn then begin
     Result := R div VelocityFactor;

@@ -80,7 +80,11 @@ begin
   if FCurrentItem < High(FTimerItems) then begin
     Inc(FCurrentItem);
     LTimer.Interval := FTimerItems[FCurrentItem].Interval;
-    LTimer.Enabled := True;
+    if LTimer.Interval = 0 then begin
+      TimerOnTimer(LTimer);
+    end else begin
+      LTimer.Enabled := True;
+    end;
   end else
     if Assigned(OnEndTimeSerie) then OnEndTimeSerie(Self);
 end;
@@ -102,11 +106,8 @@ end;
 
 procedure TSerialTimer.Append(ATimerItem: TTimerItem);
 begin
-  if ATimerItem.Interval > 0 then
-    begin
-      SetLength(FTimerItems, Length(FTimerItems)+1);
-      FTimerItems[High(FTimerItems)] := ATimerItem;
-    end;
+  SetLength(FTimerItems, Length(FTimerItems)+1);
+  FTimerItems[High(FTimerItems)] := ATimerItem;
 end;
 
 procedure TSerialTimer.Append(ATimerItems: TTimerItems);

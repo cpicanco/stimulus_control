@@ -154,6 +154,7 @@ begin
   LFilename := AParameters.Values[Key];
   try
     FImage.LoadFromFile(LFilename);
+    FImage.Kind := ikBitmap;
   except
     on E : Exception do
     begin

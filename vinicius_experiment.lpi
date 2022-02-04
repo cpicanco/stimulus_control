@@ -23,7 +23,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="vinicius_experiment"/>
+            <Filename Value="experiment_$(BuildMode)"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
@@ -140,7 +140,7 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="68">
+    <Units Count="77">
       <Unit0>
         <Filename Value="vinicius_experiment.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -483,6 +483,51 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="Controls.Trials.Freesquare.MixVTFI"/>
       </Unit67>
+      <Unit68>
+        <Filename Value="src/units/experiments.vinicius.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Vinicius"/>
+      </Unit68>
+      <Unit69>
+        <Filename Value="src/units/experiments.vinicius.experimento1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Vinicius.Experimento1"/>
+      </Unit69>
+      <Unit70>
+        <Filename Value="src/units/experiments.vinicius.comum.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Vinicius.Comum"/>
+      </Unit70>
+      <Unit71>
+        <Filename Value="src/units/experiments.vinicius.experimento2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Vinicius.Experimento2"/>
+      </Unit71>
+      <Unit72>
+        <Filename Value="src/units/experiments.grids.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Experiments.Grids"/>
+      </Unit72>
+      <Unit73>
+        <Filename Value="src/units/controls.trials.dmts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.Trials.DMTS"/>
+      </Unit73>
+      <Unit74>
+        <Filename Value="src/units/stimuli.sequence.dmts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Stimuli.Sequence.DMTS"/>
+      </Unit74>
+      <Unit75>
+        <Filename Value="src/units/audio.castlesound.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Audio.CastleSound"/>
+      </Unit75>
+      <Unit76>
+        <Filename Value="src/units/controls.obsconfkey.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Controls.ObsConfKey"/>
+      </Unit76>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
