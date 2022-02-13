@@ -31,6 +31,7 @@ var
   MessageE1A2 : string;
   MessageE1B : string;
   MessageE2B : string;
+  MessageE2C : string;
   MessageE3B : string;
 
 implementation
@@ -54,6 +55,7 @@ begin
   LoadMessageFromFile(MessageE1A2, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA2.html');
   LoadMessageFromFile(MessageE1B,  GlobalContainer.RootMedia+FolderMessages+'1-MensagemB.html');
   LoadMessageFromFile(MessageE2B,  GlobalContainer.RootMedia+FolderMessages+'2-MensagemB.html');
+  LoadMessageFromFile(MessageE2B,  GlobalContainer.RootMedia+FolderMessages+'2-MensagemC.html');
   LoadMessageFromFile(MessageE3B,  GlobalContainer.RootMedia+FolderMessages+'3-MensagemB.html');
 end;
 

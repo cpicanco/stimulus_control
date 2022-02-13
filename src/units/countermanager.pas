@@ -218,7 +218,7 @@ begin
   FSessionCscNones := 0;
   FSessionHighCscNones := 0;
   FSessionTrials := 0;
-  FCurrentBlc := 0;
+  FCurrentBlc := -1;
   FSessionVirtualHits := 0;
   FSessionPoints := 0;
   { Blocs - 20 }
@@ -305,7 +305,7 @@ end;
 
 procedure TCounterManager.BeginSess(Sender: TObject);
 begin
-  FCurrentBlc := 0;
+  FCurrentBlc := -1;
   FCurrentTrial := 0;
 end;
 

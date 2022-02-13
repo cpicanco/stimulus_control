@@ -93,6 +93,13 @@ procedure TEndCriteria.EndSessionOnEndBloc;
         Exit;
       end;
     end;
+
+    if FBloc.AutoEndSession then begin
+      { End session }
+    end else begin
+      Exit;
+    end;
+
     Counters.CurrentBlc := ConfigurationFile.BlocCount;
   end;
   procedure NextBlocOnCriteria;
