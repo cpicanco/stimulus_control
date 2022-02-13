@@ -159,7 +159,7 @@ begin
       Value := RegisNetoValues[RegisNetoIndex];
       repeat
         RandomVIS := Default(TArrayOfInteger);
-        for i in [0..4] do begin
+        for i := 0 to 4 do begin
           R := RandomAmplitude(Value, (Value*30) div 100);
           RandomVIS := Append(RandomVIS, R);
         end;

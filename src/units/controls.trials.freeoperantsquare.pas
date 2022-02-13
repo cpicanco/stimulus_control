@@ -117,7 +117,7 @@ end;
 
 procedure TFreeOperantSquareTrial.Play(ACorrection: Boolean);
 const
-  LDuration : integer = 1000*60*15000;
+  LDuration : integer = 1000*60*15;
 var
   LParameters : TStringList;
 begin
@@ -136,25 +136,29 @@ begin
   end;
 
   case FTrialType of
-    ttA1 : begin
+    ttA1, ttB1, ttB2, ttB3 : begin
       FStimulus.Schedule.Load(VI);
       FStimulus.Schedule.UseRegisNetoIntervals(True);
     end;
 
-    ttA2 : begin
+    ttA2, ttC1 : begin
       FStimulus.Schedule.Load(VI);
       FStimulus.Schedule.UseRegisNetoIntervals(False);
+    end;
+  end;
+
+  case FTrialType of
+    ttA1, ttA2 : begin
+      { do nothing }
     end;
 
     ttB1, ttB2, ttB3, ttC1 :  begin
-      FStimulus.Schedule.Load(VI);
-      FStimulus.Schedule.UseRegisNetoIntervals(False);
       SerialSound.Tone.OnStartPlaying := @ConditionalStimulusStarted;
       SerialSound.Tone.OnStop := @ConditionalStimulusStopped;
       SerialSound.Laught.OnStop := @CustomConsequenceStop;
-
     end;
   end;
+
 
   FSchedule := TSchedule.Create(Self);
   FSchedule.Load(FT, 10000);

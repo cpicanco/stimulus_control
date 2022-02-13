@@ -51,6 +51,7 @@ uses Session.Configuration.GlobalContainer, Forms;
 
 type
   TDelays = 0..4;
+  TDelaysArray = array [TDelays] of integer;
   TVTInterval = record
     Start : Cardinal;
     Stop  : Cardinal;
@@ -87,25 +88,28 @@ end;
 procedure TSerialSound.LoadPresentationPattern;
 const
   SessionDuration : integer = 15*60*1000;
-  TimeEdge : integer = 30*1000;
+  TimeEdge : integer = 60*1000;
 var
   i : integer;
+  b : integer = 0;
   Amplitude    : integer;
   BaseTimeUnit : integer;
-  Interval : TVTInterval;
   TimerItem  : TTimerItem;
+  //procedure ToMinutes(AValue : Cardinal);
+  //begin
+  //  Writeln((AValue div 1000) div 60);
+  //end;
+
 begin
-  BaseTimeUnit := ((SessionDuration - (TimeEdge*2)) div Length([TDelays])) div 2;
+  BaseTimeUnit := ((SessionDuration - TimeEdge) div Length(TDelaysArray)) div 2;
   Amplitude := (BaseTimeUnit*50) div 100;
   for i := Low(TDelays) to High(TDelays) do begin
-    if i = 0 then begin
-      TimerItem.Interval := 2000;   // override para testar
-    end else begin
-      TimerItem.Interval :=
-        BaseTimeUnit - Amplitude + Random((2 * BaseTimeUnit) + 1);
-    end;
+    TimerItem.Interval :=
+      BaseTimeUnit - Amplitude + Random((2 * BaseTimeUnit) + 1);
     TimerItem.OnTimerEvent := @StartTone;
     FSerialTimer.Append(TimerItem);
+
+    b += TimerItem.Interval;
 
     TimerItem.Interval := Round(FTone.Duration*1000);
     TimerItem.OnTimerEvent := @StopTone;
@@ -115,7 +119,6 @@ begin
     TimerItem.OnTimerEvent := @StopLaugh;
     FSerialTimer.Append(TimerItem);
   end;
-
 end;
 
 constructor TSerialSound.Create(AOwner: TComponent);
