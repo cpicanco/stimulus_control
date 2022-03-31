@@ -23,6 +23,7 @@ type
 
   TLightImage = class(TGraphicControl)
   private
+    FOriginalBounds: TRect;
     FFileName: string;
     FBitmap: TBitmap;
     FEdge: TColor;
@@ -47,7 +48,9 @@ type
     function ShortName : string;
     procedure DoResponse; virtual;
     procedure LoadFromFile(AFilename : string);
+    procedure SetOriginalBounds(aLeft, aTop, aWidth, aHeight: integer);
     procedure SetOriginalSize;
+    procedure OriginalBounds;
     procedure Centralize;
     procedure CentralizeLeft;
     procedure CentralizeRight;
@@ -121,8 +124,8 @@ var
       begin
         Font.Color:= clWhite xor Color;
         Pen.Width := FPenWidth;
-        Pen.Color := clGray;
-        Brush.Color:= clGray;//FBorderColor;
+        Pen.Color := EdgeColor;
+        Brush.Color:= Color;//FBorderColor;
         //FillRect(Rect(0, 0, Width, Height));
         if Caption = '' then Rectangle(ClientRect);
         Rectangle(ClientRect);
@@ -302,6 +305,18 @@ begin
   //SetOriginalSize;
 end;
 
+procedure TLightImage.SetOriginalBounds(aLeft, aTop, aWidth, aHeight: integer);
+var
+  LRect : TRect;
+begin
+  LRect.Left := aLeft;
+  LRect.Top := aTop;
+  LRect.Width := aWidth;
+  LRect.Height := aHeight;
+  FOriginalBounds := LRect;
+  SetBounds(aLeft, aTop, aWidth, aHeight);
+end;
+
 procedure TLightImage.DoResponse;
 begin
   Mouse.CursorPos := GetRandomPoint;
@@ -313,7 +328,7 @@ var
   AspectRatio : Double;
 begin
   case FImageKind of
-    ikLetter, ikSquare, ikCircle : { do nothing };
+    ikLetterRect, ikLetter, ikSquare, ikCircle : { do nothing };
     ikBitmap:
       begin
         AspectRatio := FBitmap.Width / FBitmap.Height;
@@ -353,6 +368,15 @@ begin
         end;
       end;
   end;
+end;
+
+procedure TLightImage.OriginalBounds;
+begin
+  SetBounds(
+    FOriginalBounds.Left,
+    FOriginalBounds.Top,
+    FOriginalBounds.Width,
+    FOriginalBounds.Height);
 end;
 
 procedure TLightImage.Centralize;

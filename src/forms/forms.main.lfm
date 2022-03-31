@@ -8,7 +8,9 @@ object Background: TBackground
   ClientHeight = 509
   ClientWidth = 814
   Color = clWhite
+  OnClick = FormClick
   OnCreate = FormCreate
+  OnPaint = FormPaint
   Position = poScreenCenter
   SessionProperties = 'CheckBoxCheatsMode.Checked;EditParticipant.Text;PageControl1.ActivePage;RadioGroupCondition.ItemIndex;RadioGroupDesign1.ItemIndex;RadioGroupDesign2.ItemIndex;SpinEditParticipant.Value;FloatSpinEditScreenWidth.Value'
   LCLVersion = '2.3.0.0'
@@ -31,12 +33,12 @@ object Background: TBackground
       Height = 182
       Top = 251
       Width = 288
-      ActivePage = TabSheet2
+      ActivePage = TabSheet1
       Align = alClient
       BorderSpacing.Top = 250
       BorderSpacing.Bottom = 50
       ParentFont = False
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 0
       object TabSheet1: TTabSheet
         Caption = '1'
@@ -60,44 +62,11 @@ object Background: TBackground
           ClientWidth = 244
           ItemIndex = 0
           Items.Strings = (
-            'A1 B1 A2 C1'
-            'A1'
-            'B1'
-            'A2'
-            'C1'
+            'Circular'
+            'Vertical'
+            'Horizontal'
           )
           ParentFont = False
-          TabOrder = 0
-        end
-      end
-      object TabSheet2: TTabSheet
-        Caption = '2'
-        ClientHeight = 145
-        ClientWidth = 282
-        object RadioGroupDesign2: TRadioGroup
-          Left = 16
-          Height = 117
-          Top = 8
-          Width = 248
-          AutoFill = True
-          Caption = 'Delineamento'
-          ChildSizing.LeftRightSpacing = 6
-          ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-          ChildSizing.EnlargeVertical = crsHomogenousChildResize
-          ChildSizing.ShrinkHorizontal = crsScaleChilds
-          ChildSizing.ShrinkVertical = crsScaleChilds
-          ChildSizing.Layout = cclLeftToRightThenTopToBottom
-          ChildSizing.ControlsPerLine = 1
-          ClientHeight = 96
-          ClientWidth = 244
-          ItemIndex = 0
-          Items.Strings = (
-            'A1 B1 A2 C1'
-            'A1'
-            'B1'
-            'A2'
-            'C1'
-          )
           TabOrder = 0
         end
       end
@@ -106,7 +75,7 @@ object Background: TBackground
       Left = 8
       Height = 29
       Top = 9
-      Width = 198
+      Width = 270
       ParentFont = False
       TabOrder = 1
       Text = 'Participante'
@@ -130,47 +99,13 @@ object Background: TBackground
       ParentFont = False
       TabOrder = 3
     end
-    object RadioGroupCondition: TRadioGroup
-      Left = 8
-      Height = 48
-      Top = 48
-      Width = 275
-      AutoFill = True
-      Caption = 'Condição'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 2
-      ClientHeight = 27
-      ClientWidth = 271
-      Columns = 2
-      ItemIndex = 0
-      Items.Strings = (
-        'Primeira'
-        'Segunda'
-      )
-      TabOrder = 4
-    end
-    object SpinEditParticipant: TSpinEdit
-      Left = 217
-      Height = 29
-      Top = 9
-      Width = 61
-      MaxValue = 16
-      MinValue = 1
-      TabOrder = 5
-      Value = 1
-    end
     object FloatSpinEditScreenWidth: TFloatSpinEdit
       Left = 8
       Height = 29
       Top = 121
       Width = 270
       DecimalPlaces = 3
-      TabOrder = 6
+      TabOrder = 4
       Value = 39.624
     end
     object LabelScreenWidth: TLabel
@@ -179,6 +114,15 @@ object Background: TBackground
       Top = 97
       Width = 232
       Caption = 'Comprimento da Tela do Monitor (cm)'
+    end
+    object Button1: TButton
+      Left = 48
+      Height = 35
+      Top = 165
+      Width = 190
+      Caption = 'Button1'
+      OnClick = Button1Click
+      TabOrder = 5
     end
   end
   object IniPropStorage: TIniPropStorage

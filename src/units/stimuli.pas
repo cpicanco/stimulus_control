@@ -19,6 +19,11 @@ type
     procedure Stop;
   end;
 
+  IDragDropable = interface
+  ['{11E4209B-68FD-4866-80C6-CBF74E22F41C}']
+    procedure DragDrop(Sender, Source: TObject; X, Y: Integer);
+  end;
+
 implementation
 
 end.

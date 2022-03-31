@@ -28,7 +28,7 @@ var
 
 implementation
 
-uses Forms;
+uses Forms, GUI.Helpers.Grids;
 
 {
   GetPositionFromSegment returns Left or Top position based on:
@@ -101,6 +101,56 @@ begin
   end;
 end;
 
+function GetCircularCentralGrid(AN: integer; ASquareSide: real): TGrid;
+var
+  LIndex      : integer = 0;
+  //LSegment    : integer = 0;
+  //LSteps      : integer = 0;
+  //LStep       : integer = 0;
+  LSquareSide : integer = 0;
+  LDegree : integer = 0;
+  LDegreeI : integer = 0;
+  LPoint : TPoint;
+  LRect  : TRect;
+  j : integer = 0;
+  i : integer = 0;
+const
+  BaseDegree : integer = 360;
+begin
+  Result := Default(TGrid);
+  SetLength(Result, 2);
+  SetLength(Result[0], AN);
+  SetLength(Result[1], 1);
+  LSquareSide := CmToScreenPixels(ASquareSide);
+  LDegree := BaseDegree;
+  LDegreeI := BaseDegree div AN;
+  LRect := GetCentralRect(Screen.Width, Screen.Height, LSquareSide div 2);
+  for j := Low(Result) to High(Result) do begin
+    for i := Low(Result[j]) to High(Result[j]) do begin
+      with Result[j][i] do begin
+        case j of
+          0:  begin
+            Index := LIndex;
+            LPoint := GetPointFromAngle(LDegree, LRect);
+            Top := LPoint.Y - (LSquareSide div 2);
+            Left := LPoint.X - (LSquareSide div 2);
+            SquareSide := LSquareSide;
+            Inc(LDegree, LDegreeI);
+          end;
+
+          1: begin
+            Index := LIndex;
+            Top := (Screen.Height div 2) - (LSquareSide div 2);
+            Left := (Screen.Width div 2) - (LSquareSide div 2);
+            SquareSide := LSquareSide;
+          end;
+        end;
+      end;
+      Inc(LIndex);
+    end;
+  end;
+end;
+
 function RectFromPosition(APosition: integer): TRect;
 var
   j, i: Integer;
@@ -118,7 +168,7 @@ end;
 
 
 initialization
-  Grid := GetCentralGrid(3, 3.0, False);
+  Grid := GetCircularCentralGrid(9, 3.0);
 
 end.
 
