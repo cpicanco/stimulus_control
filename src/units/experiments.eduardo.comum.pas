@@ -26,6 +26,8 @@ const
 
 var
   ITI : integer = 1000;
+  Question1 : string;
+  Question2 : string;
   MessageA0 : string;
   MessageE1A1 : string;
   MessageE1A2 : string;
@@ -50,12 +52,14 @@ var
 
 procedure SetupStimuli;
 begin
+  LoadMessageFromFile(Question1, GlobalContainer.RootMedia+'Pergunta1-Item-Gratuito.txt');
+  LoadMessageFromFile(Question2, GlobalContainer.RootMedia+'Pergunta2-Valor-de-Cada-Item.txt');
   LoadMessageFromFile(MessageA0, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA0.html');
   LoadMessageFromFile(MessageE1A1, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA1.html');
   LoadMessageFromFile(MessageE1A2, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA2.html');
   LoadMessageFromFile(MessageE1B,  GlobalContainer.RootMedia+FolderMessages+'1-MensagemB.html');
   LoadMessageFromFile(MessageE2B,  GlobalContainer.RootMedia+FolderMessages+'2-MensagemB.html');
-  LoadMessageFromFile(MessageE2B,  GlobalContainer.RootMedia+FolderMessages+'2-MensagemC.html');
+  LoadMessageFromFile(MessageE2C,  GlobalContainer.RootMedia+FolderMessages+'2-MensagemC.html');
   LoadMessageFromFile(MessageE3B,  GlobalContainer.RootMedia+FolderMessages+'3-MensagemB.html');
 end;
 
@@ -146,10 +150,10 @@ var
       '50.00','100.00','200.00','400.00');
   begin
     WriteTXTInput(ABlc, 'Demanda 0',
-      'Quanto você consumiria se o cigarro fosse gratuito?', '0');
+      Question1, '0');
     for i := Low(LPrices) to High(LPrices) do
       WriteTXTInput(ABlc, 'Demanda '+LPrices[i],
-      'Quantos cigarros você consumiria se cada um custasse R$'+LPrices[i]+'?',
+      Question2+LPrices[i]+'?',
       LPrices[i]);
   end;
 begin
