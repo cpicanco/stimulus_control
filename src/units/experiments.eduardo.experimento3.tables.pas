@@ -16,6 +16,7 @@ type
     IsTest         : Boolean;
     Latency        : Extended;
     ResponsesTime  : Extended;
+    Start          : Extended;
     Responses      : TFloatColumn;
     VTDelaysBegin  : TFloatColumn;
     VTDelaysEnd    : TFloatColumn;
@@ -37,8 +38,8 @@ type
     destructor Destroy; override;
   public
     procedure CreateTrial(ATrial: integer);
-    procedure AddRow(ATrial: integer; ALatency : Extended;
-      AResponsesTime : Extended;
+    procedure AddRow(ATrial: integer; ALatency: Extended;
+      AResponsesTime: Extended; ATrialStart:Extended;
       AResult: integer; IsTestTrial: Boolean);
     procedure AddResponse(ATrial : integer;
       AResponse : Extended);
@@ -91,7 +92,8 @@ begin
 end;
 
 procedure TExperiment3Table.AddRow(ATrial: integer; ALatency: Extended;
-  AResponsesTime: Extended; AResult: integer; IsTestTrial: Boolean);
+  AResponsesTime: Extended; ATrialStart:Extended;
+  AResult: integer; IsTestTrial: Boolean);
 var
   i: Integer;
 begin
@@ -100,6 +102,7 @@ begin
     FTrials[i].IsTest := IsTestTrial;
     FTrials[i].Latency := ALatency;
     FTrials[i].ResponsesTime := AResponsesTime;
+    FTrials[i].Start := ATrialStart;
     FTrials[i].Result := AResult;
   except
     on E : Exception do begin
@@ -160,6 +163,12 @@ begin
   Result := ATrial - FFirstTrial;
 end;
 
+type
+  TPeak = record
+    Value : Extended;
+    Rate : Extended;
+end;
+
 procedure TExperiment3Table.WriteTable;
 const
   NONE = -1;
@@ -168,12 +177,14 @@ const
 var
   Table : TTabDelimitedReport;
   i, j : Integer;
+  Peak : TPeak;
   Result : string;
   DelaysCount  : integer;
   DelaysTime   : Extended;
   Rate         : Extended;
   RunningRate  : Extended;
   FirstQuartil : Extended;
+  Response     : Extended;
   TrialsWithReinforcement : integer = 0;
   QuarterLife : Extended;
   Quarters : array of Extended = nil;
@@ -184,6 +195,7 @@ var
     i : integer;
   begin
     if ATrial.Responses.Count > 0 then begin
+      // todo: experiment 3 may not have delays
       Q1 := Round(ATrial.Responses.Count*0.25);
       Result := ATrial.Responses[Q1];
       for i := Low(ATrial.Delays) to High(ATrial.Delays) do begin
@@ -213,9 +225,52 @@ var
       SetLength(Result, 0);
     end;
   end;
+
+  function GetPeak(ATrial : TTableTrial) : TPeak;
+  var
+    i : integer;
+    LResponses : TFloatColumn;
+    M : TFloatColumn;
+    LMax : TFloatColumn;
+    R : Extended;
+  begin
+    Result.Value := 0;
+    Result.Rate := 0;
+    if ATrial.Responses.Count > 0 then begin
+      M := TFloatColumn.Create;
+      LMax := TFloatColumn.Create;
+      LResponses := TFloatColumn.Create;
+
+      for i := 0 to ATrial.Responses.Count-1 do begin
+        LResponses.Add(ATrial.Responses[i] - AStart);
+      end;
+
+      for i := 0 to Trunc(ATrial.ResponsesTime)+1 do begin
+        M.Clear;
+        for R in LResponses do begin
+          if (R >= i) and (R <= (i+1)) then begin
+            M.Add(R);
+          end;
+        end;
+        LMax.Add(M.Count);
+      end;
+
+      for i := 0 to LMax.Count-1 do begin
+        if LMax[i] > Result.Rate then begin
+          Result.Rate := LMax[i];
+          Result.Value := i+1;
+        end;
+      end;
+
+      M.Free;
+      LMax.Free;
+      LResponses.Free;
+    end;
+  end;
 begin
   Table := TTabDelimitedReport.Create;
   Table.Filename := GetFilename;
+
   try
     Table.WriteRow([
       'Tentativa',
@@ -228,6 +283,8 @@ begin
       'Q1/(s-s2)',
       'Pausa Pós Reforço- n2',
       'Pausa Pós Reforço- s2',
+      'Pico (sp)',
+      'Taxa no Pico (np/sp)',
       'Resultado']);
     for i := Low(FTrials) to High(FTrials) do begin
       case FTrials[i].Result of
@@ -253,6 +310,7 @@ begin
       end;
       FirstQuartil := GetFirstQuartil(FTrials[i]);
       QuarterLife := FirstQuartil/(FTrials[i].ResponsesTime-DelaysTime);
+      Peak := GetPeak(FTrials[i].Start, FTrials[i].Responses);
       Table.WriteRow([
         FTrials[i].Tag.ToString,
         FTrials[i].Latency.ToString,
@@ -264,6 +322,8 @@ begin
         QuarterLife.ToString,
         DelaysCount.ToString,
         DelaysTime.ToString,
+        Peak.Value.ToString,
+        Peak.Rate.ToString,
         Result
       ]);
       if FTrials[i].IsTest then begin
@@ -288,8 +348,10 @@ begin
         Table.WriteRow(['']);
         Table.WriteRow(['Tentativa de Teste '+FTrials[i].Tag.ToString]);
         Table.WriteRow(['Tempo', 'Frequência Acumulada']);
+        Table.WriteRow([FTrials[i].Start.ToString, '0']);
         for j := 0 to FTrials[i].Responses.Count-1 do begin
-          Table.WriteRow([FTrials[i].Responses[j].ToString, (j+1).ToString]);
+          Response := FTrials[i].Responses[j] - FTrials[i].Start;
+          Table.WriteRow([Response.ToString, (Trunc(Response)+1).ToString]);
         end;
       end else begin
         { do nothing }

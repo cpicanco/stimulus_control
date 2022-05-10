@@ -151,10 +151,10 @@ begin
   FResponseEnabled:=True;
   Invalidate;
 
-  if CheatsModeOn then begin
-    if Random <= 0.8 then
-      ParticipantBot.Start(FStimulus.AsInterface);
-  end;
+  //if CheatsModeOn then begin
+  //  if Random <= 0.8 then
+  //    ParticipantBot.Start(FStimulus.AsInterface);
+  //end;
 end;
 
 procedure TFreeSquareMixVTFI.WriteData(Sender: TObject);
@@ -170,7 +170,7 @@ begin
 
   TExperiment3Table(FTable).AddRow(
     Counters.SessionTrials,
-    LLatency, LResponsesTime, FCustomResult, IsTestTrial);
+    LLatency, LResponsesTime, FReportData.CBegin, FCustomResult, IsTestTrial);
 
   Data := Data +
           TimestampToStr(FReportData.CLatency) + HeaderTabs +

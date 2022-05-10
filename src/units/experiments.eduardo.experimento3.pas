@@ -87,7 +87,7 @@ begin
     LStringList.Clear;
 
     for i := 0 to 1 do
-      LStringList.Append('EXT');
+      LStringList.Append(T_EXT);
 
     for i := 0 to 12 do
       LStringList.Append('FI'+#32+Experiment3FITestValue.ToString);

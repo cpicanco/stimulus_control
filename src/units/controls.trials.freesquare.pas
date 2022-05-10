@@ -53,6 +53,7 @@ type
     function GetHeader: string;
     function IsTestTrial : Boolean;
   protected
+    procedure Paint; override;
     procedure TrialStart(Sender: TObject); virtual;
     procedure WriteData(Sender: TObject); override;
   public
@@ -199,6 +200,7 @@ begin
   if not FFirstResponse then begin
     LLatency := FReportData.CLatency-FReportData.CBegin;
   end;
+
   case FTrialType of
     ttE1B, ttE1C : begin
       TExperiment1Table(FTable).AddRow(
@@ -207,7 +209,7 @@ begin
     ttE3B1, ttE3B2 : begin
       TExperiment3Table(FTable).AddRow(
         Counters.SessionTrials,
-        LLatency, LResponsesTime, FCustomResult, IsTestTrial);
+        LLatency, LResponsesTime, FReportData.CBegin, FCustomResult, IsTestTrial);
     end;
   end;
 
@@ -231,9 +233,10 @@ begin
   end else begin
     if Self.Result = T_HIT then begin
       FCustomResult := 1;
-    end else
-    if (Self.Result = T_MISS) or (Self.Result = T_NONE) then begin
-      FCustomResult := 0;
+    end else begin
+      if (Self.Result = T_MISS) or (Self.Result = T_NONE) then begin
+        FCustomResult := 0;
+      end;
     end;
   end;
 end;
@@ -241,6 +244,14 @@ end;
 function TFreeSquareTrial.IsTestTrial: Boolean;
 begin
   Result := Configurations.Parameters.Values['IsTestTrial'].ToBoolean;
+end;
+
+procedure TFreeSquareTrial.Paint;
+begin
+  inherited Paint;
+  if CheatsModeOn then begin
+    Canvas.TextOut(0, 0, 'Trial '+Counters.SessionTrials.ToString);
+  end;
 end;
 
 procedure TFreeSquareTrial.OmissionEnd(Sender: TObject);
