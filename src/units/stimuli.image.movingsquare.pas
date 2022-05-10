@@ -75,10 +75,7 @@ end;
 constructor TMovingSquare.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  if CheatsModeOn then begin
-    ConsequenceTime := ConsequenceTime div VelocityFactor;
-    //Granularity := Granularity div VelocityFactor;
-  end;
+  ConsequenceTime := SquareColorDuration;
   FFreezed := False;
   Width := Round(SquareSize*(Screen.Width/ScreenInCentimeters));
   Height:= Width;

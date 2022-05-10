@@ -22,6 +22,8 @@ var VelocityFactor : integer = 10;
 const
   DefaultAddress = '127.0.1.1:50020';
 
+ function SquareColorDuration : integer;
+
  // Default = 2000
  function ConsequenceDuration : integer;
 
@@ -391,6 +393,16 @@ resourcestring
 
   rsNA = 'NA';
 implementation
+
+function SquareColorDuration: integer;
+const R : integer = 250;
+begin
+  if CheatsModeOn then begin
+    Result := R div VelocityFactor;
+  end else begin
+    Result := R;
+  end;
+end;
 
 { Controls.Trials.TemporalBissection }
 function ConsequenceDuration: integer;
