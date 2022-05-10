@@ -242,7 +242,7 @@ var
       LResponses := TFloatColumn.Create;
 
       for i := 0 to ATrial.Responses.Count-1 do begin
-        LResponses.Add(ATrial.Responses[i] - AStart);
+        LResponses.Add(ATrial.Responses[i] - ATrial.Start);
       end;
 
       for i := 0 to Trunc(ATrial.ResponsesTime)+1 do begin
@@ -310,7 +310,7 @@ begin
       end;
       FirstQuartil := GetFirstQuartil(FTrials[i]);
       QuarterLife := FirstQuartil/(FTrials[i].ResponsesTime-DelaysTime);
-      Peak := GetPeak(FTrials[i].Start, FTrials[i].Responses);
+      Peak := GetPeak(FTrials[i]);
       Table.WriteRow([
         FTrials[i].Tag.ToString,
         FTrials[i].Latency.ToString,
