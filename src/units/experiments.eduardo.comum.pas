@@ -24,6 +24,8 @@ const
 
 var
   ITI : integer = 1000;
+  Question1 : string;
+  Question2 : string;
   MessageA0 : string;
   MessageE1A1 : string;
   MessageE1A2 : string;
@@ -47,6 +49,9 @@ var
 
 procedure SetupStimuli;
 begin
+  LoadMessageFromFile(Question1, GlobalContainer.RootMedia+'Pergunta1-Item-Gratuito.txt');
+  LoadMessageFromFile(Question2, GlobalContainer.RootMedia+'Pergunta2-Valor-de-Cada-Item.txt');
+  LoadMessageFromFile(MessageA0, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA0.html');
   LoadMessageFromFile(MessageA0, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA0.html');
   LoadMessageFromFile(MessageE1A1, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA1.html');
   LoadMessageFromFile(MessageE1A2, GlobalContainer.RootMedia+FolderMessages+'1-MensagemA2.html');
@@ -138,10 +143,12 @@ var
       '15,00','20,00','25,00','30,00',
       '50,00','100,00','200,00','400,00');
   begin
-    WriteTXTInput(ABlc, 'Demanda 1', 'Quanto você consumiria se o cigarro fosse gratuito?');
+    // 1 'Quanto você consumiria se o cigarro fosse gratuito?'
+    // 2 'Quanto você consumiria se cada cigarro custasse R$'
+    WriteTXTInput(ABlc, 'Demanda 1', Question1);
     for i := Low(LValues) to High(LValues) do
       WriteTXTInput(ABlc, 'Demanda '+(i+2).ToString,
-        'Quanto você consumiria se cada cigarro custasse R$'+LValues[i]+'?');
+        Question2+LValues[i]+'?');
   end;
 begin
   ITI := ITISurvey;
