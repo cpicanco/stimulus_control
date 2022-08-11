@@ -18,26 +18,44 @@ uses
 
 type
 
+
+  TPresentationPattern = (ppNone, ppB3, ppC1);
+
+
   { TSerialSound }
 
   TSerialSound = class(TComponent)
   private
+    FPresentationPattern: TPresentationPattern;
     FTone   : TSound;
+    FToneHigh : TSound;
     FLaught : TSound;
     FSerialTimer : TSerialTimer;
-    FOnStartPlaying: TNotifyEvent;
-    FOnStop: TNotifyEvent;
+    FOnStart : TNotifyEvent;
+    FOnStopTone : TNotifyEvent;
+    FOnStopLaught: TNotifyEvent;
+    FOnStopToneHigh: TNotifyEvent;
     procedure SetLaught(AValue: TSound);
+    procedure SetOnStart(AValue: TNotifyEvent);
+    procedure SetOnStopLaught(AValue: TNotifyEvent);
+    procedure SetOnStopTone(AValue: TNotifyEvent);
+    procedure SetOnStopToneHigh(AValue: TNotifyEvent);
+    procedure SetPresentationPattern(AValue: TPresentationPattern);
     procedure SetTone(AValue: TSound);
+    procedure SetToneHigh(AValue: TSound);
     procedure StartTone(Sender : TObject);
     procedure StopTone(Sender : TObject);
+    procedure StopToneHigh(Sender : TObject);
     procedure StopLaugh(Sender : TObject);
     procedure LoadPresentationPattern;
   public
     constructor Create(AOwner : TComponent); override;
     procedure StartPlayingFromPattern;
-    property Tone : TSound read FTone write SetTone;
-    property Laught : TSound read FLaught write SetLaught;
+    property OnStart : TNotifyEvent read FOnStart write SetOnStart;
+    property OnStopTone : TNotifyEvent read FOnStopTone write SetOnStopTone;
+    property OnStopLaught : TNotifyEvent read FOnStopLaught write SetOnStopLaught;
+    property OnStopToneHigh : TNotifyEvent read FOnStopToneHigh write SetOnStopToneHigh;
+    property PresentationPattern : TPresentationPattern read FPresentationPattern write SetPresentationPattern;
   end;
 
 var
@@ -52,20 +70,35 @@ uses Session.Configuration.GlobalContainer, Forms;
 type
   TDelays = 0..4;
   TDelaysArray = array [TDelays] of integer;
-  TVTInterval = record
-    Start : Cardinal;
-    Stop  : Cardinal;
-  end;
+  //TVTInterval = record
+  //  Start : Cardinal;
+  //  Stop  : Cardinal;
+  //end;
 
 
 procedure TSerialSound.StopTone(Sender: TObject);
 begin
   FTone.Stop;
+  if Assigned(OnStopTone) then
+    OnStopTone(Self);
+  if FPresentationPattern = ppB3 then begin
+    FLaught.Play;
+  end;
+end;
+
+procedure TSerialSound.StopToneHigh(Sender: TObject);
+begin
+  FToneHigh.Stop;
+  if Assigned(OnStopToneHigh) then
+    OnStopToneHigh(Self);
 end;
 
 procedure TSerialSound.StopLaugh(Sender: TObject);
 begin
   FLaught.Stop;
+  if Assigned(OnStopLaught) then
+    OnStopLaught(Self);
+  FToneHigh.Play;
 end;
 
 procedure TSerialSound.SetLaught(AValue: TSound);
@@ -74,50 +107,96 @@ begin
   FLaught := AValue;
 end;
 
+procedure TSerialSound.SetOnStart(AValue: TNotifyEvent);
+begin
+  if FOnStart = AValue then Exit;
+  FOnStart := AValue;
+end;
+
+procedure TSerialSound.SetOnStopLaught(AValue: TNotifyEvent);
+begin
+  if FOnStopLaught = AValue then Exit;
+  FOnStopLaught := AValue;
+end;
+
+procedure TSerialSound.SetOnStopTone(AValue: TNotifyEvent);
+begin
+  if FOnStopTone = AValue then Exit;
+  FOnStopTone := AValue;
+end;
+
+procedure TSerialSound.SetOnStopToneHigh(AValue: TNotifyEvent);
+begin
+  if FOnStopToneHigh = AValue then Exit;
+  FOnStopToneHigh := AValue;
+end;
+
+procedure TSerialSound.SetPresentationPattern(AValue: TPresentationPattern);
+begin
+  if FPresentationPattern = AValue then Exit;
+  FPresentationPattern := AValue;
+  LoadPresentationPattern;
+end;
+
 procedure TSerialSound.SetTone(AValue: TSound);
 begin
   if FTone = AValue then Exit;
   FTone := AValue;
 end;
 
+procedure TSerialSound.SetToneHigh(AValue: TSound);
+begin
+  if FToneHigh = AValue then Exit;
+  FToneHigh := AValue;
+end;
+
 procedure TSerialSound.StartTone(Sender: TObject);
 begin
   FTone.Play;
+  if Assigned(OnStart) then
+    OnStart(Self);
 end;
 
 procedure TSerialSound.LoadPresentationPattern;
 const
-  SessionDuration : integer = 15*60*1000;
-  TimeEdge : integer = 60*1000;
+  TimeUnitB3 : integer = 167000;
+  TimeUnitC1 : integer = 171500;
 var
   i : integer;
-  b : integer = 0;
-  Amplitude    : integer;
-  BaseTimeUnit : integer;
   TimerItem  : TTimerItem;
-  //procedure ToMinutes(AValue : Cardinal);
-  //begin
-  //  Writeln((AValue div 1000) div 60);
-  //end;
-
 begin
-  BaseTimeUnit := ((SessionDuration - TimeEdge) div Length(TDelaysArray)) div 2;
-  Amplitude := (BaseTimeUnit*50) div 100;
-  for i := Low(TDelays) to High(TDelays) do begin
-    TimerItem.Interval :=
-      BaseTimeUnit - Amplitude + Random((2 * BaseTimeUnit) + 1);
-    TimerItem.OnTimerEvent := @StartTone;
-    FSerialTimer.Append(TimerItem);
+  case FPresentationPattern of
+    ppB3 : begin
+      for i := Low(TDelays) to High(TDelays) do begin
+        TimerItem.Interval := TimeUnitB3;
+        TimerItem.OnTimerEvent := @StartTone;
+        FSerialTimer.Append(TimerItem);
 
-    b += TimerItem.Interval;
+        TimerItem.Interval := Round(FTone.Duration*1000);
+        TimerItem.OnTimerEvent := @StopTone;
+        FSerialTimer.Append(TimerItem);
 
-    TimerItem.Interval := Round(FTone.Duration*1000);
-    TimerItem.OnTimerEvent := @StopTone;
-    FSerialTimer.Append(TimerItem);
+        TimerItem.Interval := Round(FLaught.Duration*1000);
+        TimerItem.OnTimerEvent := @StopLaugh;
+        FSerialTimer.Append(TimerItem);
 
-    TimerItem.Interval := Round(FLaught.Duration*1000);
-    TimerItem.OnTimerEvent := @StopLaugh;
-    FSerialTimer.Append(TimerItem);
+        TimerItem.Interval := Round(FToneHigh.Duration*1000);
+        TimerItem.OnTimerEvent := @StopToneHigh;
+        FSerialTimer.Append(TimerItem);
+      end;
+    end;
+
+    ppC1 : begin
+      for i := Low(TDelays) to High(TDelays) do begin
+        TimerItem.Interval := TimeUnitC1;
+        TimerItem.OnTimerEvent := @StartTone;
+        FSerialTimer.Append(TimerItem);
+
+        TimerItem.Interval := Round(FTone.Duration*1000);
+        TimerItem.OnTimerEvent := @StopTone;
+        FSerialTimer.Append(TimerItem);
+      end;
+    end;
   end;
 end;
 
@@ -126,10 +205,17 @@ begin
   inherited Create(AOwner);
   FTone := TSound.Create(Self);
   FTone.LoadFromFile('tom.wav');
+  //FTone.OnStop := @StopTone;
+
   FLaught := TSound.Create(Self);
   FLaught.LoadFromFile('risada-jocosa.wav');
+  //FLaught.OnStop := @StopLaugh;
+
+  FToneHigh := TSound.Create(Self);
+  FToneHigh.LoadFromFile('tom-alto.wav');
+  //FToneHigh.OnStop := @StopToneHigh;
+
   FSerialTimer := TSerialTimer.Create(Self);
-  LoadPresentationPattern;
 end;
 
 procedure TSerialSound.StartPlayingFromPattern;

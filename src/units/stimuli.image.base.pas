@@ -82,8 +82,9 @@ end;
 
 function TLightImage.GetRandomPoint : TPoint;
 begin
-  Result.X := BoundsRect.Left + 5 + Random(Width - 5);
-  Result.Y := BoundsRect.Top + 5 + Random(Height - 5);
+  Result.X := Left + 5 + Random(Width - 5);
+  Result.Y := Top + 5 + Random(Height - 5);
+  Result := Parent.ClientToScreen(Result);
 end;
 
 procedure TLightImage.SetKind(AValue: TImageKind);

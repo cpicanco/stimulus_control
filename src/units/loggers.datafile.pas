@@ -111,8 +111,10 @@ end;
 
 procedure TRegData.SaveData(AData: string);
 begin
-  Write(FFile, AData);
-  System.Flush(FFile);
+  if IsOpened then begin
+    Write(FFile, AData);
+    System.Flush(FFile);
+  end;
 end;
 
 procedure TRegData.SaveLine(ALine: string);

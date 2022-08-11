@@ -53,8 +53,10 @@ type
     FReportData : TReportData;
     FContainer : TPanel;
     FStimulus : TFreeSquare;
+    procedure LoosePoints;
     procedure ConditionalStimulusStarted(Sender: TObject);
     procedure ConditionalStimulusStopped(Sender: TObject);
+    procedure ConditionalStimulusStoppedHighTone(Sender: TObject);
     procedure CustomConsequenceStop(Sender: TObject);
     procedure Consequence(Sender: TObject);
     procedure Response(Sender: TObject);
@@ -97,6 +99,11 @@ begin
 
   FFirstResponse := True;
   FResponseEnabled := False;
+
+  HeaderTimestamps := HeaderTimestamps + #9 +
+    'Contador.Centro' + #9 +
+    'Contador.Direita' + #9 +
+    'VI.Real';
 end;
 
 function TFreeOperantSquareTrial.AsString: string;
@@ -116,49 +123,63 @@ begin
 end;
 
 procedure TFreeOperantSquareTrial.Play(ACorrection: Boolean);
-const
-  LDuration : integer = 1000*60*15;
 var
+  LDuration : integer = (1000*60*15) + 100;
   LParameters : TStringList;
 begin
-  CustomConsequence.Visual.Parent := FContainer;
-  Configurations.Parameters.Values[_LimitedHold] := LDuration.ToString;
-  inherited Play(ACorrection);
   LParameters := Configurations.Parameters;
-  FStimulus := TFreeSquare.Create(Self);
   case LParameters.Values['Type'] of
     'A1': FTrialType := ttA1;
-    'A2': FTrialType := ttA2;
+    'A2':
+      begin
+        FTrialType := ttA2;
+        LDuration := 1000*60*10;
+      end;
     'B1': FTrialType := ttB1;
     'B2': FTrialType := ttB2;
     'B3': FTrialType := ttB3;
     'C1': FTrialType := ttC1;
   end;
 
+  CustomConsequence.Visual.Parent := FContainer;
+  Configurations.Parameters.Values[_LimitedHold] := LDuration.ToString;
+  inherited Play(ACorrection);
+
+  FStimulus := TFreeSquare.Create(Self);
   case FTrialType of
-    ttA1, ttB1, ttB2, ttB3 : begin
+    ttA1, ttB1, ttB2 : begin
       FStimulus.Schedule.Load(VI);
       FStimulus.Schedule.UseRegisNetoIntervals(True);
     end;
 
-    ttA2, ttC1 : begin
+    ttA2, ttB3, ttC1 : begin
       FStimulus.Schedule.Load(VI);
       FStimulus.Schedule.UseRegisNetoIntervals(False);
     end;
   end;
 
   case FTrialType of
-    ttA1, ttA2 : begin
+    ttA1: begin
+      { do nothing }
+    end;
+
+    ttA2 : begin
       { do nothing }
     end;
 
     ttB1, ttB2, ttB3, ttC1 :  begin
-      SerialSound.Tone.OnStartPlaying := @ConditionalStimulusStarted;
-      SerialSound.Tone.OnStop := @ConditionalStimulusStopped;
-      SerialSound.Laught.OnStop := @CustomConsequenceStop;
+      SerialSound.OnStart := @ConditionalStimulusStarted;
+      SerialSound.OnStopTone := @ConditionalStimulusStopped;
+      SerialSound.OnStopLaught := @CustomConsequenceStop;
+      SerialSound.OnStopToneHigh := @ConditionalStimulusStoppedHighTone;
     end;
   end;
 
+  case FTrialType of
+    ttB3 : SerialSound.PresentationPattern := ppB3;
+    ttC1 : SerialSound.PresentationPattern := ppC1;
+    else {do nothing};
+  end;
 
   FSchedule := TSchedule.Create(Self);
   FSchedule.Load(FT, 10000);
@@ -174,6 +195,7 @@ begin
   FSquareSchedule := FStimulus.Schedule;
   FStimulus.FitScreen;
   FShowCounter := True;
+
   if Self.ClassType = TFreeOperantSquareTrial then Config(Self);
 end;
 
@@ -183,7 +205,7 @@ begin
   FStimulus.Start;
   FSchedule.Start;
   case FTrialType of
-    ttB1, ttB2, ttB3, ttC1 : SerialSound.StartPlayingFromPattern;
+    ttB3, ttC1 : SerialSound.StartPlayingFromPattern;
     else { do nothing };
   end;
   FReportData.CBegin:=LogEvent('OperanteLivre.Inicio');
@@ -230,40 +252,55 @@ begin
   end;
 end;
 
+procedure TFreeOperantSquareTrial.LoosePoints;
+var
+  LPoints : integer;
+begin
+  case FTrialType of
+    ttB3 : begin
+      LPoints := CounterManager.SessionPointsTopRight - 16;
+    end;
+    else begin
+      LPoints := CounterManager.SessionPointsTopRight - 13;
+    end;
+  end;
+
+  if LPoints < 0 then LPoints := 0;
+  CounterManager.SessionPointsTopRight := LPoints;
+  Invalidate;
+end;
+
 procedure TFreeOperantSquareTrial.ConditionalStimulusStarted(Sender: TObject);
 begin
-  LogEvent('CS.Inicio');
+  LogEvent('TomBaixo.Inicio');
 end;
 
 procedure TFreeOperantSquareTrial.ConditionalStimulusStopped(Sender: TObject);
-  procedure LoosePoints;
-  begin
-    CounterManager.SessionPointsTopRight :=
-      Round(CounterManager.SessionPointsTopRight*0.8);
-  end;
-
 begin
-  LogEvent('CS.Fim');
   case FTrialType of
     ttA1, ttA2, ttC1 : begin
       { do nothing }
     end;
 
     ttB1 : begin
-      LoosePoints;
+      //LoosePoints;
     end;
 
     ttB2 : begin
       CustomConsequence.Start;
-      SerialSound.Laught.Play;
     end;
 
     ttB3 : begin
       CustomConsequence.Start;
-      SerialSound.Laught.Play;
-      LoosePoints;
     end;
   end;
+  LogEvent('TomBaixo.Fim');
+end;
+
+procedure TFreeOperantSquareTrial.ConditionalStimulusStoppedHighTone(Sender: TObject);
+begin
+  LoosePoints;
+  LogEvent('TomAlto.Fim' + #9 + CounterManager.SessionPointsTopRight.ToString);
 end;
 
 procedure TFreeOperantSquareTrial.CustomConsequenceStop(Sender: TObject);
@@ -271,7 +308,7 @@ begin
   case FTrialType of
     ttB2, ttB3 : begin
       CustomConsequence.Stop;
-      LogEvent('Consequencia.Fim');
+      LogEvent('Risada.Fim');
     end;
     else { do nothing };
   end;
@@ -282,14 +319,15 @@ begin
   if Sender = FSchedule then begin
     CounterManager.SessionPointsTopRight :=
       CounterManager.SessionPointsTopRight +1;
-    LogEvent('VT.Consequencia');
+    LogEvent('VT.Consequencia' + #9#9 + CounterManager.SessionPointsTopRight.ToString);
   end;
 
   if Sender = FStimulus then begin
     FResponseReady := False;
     CounterManager.SessionPointsCenter :=
       CounterManager.SessionPointsCenter +1;
-    LogEvent('VI.Consequencia');
+    CoinSound.Start;
+    LogEvent('VI.Consequencia' + #9 + CounterManager.SessionPointsCenter.ToString);
 
     case FTrialType of
       ttA1: begin
@@ -321,7 +359,7 @@ end;
 procedure TFreeOperantSquareTrial.ResponseReady(Sender: TObject);
 begin
   if FResponseEnabled then begin
-    LogEvent('VI.Pronto');
+    LogEvent('VI.Pronto' + #9#9#9 + FSquareSchedule.AsString);
     if CheatsModeOn then begin
       FResponseReady := True;
       Invalidate;
@@ -331,6 +369,7 @@ end;
 
 procedure TFreeOperantSquareTrial.TrialBeforeEnd(Sender: TObject);
 begin
+  FSchedule.Stop;
   WriteData(Self);
 end;
 

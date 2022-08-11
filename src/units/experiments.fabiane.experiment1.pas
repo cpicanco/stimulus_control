@@ -22,8 +22,8 @@ const
   A2Name = 'Linha de Base (Fortalecimento)';
   B1Name = 'Grupo 1';
   B2Name = 'Grupo 2';
-  B3Name = 'Grupo 3';
-  C1Name = 'Reversão';
+  B3Name = 'Supressão Condicionada';
+  C1Name = 'Regra';
 
 var
   Condition : TCondition;

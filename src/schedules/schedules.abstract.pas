@@ -160,7 +160,7 @@ begin
       repeat
         RandomVIS := Default(TArrayOfInteger);
         for i := 0 to 4 do begin
-          R := RandomAmplitude(Value, (Value*30) div 100);
+          R := RandomAmplitude(Value, (Value*70) div 100);
           RandomVIS := Append(RandomVIS, R);
         end;
       until Mean(RandomVIS) = Value;
@@ -169,6 +169,7 @@ begin
       end;
     end;
   end;
+  //WriteLn(FRandomValuesList.Text);
 end;
 
 { TSchedules }
@@ -193,6 +194,7 @@ end;
 
 procedure TSchedules.ResponseReady;
 begin
+  Parameter1 := FTimer.Interval;
   if Assigned(OnResponseReady) then
     OnResponseReady(Self);
 end;

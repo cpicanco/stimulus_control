@@ -24,21 +24,23 @@ type
 
   TConsequence = class(TComponent)
   private
-    //FAuditive: TSound;
+    FAuditive: TSound;
     FVisual: TStimulusFigure;
     //procedure SoundStopped(Sender : TObject);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure Load(AImage : string);
+    procedure LoadImage(AImage : string);
+    procedure LoadSound(ASound : string);
     procedure Start;
     procedure Stop;
     property Visual : TStimulusFigure read FVisual write FVisual;
-    //property Auditive : TSound read FAuditive write FAuditive;
+    property Auditive : TSound read FAuditive write FAuditive;
   end;
 
 var
   CustomConsequence : TConsequence;
+  CoinSound : TConsequence;
 
 implementation
 
@@ -56,8 +58,8 @@ uses
 constructor TConsequence.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FVisual := TStimulusFigure.Create(Self);
-  //FAuditive := TSound.Create(Self);
+  FVisual := nil;
+  FAuditive := nil;
   //FAuditive.OnStop := @SoundStopped;
 end;
 
@@ -67,30 +69,52 @@ begin
   inherited Destroy;
 end;
 
-procedure TConsequence.Load(AImage: string);
+procedure TConsequence.LoadImage(AImage: string);
 begin
+  FVisual := TStimulusFigure.Create(Self);
   FVisual.LoadFromFile(AImage);
-  //FAuditive.LoadFromFile(ASound);
+end;
+
+procedure TConsequence.LoadSound(ASound: string);
+begin
+  FAuditive := TSound.Create(Self);
+  FAuditive.LoadFromFile(ASound);
 end;
 
 procedure TConsequence.Start;
 begin
-  FVisual.Start;
-  //FAuditive.Play;
+  if Assigned(FVisual) then begin
+    FVisual.Start;
+  end;
+
+  if Assigned(FAuditive) then begin
+    FAuditive.Play;
+  end;
 end;
 
 procedure TConsequence.Stop;
 begin
-  FVisual.Stop;
+  if Assigned(FVisual) then begin
+    FVisual.Stop;
+  end;
+
+  if Assigned(FAuditive) then begin
+    FAuditive.Stop;
+  end;
 end;
 
 initialization
   CustomConsequence := TConsequence.Create(nil);
   CustomConsequence.Name := 'CustomConsequence';
-  CustomConsequence.Load('imagem-jocosa.png');
+  CustomConsequence.LoadImage('imagem-jocosa.png');
+
+  CoinSound := TConsequence.Create(nil);
+  CoinSound.Name := 'CoinSound';
+  CoinSound.LoadSound('som-de-moeda.wav');
 
 finalization
   CustomConsequence.Free;
+  CoinSound.Free;
 
 end.
 
