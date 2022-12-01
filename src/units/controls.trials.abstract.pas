@@ -282,26 +282,22 @@ end;
 
 procedure TTrial.EndTrialThread(Sender: TObject);
 begin
+  if Assigned(FClock) then
+    FClock.Enabled := False;
+
+  FResponseEnabled:= False;
   if CheatsModeOn then begin
     ParticipantBot.Stop;
   end;
 
-  if Assigned(FClock) then
-    FClock.Enabled := False;
+  Hide;
   {$ifdef DEBUG}
     DebugLn(mt_Debug + 'TTrial.EndTrial2');
   {$endif}
 
-  LogEvent('TE');
-  FResponseEnabled:= False;
-  Hide;
-  if Assigned(OnTrialBeforeEnd) then OnTrialBeforeEnd(Sender);
-  if Parent is TCustomControl then
-    with TCustomControl(Parent) do
-      begin
-        OnKeyDown := FOldKeyDown;
-        OnKeyUp := FOldKeyUp;
-      end;
+  if Assigned(OnTrialBeforeEnd) then
+    OnTrialBeforeEnd(Sender);
+
   case Result of
     T_HIT : if Assigned(OnHit) then OnHit(Sender);
     T_MISS: if Assigned(OnMiss) then OnMiss(Sender);
@@ -309,9 +305,19 @@ begin
   end;
 
   if FIsCorrection then
-    if Assigned(OnEndCorrection) then OnEndCorrection(Sender);
+    if Assigned(OnEndCorrection) then
+      OnEndCorrection(Sender);
 
-  if Assigned(OnTrialEnd) then OnTrialEnd(Self);
+  if Assigned(OnTrialEnd) then
+    OnTrialEnd(Self);
+
+  LogEvent('TE');
+
+  if Parent is TCustomControl then
+    with TCustomControl(Parent) do begin
+      OnKeyDown := FOldKeyDown;
+      OnKeyUp := FOldKeyUp;
+    end;
 end;
 
 procedure TTrial.SetConfigurations(AValue: TCfgTrial);
@@ -651,7 +657,7 @@ end;
 
 function TTrial.LogEvent(ACode: string): Extended;
 begin
-  Result := TickCount - TimeStart;
+  Result := Elapsed;
   SaveData(TimestampToStr(Result) + #9 +
            IntToStr(CounterManager.CurrentBlc+1) + #9 +
            IntToStr(CounterManager.CurrentTrial+1) + #9 +

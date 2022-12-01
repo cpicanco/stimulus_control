@@ -26,6 +26,7 @@ uses
 {$endif}
   ;
 
+  procedure StartEpiktimer;
   function GetCustomTick : Extended;
 {$ifdef UNIX}
   function GetMonotonicTime : timespec;
@@ -38,9 +39,14 @@ implementation
 var
   ET: TEpikTimer;
 
+procedure StartEpiktimer;
+begin
+  ET.Start;
+end;
+
 function GetCustomTick: Extended;
 begin
-  Result := ET.Elapsed;
+  Result := ET.GetSystemTicks * 1e-7;
 end;
 {$endif}
 
@@ -85,7 +91,7 @@ end;
 {$ifdef WINDOWS}
 initialization
   ET := TEpikTimer.Create(nil);
-  ET.Start;
+  ET.Clear;
 
 finalization
   ET.Free;

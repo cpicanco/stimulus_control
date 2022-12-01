@@ -13,6 +13,7 @@ type
 
   TSession = class(TComponent)
   private
+    FStartTime : TDateTime;
     FBloc : TBloc;
     FOnBeforeStart: TNotifyEvent;
     FOnEndSession: TNotifyEvent;
@@ -79,7 +80,10 @@ procedure TSession.EndSession;
 var
   Footer : string;
 begin
-  Footer := HEND_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time)+ LineEnding;
+  Footer := HEND_TIME +
+    #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding +
+    'Duração:' + #9 + TimeToStr(Time - FStartTime) + LineEnding;
+
   FreeLogger(LGTimestamps,Footer);
   FreeLogger(LGData, Footer);
   if Assigned(OnEndSession) then OnEndSession(Self);
@@ -115,13 +119,14 @@ end;
 
 procedure TSession.Play(ASessionName: string; AParticipantName: string);
 begin
+  FStartTime := Time;
   Header := HSUBJECT_NAME + #9 + AParticipantName + LineEnding +
             HSESSION_NAME + #9 + ASessionName + LineEnding +
-            HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(Time) + LineEnding;
+            HBEGIN_TIME + #9 + DateTimeToStr(Date) + #9 + TimeToStr(FStartTime) + LineEnding;
   DataFilename := CreateLogger(LGData, FirstFilename, Header);
   TimestampsFilename := CreateLogger(LGTimestamps, FirstFilename, Header);
   if Assigned(OnBeforeStart) then OnBeforeStart(Self);
-  GlobalContainer.TimeStart := TickCount;
+  StartTimer;
   PlayBloc;
 end;
 

@@ -15,8 +15,8 @@ interface
 
 uses  SysUtils;
 
-procedure StartTimestamp(ATimestamp:Extended);
-
+procedure StartTimer;
+function Elapsed : Extended;
 function GetTimeStampF : string; overload;
 function GetTimeStampF(ATimestamp:Extended): string; overload;
 function TickCount : Extended;
@@ -25,14 +25,21 @@ function TimestampToStrDelta(ATimestamp: Extended) : string;
 
 implementation
 
-uses Timestamps.Helpers;
+uses
+    Session.Configuration.GlobalContainer
+    , Timestamps.Helpers;
 
-var
-  FirstTimestamp : Extended = 0;
-
-procedure StartTimestamp(ATimestamp : Extended);
+procedure StartTimer;
 begin
-  FirstTimestamp := ATimestamp;
+  {$IFDEF WINDOWS}
+  StartEpiktimer;
+  {$ENDIF}
+  GlobalContainer.TimeStart := TickCount;
+end;
+
+function Elapsed: Extended;
+begin
+  Result := GetCustomTick - GlobalContainer.TimeStart;
 end;
 
 function GetTimeStampF: string;
@@ -57,7 +64,7 @@ end;
 
 function TimestampToStrDelta(ATimestamp : Extended) : string;
 begin
-  Result:=FloatToStrF(FirstTimestamp - ATimestamp,ffFixed,0,9)
+  Result:=FloatToStrF(GlobalContainer.TimeStart - ATimestamp,ffFixed,0,9)
 end;
 
 
