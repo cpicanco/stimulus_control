@@ -1,3 +1,5 @@
+{todo: Transformar em classe}
+
 unit Experiments.Grids;
 
 {$mode ObjFPC}{$H+}
@@ -13,18 +15,48 @@ type
     Top : integer;
     Left : integer;
     SquareSide : integer;
+    Item : TObject;
   end;
 
-  TGrid = array of array of TGridItem;
+  TGridItens = array of TGridItem;
+  TMatrix = array of array of TGridItem;
 
+  TRandomPositions = record
+    Samples: TGridItens;
+    Comparisons: TGridItens;
+  end;
+
+  TGrid = class
+    private
+
+    public
+
+  end;
+
+{Cria grade quadrada como uma matriz AN x AN. Quando ADistribute = true, a
+distância horizontal e vertical entre os estímulos é diferente, e quando false
+é igual}
 function GetCentralGrid(AN: integer; ASquareSide: real;
-  ADistribute : Boolean = True) : TGrid;
+  ADistribute : Boolean = True) : TMatrix;
+
+{Cria grade circular considerando j como modelo central e i como comparações em
+torno de um diâmetro. AN = número de estímulos i; ASquareSide = lado do quadrado
+dos estímulos}
+function GetCircularCentralGrid(AN: integer; ASquareSide: real): TMatrix;
 
 function RectFromPosition(APosition : integer) : TRect;
 
+{Cria seleção randômica de modelos e comparações em posições diferentes no AGrid}
+function GetRandomPositionFromGrid(AGrid: TMatrix; ASamples: integer;
+         AComparisons: integer): TRandomPositions;
+
+{Randomiza as posições dos estímulos}
+procedure RandomizePositions(var APositions: TRandomPositions; AGrid: TMatrix);
+
 var
   ScreenInCentimeters : real = 39.624;
-  Grid : TGrid;
+  Grid : TMatrix;
+  RandomPositions: TRandomPositions;
 
 implementation
 
@@ -59,7 +91,7 @@ end;
   6..7..8
 }
 function GetCentralGrid(AN: integer; ASquareSide: real;
-  ADistribute: Boolean): TGrid;
+  ADistribute: Boolean): TMatrix;
 var
   LIndex      : integer = 0;
   //LSegment    : integer = 0;
@@ -71,7 +103,7 @@ var
   j : integer = 0;
   i : integer = 0;
 begin
-  Result := Default(TGrid);
+  Result := Default(TMatrix);
   SetLength(Result, AN, AN);
   LSquareSide := CmToScreenPixels(ASquareSide);
   if ADistribute then begin
@@ -101,7 +133,7 @@ begin
   end;
 end;
 
-function GetCircularCentralGrid(AN: integer; ASquareSide: real): TGrid;
+function GetCircularCentralGrid(AN: integer; ASquareSide: real): TMatrix;
 var
   LIndex      : integer = 0;
   //LSegment    : integer = 0;
@@ -117,7 +149,7 @@ var
 const
   BaseDegree : integer = 360;
 begin
-  Result := Default(TGrid);
+  Result := Default(TMatrix);
   SetLength(Result, 2);
   SetLength(Result[0], AN);
   SetLength(Result[1], 1);
@@ -166,9 +198,106 @@ begin
   end;
 end;
 
+function IsDifferentPosition(j, i: integer; APositions: TRandomPositions; AGrid: TMatrix): boolean;
+var
+  Item: TGridItem;
+begin
+  Result := true;
+
+  for Item in APositions.Samples do
+  begin
+    if Item.Index = AGrid[j, i].Index then
+    begin
+      Result := false;
+      break;
+    end;
+  end;
+
+  for Item in APositions.Comparisons do
+  begin
+    if Item.Index = AGrid[j, i].Index then
+    begin
+      Result := false;
+      break;
+    end;
+  end;
+end;
+
+function GetRandomItem(APositions: TRandomPositions; AGrid: TMatrix): TGridItem;
+var
+  i, j: integer;
+begin
+  repeat
+    i := Random(Length(AGrid));
+    j := Random(Length(AGrid));
+  until IsDifferentPosition(j, i, APositions, AGrid);
+
+  Result := AGrid[j, i];
+end;
+
+function GetRandomPositionFromGrid(AGrid: TMatrix; ASamples: integer;
+         AComparisons: integer): TRandomPositions;
+var
+  RandomItem: TGridItem;
+  i, j: integer;
+
+begin
+  SetLength(Result.Samples, ASamples);
+  SetLength(Result.Comparisons, AComparisons);
+
+  for i := low(Result.Samples) to high(Result.Samples) do
+      Result.Samples[i].Index := -1;
+  for i := low(Result.Comparisons) to high(Result.Comparisons) do
+      Result.Comparisons[i].Index := -1;
+
+  for i := low(Result.Samples) to high(Result.Samples) do
+  begin
+    RandomItem := GetRandomItem(Result, AGrid);
+    Result.Samples[i] := RandomItem;
+  end;
+
+  for i := low(Result.Comparisons) to high(Result.Comparisons) do
+  begin
+    RandomItem := GetRandomItem(Result, AGrid);
+    Result.Comparisons[i] := RandomItem;
+  end;
+
+end;
+
+procedure RandomizePositions(var APositions: TRandomPositions; AGrid: TMatrix);
+var
+  RandomItem: TGridItem;
+  i, j: integer;
+
+begin
+  for i := low(APositions.Samples) to high(APositions.Samples) do
+      APositions.Samples[i].Index := -1;
+  for i := low(APositions.Comparisons) to high(APositions.Comparisons) do
+      APositions.Comparisons[i].Index := -1;
+
+  for i := low(APositions.Samples) to high(APositions.Samples) do
+  begin
+    RandomItem := GetRandomItem(APositions, AGrid);
+    APositions.Samples[i].Index := RandomItem.Index;
+    APositions.Samples[i].Top := RandomItem.Top;
+    APositions.Samples[i].SquareSide := RandomItem.SquareSide;
+    APositions.Samples[i].Left := RandomItem.Left;
+  end;
+
+  for i := low(APositions.Comparisons) to high(APositions.Comparisons) do
+  begin
+    RandomItem := GetRandomItem(APositions, AGrid);
+    APositions.Comparisons[i].Index := RandomItem.Index;
+    APositions.Comparisons[i].Top := RandomItem.Top;
+    APositions.Comparisons[i].SquareSide := RandomItem.SquareSide;
+    APositions.Comparisons[i].Left := RandomItem.Left;
+  end;
+
+end;
 
 initialization
-  Grid := GetCircularCentralGrid(9, 3.0);
+  Grid := GetCentralGrid(3, 3.0, false);
+  RandomPositions := GetRandomPositionFromGrid(Grid, 1, 4);
 
 end.
 
