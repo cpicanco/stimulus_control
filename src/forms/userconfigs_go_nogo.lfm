@@ -13,7 +13,7 @@ object FormGo_NoGo: TFormGo_NoGo
   OnKeyPress = FormKeyPress
   OnPaint = FormPaint
   SessionProperties = 'cbPreview.Checked;OpenPictureDialog.InitialDir;Schedule.Text;SpinLimitedHold.Value;SpinPresentations.Value;SpinSize.Value'
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.8.0.5'
   object Panel1: TPanel
     Left = 0
     Height = 160
@@ -48,9 +48,9 @@ object FormGo_NoGo: TFormGo_NoGo
     end
     object cbPreview: TCheckBox
       Left = 12
-      Height = 19
+      Height = 21
       Top = 123
-      Width = 105
+      Width = 114
       Caption = 'Pré-vizualização'
       Checked = True
       OnChange = cbPreviewChange
@@ -79,17 +79,17 @@ object FormGo_NoGo: TFormGo_NoGo
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 4
-      ClientHeight = 81
+      ClientHeight = 85
       ClientWidth = 489
       ParentShowHint = False
       ShowHint = True
       TabOrder = 4
       object LabelSize: TLabel
         Left = 5
-        Height = 27
+        Height = 29
         Hint = 'Tamanho em pixels'
         Top = 5
-        Width = 161
+        Width = 166
         Alignment = taCenter
         Caption = 'Tamanho (pixels)'
         Layout = tlCenter
@@ -98,11 +98,11 @@ object FormGo_NoGo: TFormGo_NoGo
         ShowHint = True
       end
       object SpinSize: TSpinEdit
-        Left = 166
+        Left = 171
         Height = 25
         Hint = 'Tamanho horizontal e vertical em pixels'
         Top = 5
-        Width = 73
+        Width = 71
         Alignment = taCenter
         Constraints.MaxHeight = 25
         MaxValue = 2000
@@ -114,8 +114,8 @@ object FormGo_NoGo: TFormGo_NoGo
         Value = 300
       end
       object LabelLimitedHold: TLabel
-        Left = 239
-        Height = 27
+        Left = 242
+        Height = 29
         Hint = 'Tempo em milisegundos'
         Top = 5
         Width = 142
@@ -127,11 +127,11 @@ object FormGo_NoGo: TFormGo_NoGo
         ShowHint = True
       end
       object SpinLimitedHold: TSpinEdit
-        Left = 381
+        Left = 384
         Height = 25
         Hint = 'Tempo em milisegundos'
         Top = 5
-        Width = 103
+        Width = 100
         Alignment = taCenter
         Constraints.MaxHeight = 25
         Increment = 500
@@ -145,10 +145,10 @@ object FormGo_NoGo: TFormGo_NoGo
       end
       object LabelPresentations: TLabel
         Left = 5
-        Height = 27
+        Height = 29
         Hint = 'Quantas vezes cada estímulo será apresentado?'
-        Top = 32
-        Width = 161
+        Top = 34
+        Width = 166
         Alignment = taCenter
         Caption = 'Número de apresentações'
         Layout = tlCenter
@@ -157,11 +157,11 @@ object FormGo_NoGo: TFormGo_NoGo
         ShowHint = True
       end
       object SpinPresentations: TSpinEdit
-        Left = 166
+        Left = 171
         Height = 25
         Hint = 'Quantas vezes cada estímulo será apresentado?'
-        Top = 32
-        Width = 73
+        Top = 38
+        Width = 71
         Alignment = taCenter
         Constraints.MaxHeight = 25
         MinValue = 1
@@ -172,10 +172,10 @@ object FormGo_NoGo: TFormGo_NoGo
         Value = 1
       end
       object LabelPresentations1: TLabel
-        Left = 239
-        Height = 27
+        Left = 242
+        Height = 29
         Hint = 'Exigência de resposta aos estímulos'
-        Top = 32
+        Top = 34
         Width = 142
         Alignment = taCenter
         Caption = 'Esquema'
@@ -185,11 +185,11 @@ object FormGo_NoGo: TFormGo_NoGo
         ShowHint = True
       end
       object Schedule: TEdit
-        Left = 381
-        Height = 27
+        Left = 384
+        Height = 29
         Hint = 'CRF, FR, FI, VR, VI, FT, FI, DRH, DRL'
-        Top = 32
-        Width = 103
+        Top = 34
+        Width = 100
         ParentShowHint = False
         ShowHint = True
         TabOrder = 3
@@ -199,8 +199,8 @@ object FormGo_NoGo: TFormGo_NoGo
         Left = 5
         Height = 17
         Hint = 'Número de estímulos positivos'
-        Top = 59
-        Width = 161
+        Top = 63
+        Width = 166
         Alignment = taCenter
         Caption = 'Positivos'
         Layout = tlCenter
@@ -209,11 +209,11 @@ object FormGo_NoGo: TFormGo_NoGo
         ShowHint = True
       end
       object LabelCountPos: TLabel
-        Left = 166
+        Left = 171
         Height = 17
         Hint = 'Número de estímulos positivos adicionados'
-        Top = 59
-        Width = 73
+        Top = 63
+        Width = 71
         Alignment = taCenter
         Caption = '0'
         Layout = tlCenter
@@ -222,10 +222,10 @@ object FormGo_NoGo: TFormGo_NoGo
         ShowHint = True
       end
       object LabelNeg: TLabel
-        Left = 239
+        Left = 242
         Height = 17
         Hint = 'Número de estímulos negativos'
-        Top = 59
+        Top = 63
         Width = 142
         Alignment = taCenter
         Caption = 'Negativos'
@@ -235,11 +235,11 @@ object FormGo_NoGo: TFormGo_NoGo
         ShowHint = True
       end
       object LabelCountNeg: TLabel
-        Left = 381
+        Left = 384
         Height = 17
         Hint = 'Número de estímulos positivos adicionados'
-        Top = 59
-        Width = 103
+        Top = 63
+        Width = 100
         Alignment = taCenter
         Caption = '0'
         Layout = tlCenter
@@ -270,7 +270,7 @@ object FormGo_NoGo: TFormGo_NoGo
   object OpenPictureDialog: TOpenPictureDialog
     Width = 862
     Height = 711
-    Filter = 'Imagens (jpg, bmp, png)|*.png;*.jpg;*.bmp;*.PNG;*.JPG;*.BMP'
+    Filter = 'Imagens (jpg, bmp, png)|*.png;*.jpg;*.bmp;*.PNG;*.JPG;*.BMP|Som (wav)|*.wav;*.WAV|Video (avi, mp4, flv)|*.avi;*.AVI;*.mp4;*.MP4;*.flv;*.FLV'
     Options = [ofHideReadOnly, ofAllowMultiSelect, ofFileMustExist, ofEnableSizing]
     left = 144
     top = 176

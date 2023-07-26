@@ -265,6 +265,100 @@ msgctxt "gui.controls.keysettings.rsusbport"
 msgid "Porta USB"
 msgstr "USB"
 
+#: gui.helpers.rsangle
+msgid "Ângulo"
+msgstr ""
+
+#: gui.helpers.rsblocaddress
+msgid "Endereço"
+msgstr ""
+
+#: gui.helpers.rsblocname
+#, fuzzy
+msgctxt "gui.helpers.rsblocname"
+msgid "Nome"
+msgstr "Name"
+
+#: gui.helpers.rsblocnextbloconcriteria
+msgid "Bloco seguinte se critério for atingido"
+msgstr ""
+
+#: gui.helpers.rsblocnextbloconnotcriteria
+msgid "Bloco seguinte se critério não for atingido"
+msgstr ""
+
+#: gui.helpers.rsblocs
+#, fuzzy
+msgctxt "gui.helpers.rsblocs"
+msgid "Bloco"
+msgstr "Bloc"
+
+#: gui.helpers.rsconsequence
+#, fuzzy
+msgctxt "gui.helpers.rsconsequence"
+msgid "Consequência"
+msgstr "Consequence"
+
+#: gui.helpers.rscontingency
+msgid "Contingência"
+msgstr ""
+
+#: gui.helpers.rsexpectedresponse
+#, fuzzy
+msgctxt "gui.helpers.rsexpectedresponse"
+msgid "Resposta"
+msgstr "Response"
+
+#: gui.helpers.rsfilltypeaxes
+msgid "Eixos"
+msgstr ""
+
+#: gui.helpers.rsfilltypeblocchaining
+msgid "Encadear Blocos"
+msgstr ""
+
+#: gui.helpers.rsfilltypegonogo
+msgid "Go/No-Go"
+msgstr ""
+
+#: gui.helpers.rsfilltypematriz
+msgid "FP/FN"
+msgstr ""
+
+#: gui.helpers.rsfilltypemts
+msgid "MTS e Simples"
+msgstr ""
+
+#: gui.helpers.rslimitedhold
+msgid "Tempo/Estímulo"
+msgstr ""
+
+#: gui.helpers.rsmtsrelation
+msgid "Relação"
+msgstr ""
+
+#: gui.helpers.rsschedule
+#, fuzzy
+msgctxt "gui.helpers.rsschedule"
+msgid "Esquema"
+msgstr "Schedule"
+
+#: gui.helpers.rssize
+msgid "Tamanho"
+msgstr ""
+
+#: gui.helpers.rsstimulus
+#, fuzzy
+msgctxt "gui.helpers.rsstimulus"
+msgid "Figura"
+msgstr "Image"
+
+#: gui.helpers.rstrials
+#, fuzzy
+msgctxt "gui.helpers.rstrials"
+msgid "Tentativas"
+msgstr "Trials"
+
 #: pupil.client.error_not_implemented
 msgctxt "pupil.client.error_not_implemented"
 msgid "Commando Pupil não implementado:"
@@ -298,19 +392,373 @@ msgstr "Subject_Name:"
 msgid "(Modo de Teste)"
 msgstr "(Test Mode)"
 
+#: tformgo_nogo.btnclose.caption
+#, fuzzy
+msgctxt "tformgo_nogo.btnclose.caption"
+msgid "Fechar"
+msgstr "Close"
+
+#: tformgo_nogo.btnminimizetoptab.caption
+#, fuzzy
+msgctxt "tformgo_nogo.btnminimizetoptab.caption"
+msgid "Minimizar Aba"
+msgstr "Minimize tab"
+
+#: tformgo_nogo.btnminimizetoptab.hint
+#, fuzzy
+msgctxt "tformgo_nogo.btnminimizetoptab.hint"
+msgid "Aperte barra de espaço para alternar a aba"
+msgstr "Press space key to alternate tabs"
+
+#: tformgo_nogo.btnok.caption
+#, fuzzy
+msgctxt "tformgo_nogo.btnok.caption"
+msgid "Adicionar à Lista"
+msgstr "Add to list"
+
+#: tformgo_nogo.buttonstimuli.caption
+#, fuzzy
+msgctxt "tformgo_nogo.buttonstimuli.caption"
+msgid "Estímulos"
+msgstr "Stimuli"
+
+#: tformgo_nogo.buttonstimuli.hint
+msgid "Clique para adicionar os estímulos positivos e negativos"
+msgstr ""
+
+#: tformgo_nogo.caption
+msgid "Go No-Go"
+msgstr ""
+
+#: tformgo_nogo.cbpreview.caption
+msgid "Pré-vizualização"
+msgstr ""
+
+#: tformgo_nogo.gbstimuli.caption
+#, fuzzy
+msgctxt "tformgo_nogo.gbstimuli.caption"
+msgid "Estímulos"
+msgstr "Stimuli"
+
+#: tformgo_nogo.labelcountneg.caption
+msgctxt "tformgo_nogo.labelcountneg.caption"
+msgid "0"
+msgstr ""
+
+#: tformgo_nogo.labelcountneg.hint
+msgctxt "tformgo_nogo.labelcountneg.hint"
+msgid "Número de estímulos positivos adicionados"
+msgstr ""
+
+#: tformgo_nogo.labelcountpos.caption
+msgctxt "tformgo_nogo.labelcountpos.caption"
+msgid "0"
+msgstr ""
+
+#: tformgo_nogo.labelcountpos.hint
+msgctxt "tformgo_nogo.labelcountpos.hint"
+msgid "Número de estímulos positivos adicionados"
+msgstr ""
+
+#: tformgo_nogo.labellimitedhold.caption
+msgid "Tempo (milisegundos)"
+msgstr ""
+
+#: tformgo_nogo.labellimitedhold.hint
+msgctxt "tformgo_nogo.labellimitedhold.hint"
+msgid "Tempo em milisegundos"
+msgstr ""
+
+#: tformgo_nogo.labelneg.caption
+msgid "Negativos"
+msgstr ""
+
+#: tformgo_nogo.labelneg.hint
+msgid "Número de estímulos negativos"
+msgstr ""
+
+#: tformgo_nogo.labelpos.caption
+msgid "Positivos"
+msgstr ""
+
+#: tformgo_nogo.labelpos.hint
+msgid "Número de estímulos positivos"
+msgstr ""
+
+#: tformgo_nogo.labelpresentations.caption
+#, fuzzy
+msgctxt "tformgo_nogo.labelpresentations.caption"
+msgid "Número de apresentações"
+msgstr "Number of presentations"
+
+#: tformgo_nogo.labelpresentations.hint
+#, fuzzy
+msgctxt "tformgo_nogo.labelpresentations.hint"
+msgid "Quantas vezes cada estímulo será apresentado?"
+msgstr "How many times a stimulus will be presented?"
+
+#: tformgo_nogo.labelpresentations1.caption
+#, fuzzy
+msgctxt "tformgo_nogo.labelpresentations1.caption"
+msgid "Esquema"
+msgstr "Schedule"
+
+#: tformgo_nogo.labelpresentations1.hint
+msgid "Exigência de resposta aos estímulos"
+msgstr ""
+
+#: tformgo_nogo.labelsize.caption
+msgid "Tamanho (pixels)"
+msgstr ""
+
+#: tformgo_nogo.labelsize.hint
+msgid "Tamanho em pixels"
+msgstr ""
+
+#: tformgo_nogo.schedule.hint
+msgid "CRF, FR, FI, VR, VI, FT, FI, DRH, DRL"
+msgstr ""
+
+#: tformgo_nogo.schedule.text
+msgid "CRF"
+msgstr ""
+
+#: tformgo_nogo.spinlimitedhold.hint
+msgctxt "tformgo_nogo.spinlimitedhold.hint"
+msgid "Tempo em milisegundos"
+msgstr ""
+
+#: tformgo_nogo.spinpresentations.hint
+#, fuzzy
+msgctxt "tformgo_nogo.spinpresentations.hint"
+msgid "Quantas vezes cada estímulo será apresentado?"
+msgstr "How many times a stimulus will be presented?"
+
+#: tformgo_nogo.spinsize.hint
+msgid "Tamanho horizontal e vertical em pixels"
+msgstr ""
+
+#: tformmatrixconfig.btncancel.caption
+msgid "Voltar"
+msgstr ""
+
+#: tformmatrixconfig.btncancel.hint
+msgctxt "tformmatrixconfig.btncancel.hint"
+msgid "Salvar coordenadas."
+msgstr ""
+
+#: tformmatrixconfig.btnclearall.caption
+msgid "&Limpar"
+msgstr ""
+
+#: tformmatrixconfig.btnclearall.hint
+msgid "Limpar tela e lista de coordenadas."
+msgstr ""
+
+#: tformmatrixconfig.btnok.caption
+msgid "Ok"
+msgstr ""
+
+#: tformmatrixconfig.btnok.hint
+msgctxt "tformmatrixconfig.btnok.hint"
+msgid "Salvar coordenadas."
+msgstr ""
+
+#: tformmatrixconfig.btnrandomizematrix.caption
+msgid "&Randomizar"
+msgstr ""
+
+#: tformmatrixconfig.btnshowmatrix.caption
+msgid "&Mostrar"
+msgstr ""
+
+#: tformmatrixconfig.btnshowmatrix.hint
+msgid "Mostrar Estímulos."
+msgstr ""
+
+#: tformmatrixconfig.caption
+msgid "Gerar Matriz"
+msgstr ""
+
+#: tformmatrixconfig.cbsquare.caption
+msgid "Quadrada"
+msgstr ""
+
+#: tformmatrixconfig.cbsquare.hint
+msgid "Marque esta caixa para que o número de colunas permaneça igual ao número de linhas."
+msgstr ""
+
+#: tformmatrixconfig.cbssquare.caption
+msgid "Quadrado"
+msgstr ""
+
+#: tformmatrixconfig.cbssquare.hint
+msgid "Marque esta caixa para que a altura permaneça igual ao comprimento."
+msgstr ""
+
+#: tformmatrixconfig.chkcustomresolution.caption
+msgid "Usar esta resolução:"
+msgstr ""
+
+#: tformmatrixconfig.chkcustomresolution.hint
+msgid ""
+"Selecione esta opção para visualizar o tamanho real do estímulo.\n"
+"A resolução atual do monitor é utilizada como referência.\n"
+msgstr ""
+
+#: tformmatrixconfig.chkplotequallyspaced.caption
+msgid "Igualar"
+msgstr ""
+
+#: tformmatrixconfig.chkplotequallyspaced.hint
+msgid "Igualar a distância vertical à horizontal."
+msgstr ""
+
+#: tformmatrixconfig.chkplotproportional.caption
+msgid "Distribuir"
+msgstr ""
+
+#: tformmatrixconfig.chkplotproportional.hint
+msgid "Distribuir os estímulos no monitor de acordo com a resolução. Divide-se o comprimento pelo número de linhas e a altura pelo número de colunas."
+msgstr ""
+
+#: tformmatrixconfig.edtcol.hint
+msgid "Colunas."
+msgstr ""
+
+#: tformmatrixconfig.edtcol.text
+msgctxt "tformmatrixconfig.edtcol.text"
+msgid "3"
+msgstr ""
+
+#: tformmatrixconfig.edtdistx.hint
+msgid "Distância horizontal, em pixels, entre a borda direita de um estímulo e a esquerda de outro."
+msgstr ""
+
+#: tformmatrixconfig.edtdistx.text
+#, fuzzy
+msgctxt "tformmatrixconfig.edtdistx.text"
+msgid "100"
+msgstr "100"
+
+#: tformmatrixconfig.edtdisty.hint
+msgid "Distância vertical, em pixels, entre a borda inferior de um estímulo e a superior de outro."
+msgstr ""
+
+#: tformmatrixconfig.edtdisty.text
+#, fuzzy
+msgctxt "tformmatrixconfig.edtdisty.text"
+msgid "100"
+msgstr "100"
+
+#: tformmatrixconfig.edtheight.hint
+msgid "Altura, do estímulo, em pixels."
+msgstr ""
+
+#: tformmatrixconfig.edtheight.text
+msgctxt "tformmatrixconfig.edtheight.text"
+msgid "150"
+msgstr ""
+
+#: tformmatrixconfig.edtrow.hint
+msgid "Linhas."
+msgstr ""
+
+#: tformmatrixconfig.edtrow.text
+msgctxt "tformmatrixconfig.edtrow.text"
+msgid "3"
+msgstr ""
+
+#: tformmatrixconfig.edtscreenleft.text
+#, fuzzy
+msgctxt "tformmatrixconfig.edtscreenleft.text"
+msgid "1024"
+msgstr "1024"
+
+#: tformmatrixconfig.edtscreentop.text
+#, fuzzy
+msgctxt "tformmatrixconfig.edtscreentop.text"
+msgid "768"
+msgstr "768"
+
+#: tformmatrixconfig.edtwidth.hint
+msgid "Comprimento do estímulo, em pixels."
+msgstr ""
+
+#: tformmatrixconfig.edtwidth.text
+msgctxt "tformmatrixconfig.edtwidth.text"
+msgid "150"
+msgstr ""
+
+#: tformmatrixconfig.grpgeneralconfigs.caption
+msgid "Definições Gerais"
+msgstr ""
+
+#: tformmatrixconfig.grpmatrixrowcol.caption
+msgid "Linhas X Colunas da Matriz"
+msgstr ""
+
+#: tformmatrixconfig.grpmatrixrowcol.hint
+msgid "Para cada resolução, quanto maior a matriz, menor o tamanho dos estímulos."
+msgstr ""
+
+#: tformmatrixconfig.grpstimulispacement.caption
+msgid "Distância entre Estímulos"
+msgstr ""
+
+#: tformmatrixconfig.grpstimuliwidthheight.caption
+msgid "Comprimento X Altura"
+msgstr ""
+
+#: tformmatrixconfig.lbl1.caption
+msgctxt "tformmatrixconfig.lbl1.caption"
+msgid "x"
+msgstr ""
+
+#: tformmatrixconfig.lbl2.caption
+msgctxt "tformmatrixconfig.lbl2.caption"
+msgid "x"
+msgstr ""
+
+#: tformmatrixconfig.lbl3.caption
+msgctxt "tformmatrixconfig.lbl3.caption"
+msgid "x"
+msgstr ""
+
+#: tformmatrixconfig.lbllefttop.caption
+msgctxt "tformmatrixconfig.lbllefttop.caption"
+msgid "x"
+msgstr ""
+
+#: tformmatrixconfig.menuitemloadfromfile.caption
+msgid "Abrir"
+msgstr ""
+
+#: tformmatrixconfig.misaveastxt.caption
+msgid "Salvar Como TXT"
+msgstr ""
+
+#: tformmatrixconfig.misaveastxtwithkeys.caption
+msgid "Salvar Como TXT (com chaves)"
+msgstr ""
+
 #: tformmts.btnclose.caption
+msgctxt "tformmts.btnclose.caption"
 msgid "Fechar"
 msgstr "Close"
 
 #: tformmts.btnminimizetoptab.caption
+msgctxt "tformmts.btnminimizetoptab.caption"
 msgid "Minimizar Aba"
 msgstr "Minimize tab"
 
 #: tformmts.btnminimizetoptab.hint
+msgctxt "tformmts.btnminimizetoptab.hint"
 msgid "Aperte barra de espaço para alternar a aba"
 msgstr "Press space key to alternate tabs"
 
 #: tformmts.btnok.caption
+msgctxt "tformmts.btnok.caption"
 msgid "Adicionar à Lista"
 msgstr "Add to list"
 
@@ -394,6 +842,7 @@ msgid "Imagem do cursor do mouse"
 msgstr "Cursor image"
 
 #: tformmts.labelpresentations.caption
+msgctxt "tformmts.labelpresentations.caption"
 msgid "Número de apresentações"
 msgstr "Number of presentations"
 
@@ -428,6 +877,127 @@ msgstr "Cursor image"
 msgctxt "tformmts.spinpresentations.hint"
 msgid "Quantas vezes cada estímulo será apresentado?"
 msgstr "How many times each stimulus will be presented?"
+
+#: tformrandomizepositions.btncancel.caption
+msgid "Cancelar"
+msgstr ""
+
+#: tformrandomizepositions.btnok.caption
+msgid "OK"
+msgstr ""
+
+#: tformrandomizepositions.btnrandomize.caption
+msgctxt "tformrandomizepositions.btnrandomize.caption"
+msgid "Aleatorizar"
+msgstr ""
+
+#: tformrandomizepositions.buttonblocbackward.caption
+msgid "<"
+msgstr ""
+
+#: tformrandomizepositions.buttonblocfoward.caption
+msgid ">"
+msgstr ""
+
+#: tformrandomizepositions.buttonsave.caption
+#, fuzzy
+msgctxt "tformrandomizepositions.buttonsave.caption"
+msgid "Salvar"
+msgstr "Save"
+
+#: tformrandomizepositions.caption
+msgid "Aleatorizar posições dos estímulos"
+msgstr ""
+
+#: tformrandomizepositions.groupboxblocs.caption
+#, fuzzy
+msgctxt "tformrandomizepositions.groupboxblocs.caption"
+msgid "Blocos"
+msgstr "Blocs"
+
+#: tformrandomizepositions.groupboxpositions.caption
+msgid "Posições"
+msgstr ""
+
+#: tformrandomizepositions.labelbeginat.caption
+msgid "Começar na"
+msgstr ""
+
+#: tformrandomizepositions.labelcurrentbloc.caption
+msgctxt "tformrandomizepositions.labelcurrentbloc.caption"
+msgid "0"
+msgstr ""
+
+#: tformrandomizepositions.labelendat.caption
+msgid "Terminar na"
+msgstr ""
+
+#: tformrandomizepositions.labelgap.caption
+msgid "e Pular"
+msgstr ""
+
+#: tformrandomizepositions.labellines.caption
+msgid "linhas."
+msgstr ""
+
+#: tformrandomizepositions.labelseqtowrite.caption
+msgctxt "tformrandomizepositions.labelseqtowrite.caption"
+msgid "Aleatorizar"
+msgstr ""
+
+#: tformrandomizepositions.labeltrial.caption
+msgid "tentativa."
+msgstr ""
+
+#: tformrandomizepositions.listboxpositions.hint
+msgid "Dois cliques para carregar um arquivo com posições customizadas."
+msgstr ""
+
+#: tformrandomizepositions.pbalanced.caption
+msgid "Balanceado"
+msgstr ""
+
+#: tformrandomizepositions.pbalanced.hint
+msgid ""
+"Apresenta um estímulo em cada posição  disponível antes de uma repetição da posição.\n"
+"Evita que um mesmo estímulo seja apresentado na mesma posição na tentativa seguinte.\n"
+msgstr ""
+
+#: tformrandomizepositions.pbalancedfixedsample.caption
+msgid "Balanceado (Modelo Fixo)"
+msgstr ""
+
+#: tformrandomizepositions.pbalancedfixedsample.hint
+msgid ""
+"Sempre apresenta o modelo na posição 1.\n"
+"Evita que uma comparação apareça na posição do modelo.\n"
+"Apresenta uma comparação em cada posição  disponível antes de uma repetição da posição.\n"
+"Evita que uma mesma comparação seja apresentada na mesma posição na tentativa seguinte.\n"
+msgstr ""
+
+#: tformrandomizepositions.prand.caption
+msgid "Aleatório"
+msgstr ""
+
+#: tformrandomizepositions.prandfixedsample.caption
+msgid "Aleatório (Modelo Fixo)"
+msgstr ""
+
+#: tformrandomizepositions.sebeginat.hint
+msgid "Primeira tentativa."
+msgstr ""
+
+#: tformrandomizepositions.seendat.hint
+msgid "Última tentativa."
+msgstr ""
+
+#: tformrandomizepositions.segap.hint
+msgid "Valor salto"
+msgstr ""
+
+#: tformrandomizepositions.seseqtowrite.hint
+msgid "Valor n."
+msgstr ""
 
 #: tformuserconfig.btnexportstimulus.caption
 msgid "Exportar estímulo"
@@ -824,16 +1394,35 @@ msgctxt "userconfigs_blocs.rscaptionsessions"
 msgid "Sessões"
 msgstr "Sessions"
 
-#: userconfigs_blocs.rscomparison
-msgctxt "userconfigs_blocs.rscomparison"
+#: userconfigs_feature_positive.rscomparison
+#, fuzzy
+msgctxt "userconfigs_feature_positive.rscomparison"
 msgid "C"
 msgstr "C"
 
+#: userconfigs_feature_positive.rsnegative
+#, fuzzy
+msgctxt "userconfigs_feature_positive.rsnegative"
+msgid "Negativa"
+msgstr "Negative"
+
+#: userconfigs_feature_positive.rsposition
+msgid "Bnd"
+msgstr ""
+
+#: userconfigs_feature_positive.rspositive
+#, fuzzy
+msgctxt "userconfigs_feature_positive.rspositive"
+msgid "Positiva"
+msgstr "Positive"
+
 #: userconfigs_get_matrix.ccustomresdefleft
+msgctxt "userconfigs_get_matrix.ccustomresdefleft"
 msgid "1024"
 msgstr "1024"
 
 #: userconfigs_get_matrix.ccustomresdeftop
+msgctxt "userconfigs_get_matrix.ccustomresdeftop"
 msgid "768"
 msgstr "768"
 
@@ -842,6 +1431,7 @@ msgid "1"
 msgstr "1"
 
 #: userconfigs_get_matrix.csizedefault
+msgctxt "userconfigs_get_matrix.csizedefault"
 msgid "100"
 msgstr "100"
 
@@ -866,13 +1456,17 @@ msgid "Estímulos"
 msgstr "Stimuli"
 
 #: userconfigs_go_nogo.rswindowtitlechoosenegative
+#, fuzzy
+#| msgid "Escolhas as figuras negativas"
 msgctxt "userconfigs_go_nogo.rswindowtitlechoosenegative"
-msgid "Escolhas as figuras negativas"
+msgid "Escolha as figuras negativas"
 msgstr "Negative images"
 
 #: userconfigs_go_nogo.rswindowtitlechoosepositive
+#, fuzzy
+#| msgid "Escolhas as figuras positivas"
 msgctxt "userconfigs_go_nogo.rswindowtitlechoosepositive"
-msgid "Escolhas as figuras positivas"
+msgid "Escolha as figuras positivas"
 msgstr "Positive images"
 
 #: userconfigs_mts_simple.rscomboboxtrialtypeitem0

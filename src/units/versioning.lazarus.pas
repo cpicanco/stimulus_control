@@ -34,8 +34,12 @@ var
 begin
   FileVerInfo:=TFileVersionInfo.Create(nil);
   try
-    FileVerInfo.FileName:=ParamStr(0);
-    FileVerInfo.ReadFileInfo;
+    try
+      FileVerInfo.ReadFileInfo;
+    except
+      on E : Exception do
+        Result := 'Unknown';
+    end;
     Result := 'v'+FileVerInfo.VersionStrings.Values['FileVersion'];
   finally
     FileVerInfo.Free;

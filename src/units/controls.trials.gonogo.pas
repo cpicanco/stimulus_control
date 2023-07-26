@@ -160,7 +160,7 @@ begin
           Left := FStimulus.Left+FStimulus.Width+5;
           Width := 200;
           Height := 200;
-          FullPath := LPopUpFile;
+          Filename := LPopUpFile;
           Parent := TCustomControl(Owner);
           Show;
           AutoDestroyIn(FPopUpTime);
@@ -284,7 +284,7 @@ begin
       Height:= StrToIntDef(LHeight,Width);
       Color := StrToIntDef(LColor, $FFFFFF); //clWhite
       Loops:= StrToIntDef(LLoop, 0);
-      FullPath:= LName;
+      Filename:= LName;
       //Schedule.Kind:= CfgTrial.SList.Values[_Schedule];
       Parent := TCustomControl(Self.Parent);
     end;
