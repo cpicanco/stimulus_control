@@ -76,6 +76,10 @@ type
     procedure Play(ACorrection : Boolean); override;
   end;
 
+var
+  GainVI: integer = 10;
+  LossVT: integer = 7;
+
 implementation
 
 uses Constants, Timestamps, Graphics, Cheats,
@@ -102,8 +106,8 @@ begin
   FResponseEnabled := False;
 
   HeaderTimestamps := HeaderTimestamps + #9 +
-    'Contador.Centro' + #9 +
-    'Contador.Direita' + #9 +
+    'Total.Contador.Centro' + #9 +
+    'Total.Contador.Direita' + #9 +
     'VI.Real';
 end;
 
@@ -230,6 +234,8 @@ begin
   Data := Data + FReportData.ComparisonLatency + HeaderTabs +
     FReportData.ComparisonBegin + HeaderTabs +
     FReportData.ComparisonEnd + HeaderTabs +
+    GainVI.ToString + HeaderTabs +
+    LossVT.ToString + HeaderTabs +
     CounterManager.SessionPointsCenter.ToString + HeaderTabs +
     CounterManager.SessionPointsTopRight.ToString;
 end;
@@ -239,8 +245,10 @@ begin
   Result := rsReportRspLat + HeaderTabs +
             rsReportStmBeg + HeaderTabs +
             rsReportStmEnd + HeaderTabs +
-            'Contador.Centro' + HeaderTabs +
-            'Contador.Direita';
+            'Ganho.Contador.Centro' + HeaderTabs +
+            'Perda.Contador.Direita' + HeaderTabs +
+            'Total.Contador.Centro' + HeaderTabs +
+            'Total.Contador.Direita';
 end;
 
 procedure TFreeOperantSquareTrial.Paint;
@@ -264,7 +272,7 @@ var
 begin
   case FTrialType of
     ttB3 : begin
-      LPoints := CounterManager.SessionPointsTopRight - 16;
+      LPoints := CounterManager.SessionPointsTopRight - LossVT;
     end;
     else begin
       LPoints := CounterManager.SessionPointsTopRight - 13;
@@ -324,7 +332,7 @@ procedure TFreeOperantSquareTrial.ConditionalStimulusStopped8Seconds(
 begin
   case FTrialType of
     ttB3 : begin
-      LogEvent('TomAlto20s.Inicio');
+      LogEvent('TomAlto30s.Inicio');
     end;
     ttC1 : begin
       LogEvent('TelaCinza.Fim');
@@ -356,7 +364,7 @@ begin
   if Sender = FStimulus then begin
     FResponseReady := False;
     CounterManager.SessionPointsCenter :=
-      CounterManager.SessionPointsCenter +1;
+      CounterManager.SessionPointsCenter + GainVI;
     CoinSound.Start;
     LogEvent('VI.Consequencia' + #9 + CounterManager.SessionPointsCenter.ToString);
 

@@ -1,26 +1,26 @@
 object Background: TBackground
-  Left = 309
-  Height = 712
-  Top = 31
-  Width = 1055
+  Left = 977
+  Height = 736
+  Top = 109
+  Width = 933
   BorderStyle = bsNone
   Caption = 'Configurar sessão'
-  ClientHeight = 712
-  ClientWidth = 1055
+  ClientHeight = 736
+  ClientWidth = 933
   Color = clWhite
-  OnCreate = FormCreate
   Position = poScreenCenter
   SessionProperties = 'CheckBoxCheatsMode.Checked;EditParticipant.Text;FloatSpinEditScreen.Value;FloatSpinEditSquare.Value;FloatSpinEditSquareMove.Value;PageControl1.ActivePage;RadioGroupBehaviour.ItemIndex;RadioGroupCondition.ItemIndex;RadioGroupDesign1.ItemIndex;RadioGroupDesign2.ItemIndex;RadioGroupDesign3.ItemIndex;RadioGroupDesign4.ItemIndex;SpinEditOperandumDelay.Value;SpinEditSessionBlocs.Value;SpinEditTimeSize.Value;FloatSpinEditSquareExp3.Value'
-  LCLVersion = '2.3.0.0'
+  LCLVersion = '3.99.0.0'
   WindowState = wsFullScreen
+  OnCreate = FormCreate
   object PanelConfigurations: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideLeft.Side = asrCenter
     AnchorSideTop.Control = Owner
     AnchorSideTop.Side = asrCenter
-    Left = 382
+    Left = 321
     Height = 569
-    Top = 72
+    Top = 84
     Width = 290
     ClientHeight = 569
     ClientWidth = 290
@@ -28,7 +28,7 @@ object Background: TBackground
     TabOrder = 0
     object EditParticipant: TEdit
       Left = 8
-      Height = 29
+      Height = 23
       Top = 8
       Width = 168
       TabOrder = 0
@@ -40,15 +40,15 @@ object Background: TBackground
       Top = 8
       Width = 99
       Caption = 'Começar'
-      OnClick = ButtonStartAllClick
       TabOrder = 1
+      OnClick = ButtonStartAllClick
     end
     object LabelScreenSize: TLabel
       AnchorSideTop.Side = asrBottom
       Left = 8
-      Height = 19
+      Height = 15
       Top = 48
-      Width = 232
+      Width = 205
       Caption = 'Comprimento da Tela do Monitor (cm)'
     end
     object FloatSpinEditScreen: TFloatSpinEdit
@@ -56,8 +56,8 @@ object Background: TBackground
       AnchorSideTop.Control = LabelScreenSize
       AnchorSideTop.Side = asrBottom
       Left = 8
-      Height = 29
-      Top = 67
+      Height = 23
+      Top = 63
       Width = 275
       DecimalPlaces = 3
       TabOrder = 2
@@ -65,9 +65,9 @@ object Background: TBackground
     end
     object CheckBoxCheatsMode: TCheckBox
       Left = 8
-      Height = 21
+      Height = 19
       Top = 112
-      Width = 113
+      Width = 94
       Caption = 'Modo de teste'
       TabOrder = 3
     end
@@ -85,7 +85,7 @@ object Background: TBackground
       ChildSizing.ShrinkVertical = crsScaleChilds
       ChildSizing.Layout = cclLeftToRightThenTopToBottom
       ChildSizing.ControlsPerLine = 1
-      ClientHeight = 131
+      ClientHeight = 132
       ClientWidth = 271
       ItemIndex = 0
       Items.Strings = (
@@ -99,9 +99,9 @@ object Background: TBackground
     end
     object LabelSquareSize: TLabel
       Left = 8
-      Height = 19
+      Height = 15
       Top = 320
-      Width = 169
+      Width = 150
       Caption = 'Tamanho do Quadrado (cm)'
     end
     object FloatSpinEditSquare: TFloatSpinEdit
@@ -109,8 +109,8 @@ object Background: TBackground
       AnchorSideTop.Control = LabelSquareSize
       AnchorSideTop.Side = asrBottom
       Left = 8
-      Height = 29
-      Top = 344
+      Height = 23
+      Top = 340
       Width = 275
       BorderSpacing.Top = 5
       Increment = 0.1
@@ -120,9 +120,9 @@ object Background: TBackground
     end
     object LabelSquareMove: TLabel
       Left = 8
-      Height = 19
+      Height = 15
       Top = 384
-      Width = 184
+      Width = 163
       Caption = 'Movimento do Quadrado (cm)'
     end
     object FloatSpinEditSquareMove: TFloatSpinEdit
@@ -130,8 +130,8 @@ object Background: TBackground
       AnchorSideTop.Control = LabelSquareMove
       AnchorSideTop.Side = asrBottom
       Left = 8
-      Height = 29
-      Top = 408
+      Height = 23
+      Top = 404
       Width = 275
       BorderSpacing.Top = 5
       Increment = 0.1
@@ -141,9 +141,9 @@ object Background: TBackground
     end
     object LabelTimeSize: TLabel
       Left = 8
-      Height = 19
+      Height = 15
       Top = 448
-      Width = 179
+      Width = 153
       Caption = 'Granularidade Temporal (ms)'
     end
     object SpinEditTimeSize: TSpinEdit
@@ -151,14 +151,56 @@ object Background: TBackground
       AnchorSideTop.Control = LabelTimeSize
       AnchorSideTop.Side = asrBottom
       Left = 8
-      Height = 29
-      Top = 472
+      Height = 23
+      Top = 468
       Width = 275
       BorderSpacing.Top = 5
       Increment = 25
       MaxValue = 1000
       TabOrder = 7
       Value = 100
+    end
+    object SpinEditGainVI: TSpinEdit
+      Left = 8
+      Height = 23
+      Top = 528
+      Width = 126
+      MaxValue = 10
+      MinValue = 1
+      TabOrder = 8
+      Value = 10
+    end
+    object LabelGainVI: TLabel
+      AnchorSideLeft.Control = SpinEditGainVI
+      AnchorSideBottom.Control = SpinEditGainVI
+      Left = 8
+      Height = 15
+      Top = 508
+      Width = 129
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Bottom = 5
+      Caption = 'Quantidade de Ganho VI'
+    end
+    object SpinEditLossVT: TSpinEdit
+      Left = 152
+      Height = 23
+      Top = 528
+      Width = 129
+      MaxValue = 10
+      MinValue = 1
+      TabOrder = 9
+      Value = 7
+    end
+    object LabelLossVT: TLabel
+      AnchorSideLeft.Control = SpinEditLossVT
+      AnchorSideBottom.Control = SpinEditLossVT
+      Left = 152
+      Height = 15
+      Top = 508
+      Width = 127
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Bottom = 5
+      Caption = 'Quantidade de Perda VT'
     end
   end
   object IniPropStorage: TIniPropStorage

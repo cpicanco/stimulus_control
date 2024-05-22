@@ -29,12 +29,16 @@ type
     FloatSpinEditSquare: TFloatSpinEdit;
     FloatSpinEditSquareMove: TFloatSpinEdit;
     IniPropStorage: TIniPropStorage;
+    LabelLossVT: TLabel;
+    LabelGainVI: TLabel;
     LabelScreenSize: TLabel;
     LabelSquareMove: TLabel;
     LabelSquareSize: TLabel;
     LabelTimeSize: TLabel;
     PanelConfigurations: TPanel;
     RadioGroupDesign1: TRadioGroup;
+    SpinEditLossVT: TSpinEdit;
+    SpinEditGainVI: TSpinEdit;
     SpinEditTimeSize: TSpinEdit;
     procedure ButtonStartAllClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -61,6 +65,7 @@ uses
    , SessionSimple
    , Experiments.Fabiane
    , Stimuli.Image.MovingSquare
+   , Controls.Trials.FreeOperantSquare
    , Cheats
    ;
 
@@ -84,6 +89,8 @@ begin
   SquareSize := FloatSpinEditSquare.Value;
   SquareMovementSize := FloatSpinEditSquareMove.Value;
   Granularity := SpinEditTimeSize.Value;
+  GainVI := SpinEditGainVI.Value;
+  LossVT := SpinEditLossVT.Value;
   ConfigurationFilename := Experiments.Fabiane.MakeConfigurationFile(LDesign, 0);
   LName := 'Experimento 1'+ #32 + LDesign;
   GSession.Play(LName, EditParticipant.Text);

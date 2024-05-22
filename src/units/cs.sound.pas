@@ -72,7 +72,7 @@ uses Session.Configuration.GlobalContainer, Forms;
 { TSerialSound }
 
 type
-  TDelays = 0..4;
+  TDelays = 0..8;
   TDelaysArray = array [TDelays] of integer;
   //TVTInterval = record
   //  Start : Cardinal;
@@ -186,7 +186,7 @@ procedure TSerialSound.LoadPresentationPattern;
 const
   //TimeUnitB3 : integer = 167000;
   //TimeUnitC1 : integer = 171500;
-  TimeUnitB3 : integer = 152000;
+  TimeUnitB3 : integer = 62000;
   TimeUnitC1 : integer = 172000;
 var
   i : integer;
@@ -239,7 +239,7 @@ begin
   //FLaught.OnStop := @StopLaugh;
 
   FToneHigh := TSound.Create(Self);
-  FToneHigh.LoadFromFile('tom-alto-20s.wav');
+  FToneHigh.LoadFromFile('tom-PS-11khz-30s.wav');
   //FToneHigh.OnStop := @StopToneHigh;
 
   FSerialTimer := TSerialTimer.Create(Self);
