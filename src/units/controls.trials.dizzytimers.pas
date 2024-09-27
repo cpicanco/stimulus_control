@@ -153,7 +153,7 @@ begin
     begin
       Parent:= TCustomControl(Owner);
       Loops := 0;
-      FullPath := RootMedia + FConsequence;
+      Filename := RootMedia + FConsequence;
       Play;
     end;
   LogEvent('C');

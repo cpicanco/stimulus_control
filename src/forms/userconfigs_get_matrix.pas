@@ -52,10 +52,11 @@ type
     lbl2: TLabel;
     lbl3: TLabel;
     lblLeftTop: TLabel;
-    MenuItem1: TMenuItem;
+    MenuItemLoadFromFile: TMenuItem;
     MenuItem2: TMenuItem;
     miSaveAsTXT: TMenuItem;
     miSaveAsTXTwithKeys: TMenuItem;
+    OpenDialog: TOpenDialog;
     PanelMain: TPanel;
     puMenu: TPopupMenu;
     SaveDialog1: TSaveDialog;
@@ -82,6 +83,7 @@ type
     procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure lbCoordenadasEndDock(Sender, Target: TObject; X, Y: Integer);
+    procedure MenuItemLoadFromFileClick(Sender: TObject);
   published
     procedure SaveAsTXT(Sender: TObject);
   private
@@ -112,6 +114,18 @@ begin
   lbCoordenates.Left := 195;
   lbCoordenates.Width := 150;
   lbCoordenates.Height := 127;
+end;
+
+procedure TFormMatrixConfig.MenuItemLoadFromFileClick(Sender: TObject);
+begin
+  if OpenDialog.Execute then
+  begin
+    btnClearAll.Click;
+    lbCoordenates.Items.LoadFromFile(OpenDialog.FileName);
+    FDrawCoordenates.FromItems(lbCoordenates.Items);
+    FCanDraw := False;
+    PanelMain.BringToFront;
+  end;
 end;
 
 procedure TFormMatrixConfig.edtRowChange(Sender: TObject);

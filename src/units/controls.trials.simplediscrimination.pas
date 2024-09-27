@@ -116,7 +116,7 @@ begin
         Key.SetBounds(R.Left, R.Top, R.Right, R.Bottom);
 
         s1 := CfgTrial.SList.Values[_Comp + IntToStr(I + 1) + _cStm] + #32;
-        Key.FullPath := RootMedia + ExtractDelimited(1,s1,[#32]);
+        Key.Filename := RootMedia + ExtractDelimited(1,s1,[#32]);
         Key.Loops:= StrToIntDef(ExtractDelimited(2,s1,[#32]),0);
         Key.Color := StrToIntDef(ExtractDelimited(3,s1,[#32]), $0000FF); //clRed
 

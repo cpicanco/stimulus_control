@@ -1253,7 +1253,7 @@ begin
   stAppTitle.Caption := 'Stimulus Control';
 
   stVersion.Caption := CurrentVersion(GetCommitTag(True));
-  if stVersion.Caption = '' then
+  if (stVersion.Caption = '') or (stVersion.Caption = 'v0.0.0.0-0-0000000') then
     stVersion.Caption := FileVersion;
 
   LGitCommit := GetCommitTag(False).Text;

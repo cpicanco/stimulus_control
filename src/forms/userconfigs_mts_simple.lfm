@@ -238,7 +238,7 @@ object FormMTS: TFormMTS
         Left = 157
         Height = 27
         Hint = 'Arquivo, Cor, Repetições, Tempo'
-        Top = 32
+        Top = 32s
         Width = 150
         Constraints.MinWidth = 150
         TabOrder = 1
@@ -249,7 +249,7 @@ object FormMTS: TFormMTS
   end
   object OpenDialog: TOpenDialog
     Title = 'Selecionar arquivo de estímulo'
-    Filter = 'Imagens (jpg, bmp, png)|*.png;*.jpg;*.bmp;*.PNG;*.JPG;*.BMP|Som (wav)|*.wav;*.WAV'
+    Filter = 'Imagens (jpg, bmp, png)|*.png;*.jpg;*.bmp;*.PNG;*.JPG;*.BMP|Som (wav)|*.wav;*.WAV|Video (avi, mp4, flv)|*.avi;*.AVI;*.mp4;.*.MP4;.*.flv;*.FLV'
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
     left = 51
     top = 184

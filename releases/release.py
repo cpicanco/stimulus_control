@@ -91,10 +91,10 @@ if __name__ == "__main__":
     ]
 
     targets = {
-        'stimulus_control_win10_32bits_nozmq': src_win32_nozmq_libraries,
+        # 'stimulus_control_win10_32bits_nozmq': src_win32_nozmq_libraries,
         'stimulus_control_win10_32bits': src_win32_libraries,
         'stimulus_control_win10_64bits': src_win64_libraries,
-        'stimulus_control_linux_64bits': src_linux64_libraries
+        # 'stimulus_control_linux_64bits': src_linux64_libraries
     }
 
     for build_name, libraries in targets.items(): 
