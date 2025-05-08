@@ -1,5 +1,5 @@
 object Background: TBackground
-  Left = 977
+  Left = 975
   Height = 736
   Top = 109
   Width = 933
@@ -10,7 +10,7 @@ object Background: TBackground
   Color = clWhite
   Position = poScreenCenter
   SessionProperties = 'CheckBoxCheatsMode.Checked;EditParticipant.Text;FloatSpinEditScreen.Value;FloatSpinEditSquare.Value;FloatSpinEditSquareMove.Value;PageControl1.ActivePage;RadioGroupBehaviour.ItemIndex;RadioGroupCondition.ItemIndex;RadioGroupDesign1.ItemIndex;RadioGroupDesign2.ItemIndex;RadioGroupDesign3.ItemIndex;RadioGroupDesign4.ItemIndex;SpinEditOperandumDelay.Value;SpinEditSessionBlocs.Value;SpinEditTimeSize.Value;FloatSpinEditSquareExp3.Value'
-  LCLVersion = '3.99.0.0'
+  LCLVersion = '4.99.0.0'
   WindowState = wsFullScreen
   OnCreate = FormCreate
   object PanelConfigurations: TPanel
