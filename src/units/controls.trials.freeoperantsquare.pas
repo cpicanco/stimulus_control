@@ -142,7 +142,11 @@ begin
       end;
     'B1': FTrialType := ttB1;
     'B2': FTrialType := ttB2;
-    'B3': FTrialType := ttB3;
+    'B3':
+      begin
+        FTrialType := ttB3;
+        LDuration := 600000;
+      end;
     'C1': FTrialType := ttC1;
   end;
 
