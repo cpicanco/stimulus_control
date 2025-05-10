@@ -72,7 +72,7 @@ uses Session.Configuration.GlobalContainer, Forms;
 { TSerialSound }
 
 type
-  TDelays = 0..8;
+  TDelays = 0..5;
   TDelaysArray = array [TDelays] of integer;
   //TVTInterval = record
   //  Start : Cardinal;
