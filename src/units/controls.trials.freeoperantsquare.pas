@@ -291,7 +291,8 @@ end;
 procedure TFreeOperantSquareTrial.ConditionalStimulusStarted(Sender: TObject);
 begin
   case FTrialType of
-    ttB3, ttC1 : begin
+    //ttB3,
+    ttC1 : begin
       Parent.Color := clGray;
       LogEvent('TelaCinza.Inicio');
     end;
@@ -326,7 +327,7 @@ end;
 procedure TFreeOperantSquareTrial.ConditionalStimulusStoppedHighTone(Sender: TObject);
 begin
   Parent.Color := clGreen;
-  LogEvent('TelaCinza.Fim');
+  //LogEvent('TelaCinza.Fim');
   LoosePoints;
   LogEvent('TomAlto.Fim' + #9 + CounterManager.SessionPointsTopRight.ToString);
 end;
