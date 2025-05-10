@@ -19,7 +19,7 @@ uses
 type
 
 
-  TPresentationPattern = (ppNone, ppB3, ppC1);
+  TPresentationPattern = (ppNone, ppB3, ppB4, ppC1);
 
   { TSerialSound }
 
@@ -112,6 +112,9 @@ begin
   if FPresentationPattern = ppB3 then begin
     FToneHigh.Play;
   end;
+  if FPresentationPattern = ppB4 then begin
+    FToneHigh.Play;
+  end;
 end;
 
 //procedure TSerialSound.SetLaught(AValue: TSound);
@@ -194,6 +197,26 @@ var
 begin
   case FPresentationPattern of
     ppB3 : begin
+      for i := Low(TDelays) to High(TDelays) do begin
+        TimerItem.Interval := TimeUnitB3;
+        TimerItem.OnTimerEvent := @StartGrayScreen;
+        FSerialTimer.Append(TimerItem);
+
+        TimerItem.Interval := Round(8000);
+        TimerItem.OnTimerEvent := @Stop8Seconds;
+        FSerialTimer.Append(TimerItem);
+
+        //TimerItem.Interval := Round(FLaught.Duration*1000);
+        //TimerItem.OnTimerEvent := @StopLaugh;
+        //FSerialTimer.Append(TimerItem);
+
+        TimerItem.Interval := Round(FToneHigh.Duration*1000);
+        TimerItem.OnTimerEvent := @StopToneHigh;
+        FSerialTimer.Append(TimerItem);
+      end;
+    end;
+
+    ppB4 : begin
       for i := Low(TDelays) to High(TDelays) do begin
         TimerItem.Interval := TimeUnitB3;
         TimerItem.OnTimerEvent := @StartGrayScreen;

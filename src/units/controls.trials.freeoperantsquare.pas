@@ -23,7 +23,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls
 
 type
 
-  TTrialType = (ttA1, ttA2, ttB1, ttB2, ttB3, ttC1);
+  TTrialType = (ttA1, ttA2, ttB1, ttB2, ttB3, ttB4, ttC1);
 
   TReportData = record
     CBegin : Extended;
@@ -147,6 +147,11 @@ begin
         FTrialType := ttB3;
         LDuration := 600000;
       end;
+    'B4':
+      begin
+        FTrialType := ttB4;
+        LDuration := 600000;
+      end;
     'C1': FTrialType := ttC1;
   end;
 
@@ -162,6 +167,11 @@ begin
     end;
 
     ttA2, ttB3, ttC1 : begin
+      FStimulus.Schedule.Load(VI);
+      FStimulus.Schedule.UseRegisNetoIntervals(False);
+    end;
+
+    ttB4 : begin
       FStimulus.Schedule.Load(VI);
       FStimulus.Schedule.UseRegisNetoIntervals(False);
     end;
@@ -187,10 +197,19 @@ begin
       SerialSound.OnStop8Seconds := @ConditionalStimulusStopped8Seconds;
       SerialSound.OnStopToneHigh := @ConditionalStimulusStoppedHighTone;
     end;
+
+    ttB4 :  begin
+      SerialSound.OnStart := @ConditionalStimulusStarted;
+      //SerialSound.OnStopTone := @ConditionalStimulusStopped;
+      //SerialSound.OnStopLaught := @CustomConsequenceStop;
+      SerialSound.OnStop8Seconds := @ConditionalStimulusStopped8Seconds;
+      SerialSound.OnStopToneHigh := @ConditionalStimulusStoppedHighTone;
+    end;
   end;
 
   case FTrialType of
     ttB3 : SerialSound.PresentationPattern := ppB3;
+    ttB4 : SerialSound.PresentationPattern := ppB4;
     ttC1 : SerialSound.PresentationPattern := ppC1;
     else {do nothing};
   end;
@@ -220,6 +239,7 @@ begin
   FSchedule.Start;
   case FTrialType of
     ttB3, ttC1 : SerialSound.StartPlayingFromPattern;
+    ttB4 : SerialSound.StartPlayingFromPattern;
     else { do nothing };
   end;
   FReportData.CBegin:=LogEvent('OperanteLivre.Inicio');
@@ -276,6 +296,9 @@ var
 begin
   case FTrialType of
     ttB3 : begin
+      LPoints := CounterManager.SessionPointsTopRight - LossVT;
+    end;
+    ttB4 : begin
       LPoints := CounterManager.SessionPointsTopRight - LossVT;
     end;
     else begin
@@ -337,6 +360,9 @@ procedure TFreeOperantSquareTrial.ConditionalStimulusStopped8Seconds(
 begin
   case FTrialType of
     ttB3 : begin
+      LogEvent('TomAlto30s.Inicio');
+    end;
+    ttB4 : begin
       LogEvent('TomAlto30s.Inicio');
     end;
     ttC1 : begin
