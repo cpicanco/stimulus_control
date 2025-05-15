@@ -78,7 +78,7 @@ type
 
 var
   GainVI: integer = 10;
-  LossVT: integer = 7;
+  LossVT: integer = 10;
 
 implementation
 
@@ -360,10 +360,10 @@ procedure TFreeOperantSquareTrial.ConditionalStimulusStopped8Seconds(
 begin
   case FTrialType of
     ttB3 : begin
-      LogEvent('TomAlto30s.Inicio');
+      LogEvent('TomAlto20s.Inicio');
     end;
     ttB4 : begin
-      LogEvent('TomAlto30s.Inicio');
+      LogEvent('TomAlto20s.Inicio');
     end;
     ttC1 : begin
       LogEvent('TelaCinza.Fim');
