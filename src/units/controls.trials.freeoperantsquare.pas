@@ -314,12 +314,13 @@ end;
 procedure TFreeOperantSquareTrial.ConditionalStimulusStarted(Sender: TObject);
 begin
   case FTrialType of
-    //ttB3,
-    ttC1 : begin
-      Parent.Color := clGray;
-      LogEvent('TelaCinza.Inicio');
+    ttB3: begin
+      { do nothing }
     end;
-    else begin
+    ttB4: begin
+      { do nothing }
+    end;
+    ttC1: begin
       { do nothing }
     end;
   end;
@@ -365,10 +366,10 @@ begin
     ttB4 : begin
       LogEvent('TomAlto20s.Inicio');
     end;
-    ttC1 : begin
-      LogEvent('TelaCinza.Fim');
-      Parent.Color := clGreen;
-    end
+    //ttC1 : begin
+    //  LogEvent('TelaCinza.Fim');
+    //  Parent.Color := clGreen;
+    //end
     else { do nothing };
   end;
 end;

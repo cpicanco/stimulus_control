@@ -73,7 +73,7 @@ uses Session.Configuration.GlobalContainer, Forms;
 { TSerialSound }
 
 type
-  TDelays = 0..5;
+  TDelays = 0..8;
   TDelaysArray = array [TDelays] of integer;
   //TVTInterval = record
   //  Start : Cardinal;
@@ -196,7 +196,7 @@ end;
 
 procedure TSerialSound.LoadPresentationPattern;
 const
-  TimeUnitC1 = 172000;
+  //TimeUnitC1 = 172000;
   HighToneDuration = 20000;
 var
   i : Integer;
@@ -253,17 +253,17 @@ begin
       end;
     end;
 
-    ppC1 : begin
-      for i := Low(TDelays) to High(TDelays) do begin
-        TimerItem.Interval := TimeUnitC1;
-        TimerItem.OnTimerEvent := @StartGrayScreen;
-        FSerialTimer.Append(TimerItem);
-
-        TimerItem.Interval := Round(8000);
-        TimerItem.OnTimerEvent := @Stop8Seconds;
-        FSerialTimer.Append(TimerItem);
-      end;
-    end;
+    //ppC1 : begin
+    //  for i := Low(TDelays) to High(TDelays) do begin
+    //    TimerItem.Interval := TimeUnitC1;
+    //    TimerItem.OnTimerEvent := @StartGrayScreen;
+    //    FSerialTimer.Append(TimerItem);
+    //
+    //    TimerItem.Interval := Round(8000);
+    //    TimerItem.OnTimerEvent := @Stop8Seconds;
+    //    FSerialTimer.Append(TimerItem);
+    //  end;
+    //end;
   end;
 end;
 
