@@ -19,13 +19,14 @@ uses
   Classes, SysUtils
   , CastleSoundEngine
   , Stimuli.Image
+  , Audio.CastleSound
   ;
 
 type
 
   TConsequence = record
     Visual : TStimulusFigure;
-    Auditive : TSoundBuffer;
+    Auditive : TSound;
     //Interval : integer;
   end;
 
@@ -52,9 +53,11 @@ var
   AudioFilesHit : TStringArray;
   AudioFilesMiss : TStringArray;
   VisualsHit : array of TStimulusFigure;
-  AudiblesHit : array of TSoundBuffer;
+  //AudiblesHit : array of TSoundBuffer;
   VisualsMiss : array of TStimulusFigure;
-  AudiblesMiss : array of TSoundBuffer;
+  //AudiblesMiss : array of TSoundBuffer;
+  AudiblesHit : array of TSound;
+  AudiblesMiss : array of TSound;
 
 function NextConsequence(AHit : Boolean) : TConsequence;
 begin
@@ -79,7 +82,10 @@ end;
 procedure Play(AConsequence: TConsequence);
 begin
   AConsequence.Visual.Start;
-  SoundEngine.PlaySound(AConsequence.Auditive);
+  //SoundEngine.PlayBuffer(AConsequence.Auditive);
+  //AConsequence.Auditive.Play;
+  if Assigned(AConsequence.Auditive) then
+     AConsequence.Auditive.Play;
 end;
 
 procedure LoadBuffers(ImagesHit, ImagesMiss,
@@ -113,13 +119,17 @@ begin
   SetLength(AudiblesHit, Length(AudiosHit));
   for i := Low(AudiosHit) to High(AudiosHit) do
   begin
-    AudiblesHit[i] := SoundEngine.LoadBuffer(AudiosHit[i]);
+    //AudiblesHit[i] := SoundEngine.LoadBuffer(AudiosHit[i]);
+    AudiblesHit[i] := TSound.Create(nil);
+    AudiblesHit[i].LoadFromFile(AudiosHit[i]);
   end;
 
   SetLength(AudiblesMiss, Length(AudiosMiss));
   for i := Low(AudiosMiss) to High(AudiosMiss) do
   begin
-    AudiblesMiss[i] := SoundEngine.LoadBuffer(AudiosMiss[i]);
+    //AudiblesMiss[i] := SoundEngine.LoadBuffer(AudiosMiss[i]);
+    AudiblesMiss[i] := TSound.Create(nil);
+    AudiblesMiss[i].LoadFromFile(AudiosMiss[i]);
   end;
 
   LParameters.Free;

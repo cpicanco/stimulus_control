@@ -14,12 +14,12 @@ unit CS.Sound;
 interface
 
 uses
-  Classes, SysUtils, Audio.CastleSound, SerialTimer;
+  Classes, SysUtils, Audio.CastleSound, SerialTimer, Dialogs, DateUtils;
 
 type
 
 
-  TPresentationPattern = (ppNone, ppB3, ppC1);
+  TPresentationPattern = (ppNone, ppB3, ppB4, ppC1);
 
   { TSerialSound }
 
@@ -36,6 +36,7 @@ type
     //FOnStopLaught: TNotifyEvent;
     FOnStopToneHigh: TNotifyEvent;
     //procedure SetLaught(AValue: TSound);
+    procedure StartToneHigh(Sender: TObject);
     procedure SetOnStart(AValue: TNotifyEvent);
     procedure SetOnStop8Seconds(AValue: TNotifyEvent);
     //procedure SetOnStopLaught(AValue: TNotifyEvent);
@@ -112,6 +113,9 @@ begin
   if FPresentationPattern = ppB3 then begin
     FToneHigh.Play;
   end;
+  if FPresentationPattern = ppB4 then begin
+    FToneHigh.Play;
+  end;
 end;
 
 //procedure TSerialSound.SetLaught(AValue: TSound);
@@ -182,48 +186,84 @@ begin
     OnStart(Self);
 end;
 
+procedure TSerialSound.StartToneHigh(Sender: TObject);
+begin
+  FToneHigh.Play;
+
+  if Assigned(OnStop8Seconds) then
+    OnStop8Seconds(Self);
+end;
+
 procedure TSerialSound.LoadPresentationPattern;
 const
-  //TimeUnitB3 : integer = 167000;
-  //TimeUnitC1 : integer = 171500;
-  TimeUnitB3 : integer = 62000;
-  TimeUnitC1 : integer = 172000;
+  //TimeUnitC1 = 172000;
+  HighToneDuration = 20000;
 var
-  i : integer;
+  i : Integer;
   TimerItem  : TTimerItem;
+  AbsoluteTimes: array[0..4] of Integer;
+  LastTime: Integer;
 begin
   case FPresentationPattern of
     ppB3 : begin
-      for i := Low(TDelays) to High(TDelays) do begin
-        TimerItem.Interval := TimeUnitB3;
-        TimerItem.OnTimerEvent := @StartGrayScreen;
+      AbsoluteTimes[0] := 150000;
+      AbsoluteTimes[1] := 230000;
+      AbsoluteTimes[2] := 290000;
+      AbsoluteTimes[3] := 430000;
+      AbsoluteTimes[4] := 490000;
+
+      LastTime := 0;
+
+      for i := Low(AbsoluteTimes) to High(AbsoluteTimes) do begin
+        TimerItem.Interval := AbsoluteTimes[i] - LastTime;
+        TimerItem.OnTimerEvent := @StartToneHigh;
         FSerialTimer.Append(TimerItem);
 
-        TimerItem.Interval := Round(8000);
-        TimerItem.OnTimerEvent := @Stop8Seconds;
-        FSerialTimer.Append(TimerItem);
+        LastTime := AbsoluteTimes[i];
 
-        //TimerItem.Interval := Round(FLaught.Duration*1000);
-        //TimerItem.OnTimerEvent := @StopLaugh;
-        //FSerialTimer.Append(TimerItem);
-
-        TimerItem.Interval := Round(FToneHigh.Duration*1000);
+        TimerItem.Interval := HighToneDuration;
         TimerItem.OnTimerEvent := @StopToneHigh;
         FSerialTimer.Append(TimerItem);
+
+        LastTime := LastTime + HighToneDuration;
       end;
     end;
 
-    ppC1 : begin
-      for i := Low(TDelays) to High(TDelays) do begin
-        TimerItem.Interval := TimeUnitC1;
-        TimerItem.OnTimerEvent := @StartGrayScreen;
+    ppB4 : begin
+      AbsoluteTimes[0] := 20000;
+      AbsoluteTimes[1] := 95000;
+      AbsoluteTimes[2] := 210000;
+      AbsoluteTimes[3] := 360000;
+      AbsoluteTimes[4] := 530000;
+
+      LastTime := 0;
+
+      for i := Low(AbsoluteTimes) to High(AbsoluteTimes) do begin
+        TimerItem.Interval := AbsoluteTimes[i] - LastTime;
+        TimerItem.OnTimerEvent := @StartToneHigh;
         FSerialTimer.Append(TimerItem);
 
-        TimerItem.Interval := Round(8000);
-        TimerItem.OnTimerEvent := @Stop8Seconds;
+        LastTime := AbsoluteTimes[i];
+
+        TimerItem.Interval := HighToneDuration;
+        TimerItem.OnTimerEvent := @StopToneHigh;
         FSerialTimer.Append(TimerItem);
+
+        LastTime := LastTime + HighToneDuration;
       end;
     end;
+
+    //ppC1 : begin
+    //  for i := Low(TDelays) to High(TDelays) do begin
+    //    TimerItem.Interval := TimeUnitC1;
+    //    TimerItem.OnTimerEvent := @StartGrayScreen;
+    //    FSerialTimer.Append(TimerItem);
+    //
+    //    TimerItem.Interval := Round(8000);
+    //    TimerItem.OnTimerEvent := @Stop8Seconds;
+    //    FSerialTimer.Append(TimerItem);
+    //  end;
+    //end;
   end;
 end;
 
@@ -239,7 +279,7 @@ begin
   //FLaught.OnStop := @StopLaugh;
 
   FToneHigh := TSound.Create(Self);
-  FToneHigh.LoadFromFile('tom-PS-11khz-30s.wav');
+  FToneHigh.LoadFromFile('tom-alto-20s.wav');
   //FToneHigh.OnStop := @StopToneHigh;
 
   FSerialTimer := TSerialTimer.Create(Self);

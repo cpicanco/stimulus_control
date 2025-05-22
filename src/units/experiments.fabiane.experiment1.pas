@@ -15,14 +15,15 @@ uses
   FileMethods, Constants;
 
 type
-  TCondition = (A1, A2, B1, B2, B3, C1);
+  TCondition = (A1, A2, B1, B2, B3, B4, C1);
 
 const
   A1Name = 'Linha de Base (Aquisição)';
   A2Name = 'Linha de Base (Fortalecimento)';
   B1Name = 'Grupo 1';
   B2Name = 'Grupo 2';
-  B3Name = 'Supressão Condicionada';
+  B3Name = 'Supressão Condicionada 1';
+  B4Name = 'Supressão Condicionada 2';
   C1Name = 'Regra';
 
 var
@@ -74,6 +75,11 @@ begin
   WriteCondition;
 end;
 
+procedure WriteConditionB4;
+begin
+  WriteCondition;
+end;
+
 procedure WriteConditionC1;
 begin
   WriteCondition;
@@ -90,6 +96,7 @@ procedure WriteToConfigurationFile(ADesign : string);
       B1 : WriteConditionB1;
       B2 : WriteConditionB2;
       B3 : WriteConditionB3;
+      B4 : WriteConditionB4;
       C1 : WriteConditionC1;
     end;
   end;
@@ -101,6 +108,7 @@ begin
     B1Name : Condition := B1;
     B2Name : Condition := B2;
     B3Name : Condition := B3;
+    B4Name : Condition := B4;
     C1Name : Condition := C1;
     else
       raise Exception.Create('Unknown condition');

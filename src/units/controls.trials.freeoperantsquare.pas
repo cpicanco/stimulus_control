@@ -23,7 +23,7 @@ uses LCLIntf, LCLType, Controls, Classes, SysUtils, ExtCtrls
 
 type
 
-  TTrialType = (ttA1, ttA2, ttB1, ttB2, ttB3, ttC1);
+  TTrialType = (ttA1, ttA2, ttB1, ttB2, ttB3, ttB4, ttC1);
 
   TReportData = record
     CBegin : Extended;
@@ -78,7 +78,7 @@ type
 
 var
   GainVI: integer = 10;
-  LossVT: integer = 7;
+  LossVT: integer = 10;
 
 implementation
 
@@ -142,7 +142,16 @@ begin
       end;
     'B1': FTrialType := ttB1;
     'B2': FTrialType := ttB2;
-    'B3': FTrialType := ttB3;
+    'B3':
+      begin
+        FTrialType := ttB3;
+        LDuration := 600000;
+      end;
+    'B4':
+      begin
+        FTrialType := ttB4;
+        LDuration := 600000;
+      end;
     'C1': FTrialType := ttC1;
   end;
 
@@ -158,6 +167,11 @@ begin
     end;
 
     ttA2, ttB3, ttC1 : begin
+      FStimulus.Schedule.Load(VI);
+      FStimulus.Schedule.UseRegisNetoIntervals(False);
+    end;
+
+    ttB4 : begin
       FStimulus.Schedule.Load(VI);
       FStimulus.Schedule.UseRegisNetoIntervals(False);
     end;
@@ -183,10 +197,19 @@ begin
       SerialSound.OnStop8Seconds := @ConditionalStimulusStopped8Seconds;
       SerialSound.OnStopToneHigh := @ConditionalStimulusStoppedHighTone;
     end;
+
+    ttB4 :  begin
+      SerialSound.OnStart := @ConditionalStimulusStarted;
+      //SerialSound.OnStopTone := @ConditionalStimulusStopped;
+      //SerialSound.OnStopLaught := @CustomConsequenceStop;
+      SerialSound.OnStop8Seconds := @ConditionalStimulusStopped8Seconds;
+      SerialSound.OnStopToneHigh := @ConditionalStimulusStoppedHighTone;
+    end;
   end;
 
   case FTrialType of
     ttB3 : SerialSound.PresentationPattern := ppB3;
+    ttB4 : SerialSound.PresentationPattern := ppB4;
     ttC1 : SerialSound.PresentationPattern := ppC1;
     else {do nothing};
   end;
@@ -216,6 +239,7 @@ begin
   FSchedule.Start;
   case FTrialType of
     ttB3, ttC1 : SerialSound.StartPlayingFromPattern;
+    ttB4 : SerialSound.StartPlayingFromPattern;
     else { do nothing };
   end;
   FReportData.CBegin:=LogEvent('OperanteLivre.Inicio');
@@ -274,6 +298,9 @@ begin
     ttB3 : begin
       LPoints := CounterManager.SessionPointsTopRight - LossVT;
     end;
+    ttB4 : begin
+      LPoints := CounterManager.SessionPointsTopRight - LossVT;
+    end;
     else begin
       LPoints := CounterManager.SessionPointsTopRight - 13;
     end;
@@ -287,11 +314,13 @@ end;
 procedure TFreeOperantSquareTrial.ConditionalStimulusStarted(Sender: TObject);
 begin
   case FTrialType of
-    ttB3, ttC1 : begin
-      Parent.Color := clGray;
-      LogEvent('TelaCinza.Inicio');
+    ttB3: begin
+      { do nothing }
     end;
-    else begin
+    ttB4: begin
+      { do nothing }
+    end;
+    ttC1: begin
       { do nothing }
     end;
   end;
@@ -322,7 +351,7 @@ end;
 procedure TFreeOperantSquareTrial.ConditionalStimulusStoppedHighTone(Sender: TObject);
 begin
   Parent.Color := clGreen;
-  LogEvent('TelaCinza.Fim');
+  //LogEvent('TelaCinza.Fim');
   LoosePoints;
   LogEvent('TomAlto.Fim' + #9 + CounterManager.SessionPointsTopRight.ToString);
 end;
@@ -332,12 +361,15 @@ procedure TFreeOperantSquareTrial.ConditionalStimulusStopped8Seconds(
 begin
   case FTrialType of
     ttB3 : begin
-      LogEvent('TomAlto30s.Inicio');
+      LogEvent('TomAlto20s.Inicio');
     end;
-    ttC1 : begin
-      LogEvent('TelaCinza.Fim');
-      Parent.Color := clGreen;
-    end
+    ttB4 : begin
+      LogEvent('TomAlto20s.Inicio');
+    end;
+    //ttC1 : begin
+    //  LogEvent('TelaCinza.Fim');
+    //  Parent.Color := clGreen;
+    //end
     else { do nothing };
   end;
 end;
